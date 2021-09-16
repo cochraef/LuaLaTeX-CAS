@@ -155,6 +155,5 @@ function Polynomial:divide(b)
     return Polynomial(q), r
 end
 
-
 -- Creates construction method
 Polynomial = setmetatable(Polynomial, { __call = Polynomial.new, __index = nil})
