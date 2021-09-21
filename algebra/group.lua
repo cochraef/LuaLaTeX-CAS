@@ -2,7 +2,7 @@
 -- Groups have the following static variables:
 --      identity - the identity element of the Group
 -- Groups have the following relations to other classes:
---      Groups are subinterfaces to BinaryOperations
+--      Groups extend BinaryOperations
 Group = {}
 __Group = {}
 
@@ -21,7 +21,7 @@ end
 
 -- Returns the type of this object
 function Group:getType()
-    return "Group"
+    return Group
 end
 
 -- Returns whether the group is associative

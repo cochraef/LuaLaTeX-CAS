@@ -12,12 +12,12 @@ Ring = {}
 --------------------------
 
 -- Returns true if this ring is a subring of another ring; false otherwise
-function Ring:subringof(other)
-    if self == other then
+function Ring.subringof(this, other)
+    if this == other then
         return true
     end
     for _, subring in ipairs(other.subrings()) do
-        if self:subringof(subring) then
+        if this.subringof(this, subring) then
             return true
         end
     end
@@ -30,7 +30,7 @@ end
 
 -- Returns the type of this object
 function Ring:getType()
-    return "Ring"
+    return Ring
 end
 
 -- Returns whether the ring is commutative
@@ -55,11 +55,11 @@ __RingOperations.__add = function(a, b)
     if aring == bring then
         return a:add(b)
     end
-    if aring.subringof(bring) then
+    if aring.subringof(aring, bring) then
         return a:inRing(bring):add(b)
     end
-    if bring.subringof(aring) then
-        return b:inRing(aring):add(a)
+    if bring.subringof(bring, aring) then
+        return a:add(b:inRing(aring))
     end
 
     error("Attempted to add two elements of different rings")
@@ -70,11 +70,11 @@ __RingOperations.__sub = function(a, b)
     if aring == bring then
         return a:sub(b)
     end
-    if aring.subringof(bring) then
+    if aring.subringof(aring, bring) then
         return a:inRing(bring):sub(b)
     end
-    if bring.subringof(aring) then
-        return b:inRing(aring):sub(a)
+    if bring.subringof(bring, aring) then
+        return a:sub(b:inRing(aring))
     end
 
     error("Attempted to subtract two elements of different rings")
@@ -85,18 +85,18 @@ __RingOperations.__mul = function(a, b)
     if aring == bring then
         return a:mul(b)
     end
-    if aring.subringof(bring) then
+    if aring.subringof(aring, bring) then
         return a:inRing(bring):mul(b)
     end
-    if bring.subringof(aring) then
-        return b:inRing(aring):mul(a)
+    if bring.subringof(bring, aring) then
+        return a:mul(b:inRing(aring))
     end
 
     error("Attempted to multiply two elements of different rings")
 end
 
 __RingOperations.__pow = function(a, n)
-    if n.getType() ~= "Integer" then
+    if n.getType() ~= Integer then
         error("Unsupported domain for exponentiation")
     end
     return a:pow(n)
@@ -128,11 +128,11 @@ __RingOperations.__eq = function(a, b)
     if aring == bring then
         return a:eq(b)
     end
-    if aring.subringof(bring) then
+    if aring.subringof(aring, bring) then
         return a:inRing(bring):eq(b)
     end
-    if bring.subringof(aring) then
-        return b:inRing(aring):eq(a)
+    if bring.subringof(bring, aring) then
+        return a:eq(b:inRing(aring))
     end
 
     error("Attempted to compare two elements of different rings")
@@ -141,13 +141,13 @@ end
 __RingOperations.__lt = function(a, b)
     local aring, bring = a:getType(), b:getType()
     if aring == bring then
-        return a:eq(b)
+        return a:lt(b)
     end
-    if aring.subringof(bring) then
+    if aring.subringof(aring, bring) then
         return a:inRing(bring):lt(b)
     end
-    if bring.subringof(aring) then
-        return b:inRing(aring):lt(a)
+    if bring.subringof(bring, aring) then
+        return a:lt(b:inRing(aring))
     end
 
     error("Attempted to compare two elements of different rings")
@@ -158,11 +158,11 @@ __RingOperations.__le = function(a, b)
     if aring == bring then
         return a:eq(b)
     end
-    if aring.subringof(bring) then
+    if aring.subringof(aring, bring) then
         return a:inRing(bring):le(b)
     end
-    if bring.subringof(aring) then
-        return b:inRing(aring):le(a)
+    if bring.subringof(bring, aring) then
+        return a:le(b:inRing(aring))
     end
 
     error("Attempted to compare two elements of different rings")

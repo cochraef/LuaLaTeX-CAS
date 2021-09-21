@@ -46,8 +46,12 @@ function PolynomialRing:new(coefficients, symbol)
 end
 
 -- Returns the type of this object
+-- has a field for the type of ring used to construct this ring, like type parameterization in Java only worse
 function PolynomialRing:getType()
-    return "PolynomialRing<"..self.ring:getType()..">"
+    local t = {PolynomialRing, self.ring}
+    return setmetatable(t, {__index = PolynomialRing, __eq = function(a, b)
+        return a[2] == b[2]
+    end})
 end
 
 -- Returns whether the ring is commutative

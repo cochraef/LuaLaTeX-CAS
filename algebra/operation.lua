@@ -12,5 +12,5 @@ Operation = {}
 
 -- Returns the type of an object
 function Operation:getType()
-    return "Operation"
+    return Operation
 end

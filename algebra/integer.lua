@@ -1,15 +1,19 @@
-local bn = require("lib.nums.bn")
-require("lib.table.copy")
-
 -- Represents an element of the ring of integers
 -- Integers have the following instance variables:
 --      internal - the internal representation of the integer
+-- Integers have the following relationshipt to other classes:
+--      Integers implement Rings
 Integer = {}
 __Integer = {}
 
 --------------------------
 -- Static functionality --
 --------------------------
+
+-- Returns the subrings of this ring
+function Integer.subrings()
+    return {}
+end
 
 -- Method for computing the gcd of two integers using Euclid's algorithm
 function Integer.gcd(a, b)
@@ -53,12 +57,14 @@ function Integer:new(n)
         return tostring(a.internal)
     end
     mt.__div = function(a, b)   -- Constructor for a rational number disguised as division
-        return Rational(a, b)
+        if(b.getType() == Integer) then
+            return Rational(a, b)
+        end
+        return __FieldOperations.__div(a, b)
     end
     o = setmetatable(o, mt)
 
-
-    n = n or "0"
+    n = n or 0
     o.internal = bn(n)
 
     o.addgroup = Group(function(a, b)
@@ -86,17 +92,21 @@ end
 
 -- Returns the type of this object
 function Integer:getType()
-    return "Integer"
+    return Integer
 end
 
--- Returns the subrings of this ring
-function Integer:getSubrings()
-    return {}
+-- Explicitly converts this element to an element of another ring
+function Integer:inRing(ring)
+    if(ring == Rational) then
+        return Rational(self, Integer(1), true)
+    end
+
+    error("Unable to convert element to proper ring.")
 end
 
 -- Division with remainder in integers
 function Integer:divremainder(b)
-    return self.internal // b.internal, self.internal % b.internal
+    return Integer(self.internal // b.internal), Integer(self.internal % b.internal)
 end
 
 function Integer:eq(b)
@@ -118,3 +128,9 @@ end
 __Integer.__index = Ring
 __Integer.__call = Integer.new
 Integer = setmetatable(Integer, __Integer)
+
+----------------------
+-- Static constants --
+----------------------
+
+Integer.zero = Integer(0)

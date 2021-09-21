@@ -4,7 +4,7 @@
 --      set - The singular set over which this BinaryOperation operates
 --      pow - The exponentiation operation this binary operation uses
 -- BinaryOperations have the following relations to other classes:
---      BinaryOperations are subinterfaces to Operations
+--      BinaryOperations implement Operations
 BinaryOperation = {}
 __BinaryOperation = {}
 
@@ -38,7 +38,7 @@ end
 
 -- Returns the type of this object
 function BinaryOperation:getType()
-    return "BinaryOperation"
+    return BinaryOperation
 end
 
 -- Returns whether the binary operation is associative
