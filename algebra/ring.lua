@@ -1,11 +1,8 @@
--- Represents a ring with unity
--- Rings have the following static variables:
---      zero - the identity element of the additive group of this ring
---      ring - the identity element of the multiplicative group of this ring
--- Rings have the following instance variables:
---      addgroup - the additive group of this ring
---      mulgroup - the multiplicative operation of this ring
+-- Interface for an element of a ring with unity
+-- Rings have the following relation to other classes:
+--      Rings extend AtomicExpresssions
 Ring = {}
+__Ring = {}
 
 --------------------------
 -- Static functionality --
@@ -16,7 +13,7 @@ function Ring.subringof(this, other)
     if this == other then
         return true
     end
-    for _, subring in ipairs(other.subrings()) do
+    for _, subring in ipairs(other.subrings(other)) do
         if this.subringof(this, subring) then
             return true
         end
@@ -29,13 +26,64 @@ end
 ----------------------------
 
 -- Returns the type of this object
-function Ring:getType()
-    return Ring
+function Ring:getRing()
+    error("Called unimplemented method : getRing()")
 end
 
 -- Returns whether the ring is commutative
 function Ring:isCommutative()
-    return nil
+    error("Called unimplemented method : isCommutative()")
+end
+
+function Ring:add(b)
+    error("Called unimplemented method : add()")
+end
+
+function Ring:sub(b)
+    return(self:add(b:neg()))
+end
+
+function Ring:neg()
+    error("Called unimplemented method : neg()")
+end
+
+function Ring:mul(b)
+    error("Called unimplemented method : mul()")
+end
+
+-- Ring exponentiation based on the definition. Specific rings may implement more efficient methods.
+function Ring:pow(n)
+    if(n < Integer(0)) then
+        error("Execution error: Negative exponentiation is undefined over general rings")
+    end
+    local k = Integer(0)
+    local b = self.getRing().one(self)
+    while k < n do
+        b = b.mul(self)
+        k = k + Integer(1)
+    end
+    return b
+end
+
+function Ring:eq(b)
+    error("Execution error: Ring does not have a total order")
+end
+
+function Ring:lt(b)
+    error("Execution error: Ring does not have a total order")
+end
+
+function Ring:le(b)
+    error("Execution error: Ring does not have a total order")
+end
+
+-- The additive and multiplicative identities of the ring
+function Ring:zero()
+    error("Called unimplemented method : zero()")
+end
+
+function Ring:one()
+    error("Called unimplemented method : one()")
 end
 
 --------------------------
@@ -47,11 +95,11 @@ __RingOperations = {}
 -- then passing the arguments to the function in a specific ring
 
 __RingOperations.__unm = function(a)
-    return a:inv()
+    return a:neg()
 end
 
 __RingOperations.__add = function(a, b)
-    local aring, bring = a:getType(), b:getType()
+    local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:add(b)
     end
@@ -66,7 +114,7 @@ __RingOperations.__add = function(a, b)
 end
 
 __RingOperations.__sub = function(a, b)
-    local aring, bring = a:getType(), b:getType()
+    local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:sub(b)
     end
@@ -81,7 +129,7 @@ __RingOperations.__sub = function(a, b)
 end
 
 __RingOperations.__mul = function(a, b)
-    local aring, bring = a:getType(), b:getType()
+    local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:mul(b)
     end
@@ -96,35 +144,16 @@ __RingOperations.__mul = function(a, b)
 end
 
 __RingOperations.__pow = function(a, n)
-    if n.getType() ~= Integer then
-        error("Unsupported domain for exponentiation")
+    if n:getRing() ~= Integer then
+        error("Sent parameter of wrong type: n must be an integer")
     end
     return a:pow(n)
-end
-
--- Division with remainder, assuming the ring is a Euclidean domain
--- Unfortunately, this can only return 1 result, so it returns the quotient - for the remainder use a % b, or a:divremainder(b)
-__RingOperations.__idiv = function(a, b)
-    local aring, bring = a:getType(), b:getType()
-    if aring ~= bring then
-        error("Attempted to divide two different rings with remainder")
-    end
-    return a:divremainder(b)
-end
-
-__RingOperations.__mod = function(a, b)
-    local aring, bring = a:getType(), b:getType()
-    if aring ~= bring then
-        error("Attempted to divide two different rings with remainder")
-    end
-    local _,q = a:divremainder(b)
-    return q
 end
 
 -- Comparison operations assume, of course, that the ring operation is equipped with a total order
 -- All elements of all rings need these metamethods, since in Lua comparisons on tables only fire if both objects have the table
 __RingOperations.__eq = function(a, b)
-    local aring, bring = a:getType(), b:getType()
+    local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:eq(b)
     end
@@ -139,7 +168,7 @@ __RingOperations.__eq = function(a, b)
 end
 
 __RingOperations.__lt = function(a, b)
-    local aring, bring = a:getType(), b:getType()
+    local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:lt(b)
     end
@@ -154,9 +183,9 @@ __RingOperations.__lt = function(a, b)
 end
 
 __RingOperations.__le = function(a, b)
-    local aring, bring = a:getType(), b:getType()
+    local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
-        return a:eq(b)
+        return a:le(b)
     end
     if aring.subringof(aring, bring) then
         return a:inRing(bring):le(b)
@@ -168,38 +197,9 @@ __RingOperations.__le = function(a, b)
     error("Attempted to compare two elements of different rings")
 end
 
-function Ring:inv()
-    return self.addgroup:inv()
-end
+-----------------
+-- Inheritance --
+-----------------
 
-function Ring:add(b)
-    return self.addgroup:eval(self,b)
-end
-
-function Ring:sub(b)
-    return self.addgroup:eval(self,b:inv())
-end
-
-function Ring:mul(b)
-    return self.mulgroup:eval(self,b)
-end
-
-function Ring:pow(n)
-    return self.mulgroup.pow(self, n)
-end
-
-function Ring:divremainder(b)
-    error("Ring is not a euclidian domain, or no division with remainder algorithm exists")
-end
-
-function Ring:eq(b)
-    error("Ring does not have a total order")
-end
-
-function Ring:lt(b)
-    error("Ring does not have a total order")
-end
-
-function Ring:le(b)
-    error("Ring does not have a total order")
-end
+__Ring.__index = AtomicExpression
+AtomicExpression = setmetatable(AtomicExpression, __PolynomialRing)

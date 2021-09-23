@@ -1,8 +1,8 @@
 -- Represents an element of the ring of integers
 -- Integers have the following instance variables:
 --      internal - the internal representation of the integer
--- Integers have the following relationshipt to other classes:
---      Integers implement Rings
+-- Integers have the following relationship to other classes:
+--      Integers implement Euclidean Domains
 Integer = {}
 __Integer = {}
 
@@ -10,7 +10,7 @@ __Integer = {}
 -- Static functionality --
 --------------------------
 
--- Returns the subrings of this ring
+-- Returns the immediate subrings of this ring
 function Integer.subrings()
     return {}
 end
@@ -51,47 +51,27 @@ end
 -- Creates a new integer given a string or number representation of the integer
 function Integer:new(n)
     local o = {}
-    local mt = Copy(__RingOperations)
-    mt.__index = Integer
-    mt.__tostring = function(a)
+    local __o = Copy(__EuclideanOperations)
+    __o.__index = Integer
+    __o.__tostring = function(a)
         return tostring(a.internal)
     end
-    mt.__div = function(a, b)   -- Constructor for a rational number disguised as division
-        if(b.getType() == Integer) then
+    __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
+        if(b.getRing() == Integer) then
             return Rational(a, b)
         end
         return __FieldOperations.__div(a, b)
     end
-    o = setmetatable(o, mt)
+    o = setmetatable(o, __o)
 
     n = n or 0
     o.internal = bn(n)
-
-    o.addgroup = Group(function(a, b)
-        return Integer(a.internal + b.internal)
-    end)
-    function o.addgroup:isAbelian()
-        return true
-    end
-    function o.addgroup:inv()
-        return Integer(-o.internal)
-    end
-
-    o.mulgroup = BinaryOperation(function (a, b)
-        return Integer(a.internal * b.internal)
-    end)
-    function o.mulgroup:isAssociative()
-        return true
-    end
-    o.mulgroup.pow = function(a, b)
-        return Integer(a.internal ^ b.internal)
-    end
 
     return o
 end
 
 -- Returns the type of this object
-function Integer:getType()
+function Integer:getRing()
     return Integer
 end
 
@@ -102,6 +82,23 @@ function Integer:inRing(ring)
     end
 
     error("Unable to convert element to proper ring.")
+end
+
+function Integer:add(b)
+    return Integer(self.internal + b.internal)
+end
+
+function Integer:neg()
+    return Integer(-self.internal)
+end
+
+function Integer:mul(b)
+    return Integer(self.internal * b.internal)
+end
+
+-- Overrides the generic power method with the bignum library's more efficient method
+function Integer:pow(b)
+    return Integer(self.internal ^ b.internal)
 end
 
 -- Division with remainder in integers
@@ -121,16 +118,23 @@ function Integer:le(b)
     return self.internal <= b.internal
 end
 
+function Integer:zero()
+    return Integer(0)
+end
+
+function Integer:one()
+    return Integer(1)
+end
+
+-- returns this integer as a number
+function Integer:asNumber()
+    return self.internal.asNumber()
+end
+
 -----------------
 -- Inheritance --
 -----------------
 
-__Integer.__index = Ring
+__Integer.__index = EuclideanDomain
 __Integer.__call = Integer.new
 Integer = setmetatable(Integer, __Integer)
-
-----------------------
--- Static constants --
-----------------------
-
-Integer.zero = Integer(0)

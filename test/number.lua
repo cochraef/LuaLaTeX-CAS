@@ -1,13 +1,13 @@
 require("algebra._init")
 
+local function test(expected, actual)
+    print(tostring(expected) .. " (Expected: " .. tostring(actual) .. ")")
+end
+
 -- Integer Testing
 local a = Integer(5)
 local b = Integer(3)
 local c = Integer(-12)
-
-local function test(expected, actual)
-    print(tostring(expected) .. " (Expected: " .. tostring(actual) .. ")")
-end
 
 tostring(c)
 
