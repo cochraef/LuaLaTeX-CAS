@@ -50,22 +50,24 @@ function CompoundExpression:evaluate()
     local results = {}
     local reducible = true
     for index, expression in ipairs(self.expressions) do
+        results[index] = expression.evaluate()
         if not expression:isAtomic() then
             reducible = false
         end
-        results[index] = expression.evaluate()
     end
     if not reducible then
-        return self
+        return CompoundExpression(self.operation, results, self.name)
     end
     return self.operation(results)
 end
 
 -- Substitutes each variable for a new one
 function CompoundExpression:substitute(variables)
-    for index, expression in ipairs(self.expressions) do
-        self.expressions[index] = expression:substitute(variables)
+    local results = {}
+    for index, expression in pairs(self.expressions) do
+        results[index] = expression:substitute(variables)
     end
+    return CompoundExpression(self.operation, self.results, self.name)
 end
 
 -- Returns whether the expression is atomic or not

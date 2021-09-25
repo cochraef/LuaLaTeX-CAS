@@ -33,4 +33,4 @@ end
 -----------------
 
 __AtomicExpression.__index = Expression
-AtomicExpression = setmetatable(AtomicExpression, __PolynomialRing)
+AtomicExpression = setmetatable(AtomicExpression, __AtomicExpression)

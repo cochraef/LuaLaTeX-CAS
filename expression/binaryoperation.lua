@@ -14,21 +14,23 @@ function BinaryOperation:new(operation, expressions, name)
     local o = CompoundExpression:new(operation, expressions, name)
     local __o = {}
 
-    o.name = BinaryOperation.DEFAULT_NAMES[expressions]
+    o.name = BinaryOperation.DEFAULT_NAMES[operation]
 
-    __o.index = BinaryOperation
-    __o.tostring = function(a)
-        local expressionnames = "";
+    __o.__index = BinaryOperation
+    __o.__tostring = function(a)
+        local expressionnames = '';
         for index, expression in ipairs(a.expressions) do
-            expressionnames = expressionnames .. " " .. expression
+            if index > 1 then
+                expressionnames = expressionnames .. ' '
+            end
+            expressionnames = expressionnames .. tostring(expression)
             if a.expressions[index + 1] then
-                expressionnames = expressionnames .. " " .. name
+                expressionnames = expressionnames .. ' ' .. a.name
             end
         end
-        return "(" .. expressionnames .. " )"
+        return '(' .. expressionnames .. ')'
     end
     o = setmetatable(o, __o)
-
 
     return o
 end
@@ -38,26 +40,35 @@ function BinaryOperation:evaluate()
     local results = {}
     local reducible = true
     for index, expression in ipairs(self.expressions) do
-        if not expression:isEvaluatable() then
+        results[index] = expression:evaluate()
+        if not results[index]:isEvaluatable() then
             reducible = false
         end
-        results[index] = expression.evaluate()
     end
     if not reducible then
-        return self
+        return BinaryOperation(self.operation, results)
     end
 
     if not self.expressions[1] then
         error("Execution error: cannot perform binary operation on zero expressions")
     end
 
-    local result = self.expressions[1]
-    for index, expression in ipairs(self.expression) do
-        if not index == 1 then
+    local result = results[1]
+    for index, expression in ipairs(results) do
+        if not (index == 1) then
             result = self.operation(result, expression)
         end
     end
     return result
+end
+
+-- Substitutes each variable for a new one
+function BinaryOperation:substitute(variables)
+    local results = {}
+    for index, expression in ipairs(self.expressions) do
+        results[index] = expression:substitute(variables)
+    end
+    return BinaryOperation(self.operation, results)
 end
 
 -- Returns whether the binary operation is associative

@@ -24,6 +24,7 @@ function SymbolExpression:new(symbol)
     end
 
     o.symbol = symbol
+    o = setmetatable(o, __o)
 
     return o
 end
@@ -34,7 +35,7 @@ function SymbolExpression:substitute(variables)
         error("Sent parameter of wrong type: variables must be a table")
     end
 
-    for index, expression in ipairs(variables) do
+    for index, expression in pairs(variables) do
         if type(index) ~= "string" then
             error("Sent parameter of wrong type: variables must have strings as indicies")
         end
@@ -47,7 +48,7 @@ function SymbolExpression:substitute(variables)
 end
 
 -- Symbols can not be evaluated to a concrete value
-function AtomicExpression:isEvaluatable()
+function SymbolExpression:isEvaluatable()
     return false
 end
 

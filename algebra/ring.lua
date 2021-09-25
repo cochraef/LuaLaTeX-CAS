@@ -202,4 +202,4 @@ end
 -----------------
 
 __Ring.__index = AtomicExpression
-AtomicExpression = setmetatable(AtomicExpression, __PolynomialRing)
+Ring = setmetatable(Ring, __Ring)

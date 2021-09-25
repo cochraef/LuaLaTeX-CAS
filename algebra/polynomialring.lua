@@ -228,7 +228,7 @@ function PolynomialRing:substitute(variables)
         error("Sent parameter of wrong type: variables must be a table")
     end
 
-    for index, expression in ipairs(variables) do
+    for index, expression in pairs(variables) do
         if type(index) ~= "string" then
             error("Sent parameter of wrong type: variables must have strings as indicies")
         end
@@ -244,8 +244,8 @@ end
 function PolynomialRing:toCompoundExpression()
     local terms = {}
     for exponent, coefficient in pairs(self.coefficients) do
-        terms[exponent:asNumber() - 1] = BinaryOperation(BinaryOperation.MUL, {coefficient,
-                                                BinaryOperation(BinaryOperation.POW, {SymbolExpression(self.symbol), exponent})})
+        terms[exponent + 1] = BinaryOperation(BinaryOperation.MUL, {coefficient,
+                                                BinaryOperation(BinaryOperation.POW, {SymbolExpression(self.symbol), Integer(exponent)})})
     end
     return BinaryOperation(BinaryOperation.ADD, terms)
 end
