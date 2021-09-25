@@ -19,9 +19,9 @@ function PolynomialRing.subrings(construction)
     local subrings = {child}
 
     for i, subring in ipairs(child.subrings()) do
-        local new = PolynomialRing({}, "x")
+        local new = PolynomialRing({}, construction["symbol"])
         new.ring = subring
-        subrings[i + 1] = new.getType()
+        subrings[i + 1] = new:getRing()
     end
 
     return subrings
@@ -49,39 +49,59 @@ function PolynomialRing:new(coefficients, symbol, degree)
     o = setmetatable(o, __o)
 
     if type(coefficients) ~= "table" then
-        error("Coefficients must be in an array")
+        error("Sent parameter of wrong type: Coefficients must be in an array")
     end
     o.coefficients = {}
-    o.degree = Integer(-1)
-
-    local properstart = coefficients[0]
-    for index, coefficient in ipairs(coefficients) do
-        if type(index) ~= "number" then
-            error("Coefficients must be in an array")
-        end
-        if not coefficient.getRing() then
-            error("Coefficients must be part of a ring")
-        end
-        if not o.ring then
-            o.ring = coefficient.getRing()
-        end
-
-        if properstart then
-            o.coefficients[index] = coefficient
-        else
-            o.coefficients[index - 1] = coefficient
-        end
-
-        if degree and o.degree == degree then
-            break
-        end
-        o.degree = o.degree + Integer(1)
-    end
+    o.degree = degree or Integer(-1)
 
     if type(symbol) ~= "string" then
         error("Symbol must be a string")
     end
     o.symbol = symbol
+
+    -- Determines what ring the polynomial ring should have as its child
+    for index, coefficient in pairs(coefficients) do
+        if type(index) ~= "number" then
+            error("Sent parameter of wrong type: Coefficients must be in an array")
+        end
+        if not coefficient.getRing() then
+            error("Sent parameter of wrong type: Coefficients must be elements of a ring")
+        end
+        if not o.ring then
+            o.ring = coefficient.getRing()
+        else
+            local newring = coefficient.getRing()
+            if o.ring.subringof(o.ring, newring) then
+                o.ring = newring
+            elseif not newring.subringof(newring, o.ring) then
+                error("Sent parameter of wrong type: Coefficients must all be part of the same ring")
+            end
+        end
+    end
+
+    if not coefficients[0] then
+        -- Constructs the coefficients when a new polynomial is instantiated as an array
+        for index, coefficient in ipairs(coefficients) do
+            o.coefficients[index - 1] = coefficient
+            o.degree = o.degree + Integer(1)
+        end
+    else
+        -- Constructs the coefficients from an existing polynomial of coefficients
+        local loc = o.degree:asNumber()
+        while loc > 0 do
+            if not coefficients[loc] or coefficients[loc] == o.ring.zero() then
+                o.degree = o.degree - Integer(1)
+            else
+                break
+            end
+            loc = loc - 1
+        end
+
+        while loc >= 0 do
+            o.coefficients[loc] = coefficients[loc]
+            loc = loc - 1
+        end
+    end
 
     -- Each value of the polynomial greater than its degree is implicitly zero
     o.coefficients = setmetatable(o.coefficients, {__index = function (table, key)
@@ -94,10 +114,21 @@ end
 -- Returns the type of this object
 -- has a field for the type of ring used to construct this ring, like type parameterization in Java only worse
 function PolynomialRing:getRing()
-    local t = {child=self.ring}
+    local t = {child=self.ring, symbol=self.symbol}
     return setmetatable(t, {__index = PolynomialRing, __eq = function(a, b)
-        return a["child"] == b["child"]
+        return a["child"] == b["child"] and a["symbol"] == b["symbol"]
     end})
+end
+
+-- Explicitly converts this element to an element of another ring
+function PolynomialRing:inRing(ring)
+    local coefficients = {}
+    local loc = 0
+    while loc <= self.degree:asNumber() do
+        coefficients[loc] = self.coefficients[loc]:inRing(ring["child"])
+        loc = loc + 1
+    end
+    return PolynomialRing(coefficients, self.symbol, self.degree)
 end
 
 
@@ -109,10 +140,6 @@ end
 function PolynomialRing:add(b)
     local larger
 
-    if(self.symbol ~= b.symbol) then
-        error("Attempted to add two polynomial rings with different symbols")
-    end
-
     if self.degree > b.degree then
         larger = self
     else
@@ -120,62 +147,71 @@ function PolynomialRing:add(b)
     end
 
     local new = {}
-    local loc = Integer(0)
-    while loc <= larger.degree do
+    local loc = 0
+    while loc <= larger.degree:asNumber() do
         new[loc] = self.coefficients[loc] + b.coefficients[loc]
+        loc = loc + 1
     end
 
-    return PolynomialRing(new, self.symbol)
+    return PolynomialRing(new, self.symbol, larger.degree)
 end
 
 function PolynomialRing:neg()
     local new = {}
-    local loc = Integer(0)
-    while loc <= self.degree do
+    local loc = 0
+    while loc <= self.degree:asNumber() do
         new[loc] = -self.coefficients[loc]
+        loc = loc + 1
     end
-    return PolynomialRing(new, self.symbol)
+    return PolynomialRing(new, self.symbol, self.degree)
 end
 
-
 function PolynomialRing:mul(b)
-    if self.degree == Integer(1) and b.degree == Integer(1) then
-        return PolynomialRing({self.coefficients[0] * b.coefficients[0]}, Integer(1))
+    if self.degree == Integer(0) and b.degree == Integer(0) then
+        return PolynomialRing({self.coefficients[0] * b.coefficients[0]}, self.symbol, Integer(1))
     end
 
-    local k = Integer.ceillog(Integer.max(self.degree, b.degree), Integer(2))
+    local k = Integer.ceillog(Integer.max(self.degree, b.degree) + Integer(1), Integer(2))
     local n = Integer(2) ^ k
     local m = n / Integer(2)
 
     local a0, a1, b0, b1 = {}, {}, {}, {}
 
-    for e = 0, m.internal:asnumber() - 1 do
+    for e = 0, m:asNumber() - 1 do
         a0[e] = self.coefficients[e]
-        a1[e] = self.coefficients[e + m.internal:asnumber()]
+        a1[e] = self.coefficients[e + m:asNumber()]
         b0[e] = b.coefficients[e]
-        b1[e] = b.coefficients[e + m.internal:asnumber()]
+        b1[e] = b.coefficients[e + m:asNumber()]
     end
 
-    local p1 = PolynomialRing(a1, m) * PolynomialRing(b1, m)
-    local p2 = PolynomialRing(a0, m) * PolynomialRing(b0, m)
-    local p3 = (PolynomialRing(a0, m) + PolynomialRing(a1, m)) * (PolynomialRing(b0, m) + PolynomialRing(b1, m)) - p1 - p2
+    local p1 = PolynomialRing(a1, self.symbol, m - Integer(1)) * PolynomialRing(b1, self.symbol, m - Integer(1))
+    local p2 = PolynomialRing(a0, self.symbol, m - Integer(1)) * PolynomialRing(b0, self.symbol, m - Integer(1))
+    local p3 = (PolynomialRing(a0, self.symbol, m - Integer(1)) + PolynomialRing(a1, self.symbol, m - Integer(1))) *
+                (PolynomialRing(b0, self.symbol, m - Integer(1)) + PolynomialRing(b1, self.symbol, m - Integer(1)))
+                - p1 - p2
 
-    local p = p1:multiplyDegree(n.internal:asnumber()) + p3:multiplyDegree(m.internal:asnumber()) + p2
-    p.degree = self.degree + b.degree - Integer(1)
-    return p
+    return p1:multiplyDegree(n:asNumber()) + p3:multiplyDegree(m:asNumber()) + p2
 end
 
 function PolynomialRing:divremainder(b)
-    local n, m = self.degree - Integer(1), b.degree - Integer(1)
-    local r, u = PolynomialRing(self.coefficients), Integer(1) / b.coefficients[m.internal:asnumber()]
+    local n, m = self.degree, b.degree
+    local r, u = PolynomialRing(self.coefficients, self.symbol, self.degree), Integer(1) / b.coefficients[m:asNumber()]
 
-    local q = {}
-    for i = (n-m).internal:asnumber(), 0,-1 do
-        q[i] = r.coefficients[(r.degree - Integer(1)).internal:asnumber()] * u
-        r = r - PolynomialRing({q[i]}):multiplyDegree(i) * b
+    if(m > n) then
+        return PolynomialRing({Integer(0)}, self.symbol, Integer(0)), self
     end
 
-    return PolynomialRing(q), r
+    local q = {}
+    for i = (n-m):asNumber(), 0,-1 do
+        if r.degree:asNumber() == m:asNumber() + i then
+            q[i] = r.coefficients[r.degree:asNumber()] * u
+            r = r - PolynomialRing({q[i]}, self.symbol):multiplyDegree(i) * b
+        else
+            q[i] = Integer(0)
+        end
+    end
+
+    return PolynomialRing(q, self.symbol, self.degree), r
 end
 
 function PolynomialRing:zero()
@@ -207,7 +243,7 @@ end
 -- Transforms from array format to an expression format
 function PolynomialRing:toCompoundExpression()
     local terms = {}
-    for exponent, coefficient in ipairs(self.coefficients) do
+    for exponent, coefficient in pairs(self.coefficients) do
         terms[exponent:asNumber() - 1] = BinaryOperation(BinaryOperation.MUL, {coefficient,
                                                 BinaryOperation(BinaryOperation.POW, {SymbolExpression(self.symbol), exponent})})
     end
@@ -218,12 +254,14 @@ end
 function PolynomialRing:multiplyDegree(n)
     local new = {}
     for e = 0, n-1 do
-        new[e] = self.ring.ZERO
+        new[e] = self.ring.zero()
     end
-    for e = 0, self.degree.internal:asnumber() do
-        new[e + n] = self.coefficients[e]
+    local loc = n
+    while loc <= self.degree:asNumber() + n do
+        new[loc] = self.coefficients[loc - n]
+        loc = loc + 1
     end
-    return PolynomialRing(new, self.degree + Integer(n))
+    return PolynomialRing(new, self.symbol, self.degree + Integer(n))
 end
 
 -----------------

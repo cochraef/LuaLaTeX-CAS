@@ -62,6 +62,27 @@ function Rational:reduce()
 
 end
 
+-- Returns the type of this object
+function Rational:getRing()
+    return Rational
+end
+
+-- Explicitly converts this element to an element of another ring
+function Rational:inRing(ring)
+    if ring == Rational then
+        return self
+    end
+
+    local ratring = PolynomialRing({}, ring["symbol"])
+    ratring.ring = Rational
+
+    if ratring.subringof(ratring:getRing(), ring) then
+        return PolynomialRing({self}, ring["symbol"]):inRing(ring)
+    end
+
+    error("Unable to convert element to proper ring.")
+end
+
 function Rational:add(b)
     return Rational(self.numerator * b.denominator + self.denominator * b.numerator, self.denominator * b.denominator)
 end
@@ -87,11 +108,6 @@ function Rational:div(b)
     return Rational(self.numerator * b.denominator, self.denominator * b.numerator)
 end
 
--- Returns the type of this object
-function Rational:getRing()
-    return Rational
-end
-
 function Rational:eq(b)
     return self.numerator == b.numerator and self.denominator == self.denominator
 end
@@ -111,7 +127,7 @@ function Rational:lt(b)
 end
 
 function Rational:le(b)
-    return self.eq(b) or self.lt(b)
+    return self:eq(b) or self:lt(b)
 end
 
 function Rational:zero()

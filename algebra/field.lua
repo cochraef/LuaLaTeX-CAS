@@ -24,7 +24,7 @@ function Field:pow(n)
         base = base:inv()
     end
     local k = Integer(0)
-    local b = self.getRing().one
+    local b = self.getRing().one()
     while k < n do
         b = b.mul(base)
         k = k + Integer(1)

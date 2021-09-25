@@ -77,8 +77,19 @@ end
 
 -- Explicitly converts this element to an element of another ring
 function Integer:inRing(ring)
-    if(ring == Rational) then
-        return Rational(self, Integer(1), true)
+    if ring == Integer then
+        return self
+    end
+
+    if Rational.subringof(Rational, ring) then
+        return Rational(self, Integer(1), true):inRing(ring)
+    end
+
+    local intring = PolynomialRing({}, ring["symbol"])
+    intring.ring = Integer
+
+    if intring.subringof(intring:getRing(), ring) then
+        return PolynomialRing({self}, ring["symbol"]):inRing(ring)
     end
 
     error("Unable to convert element to proper ring.")
@@ -107,6 +118,10 @@ function Integer:divremainder(b)
 end
 
 function Integer:eq(b)
+    -- The bignum library treated signed zeros as not being equal???
+    if self:asNumber() == 0 and b:asNumber() == 0 then
+        return true
+    end
     return self.internal == b.internal
 end
 
@@ -128,7 +143,11 @@ end
 
 -- returns this integer as a number
 function Integer:asNumber()
-    return self.internal.asNumber()
+    -- The bignum library is broken for some reason and doesn't give the right answer when zero is negative
+    if self.internal._digits[1] == 0 and not self.internal._digits[2] then
+        return 0
+    end
+    return self.internal:asnumber()
 end
 
 -----------------

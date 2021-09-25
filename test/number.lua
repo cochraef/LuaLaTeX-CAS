@@ -1,7 +1,11 @@
 require("algebra._init")
 
 local function test(expected, actual)
-    print(tostring(expected) .. " (Expected: " .. tostring(actual) .. ")")
+    if(tostring(expected) == tostring(actual)) then
+        print("Result: " .. tostring(expected))
+    else
+        print("Result: ".. tostring(expected) .. " (Expected: " .. tostring(actual) .. ")")
+    end
 end
 
 -- Integer Testing
@@ -70,6 +74,6 @@ local e = Integer(8)
 
 print("Testing combined integer/rational comparisons...")
 test(a/e == x, false)
-test(e/a == x, false)
+test(e/a == x, true)
 test(y < b , true)
 test(b < y, false)
