@@ -66,3 +66,48 @@ test(f:toCompoundExpression(), "((6 * (x ^ 0)) + (5 * (x ^ 1)) + (1 * (x ^ 2)))"
 test(f:evaluate(), "1x^2+5x^1+6x^0")
 test(f:substitute({x=Integer(1)}), "((6 * (1 ^ 0)) + (5 * (1 ^ 1)) + (1 * (1 ^ 2)))")
 test(f:substitute({x=Integer(1)}):evaluate(), 12)
+print()
+
+local g = BinaryOperation(BinaryOperation.POW,
+                                            {Integer(0),
+                                            SymbolExpression("x")})
+
+local h = BinaryOperation(BinaryOperation.POW,
+                                            {Integer(1),
+                                            SymbolExpression("x")})
+
+local i = BinaryOperation(BinaryOperation.POW,
+                                            {SymbolExpression("x"),
+                                            Integer(0)})
+
+local j = BinaryOperation(BinaryOperation.POW,
+                                            {SymbolExpression("x"),
+                                            Integer(1)})
+
+local k = BinaryOperation(BinaryOperation.POW,
+                                            {SymbolExpression("x"),
+                                            SymbolExpression("y")})
+
+local l = BinaryOperation(BinaryOperation.POW,
+                                            {BinaryOperation(BinaryOperation.POW,
+                                                {BinaryOperation(BinaryOperation.POW,
+                                                    {SymbolExpression("x"),
+                                                    Integer(3)}),
+                                                Integer(4)}),
+                                            Integer(5)})
+
+local m = BinaryOperation(BinaryOperation.POW,
+                                            {BinaryOperation(BinaryOperation.MUL,
+                                                {SymbolExpression("x"),
+                                                SymbolExpression("y")}),
+                                            SymbolExpression("a")})
+
+
+print("Testing exponent autosimplification...")
+test(g:autosimplify(), "(0 ^ x)")
+test(h:autosimplify(), "1")
+test(i:autosimplify(), "1")
+test(j:autosimplify(), "x")
+test(k:autosimplify(), "(x ^ y)")
+test(l:autosimplify(), "(x ^ 60)")
+test(m:autosimplify(), "((x ^ a) * (y ^ a))")

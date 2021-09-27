@@ -145,7 +145,7 @@ end
 
 __RingOperations.__pow = function(a, n)
     if n:getRing() ~= Integer then
-        error("Sent parameter of wrong type: n must be an integer")
+        error("Sent parameter of wrong type: exponent must be an integer")
     end
     return a:pow(n)
 end

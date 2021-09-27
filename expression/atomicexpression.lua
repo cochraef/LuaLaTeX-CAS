@@ -18,6 +18,11 @@ function AtomicExpression:substitute(variables)
     return self
 end
 
+-- Performs automatic simplification of an expression
+function Expression:autosimplify()
+    return self
+end
+
 -- Atomic expressions are atomic, suprisingly
 function AtomicExpression:isAtomic()
     return true

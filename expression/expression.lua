@@ -15,6 +15,11 @@ function Expression:substitute(variables)
     error("Called unimplemented method : substitute()")
 end
 
+-- Performs automatic simplification of an expression
+function Expression:autosimplify()
+    error("Called unimplemented method : autosimplify()")
+end
+
 -- Returns whether the expression is atomic or not
 function Expression:isAtomic()
     error("Called unimplemented method: isAtomic()")
