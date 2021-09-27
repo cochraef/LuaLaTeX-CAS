@@ -44,6 +44,17 @@ function BinaryOperation:new(operation, expressions, name)
         end
         return '(' .. expressionnames .. ')'
     end
+    __o.__eq = function(a, b)
+        local loc = 1
+        while a.expressions[loc] or b.expressions[loc] do
+            if not a.expressions[loc] or not b.expressions[loc] or
+                (a.expressions[loc] ~= b.expressions[loc]) then
+                return false
+            end
+            loc = loc + 1
+        end
+        return a.operation == b.operation
+    end
     o = setmetatable(o, __o)
 
     return o
@@ -139,7 +150,7 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that (x_1*x_2*...*x_n)^a = x_1^a*x_2^a*..x_n^a
-    if not base:isAtomic() and base.operation == BinaryOperation.MUL then
+    if base.operation == BinaryOperation.MUL then
         local results = {}
         for index, expression in ipairs(base.expressions) do
             results[index] = BinaryOperation(BinaryOperation.POW, {expression, exponent}):autosimplify()
@@ -156,11 +167,12 @@ function BinaryOperation:simplifyproduct()
     local results = {}
     local reducible = true
     for index, expression in ipairs(self.expressions) do
-        results[index] = expression:evaluate()
-        if not results[index]:isEvaluatable() then
+        if not expression:isEvaluatable() then
             reducible = false
         end
+        results[index] = expression:evaluate()
     end
+
     if reducible then
         local result = results[1]
         for index, expression in ipairs(results) do
@@ -180,7 +192,114 @@ function BinaryOperation:simplifyproduct()
         end
     end
 
-    return self
+    -- We don't really know what ring we are working in here, so just assume the integer ring
+    if not evaluated.expressions[1] then
+        return Integer(1)
+    end
+
+    -- Simplifies single products to their operands
+    if evaluated.expressions[1] and not evaluated.expressions[2] then
+        return evaluated.expressions[1]
+    end
+
+    local term1 = evaluated.expressions[1]
+    local term2 = evaluated.expressions[2]
+
+    if evaluated.expressions[1] and evaluated.expressions[2] and not evaluated.expressions[3] then
+
+        if (term1:isEvaluatable() or not (term1.operation == BinaryOperation.MUL)) and
+            (term2:isEvaluatable() or not (term2.operation == BinaryOperation.MUL)) then
+            -- Uses the property that x*1 = x
+            if term1:isEvaluatable() and term1 == term1:one() then
+                return term2
+            end
+
+            if term2:isEvaluatable() and term2 == term2:one() then
+                return term1
+            end
+
+            -- Uses the property that x^a*x^b=x^(a+b)
+            if (term1.operation == BinaryOperation.POW) and (term2.operation == BinaryOperation.POW) and term1.expressions[1] == term2.expressions[2] then
+                return BinaryOperation(BinaryOperation.POW,
+                                    {term1.expressions[1],
+                                    BinaryOperation(BinaryOperation.ADD,
+                                        {term1.expressions[2], term2.expressions[2]})}):autosimplify()
+            end
+
+            return evaluated
+        end
+
+        if term1.operation == BinaryOperation.MUL and not (term2.operation == BinaryOperation.MUL) then
+            return term1:mergeproducts(BinaryOperation(BinaryOperation.MUL, {term2}))
+        end
+
+        if not (term1.operation == BinaryOperation.MUL) and term2.operation == BinaryOperation.MUL then
+            return BinaryOperation(BinaryOperation.MUL, {term1}):mergeproducts(term2)
+        end
+
+        return term1:mergeproducts(term2)
+    end
+
+    local rest = {}
+    for index, expression in ipairs(evaluated.expressions) do
+        if index > 1 then
+            rest[index - 1] = expression
+        end
+    end
+
+    local result = BinaryOperation(BinaryOperation.MUL, rest):autosimplify()
+
+    if term1.operation == BinaryOperation.MUL then
+        return term1:mergeproducts(result)
+    else
+        return BinaryOperation(BinaryOperation.MUL, {term1}):mergeproducts()
+    end
+end
+
+-- Merges two lists of products
+function BinaryOperation:mergeproducts(other)
+    local first = BinaryOperation(BinaryOperation.MUL, {self.expressions[1], self.expressions[2]}):autosimplify()
+
+    if not self.expressions[1] then
+        return other
+    end
+
+    if not other.expressions[1] then
+        return self
+    end
+
+    local selfrest = {}
+    for index, expression in ipairs(self.expressions) do
+        if index > 1 then
+            selfrest[index - 1] = expression
+        end
+    end
+
+    local otherrest = {}
+    for index, expression in ipairs(self.expressions) do
+        if index > 1 then
+            otherrest[index - 1] = expression
+        end
+    end
+
+    if first.isEvaluatable() and first == first.one() then
+        return BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
+    end
+
+    if first.isEvaluatable() or not first.expressions[2] then
+        local result = BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
+        if first.isEvaluatable() then
+            table.insert(result.expressions, first)
+        else
+            table.insert(result.expressions, first.expressions[1])
+        end
+        return result
+    end
+
+    local result = BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
+    table.insert(result.expressions, first.expressions[1])
+    table.insert(result.expressions, first.expressions[2])
+    return result
 
 end
 

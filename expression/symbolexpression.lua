@@ -18,6 +18,9 @@ function SymbolExpression:new(symbol)
     __o.__tostring = function(a)
         return a.symbol
     end
+    __o.__eq = function(a, b)
+        return a.symbol == b.symbol
+    end
 
     if type(symbol) ~= "string" then
         error("Sent parameter of wrong type: symbol must be a string")

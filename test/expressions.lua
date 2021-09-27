@@ -111,3 +111,20 @@ test(j:autosimplify(), "x")
 test(k:autosimplify(), "(x ^ y)")
 test(l:autosimplify(), "(x ^ 60)")
 test(m:autosimplify(), "((x ^ a) * (y ^ a))")
+print()
+
+local n = BinaryOperation(BinaryOperation.MUL,
+                            {SymbolExpression("x"),
+                             SymbolExpression("y"),
+                             Integer(0),
+                             Integer(-2)
+                            })
+-- local o = BinaryOperation(BinaryOperation.MUL,
+--                             {SymbolExpression("x"),
+--                             BinaryOperation(BinaryOperation.MUL,
+--                                 {SymbolExpression("y"),
+--                                 SymbolExpression("z")})})
+
+print("Testing product autosimplification...")
+test(n:autosimplify(), 0)
+-- test(o:autosimplify(), "(x * y * z)")
