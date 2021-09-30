@@ -147,12 +147,20 @@ __RingOperations.__pow = function(a, n)
     if n:getRing() ~= Integer then
         error("Sent parameter of wrong type: exponent must be an integer")
     end
+
+    if a == a.zero() and n == Integer(0) then
+        error("Cannot raise 0 to the power of 0")
+    end
     return a:pow(n)
 end
 
 -- Comparison operations assume, of course, that the ring operation is equipped with a total order
 -- All elements of all rings need these metamethods, since in Lua comparisons on tables only fire if both objects have the table
 __RingOperations.__eq = function(a, b)
+    -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua runs this function anyway
+    if not b.getRing then
+        return false
+    end
     local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:eq(b)

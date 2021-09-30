@@ -55,6 +55,39 @@ function SymbolExpression:isEvaluatable()
     return false
 end
 
+-- Symbol Expressions come after concrete expressions
+function SymbolExpression:order(other)
+    if other.isEvaluatable() then
+        return false
+    end
+
+    if other.isAtomic() then
+        if #other.symbol < #self.symbol then
+            return false
+        end
+        for i = 1, #self.symbol do
+            if string.byte(self.symbol, i) ~= string.byte(other.symbol, i) then
+                return string.byte(self.symbol, i) < string.byte(other.symbol, i)
+            end
+        end
+
+        return true
+    end
+
+    if other.operation == BinaryOperation.POW then
+        return BinaryOperation(BinaryOperation.POW, {self, Integer(1)}):order(other)
+    end
+
+    if other.operation == BinaryOperation.MUL then
+        return BinaryOperation(BinaryOperation.MUL, {self}):order(other)
+    end
+
+    if other.operation == BinaryOperation.ADD then
+        return BinaryOperation(BinaryOperation.ADD, {self}):order(other)
+    end
+
+end
+
 -----------------
 -- Inheritance --
 -----------------

@@ -1,4 +1,8 @@
 -- Represents a binary operation with two inputs and one output
+-- BinaryOperations have the following instance variables:
+--      name - the string name of the function
+--      operation - the operation to apply to the list of operands
+--      expressions - a list of subexpressions associated with this expression
 -- However, the expressions instance variable can store any number of operations greater than zero
 -- BinaryOperations have the following relations to other classes:
 --      BinaryOperations extend CompoundExpressions
@@ -11,10 +15,24 @@ __BinaryOperation = {}
 
 -- Creates a new binary operation with the given operation
 function BinaryOperation:new(operation, expressions, name)
-    local o = CompoundExpression:new(operation, expressions, name)
+    local o = {}
     local __o = {}
 
+    if type(name) ~= "string" and type(name) ~= "nil" then
+        error("Sent parameter of wrong type: name must be a string")
+    end
+
+    if type(operation) ~= "function" then
+        error("Sent parameter of wrong type: operation must be a function")
+    end
+
+    if type(expressions) ~= "table" then
+        error("Sent parameter of wrong type: expressions must be an array")
+    end
+
     o.name = BinaryOperation.DEFAULT_NAMES[operation]
+    o.operation = operation
+    o.expressions = Copy(expressions)
 
     if o.operation == BinaryOperation.ADD or o.operation == BinaryOperation.MUL then
         function o:isCommutative()
@@ -109,6 +127,9 @@ function BinaryOperation:autosimplify()
     if simplified.operation == BinaryOperation.MUL then
         return simplified:simplifyproduct()
     end
+    if simplified.operation == BinaryOperation.ADD then
+        return simplified:simplifysum()
+    end
 
     return simplified
 end
@@ -123,10 +144,9 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that 0^x = 0 if x does not equal 0
-    -- This is not being simplified right now, since we need to figure out what to do if there is a variable in the exponent
-    -- if base:isEvaluatable() and base == base:zero() then
-    --     return Integer(0)
-    -- end
+    if base:isEvaluatable() and base == base:zero() then
+        return Integer(0)
+    end
 
     -- Uses the property that 1^x = 1
     if base:isEvaluatable() and base == base:one() then
@@ -219,11 +239,24 @@ function BinaryOperation:simplifyproduct()
             end
 
             -- Uses the property that x^a*x^b=x^(a+b)
-            if (term1.operation == BinaryOperation.POW) and (term2.operation == BinaryOperation.POW) and term1.expressions[1] == term2.expressions[2] then
+            if term1.operation ~= BinaryOperation.POW then
+                term1 = BinaryOperation(BinaryOperation.POW, {term1, Integer(1)})
+            end
+            if term2.operation ~= BinaryOperation.POW then
+                term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer(1)})
+            end
+            if term1.expressions[1] == term2.expressions[1] then
                 return BinaryOperation(BinaryOperation.POW,
                                     {term1.expressions[1],
                                     BinaryOperation(BinaryOperation.ADD,
-                                        {term1.expressions[2], term2.expressions[2]})}):autosimplify()
+                                        {term1.expressions[2], term2.expressions[2]}):autosimplify()}):autosimplify()
+            end
+
+            term1 = term1.expressions[1]
+            term2 = term2.expressions[1]
+
+            if term2:order(term1) then
+                return BinaryOperation(BinaryOperation.MUL, {term2, term1})
             end
 
             return evaluated
@@ -249,17 +282,17 @@ function BinaryOperation:simplifyproduct()
 
     local result = BinaryOperation(BinaryOperation.MUL, rest):autosimplify()
 
-    if term1.operation == BinaryOperation.MUL then
-        return term1:mergeproducts(result)
-    else
-        return BinaryOperation(BinaryOperation.MUL, {term1}):mergeproducts()
+    if term1.operation ~= BinaryOperation.MUL then
+        term1 = BinaryOperation(BinaryOperation.MUL, {term1})
     end
+    if result.operation ~= BinaryOperation.MUL then
+        result = BinaryOperation(BinaryOperation.MUL, {result})
+    end
+    return term1:mergeproducts(result)
 end
 
 -- Merges two lists of products
 function BinaryOperation:mergeproducts(other)
-    local first = BinaryOperation(BinaryOperation.MUL, {self.expressions[1], self.expressions[2]}):autosimplify()
-
     if not self.expressions[1] then
         return other
     end
@@ -267,6 +300,8 @@ function BinaryOperation:mergeproducts(other)
     if not other.expressions[1] then
         return self
     end
+
+    local first = BinaryOperation(BinaryOperation.MUL, {self.expressions[1], other.expressions[1]}):autosimplify()
 
     local selfrest = {}
     for index, expression in ipairs(self.expressions) do
@@ -276,7 +311,7 @@ function BinaryOperation:mergeproducts(other)
     end
 
     local otherrest = {}
-    for index, expression in ipairs(self.expressions) do
+    for index, expression in ipairs(other.expressions) do
         if index > 1 then
             otherrest[index - 1] = expression
         end
@@ -286,23 +321,116 @@ function BinaryOperation:mergeproducts(other)
         return BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
     end
 
-    if first.isEvaluatable() or not first.expressions[2] then
+    if first.operation ~= BinaryOperation.MUL or not first.expressions[2] then
         local result = BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
-        if first.isEvaluatable() then
-            table.insert(result.expressions, first)
+        if first.operation ~= BinaryOperation.MUL then
+            table.insert(result.expressions, 1, first)
         else
-            table.insert(result.expressions, first.expressions[1])
+            table.insert(result.expressions, 1, first.expressions[1])
+        end
+        if result.expressions[1] and not result.expressions[2] then
+            return result.expressions[1]
         end
         return result
     end
 
-    local result = BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
-    table.insert(result.expressions, first.expressions[1])
-    table.insert(result.expressions, first.expressions[2])
-    return result
+    local result
+    if first.expressions[1] == self.expressions[1] then
+        result = BinaryOperation(self.operation, selfrest):mergeproducts(other)
+    else
+        result = self:mergeproducts(BinaryOperation(other.operation, otherrest))
+    end
 
+    table.insert(result.expressions, 1, first.expressions[1])
+
+    if result.expressions[1] and not result.expressions[2] then
+        return result.expressions[1]
+    end
+    return result
 end
 
+function BinaryOperation:simplifysum()
+    local results = {}
+    local reducible = true
+    for index, expression in ipairs(self.expressions) do
+        if not expression:isEvaluatable() then
+            reducible = false
+        end
+        results[index] = expression:evaluate()
+    end
+
+    if reducible then
+        local result = results[1]
+        for index, expression in ipairs(results) do
+            if not (index == 1) then
+                result = self.operation(result, expression)
+            end
+        end
+        return result
+    end
+end
+
+
+function BinaryOperation:order(other)
+    if other.isEvaluatable() then
+        return false
+    end
+
+    if other.isAtomic() then
+        if self.operation == BinaryOperation.POW then
+            return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer(1)}))
+        end
+
+        if self.operation == BinaryOperation.MUL then
+            return self:order(BinaryOperation(BinaryOperation.MUL, {other}))
+        end
+
+        if self.operation == BinaryOperation.ADD then
+            return self:order(BinaryOperation(BinaryOperation.ADD, {other}))
+        end
+    end
+
+    if self.operation == BinaryOperation.POW and other.operation == BinaryOperation.POW then
+        if self.expressions[1] ~= other.expressions[1] then
+            return self.expressions[1]:order(other.expressions[1])
+        end
+        return self.expressions[2]:order(other.expressions[2])
+    end
+
+    if (self.operation == BinaryOperation.MUL and other.operation == BinaryOperation.MUL) or
+    (self.operation == BinaryOperation.ADD and other.operation == BinaryOperation.ADD) then
+        local k = 0
+        while #self.expressions - k > 0 and #other.expressions - k > 0 do
+            if self.expressions[#self.expressions - k] ~= other.expressions[#other.expressions - k] then
+                return self.expressions[#self.expressions - k]:order(other.expressions[#other.expressions - k])
+            end
+            k = k + 1
+        end
+        return #self.expressions < #other.expressions
+    end
+
+    if (self.operation == BinaryOperation.MUL) and (other.operation == BinaryOperation.POW or other.operation == BinaryOperation.ADD) then
+        return self:order(BinaryOperation(BinaryOperation.MUL, {other}))
+    end
+
+    if (self.operation == BinaryOperation.POW) and (other.operation == BinaryOperation.MUL) then
+        return BinaryOperation(BinaryOperation.MUL, {self}):order(other)
+    end
+
+    if (self.operation == BinaryOperation.POW) and (other.operation == BinaryOperation.ADD) then
+        return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer(1)}))
+    end
+
+    if (self.operation == BinaryOperation.ADD) and (other.operation == BinaryOperation.MUL) then
+        return BinaryOperation(BinaryOperation.MUL, {self}):order(other)
+    end
+
+    if (self.operation == BinaryOperation.ADD) and (other.operation == BinaryOperation.POW) then
+        return BinaryOperation(BinaryOperation.POW, {self, Integer(1)}):order(other)
+    end
+
+    return true
+end
 -- Returns whether the binary operation is associative
 function BinaryOperation:isAssociative()
     error("Called unimplemented method: isAssociative()")

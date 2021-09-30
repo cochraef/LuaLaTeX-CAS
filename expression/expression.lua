@@ -29,3 +29,8 @@ end
 function Expression:isEvaluatable()
     error("Called unimplemented method: isEvaluatable()")
 end
+
+-- Returns true if this expression comes before the other expressions in commutative binary operations, false otherwise
+function Expression:order(other)
+    error("Called unimplemented method: order()")
+end

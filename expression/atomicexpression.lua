@@ -33,6 +33,15 @@ function AtomicExpression:isEvaluatable()
     return true
 end
 
+-- Atomic expressions should come before all other expressions except themselves
+function AtomicExpression:order(other)
+    if other.isEvaluatable() then
+        return self < other
+    end
+
+    return true
+end
+
 -----------------
 -- Inheritance --
 -----------------

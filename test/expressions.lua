@@ -104,7 +104,7 @@ local m = BinaryOperation(BinaryOperation.POW,
 
 
 print("Testing exponent autosimplification...")
-test(g:autosimplify(), "(0 ^ x)")
+test(g:autosimplify(), "0")
 test(h:autosimplify(), "1")
 test(i:autosimplify(), "1")
 test(j:autosimplify(), "x")
@@ -119,12 +119,25 @@ local n = BinaryOperation(BinaryOperation.MUL,
                              Integer(0),
                              Integer(-2)
                             })
--- local o = BinaryOperation(BinaryOperation.MUL,
---                             {SymbolExpression("x"),
---                             BinaryOperation(BinaryOperation.MUL,
---                                 {SymbolExpression("y"),
---                                 SymbolExpression("z")})})
+
+local o = BinaryOperation(BinaryOperation.MUL,
+                            {SymbolExpression("x"),
+                            BinaryOperation(BinaryOperation.MUL,
+                                {SymbolExpression("y"),
+                                SymbolExpression("z")})})
+
+local p = BinaryOperation(BinaryOperation.MUL,
+                            {SymbolExpression("x")})
+
+local q = BinaryOperation(BinaryOperation.MUL,
+                            {SymbolExpression("x"), SymbolExpression("x"), SymbolExpression("x"), SymbolExpression("x")})
+
+local r = BinaryOperation(BinaryOperation.MUL,
+                            {SymbolExpression("x"), Integer(3), SymbolExpression("a")})
 
 print("Testing product autosimplification...")
 test(n:autosimplify(), 0)
--- test(o:autosimplify(), "(x * y * z)")
+test(o:autosimplify(), "(x * y * z)")
+test(p:autosimplify(), "x")
+test(q:autosimplify(), "(x ^ 4)")
+test(r:autosimplify(), "(3 * a * x)")
