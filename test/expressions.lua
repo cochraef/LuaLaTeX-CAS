@@ -141,3 +141,26 @@ test(o:autosimplify(), "(x * y * z)")
 test(p:autosimplify(), "x")
 test(q:autosimplify(), "(x ^ 4)")
 test(r:autosimplify(), "(3 * a * x)")
+print()
+
+local s = BinaryOperation(BinaryOperation.ADD,
+                            {SymbolExpression("x")})
+
+local t = BinaryOperation(BinaryOperation.ADD,
+                            {SymbolExpression("x"),
+                                BinaryOperation(BinaryOperation.ADD,
+                                    {Integer(3),
+                                    SymbolExpression("y")})})
+
+local u = BinaryOperation(BinaryOperation.ADD,
+                            {BinaryOperation(BinaryOperation.MUL,
+                                {SymbolExpression("x"),
+                                SymbolExpression("y")}),
+                            BinaryOperation(BinaryOperation.MUL,
+                                {SymbolExpression("y"),
+                                 SymbolExpression("x")})})
+
+print("Testing sum autosimplification...")
+test(s:autosimplify(), "x")
+test(t:autosimplify(), "3 + x + y")
+test(u:autosimplify(), "(2 * x * y)")

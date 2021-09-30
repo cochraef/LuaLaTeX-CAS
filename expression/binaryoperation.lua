@@ -349,6 +349,7 @@ function BinaryOperation:mergeproducts(other)
     return result
 end
 
+-- Automatic simplification of addition expressions
 function BinaryOperation:simplifysum()
     local results = {}
     local reducible = true
@@ -368,6 +369,148 @@ function BinaryOperation:simplifysum()
         end
         return result
     end
+
+    local evaluated = BinaryOperation(self.operation, results)
+
+    -- We don't really know what ring we are working in here, so just assume the integer ring
+    if not evaluated.expressions[1] then
+        return Integer(0)
+    end
+
+    -- Simplifies single sums to their operands
+    if evaluated.expressions[1] and not evaluated.expressions[2] then
+        return evaluated.expressions[1]
+    end
+
+    local term1 = evaluated.expressions[1]
+    local term2 = evaluated.expressions[2]
+
+    if evaluated.expressions[1] and evaluated.expressions[2] and not evaluated.expressions[3] then
+
+        if (term1:isEvaluatable() or not (term1.operation == BinaryOperation.ADD)) and
+            (term2:isEvaluatable() or not (term2.operation == BinaryOperation.ADD)) then
+
+            -- Uses the property that x + 0 = x
+            if term1:isEvaluatable() and term1 == term1:zero() then
+                return term2
+            end
+
+            if term2:isEvaluatable() and term2 == term2:zero() then
+                return term1
+            end
+
+            -- Uses the property that a*x+b*x= (a+b)*x
+            -- This is only done if a and b are constant, since otherwise this could be counterproductive
+            -- We SHOULD be okay to only check left distributivity, since constants always come first when ordered
+            if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1].isEvaluatable() then
+                term1 = BinaryOperation(BinaryOperation.MUL, {Integer(1), term1})
+            end
+            if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1].isEvaluatable() then
+                term2 = BinaryOperation(BinaryOperation.MUL, {Integer(1), term2})
+            end
+            if term1.expressions[2] == term2.expressions[2] and term1.expressions[1].isEvaluatable() and term2.expressions[1].isEvaluatable() then
+                return BinaryOperation(BinaryOperation.MUL,
+                                    {BinaryOperation(BinaryOperation.ADD,
+                                        {term1.expressions[1],
+                                        term2.expressions[1]}):autosimplify(),
+                                    term1.expressions[2]}):autosimplify()
+            end
+
+            term1 = term1.expressions[1]
+            term2 = term2.expressions[1]
+
+            if term2:order(term1) then
+                return BinaryOperation(BinaryOperation.ADD, {term2, term1})
+            end
+
+            return evaluated
+        end
+
+        if term1.operation == BinaryOperation.ADD and not (term2.operation == BinaryOperation.ADD) then
+            return term1:mergesums(BinaryOperation(BinaryOperation.ADD, {term2}))
+        end
+
+        if not (term1.operation == BinaryOperation.ADD) and term2.operation == BinaryOperation.ADD then
+            return BinaryOperation(BinaryOperation.ADD, {term1}):mergesums(term2)
+        end
+
+        return term1:mergesums(term2)
+    end
+
+    local rest = {}
+    for index, expression in ipairs(evaluated.expressions) do
+        if index > 1 then
+            rest[index - 1] = expression
+        end
+    end
+
+    local result = BinaryOperation(BinaryOperation.ADD, rest):autosimplify()
+
+    if term1.operation ~= BinaryOperation.ADD then
+        term1 = BinaryOperation(BinaryOperation.ADD, {term1})
+    end
+    if result.operation ~= BinaryOperation.ADD then
+        result = BinaryOperation(BinaryOperation.ADD, {result})
+    end
+    return term1:mergesums(result)
+end
+
+-- Merges two lists of sums
+function BinaryOperation:mergesums(other)
+    if not self.expressions[1] then
+        return other
+    end
+
+    if not other.expressions[1] then
+        return self
+    end
+
+    local first = BinaryOperation(BinaryOperation.ADD, {self.expressions[1], other.expressions[1]}):autosimplify()
+
+    local selfrest = {}
+    for index, expression in ipairs(self.expressions) do
+        if index > 1 then
+            selfrest[index - 1] = expression
+        end
+    end
+
+    local otherrest = {}
+    for index, expression in ipairs(other.expressions) do
+        if index > 1 then
+            otherrest[index - 1] = expression
+        end
+    end
+
+    if first.isEvaluatable() and first == first.one() then
+        return BinaryOperation(self.operation, selfrest):mergesums(BinaryOperation(other.operation, otherrest))
+    end
+
+    if first.operation ~= BinaryOperation.ADD or not first.expressions[2] then
+        local result = BinaryOperation(self.operation, selfrest):mergesums(BinaryOperation(other.operation, otherrest))
+        if first.operation ~= BinaryOperation.ADD then
+            table.insert(result.expressions, 1, first)
+        else
+            table.insert(result.expressions, 1, first.expressions[1])
+        end
+        if result.expressions[1] and not result.expressions[2] then
+            return result.expressions[1]
+        end
+        return result
+    end
+
+    local result
+    if first.expressions[1] == self.expressions[1] then
+        result = BinaryOperation(self.operation, selfrest):mergesums(other)
+    else
+        result = self:mergesums(BinaryOperation(other.operation, otherrest))
+    end
+
+    table.insert(result.expressions, 1, first.expressions[1])
+
+    if result.expressions[1] and not result.expressions[2] then
+        return result.expressions[1]
+    end
+    return result
 end
 
 
