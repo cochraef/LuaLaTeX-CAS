@@ -100,7 +100,7 @@ function Rational:inv(b)
 end
 
 function Rational:pow(b)
-    return Rational(self.numerator ^ b.internal, self.numerator ^ b.internal)
+    return (self.numerator ^ b) / (self.denominator ^ b)
 end
 
 -- Divides a rational number by another

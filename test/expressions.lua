@@ -1,34 +1,43 @@
 require("algebra._init")
 
-local function test(expected, actual)
-    if(tostring(expected) == tostring(actual)) then
-        print("Result: " .. tostring(expected))
+local function test(actual, expected, initial)
+    if initial then
+        if tostring(expected) == tostring(actual) then
+            print(tostring(initial) .. " -> " .. tostring(actual))
+        else
+            print(tostring(initial) .. " -> " .. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+        end
     else
-        print("Result: ".. tostring(expected) .. " (Expected: " .. tostring(actual) .. ")")
+        if tostring(expected) == tostring(actual) then
+            print("Result: " .. tostring(actual))
+        else
+            print("Result: ".. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+        end
     end
 end
 
-local a = BinaryOperation(BinaryOperation.ADD,
-                                    {Integer(3),
-                                    Integer(5)})
+local a = BinaryOperation.ADDEXP
+                ({Integer(3),
+                Integer(5)})
 
-local b = BinaryOperation(BinaryOperation.MUL,
-                                    {BinaryOperation(BinaryOperation.ADD,
-                                        {Integer(13),
-                                        Integer(12)}),
-                                    Integer(-4)})
+local b = BinaryOperation.MULEXP
+                ({BinaryOperation.ADDEXP
+                    ({Integer(13),
+                    Integer(12)}),
+                Integer(-4)})
 
-local c = BinaryOperation(BinaryOperation.DIV,
-                                    {SymbolExpression("x"), SymbolExpression("y")})
+local c = BinaryOperation.DIVEXP
+                ({SymbolExpression("x"),
+                SymbolExpression("y")})
 
-local d = BinaryOperation(BinaryOperation.DIV,
-                                    {BinaryOperation(BinaryOperation.ADD,
-                                        {Integer(4),
-                                        Integer(-3)}),
-                                    SymbolExpression("y")})
+local d = BinaryOperation.DIVEXP
+            ({BinaryOperation.ADDEXP
+                ({Integer(4),
+                Integer(-3)}),
+            SymbolExpression("y")})
 
-local e = BinaryOperation(BinaryOperation.ADD,
-                            {Integer(3),
+local e = BinaryOperation.ADDEXP
+                            ({Integer(3),
                             Integer(4),
                             Integer(5),
                             Integer(6)})
@@ -68,99 +77,155 @@ test(f:substitute({x=Integer(1)}), "((6 * (1 ^ 0)) + (5 * (1 ^ 1)) + (1 * (1 ^ 2
 test(f:substitute({x=Integer(1)}):evaluate(), 12)
 print()
 
-local g = BinaryOperation(BinaryOperation.POW,
-                                            {Integer(0),
-                                            SymbolExpression("x")})
+local g = BinaryOperation.POWEXP
+            ({Integer(0),
+            SymbolExpression("x")})
 
-local h = BinaryOperation(BinaryOperation.POW,
-                                            {Integer(1),
-                                            SymbolExpression("x")})
+local h = BinaryOperation.POWEXP
+            ({Integer(1),
+            SymbolExpression("x")})
 
-local i = BinaryOperation(BinaryOperation.POW,
-                                            {SymbolExpression("x"),
-                                            Integer(0)})
+local i = BinaryOperation.POWEXP
+            ({SymbolExpression("x"),
+            Integer(0)})
 
-local j = BinaryOperation(BinaryOperation.POW,
-                                            {SymbolExpression("x"),
-                                            Integer(1)})
+local j = BinaryOperation.POWEXP
+            ({SymbolExpression("x"),
+            Integer(1)})
 
-local k = BinaryOperation(BinaryOperation.POW,
-                                            {SymbolExpression("x"),
-                                            SymbolExpression("y")})
+local k = BinaryOperation.POWEXP
+            ({SymbolExpression("x"),
+            SymbolExpression("y")})
 
-local l = BinaryOperation(BinaryOperation.POW,
-                                            {BinaryOperation(BinaryOperation.POW,
-                                                {BinaryOperation(BinaryOperation.POW,
-                                                    {SymbolExpression("x"),
-                                                    Integer(3)}),
-                                                Integer(4)}),
-                                            Integer(5)})
+local l = BinaryOperation.POWEXP
+            ({BinaryOperation.POWEXP
+                ({BinaryOperation.POWEXP
+                    ({SymbolExpression("x"),
+                    Integer(3)}),
+                Integer(4)}),
+            Integer(5)})
 
-local m = BinaryOperation(BinaryOperation.POW,
-                                            {BinaryOperation(BinaryOperation.MUL,
-                                                {SymbolExpression("x"),
-                                                SymbolExpression("y")}),
-                                            SymbolExpression("a")})
+local m = BinaryOperation.POWEXP
+            ({BinaryOperation.MULEXP
+                ({SymbolExpression("x"),
+                SymbolExpression("y")}),
+            SymbolExpression("a")})
 
 
 print("Testing exponent autosimplification...")
-test(g:autosimplify(), "0")
-test(h:autosimplify(), "1")
-test(i:autosimplify(), "1")
-test(j:autosimplify(), "x")
-test(k:autosimplify(), "(x ^ y)")
-test(l:autosimplify(), "(x ^ 60)")
-test(m:autosimplify(), "((x ^ a) * (y ^ a))")
+test(g:autosimplify(), "0", g)
+test(h:autosimplify(), "1", h)
+test(i:autosimplify(), "1", i)
+test(j:autosimplify(), "x", j)
+test(k:autosimplify(), "(x ^ y)", k)
+test(l:autosimplify(), "(x ^ 60)", l)
+test(m:autosimplify(), "((x ^ a) * (y ^ a))", m)
 print()
 
-local n = BinaryOperation(BinaryOperation.MUL,
-                            {SymbolExpression("x"),
-                             SymbolExpression("y"),
-                             Integer(0),
-                             Integer(-2)
-                            })
+local n = BinaryOperation.MULEXP
+            ({SymbolExpression("x"),
+            SymbolExpression("y"),
+            Integer(0),
+            Integer(-2)
+            })
 
-local o = BinaryOperation(BinaryOperation.MUL,
-                            {SymbolExpression("x"),
-                            BinaryOperation(BinaryOperation.MUL,
-                                {SymbolExpression("y"),
-                                SymbolExpression("z")})})
+local o = BinaryOperation.MULEXP
+            ({SymbolExpression("x"),
+            BinaryOperation.MULEXP
+                ({SymbolExpression("y"),
+                SymbolExpression("z")})})
 
-local p = BinaryOperation(BinaryOperation.MUL,
-                            {SymbolExpression("x")})
+local p = BinaryOperation.MULEXP
+            ({SymbolExpression("x")})
 
-local q = BinaryOperation(BinaryOperation.MUL,
-                            {SymbolExpression("x"), SymbolExpression("x"), SymbolExpression("x"), SymbolExpression("x")})
+local q = BinaryOperation.MULEXP
+            ({SymbolExpression("x"), SymbolExpression("x"), SymbolExpression("x"), SymbolExpression("x")})
 
-local r = BinaryOperation(BinaryOperation.MUL,
-                            {SymbolExpression("x"), Integer(3), SymbolExpression("a")})
+local r = BinaryOperation.MULEXP
+            ({SymbolExpression("x"), Integer(3), SymbolExpression("a")})
 
 print("Testing product autosimplification...")
-test(n:autosimplify(), 0)
-test(o:autosimplify(), "(x * y * z)")
-test(p:autosimplify(), "x")
-test(q:autosimplify(), "(x ^ 4)")
-test(r:autosimplify(), "(3 * a * x)")
+test(n:autosimplify(), 0, n)
+test(o:autosimplify(), "(x * y * z)", o)
+test(p:autosimplify(), "x", p)
+test(q:autosimplify(), "(x ^ 4)", q)
+test(r:autosimplify(), "(3 * a * x)", r)
 print()
 
-local s = BinaryOperation(BinaryOperation.ADD,
-                            {SymbolExpression("x")})
+local s = BinaryOperation.ADDEXP
+            ({SymbolExpression("x")})
 
-local t = BinaryOperation(BinaryOperation.ADD,
-                            {SymbolExpression("x"),
-                                BinaryOperation(BinaryOperation.ADD,
-                                    {Integer(3),
-                                    SymbolExpression("y")})})
+local t = BinaryOperation.ADDEXP
+            ({SymbolExpression("x"),
+                BinaryOperation.ADDEXP
+                    ({Integer(3),
+                    SymbolExpression("y")})})
 
-local u = BinaryOperation(BinaryOperation.ADD,
-                            {BinaryOperation(BinaryOperation.MUL,
-                                {SymbolExpression("x"),
-                                SymbolExpression("y")}),
-                            BinaryOperation(BinaryOperation.MUL,
-                                {SymbolExpression("y"),
-                                 SymbolExpression("x")})})
+local u = BinaryOperation.ADDEXP
+        ({BinaryOperation.MULEXP
+            ({SymbolExpression("x"),
+            SymbolExpression("y")}),
+        BinaryOperation.MULEXP
+            ({SymbolExpression("y"),
+                SymbolExpression("x")})})
+
+local v = BinaryOperation.ADDEXP
+            ({Integer(3),
+            BinaryOperation.ADDEXP
+                ({BinaryOperation.MULEXP
+                    ({Integer(2),
+                    BinaryOperation.POWEXP
+                        ({SymbolExpression("x"),
+                        Integer(2)})}),
+                BinaryOperation.ADDEXP
+                    ({BinaryOperation.MULEXP
+                        ({Integer(1),
+                        SymbolExpression("y")}),
+                    BinaryOperation.MULEXP
+                        ({Integer(0),
+                        SymbolExpression("x")})})}),
+            Integer(6)})
 
 print("Testing sum autosimplification...")
-test(s:autosimplify(), "x")
-test(t:autosimplify(), "3 + x + y")
-test(u:autosimplify(), "(2 * x * y)")
+test(s:autosimplify(), "x", s)
+test(t:autosimplify(), "(3 + x + y)", t)
+test(u:autosimplify(), "(2 * x * y)", u)
+test(v:autosimplify(), "(9 + (2 * (x ^ 2)) + y)", v)
+print()
+
+local w = BinaryOperation.MULEXP
+            ({BinaryOperation.DIVEXP
+                ({Integer(1), 
+                SymbolExpression("x")}),
+            SymbolExpression("x")})
+
+local x = BinaryOperation.MULEXP
+            ({BinaryOperation.DIVEXP
+                ({SymbolExpression("y"),
+                SymbolExpression("x")}),
+            BinaryOperation.DIVEXP
+                ({SymbolExpression("x"),
+                SymbolExpression("y")})})
+
+print("Testing quotient autosimplification...")
+test(w:autosimplify(), "1", w)
+test(x:autosimplify(), "1", x)
+print()
+
+local y = BinaryOperation.ADDEXP
+            ({SymbolExpression("x"),
+            SymbolExpression("y"),
+            BinaryOperation.SUBEXP
+                ({SymbolExpression("x"),
+                SymbolExpression("y")})})
+
+print("Testing difference autosimplification...")
+test(y:autosimplify(), "(2 * x)", y)
+print()
+
+-- I am kind of impressed this works this fast
+print("--- MEGA TEST ---")
+local z = BinaryOperation.ADDEXP
+          ({a, b, c, d, e, f, g, h, i, j, k, l, n, m, o, p, q, r, s, t, u, v, w, x, y})
+
+print(z:autosimplify())

@@ -44,7 +44,7 @@ function BinaryOperation:new(operation, expressions, name)
         end
     end
 
-    if not o:isCommutative() and (not o.expressions[1] or not o.expressions[2] or o.expressions[3]) then
+    if not o:isCommutative() and (not o.operation == BinaryOperation.SUB or not o.expressions[1] or not o.expressions[2] or o.expressions[3]) then
         error("Sent parameter of wrong type: noncommutative operations cannot have an arbitrary number of paramaters")
     end
 
@@ -63,6 +63,10 @@ function BinaryOperation:new(operation, expressions, name)
         return '(' .. expressionnames .. ')'
     end
     __o.__eq = function(a, b)
+        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
+        if not b.operation then
+            return false
+        end
         local loc = 1
         while a.expressions[loc] or b.expressions[loc] do
             if not a.expressions[loc] or not b.expressions[loc] or
@@ -130,7 +134,12 @@ function BinaryOperation:autosimplify()
     if simplified.operation == BinaryOperation.ADD then
         return simplified:simplifysum()
     end
-
+    if simplified.operation == BinaryOperation.DIV then
+        return simplified:simplifyquotient()
+    end
+    if simplified.operation == BinaryOperation.SUB then
+        return simplified:simplifydifference()
+    end
     return simplified
 end
 
@@ -184,82 +193,90 @@ end
 
 -- Automatic simplification of multiplication expressions
 function BinaryOperation:simplifyproduct()
-    local results = {}
-    local reducible = true
-    for index, expression in ipairs(self.expressions) do
-        if not expression:isEvaluatable() then
-            reducible = false
-        end
-        results[index] = expression:evaluate()
+    if not self.expressions[1] then
+        error("Execution error: attempted to simplify empty product")
     end
 
-    if reducible then
-        local result = results[1]
-        for index, expression in ipairs(results) do
-            if not (index == 1) then
-                result = self.operation(result, expression)
-            end
-        end
-        return result
+    if not self.expressions[2] then
+        return self.expressions[1]
     end
-
-    local evaluated = BinaryOperation(self.operation, results)
 
     -- Uses the property that x*0=0
-    for index, expression in ipairs(evaluated.expressions) do
+    for index, expression in ipairs(self.expressions) do
         if expression:isEvaluatable() and expression == expression:zero() then
             return expression:zero()
         end
     end
 
+    local result = self:simplifyproductrec()
+
     -- We don't really know what ring we are working in here, so just assume the integer ring
-    if not evaluated.expressions[1] then
+    if not result.expressions[1] then
         return Integer(1)
     end
 
-    -- Simplifies single products to their operands
-    if evaluated.expressions[1] and not evaluated.expressions[2] then
-        return evaluated.expressions[1]
+    if not result.expressions[2] then
+        return result.expressions[1]
     end
 
-    local term1 = evaluated.expressions[1]
-    local term2 = evaluated.expressions[2]
+    return result
+end
 
-    if evaluated.expressions[1] and evaluated.expressions[2] and not evaluated.expressions[3] then
+function BinaryOperation:simplifyproductrec()
+    local term1 = self.expressions[1]
+    local term2 = self.expressions[2]
 
+    if not self.expressions[3] then
         if (term1:isEvaluatable() or not (term1.operation == BinaryOperation.MUL)) and
             (term2:isEvaluatable() or not (term2.operation == BinaryOperation.MUL)) then
+
+            if term1:isEvaluatable() and term2:isEvaluatable() then
+                return BinaryOperation(BinaryOperation.MUL, {self:evaluate()})
+            end
+
             -- Uses the property that x*1 = x
             if term1:isEvaluatable() and term1 == term1:one() then
-                return term2
+                return BinaryOperation(BinaryOperation.MUL, {term2})
             end
 
             if term2:isEvaluatable() and term2 == term2:one() then
-                return term1
+                return BinaryOperation(BinaryOperation.MUL, {term1})
             end
 
             -- Uses the property that x^a*x^b=x^(a+b)
+            local revertterm1 = false
+            local revertterm2 = false
             if term1.operation ~= BinaryOperation.POW then
                 term1 = BinaryOperation(BinaryOperation.POW, {term1, Integer(1)})
+                revertterm1 = true
             end
             if term2.operation ~= BinaryOperation.POW then
                 term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer(1)})
+                revertterm2 = true
             end
             if term1.expressions[1] == term2.expressions[1] then
-                return BinaryOperation(BinaryOperation.POW,
+                local result = BinaryOperation(BinaryOperation.POW,
                                     {term1.expressions[1],
                                     BinaryOperation(BinaryOperation.ADD,
                                         {term1.expressions[2], term2.expressions[2]}):autosimplify()}):autosimplify()
+                if result.isEvaluatable() and result == result:one() then
+                    return BinaryOperation(BinaryOperation.MUL, {})
+                end
+                return BinaryOperation(BinaryOperation.MUL, {result})
             end
 
-            term1 = term1.expressions[1]
-            term2 = term2.expressions[1]
+            if revertterm1 then
+                term1 = term1.expressions[1]
+            end
+            if revertterm2 then
+                term2 = term2.expressions[1]
+            end
 
             if term2:order(term1) then
                 return BinaryOperation(BinaryOperation.MUL, {term2, term1})
             end
 
-            return evaluated
+            return self
         end
 
         if term1.operation == BinaryOperation.MUL and not (term2.operation == BinaryOperation.MUL) then
@@ -274,13 +291,13 @@ function BinaryOperation:simplifyproduct()
     end
 
     local rest = {}
-    for index, expression in ipairs(evaluated.expressions) do
+    for index, expression in ipairs(self.expressions) do
         if index > 1 then
             rest[index - 1] = expression
         end
     end
 
-    local result = BinaryOperation(BinaryOperation.MUL, rest):autosimplify()
+    local result = BinaryOperation(BinaryOperation.MUL, rest):simplifyproductrec()
 
     if term1.operation ~= BinaryOperation.MUL then
         term1 = BinaryOperation(BinaryOperation.MUL, {term1})
@@ -301,7 +318,7 @@ function BinaryOperation:mergeproducts(other)
         return self
     end
 
-    local first = BinaryOperation(BinaryOperation.MUL, {self.expressions[1], other.expressions[1]}):autosimplify()
+    local first = BinaryOperation(BinaryOperation.MUL, {self.expressions[1], other.expressions[1]}):simplifyproductrec()
 
     local selfrest = {}
     for index, expression in ipairs(self.expressions) do
@@ -343,87 +360,92 @@ function BinaryOperation:mergeproducts(other)
 
     table.insert(result.expressions, 1, first.expressions[1])
 
-    if result.expressions[1] and not result.expressions[2] then
-        return result.expressions[1]
-    end
     return result
 end
 
 -- Automatic simplification of addition expressions
 function BinaryOperation:simplifysum()
-    local results = {}
-    local reducible = true
-    for index, expression in ipairs(self.expressions) do
-        if not expression:isEvaluatable() then
-            reducible = false
-        end
-        results[index] = expression:evaluate()
+    if not self.expressions[1] then
+        error("Execution error: Attempted to simplify empty sum")
     end
 
-    if reducible then
-        local result = results[1]
-        for index, expression in ipairs(results) do
-            if not (index == 1) then
-                result = self.operation(result, expression)
-            end
-        end
-        return result
+    if not self.expressions[2] then
+        return self.expressions[1]
     end
 
-    local evaluated = BinaryOperation(self.operation, results)
+    local result = self:simplifysumrec()
 
     -- We don't really know what ring we are working in here, so just assume the integer ring
-    if not evaluated.expressions[1] then
+    if not result.expressions[1] then
         return Integer(0)
     end
 
     -- Simplifies single sums to their operands
-    if evaluated.expressions[1] and not evaluated.expressions[2] then
-        return evaluated.expressions[1]
+    if not result.expressions[2] then
+        return result.expressions[1]
     end
 
-    local term1 = evaluated.expressions[1]
-    local term2 = evaluated.expressions[2]
+    return result
+end
 
-    if evaluated.expressions[1] and evaluated.expressions[2] and not evaluated.expressions[3] then
+function BinaryOperation:simplifysumrec()
+    local term1 = self.expressions[1]
+    local term2 = self.expressions[2]
 
+    if self.expressions[1] and self.expressions[2] and not self.expressions[3] then
         if (term1:isEvaluatable() or not (term1.operation == BinaryOperation.ADD)) and
             (term2:isEvaluatable() or not (term2.operation == BinaryOperation.ADD)) then
 
+            if term1:isEvaluatable() and term2:isEvaluatable() then
+                return BinaryOperation(BinaryOperation.ADD, {self:evaluate()})
+            end
+
             -- Uses the property that x + 0 = x
             if term1:isEvaluatable() and term1 == term1:zero() then
-                return term2
+                return BinaryOperation(BinaryOperation.ADD, {term2})
             end
 
             if term2:isEvaluatable() and term2 == term2:zero() then
-                return term1
+                return BinaryOperation(BinaryOperation.ADD, {term1})
             end
 
+            local revertterm1 = false
+            local revertterm2 = false
             -- Uses the property that a*x+b*x= (a+b)*x
             -- This is only done if a and b are constant, since otherwise this could be counterproductive
             -- We SHOULD be okay to only check left distributivity, since constants always come first when ordered
             if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1].isEvaluatable() then
                 term1 = BinaryOperation(BinaryOperation.MUL, {Integer(1), term1})
+                revertterm1 = true
             end
             if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1].isEvaluatable() then
                 term2 = BinaryOperation(BinaryOperation.MUL, {Integer(1), term2})
+                revertterm2 = true
             end
             if term1.expressions[2] == term2.expressions[2] and term1.expressions[1].isEvaluatable() and term2.expressions[1].isEvaluatable() then
-                return BinaryOperation(BinaryOperation.MUL,
+                local result = BinaryOperation(BinaryOperation.MUL,
                                     {BinaryOperation(BinaryOperation.ADD,
                                         {term1.expressions[1],
                                         term2.expressions[1]}):autosimplify(),
                                     term1.expressions[2]}):autosimplify()
+                if result.isEvaluatable() and result == result:zero() then
+                    return BinaryOperation(BinaryOperation.ADD, {})
+                end
+                return BinaryOperation(BinaryOperation.ADD, {result})
             end
 
-            term1 = term1.expressions[1]
-            term2 = term2.expressions[1]
+            if revertterm1 then
+                term1 = term1.expressions[2]
+            end
+            if revertterm2 then
+                term2 = term2.expressions[2]
+            end
 
             if term2:order(term1) then
                 return BinaryOperation(BinaryOperation.ADD, {term2, term1})
             end
 
-            return evaluated
+            return self
         end
 
         if term1.operation == BinaryOperation.ADD and not (term2.operation == BinaryOperation.ADD) then
@@ -438,13 +460,13 @@ function BinaryOperation:simplifysum()
     end
 
     local rest = {}
-    for index, expression in ipairs(evaluated.expressions) do
+    for index, expression in ipairs(self.expressions) do
         if index > 1 then
             rest[index - 1] = expression
         end
     end
 
-    local result = BinaryOperation(BinaryOperation.ADD, rest):autosimplify()
+    local result = BinaryOperation(BinaryOperation.ADD, rest):simplifysumrec()
 
     if term1.operation ~= BinaryOperation.ADD then
         term1 = BinaryOperation(BinaryOperation.ADD, {term1})
@@ -465,7 +487,7 @@ function BinaryOperation:mergesums(other)
         return self
     end
 
-    local first = BinaryOperation(BinaryOperation.ADD, {self.expressions[1], other.expressions[1]}):autosimplify()
+    local first = BinaryOperation(BinaryOperation.ADD, {self.expressions[1], other.expressions[1]}):simplifysumrec()
 
     local selfrest = {}
     for index, expression in ipairs(self.expressions) do
@@ -492,9 +514,6 @@ function BinaryOperation:mergesums(other)
         else
             table.insert(result.expressions, 1, first.expressions[1])
         end
-        if result.expressions[1] and not result.expressions[2] then
-            return result.expressions[1]
-        end
         return result
     end
 
@@ -511,6 +530,30 @@ function BinaryOperation:mergesums(other)
         return result.expressions[1]
     end
     return result
+end
+
+-- Automatic simplification of quotient expressions
+function BinaryOperation:simplifyquotient()
+    local numerator = self.expressions[1]
+    local denominator = self.expressions[2]
+
+    if numerator:isEvaluatable() and denominator:isEvaluatable() then
+        return self:evaluate()
+    end
+
+    return BinaryOperation(BinaryOperation.MUL, {numerator, BinaryOperation(BinaryOperation.POW, {denominator, Integer(-1)}):autosimplify()}):autosimplify()
+end
+
+-- Automatic simplification of difference expressions
+function BinaryOperation:simplifydifference()
+    local term1 = self.expressions[1]
+    local term2 = self.expressions[2]
+
+    if not term2 then
+        return BinaryOperation(BinaryOperation.MUL, {Integer(-1), term1}):autosimplify()
+    end
+
+    return BinaryOperation(BinaryOperation.ADD, {term1, BinaryOperation(BinaryOperation.MUL, {Integer(-1), term2}):autosimplify()}):autosimplify()
 end
 
 
@@ -635,3 +678,31 @@ BinaryOperation.DEFAULT_NAMES = {
     [BinaryOperation.MOD] = "%",
     [BinaryOperation.POW] = "^",
 }
+
+BinaryOperation.ADDEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.ADD, expressions, name)
+end
+
+BinaryOperation.SUBEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.SUB, expressions, name)
+end
+
+BinaryOperation.MULEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.MUL, expressions, name)
+end
+
+BinaryOperation.DIVEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.DIV, expressions, name)
+end
+
+BinaryOperation.IDIVEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.IDIV, expressions, name)
+end
+
+BinaryOperation.MODEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.MOD, expressions, name)
+end
+
+BinaryOperation.POWEXP = function(expressions, name)
+    return BinaryOperation(BinaryOperation.POW, expressions, name)
+end

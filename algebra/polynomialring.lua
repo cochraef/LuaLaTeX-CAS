@@ -240,6 +240,10 @@ function PolynomialRing:substitute(variables)
     return self
 end
 
+function PolynomialRing:autosimplify()
+    return self:toCompoundExpression():autosimplify()
+end
+
 -- Transforms from array format to an expression format
 function PolynomialRing:toCompoundExpression()
     local terms = {}

@@ -20,7 +20,7 @@
 
 --- Fixed width unsigned integers backed by a BigNum.
 
-local bn = require("nums.bn")
+local bn = require("_lib.nums.bn")
 
 local M = {}
 local M_mt = {}

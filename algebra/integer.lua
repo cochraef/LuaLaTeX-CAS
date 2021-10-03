@@ -109,6 +109,9 @@ end
 
 -- Overrides the generic power method with the bignum library's more efficient method
 function Integer:pow(b)
+    if b < Integer(0) then
+        return Integer(1) / Integer(self.internal ^ (-b.internal))
+    end
     return Integer(self.internal ^ b.internal)
 end
 
