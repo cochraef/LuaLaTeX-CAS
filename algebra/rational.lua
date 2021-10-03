@@ -109,7 +109,7 @@ function Rational:div(b)
 end
 
 function Rational:eq(b)
-    return self.numerator == b.numerator and self.denominator == self.denominator
+    return self.numerator == b.numerator and self.denominator == b.denominator
 end
 
 function Rational:lt(b)

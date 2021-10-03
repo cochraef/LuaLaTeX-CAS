@@ -195,7 +195,7 @@ print()
 
 local w = BinaryOperation.MULEXP
             ({BinaryOperation.DIVEXP
-                ({Integer(1), 
+                ({Integer(1),
                 SymbolExpression("x")}),
             SymbolExpression("x")})
 
@@ -207,12 +207,19 @@ local x = BinaryOperation.MULEXP
                 ({SymbolExpression("x"),
                 SymbolExpression("y")})})
 
+local y = BinaryOperation.MULEXP
+    ({BinaryOperation.DIVEXP
+        ({Integer(1),
+        Integer(3)}),
+    SymbolExpression("x")})
+
 print("Testing quotient autosimplification...")
 test(w:autosimplify(), "1", w)
 test(x:autosimplify(), "1", x)
+test(y:autosimplify(), "(1/3 * x)", y)
 print()
 
-local y = BinaryOperation.ADDEXP
+local z = BinaryOperation.ADDEXP
             ({SymbolExpression("x"),
             SymbolExpression("y"),
             BinaryOperation.SUBEXP
@@ -220,12 +227,12 @@ local y = BinaryOperation.ADDEXP
                 SymbolExpression("y")})})
 
 print("Testing difference autosimplification...")
-test(y:autosimplify(), "(2 * x)", y)
+test(z:autosimplify(), "(2 * x)", y)
 print()
 
 -- I am kind of impressed this works this fast
 print("--- MEGA TEST ---")
-local z = BinaryOperation.ADDEXP
-          ({a, b, c, d, e, f, g, h, i, j, k, l, n, m, o, p, q, r, s, t, u, v, w, x, y})
+local AAAAAAAAAAAAA = BinaryOperation.ADDEXP
+          ({a, b, c, d, e, f, g, h, i, j, k, l, n, m, o, p, q, r, s, t, u, v, w, x, y, z})
 
-print(z:autosimplify())
+print(AAAAAAAAAAAAA:autosimplify())

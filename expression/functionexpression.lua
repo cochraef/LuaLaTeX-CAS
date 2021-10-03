@@ -1,0 +1,5 @@
+-- Represents an arbitary function from one expression to another
+-- FunctionExpressions have the following instance variables:
+--      name - the string name of the function
+-- FunctionExpressions have the following relations to other classes:
+--      FunctionExpressions extend CompoundExpressions
