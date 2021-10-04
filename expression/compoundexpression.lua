@@ -27,6 +27,5 @@ end
 -- Inheritance --
 -----------------
 
-__CompoundExpression.index = Expression
-__CompoundExpression.call = CompoundExpression.new
+__CompoundExpression.__index = Expression
 CompoundExpression = setmetatable(CompoundExpression, __CompoundExpression)

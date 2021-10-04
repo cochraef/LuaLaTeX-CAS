@@ -158,7 +158,7 @@ end
 -- All elements of all rings need these metamethods, since in Lua comparisons on tables only fire if both objects have the table
 __RingOperations.__eq = function(a, b)
     -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
-    if not b.getRing then
+    if not a.ring or not b.getRing then
         return false
     end
     local aring, bring = a:getRing(), b:getRing()

@@ -227,7 +227,7 @@ local z = BinaryOperation.ADDEXP
                 SymbolExpression("y")})})
 
 print("Testing difference autosimplification...")
-test(z:autosimplify(), "(2 * x)", y)
+test(z:autosimplify(), "(2 * x)", z)
 print()
 
 -- I am kind of impressed this works this fast

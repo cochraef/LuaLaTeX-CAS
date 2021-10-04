@@ -34,3 +34,12 @@ end
 function Expression:order(other)
     error("Called unimplemented method: order()")
 end
+
+----------------------
+-- Instance methods --
+----------------------
+
+-- Returns the type of the expression - may not be accurate
+function Expression:type()
+    return getmetatable(self).__index
+end
