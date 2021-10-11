@@ -13,7 +13,7 @@ __SymbolExpression = {}
 -- Given the name of the symbol as a string, creates a new symbol
 function SymbolExpression:new(symbol)
     local o = {}
-    local __o = {}
+    local __o = Copy(__ExpressionOperations)
     __o.__index = SymbolExpression
     __o.__tostring = function(a)
         return a.symbol

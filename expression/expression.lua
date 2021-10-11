@@ -43,3 +43,32 @@ end
 function Expression:type()
     return getmetatable(self).__index
 end
+
+--------------------------
+-- Instance metamethods --
+--------------------------
+__ExpressionOperations = {}
+
+__ExpressionOperations.__unm = function(a)
+    return BinaryOperation.SUBEXP({a})
+end
+
+__ExpressionOperations.__add = function(a, b)
+    return BinaryOperation.ADDEXP({a, b})
+end
+
+__ExpressionOperations.__sub = function(a, b)
+    return BinaryOperation.SUBEXP({a, b})
+end
+
+__ExpressionOperations.__mul = function(a, b)
+    return BinaryOperation.MULEXP({a, b})
+end
+
+__ExpressionOperations.__div = function(a, b)
+    return BinaryOperation.DIVEXP({a, b})
+end
+
+__ExpressionOperations.__pow = function(a, b)
+    return BinaryOperation.POWEXP({a, b})
+end

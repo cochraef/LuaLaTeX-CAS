@@ -99,6 +99,10 @@ __RingOperations.__unm = function(a)
 end
 
 __RingOperations.__add = function(a, b)
+    if not b.getRing and b.isEvaluatable then
+        return BinaryOperation.ADDEXP({a, b})
+    end
+
     local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:add(b)
@@ -114,6 +118,10 @@ __RingOperations.__add = function(a, b)
 end
 
 __RingOperations.__sub = function(a, b)
+    if not b.getRing and b.isEvaluatable then
+        return BinaryOperation.SUBEXP({a, b})
+    end
+
     local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:sub(b)
@@ -129,6 +137,10 @@ __RingOperations.__sub = function(a, b)
 end
 
 __RingOperations.__mul = function(a, b)
+    if not b.getRing and b.isEvaluatable then
+        return BinaryOperation.MULEXP({a, b})
+    end
+
     local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:mul(b)
@@ -144,6 +156,10 @@ __RingOperations.__mul = function(a, b)
 end
 
 __RingOperations.__pow = function(a, n)
+    if not n.getRing and n.isEvaluatable then
+        return BinaryOperation.POWEXP({a, n})
+    end
+
     if n:getRing() ~= Integer then
         error("Sent parameter of wrong type: exponent must be an integer")
     end
@@ -157,7 +173,7 @@ end
 -- Comparison operations assume, of course, that the ring operation is equipped with a total order
 -- All elements of all rings need these metamethods, since in Lua comparisons on tables only fire if both objects have the table
 __RingOperations.__eq = function(a, b)
-    -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
+    -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
     if not a.getRing or not b.getRing then
         return false
     end

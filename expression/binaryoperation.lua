@@ -16,7 +16,7 @@ __BinaryOperation = {}
 -- Creates a new binary operation with the given operation
 function BinaryOperation:new(operation, expressions, name)
     local o = {}
-    local __o = {}
+    local __o = Copy(__ExpressionOperations)
 
     if type(name) ~= "string" and type(name) ~= "nil" then
         error("Sent parameter of wrong type: name must be a string")
@@ -44,7 +44,7 @@ function BinaryOperation:new(operation, expressions, name)
         end
     end
 
-    if not o:isCommutative() and (not o.operation == BinaryOperation.SUB or not o.expressions[1] or not o.expressions[2] or o.expressions[3]) then
+    if not o:isCommutative() and o.operation ~= BinaryOperation.SUB and (not o.expressions[1] or not o.expressions[2] or o.expressions[3]) then
         error("Sent parameter of wrong type: noncommutative operations cannot have an arbitrary number of paramaters")
     end
 
@@ -52,6 +52,9 @@ function BinaryOperation:new(operation, expressions, name)
     __o.__tostring = function(a)
         local expressionnames = '';
         for index, expression in ipairs(a.expressions) do
+            if index == 1 and not a.expressions[index + 1] then
+                expressionnames = expressionnames .. a.name .. ' '
+            end
             if index > 1 then
                 expressionnames = expressionnames .. ' '
             end

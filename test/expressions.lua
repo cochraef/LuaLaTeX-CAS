@@ -236,3 +236,16 @@ local AAAAAAAAAAAAA = BinaryOperation.ADDEXP
           ({a, b, c, d, e, f, g, h, i, j, k, l, n, m, o, p, q, r, s, t, u, v, w, x, y, z})
 
 print(AAAAAAAAAAAAA:autosimplify())
+print("")
+
+print("Testing metamethod expressions...")
+
+local aa = SymbolExpression("x") + SymbolExpression("y") + SymbolExpression("z")
+
+local ab = -(SymbolExpression("x") / SymbolExpression("y"))
+
+test(aa, "((x + y) + z)")
+test(aa:autosimplify(), "(x + y + z)", aa)
+
+test(ab, "(- (x / y))")
+test(ab:autosimplify(), "(-1 * x * (y ^ -1))", ab)

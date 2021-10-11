@@ -39,6 +39,10 @@ end
 __FieldOperations = Copy(__EuclideanOperations)
 
 __FieldOperations.__div = function(a, b)
+    if not b.getRing and b.isEvaluatable then
+        return BinaryOperation.DIVEXP({a, b})
+    end
+
     if(b == b:getRing():zero()) then
         error("Cannot divide by zero.")
     end
