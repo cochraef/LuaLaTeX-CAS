@@ -151,7 +151,7 @@ function BinaryOperation:simplifypower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
 
-    if base:isEvaluatable() and exponent:isEvaluatable() then
+    if base:isEvaluatable() and exponent:isEvaluatable() and not exponent:getRing() == Rational then
         return self:evaluate()
     end
 

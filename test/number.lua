@@ -1,10 +1,18 @@
 require("algebra._init")
 
-local function test(expected, actual)
-    if(tostring(expected) == tostring(actual)) then
-        print("Result: " .. tostring(expected))
+local function test(actual, expected, initial)
+    if initial then
+        if tostring(expected) == tostring(actual) then
+            print(tostring(initial) .. " -> " .. tostring(actual))
+        else
+            print(tostring(initial) .. " -> " .. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+        end
     else
-        print("Result: ".. tostring(expected) .. " (Expected: " .. tostring(actual) .. ")")
+        if tostring(expected) == tostring(actual) then
+            print("Result: " .. tostring(actual))
+        else
+            print("Result: ".. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+        end
     end
 end
 
@@ -77,3 +85,23 @@ test(a/e == x, false)
 test(e/a == x, true)
 test(y < b , true)
 test(b < y, false)
+print()
+
+
+print("Testing Pollard Rho Algorithm...")
+
+local f = Integer(3)
+local g = Integer(216)
+local h = Integer(10000)
+local i = Integer("77664115786500202128")
+
+test(f:factor(), 3, f)
+test(g:factor(), 3, g)
+test(h:factor(), 16, h)
+test(i:factor(), 3, i)
+
+print("Testing Prime Factorization...")
+test(f:primefactorization(), "(* (3 ^ 1))", f)
+test(g:primefactorization(), "((2 ^ 3) * (3 ^ 3))", g)
+test(h:primefactorization(), "((2 ^ 4) * (3 ^ 4))", h)
+-- test(i:primefactorization(), 16, i)

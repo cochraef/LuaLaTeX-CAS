@@ -153,6 +153,75 @@ function Integer:asNumber()
     return self.internal:asnumber()
 end
 
+-- returns the prime factorization of this integer as a expression
+function Integer:primefactorization()
+    local result = self:primefactorizationrec()
+    local mul = {}
+    local i = 1
+    for factor, degree in pairs(result) do
+        mul[i] = BinaryOperation.POWEXP({factor, degree})
+        i = i + 1
+    end
+    return BinaryOperation.MULEXP(mul)
+end
+
+-- Recursive part of prime factorization using Pollard Rho
+function Integer:primefactorizationrec()
+    local result = self:factor()
+    if result == self then
+        return {[result]=Integer(1)}
+    end
+    local remaining = self / result
+    local y = result:factor()
+    if y == result then
+        return Integer.mergefactors(remaining:primefactorizationrec(), {[result]=Integer(1)})
+    end
+
+    return Integer.mergefactors(result:primefactorizationrec(), remaining:primefactorizationrec())
+end
+
+
+function Integer.mergefactors(a, b)
+    local result = Copy(a)
+
+    for factor, degree in pairs(b) do
+        for ofactor, odegree in pairs(result) do
+            if factor == ofactor then
+                result[ofactor] = result[ofactor] + odegree
+                goto foundpair
+            end
+        end
+        result[factor] = degree
+        ::foundpair::
+    end
+    return result
+end
+
+-- return a non-trivial factor of n via Pollard Rho
+function Integer:factor()
+    math.randomseed(os.time())
+    math.random()
+    math.random()
+    local x = {}
+    x[0] = Integer(math.random(10))
+    x[1] = (x[0] ^ Integer(2) + Integer(1)) % self
+    x[2] = (x[1] ^ Integer(2) + Integer(1)) % self
+    local d = Integer.gcd(x[2]-x[1], self):abs()
+    local i = 2
+    while d == Integer(1) do
+        x[i+1] = (x[i] ^ Integer(2) + Integer(1)) % self
+        x[i+2] = (x[i] ^ Integer(2) + Integer(1)) % self
+        i = i + 2
+        d = Integer.gcd(x[i] - x[i/2], self):abs()
+    end
+    return d
+end
+
+-- returns the absolute value of an integer
+function Integer:abs()
+    return Integer(self.internal:abs())
+end
+
 -----------------
 -- Inheritance --
 -----------------
