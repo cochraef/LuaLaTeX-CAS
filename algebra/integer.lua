@@ -44,6 +44,24 @@ function Integer.ceillog(a, base)
     return k
 end
 
+-- Returns a ^ b (mod n). This should be used when a ^ b is potentially large.
+function Integer.powmod(a, b, n)
+    if n == Integer(1) then
+        return Integer(0)
+    else
+        local r = Integer(1)
+        a = a % n
+        while b > Integer(0) do
+          if b % Integer(2) == Integer(1) then
+            r = (r * a) % n
+          end
+          a = (a ^ Integer(2)) % n
+          b = b // Integer(2)
+        end
+        return r
+    end
+end
+
 ----------------------------
 -- Instance functionality --
 ----------------------------
@@ -167,12 +185,12 @@ end
 
 -- Recursive part of prime factorization using Pollard Rho
 function Integer:primefactorizationrec()
-    local result = self:factor()
+    local result = self:findafactor()
     if result == self then
         return {[result]=Integer(1)}
     end
     local remaining = self / result
-    local y = result:factor()
+    local y = result:findafactor()
     if y == result then
         return Integer.mergefactors(remaining:primefactorizationrec(), {[result]=Integer(1)})
     end
@@ -188,33 +206,71 @@ function Integer.mergefactors(a, b)
         for ofactor, odegree in pairs(result) do
             if factor == ofactor then
                 result[ofactor] = result[ofactor] + odegree
-                goto foundpair
+                goto continue
             end
         end
         result[factor] = degree
-        ::foundpair::
+        ::continue::
     end
     return result
 end
 
--- return a non-trivial factor of n via Pollard Rho
-function Integer:factor()
-    math.randomseed(os.time())
-    math.random()
-    math.random()
-    local x = {}
-    x[0] = Integer(math.random(10))
-    x[1] = (x[0] ^ Integer(2) + Integer(1)) % self
-    x[2] = (x[1] ^ Integer(2) + Integer(1)) % self
-    local d = Integer.gcd(x[2]-x[1], self):abs()
-    local i = 2
-    while d == Integer(1) do
-        x[i+1] = (x[i] ^ Integer(2) + Integer(1)) % self
-        x[i+2] = (x[i] ^ Integer(2) + Integer(1)) % self
-        i = i + 2
-        d = Integer.gcd(x[i] - x[i/2], self):abs()
+-- return a non-trivial factor of n via Pollard Rho, or returns n if n is prime
+function Integer:findafactor()
+    -- math.randomseed(os.time())
+    -- math.random()
+    -- math.random()
+    local g = function(x)
+        return (x ^ Integer(2)) + Integer(1) % self
     end
+    local x = Integer(2)
+    local y = Integer(2)
+    local d = Integer(1)
+    while d == Integer(1) do
+        x = g(x)
+        y = g(g(y))
+        d = Integer.gcd((x - y):abs(), self)
+    end
+
     return d
+end
+
+-- uses Miller-Rabin to determine whether a number is prime up to a very large number
+function Integer:isprime()
+    if self % Integer(2) == Integer(0) then
+        return false
+    end
+
+    local smallprimes = {Integer(2), Integer(3), Integer(5), Integer(7), Integer(11), Integer(13), Integer(17), Integer(19), Integer(23),
+                            Integer(29), Integer(31), Integer(37), Integer(41), Integer(43), Integer(47), Integer(53), Integer(59)}
+
+    local r = Integer(0)
+    local d = self - Integer(1)
+    while d % Integer(2) == Integer(0) do
+        r = r + Integer(1)
+        d = d / Integer(2)
+    end
+
+    for _, a in ipairs(smallprimes) do
+        local x = Integer.powmod(a, d, self)
+        if x == Integer(1) or x == self - Integer(1) then
+            goto continue
+        end
+
+        while r > Integer(0) do
+            x = Integer.powmod(x, Integer(2), self)
+            if x == self - Integer(1) then
+                goto continue
+            end
+            r = r - Integer(1)
+        end
+        do
+            return false
+        end
+        ::continue::
+    end
+
+    return true
 end
 
 -- returns the absolute value of an integer

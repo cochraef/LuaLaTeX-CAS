@@ -21,8 +21,6 @@ local a = Integer(5)
 local b = Integer(3)
 local c = Integer(-12)
 
-tostring(c)
-
 print("Testing integer operations...")
 test(-c, 12)
 test(a + b, 8)
@@ -87,21 +85,35 @@ test(y < b , true)
 test(b < y, false)
 print()
 
-
-print("Testing Pollard Rho Algorithm...")
-
 local f = Integer(3)
 local g = Integer(216)
 local h = Integer(10000)
 local i = Integer("77664115786500202128")
+local j = Integer(4)
+local k = Integer(8)
+local m = Integer(16)
+local n = Integer(100000000003);
 
-test(f:factor(), 3, f)
-test(g:factor(), 3, g)
-test(h:factor(), 16, h)
-test(i:factor(), 3, i)
+print("Testing Miller-Rabin Primes...")
+test(f:isprime(), false, f);
+test(g:isprime(), false, g);
+test(h:isprime(), false, h);
+test(i:isprime(), false, i);
+test(n:isprime(), true, n);
+print()
 
-print("Testing Prime Factorization...")
-test(f:primefactorization(), "(* (3 ^ 1))", f)
-test(g:primefactorization(), "((2 ^ 3) * (3 ^ 3))", g)
-test(h:primefactorization(), "((2 ^ 4) * (3 ^ 4))", h)
+
+print("Testing Pollard Rho Algorithm...")
+test(f:findafactor(), 3, f)
+test(g:findafactor(), 3, g)
+test(h:findafactor(), 16, h)
+test(i:findafactor(), 3, i)
+test(j:findafactor(), 2, j)
+test(k:findafactor(), 2, k)
+test(m:findafactor(), 2, m)
+
+-- print("Testing Prime Factorization...")
+-- test(f:primefactorization(), "(* (3 ^ 1))", f)
+-- test(g:primefactorization(), "((2 ^ 3) * (3 ^ 3))", g)
+-- test(h:primefactorization(), "((2 ^ 4) * (3 ^ 4))", h)
 -- test(i:primefactorization(), 16, i)
