@@ -190,11 +190,6 @@ function Integer:primefactorizationrec()
         return {[result]=Integer(1)}
     end
     local remaining = self / result
-    local y = result:findafactor()
-    if y == result then
-        return Integer.mergefactors(remaining:primefactorizationrec(), {[result]=Integer(1)})
-    end
-
     return Integer.mergefactors(result:primefactorizationrec(), remaining:primefactorizationrec())
 end
 
@@ -205,7 +200,7 @@ function Integer.mergefactors(a, b)
     for factor, degree in pairs(b) do
         for ofactor, odegree in pairs(result) do
             if factor == ofactor then
-                result[ofactor] = result[ofactor] + odegree
+                result[ofactor] = degree + odegree
                 goto continue
             end
         end
@@ -217,22 +212,39 @@ end
 
 -- return a non-trivial factor of n via Pollard Rho, or returns n if n is prime
 function Integer:findafactor()
-    -- math.randomseed(os.time())
-    -- math.random()
-    -- math.random()
-    local g = function(x)
-        return (x ^ Integer(2)) + Integer(1) % self
-    end
-    local x = Integer(2)
-    local y = Integer(2)
-    local d = Integer(1)
-    while d == Integer(1) do
-        x = g(x)
-        y = g(g(y))
-        d = Integer.gcd((x - y):abs(), self)
+
+    if self:isprime() then
+        return self + Integer(0)
     end
 
-    return d
+    if self % Integer(2) == Integer(0) then
+        return Integer(2)
+    end
+
+    local g = function(x)
+        local temp = Integer.powmod(x, Integer(2), self)
+        if temp == self then
+            temp = Integer(0)
+        end
+        return temp
+    end
+
+    local x = Integer(2)
+    while x < self do
+        local y = Integer(2)
+        local d = Integer(1)
+        while d == Integer(1) do
+            x = g(x)
+            y = g(g(y))
+            d = Integer.gcd((x - y):abs(), self)
+        end
+
+        if d < self then
+            return d
+        end
+
+        x = x + Integer(1)
+    end
 end
 
 -- uses Miller-Rabin to determine whether a number is prime up to a very large number
@@ -243,6 +255,12 @@ function Integer:isprime()
 
     local smallprimes = {Integer(2), Integer(3), Integer(5), Integer(7), Integer(11), Integer(13), Integer(17), Integer(19), Integer(23),
                             Integer(29), Integer(31), Integer(37), Integer(41), Integer(43), Integer(47), Integer(53), Integer(59)}
+
+    for _, value in pairs(smallprimes) do
+        if value == self then
+            return true
+        end
+    end
 
     local r = Integer(0)
     local d = self - Integer(1)
