@@ -15,3 +15,15 @@ local function test(actual, expected, initial)
         end
     end
 end
+
+local a = BinaryOperation.POWEXP({Integer(8), Integer(1) / Integer(2)})
+local b = BinaryOperation.POWEXP({Integer(27), Integer(1) / Integer(3)})
+local c = BinaryOperation.POWEXP({Integer(36), Integer(1) / Integer(2)})
+local d = BinaryOperation.POWEXP({Integer(36264691), Integer(1) / Integer(2)})
+
+
+print("Testing rational power simplification ... ")
+test(a:autosimplify(), "(2 * (2 ^ 1/2))", a)
+test(b:autosimplify(), "3", b)
+test(c:autosimplify(), "6", c)
+test(d:autosimplify(), "(331 * (331 ^ 1/2))", d)

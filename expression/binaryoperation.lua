@@ -151,7 +151,11 @@ function BinaryOperation:simplifypower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
 
-    if base:isEvaluatable() and exponent:isEvaluatable() and not exponent:getRing() == Rational then
+    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getRing() == Rational then
+        return self:simplifyrationalpower()
+    end
+
+    if base:isEvaluatable() and exponent:isEvaluatable() then
         return self:evaluate()
     end
 
@@ -192,6 +196,44 @@ function BinaryOperation:simplifypower()
 
     -- Our expression cannot be simplified
     return self
+end
+
+-- Automatic simplification of rational power expressions
+function BinaryOperation:simplifyrationalpower()
+    local base = self.expressions[1]
+    local exponent = self.expressions[2]
+    if base:getRing() == Rational then
+        return (BinaryOperation(BinaryOperation.POW, {base.numerator, exponent}):simplifyrationalpower()) /
+                (BinaryOperation(BinaryOperation.POW, {base.denominator, exponent}):simplifyrationalpower())
+    end
+
+    -- Limit for attempting simplification of rational powers automatically
+    -- if base > Integer(100000) then
+    --     return self
+    -- end
+
+    local primes = base:primefactorization()
+
+    if(primes.expressions[1] and not primes.expressions[2]) then
+        local primeexponent = primes.expressions[1].expressions[2]
+        local primebase = primes.expressions[1].expressions[1]
+        local newexponent = primeexponent * exponent
+        local integerpart
+        if newexponent.getRing() == Rational then
+            integerpart = newexponent.numerator // newexponent.denominator
+        else
+            integerpart = newexponent
+        end
+
+        if integerpart == Integer(0) then
+            return BinaryOperation(BinaryOperation.POW, {primebase, newexponent})
+        end
+        return BinaryOperation(BinaryOperation.MUL,
+                    {BinaryOperation(BinaryOperation.POW, {primebase, integerpart}),
+                    BinaryOperation(BinaryOperation.POW, {primebase, newexponent - integerpart})}):autosimplify()
+    end
+
+    return BinaryOperation(BinaryOperation.POW, {primes, exponent}):simplifypower()
 end
 
 -- Automatic simplification of multiplication expressions
@@ -257,7 +299,8 @@ function BinaryOperation:simplifyproductrec()
                 term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer(1)})
                 revertterm2 = true
             end
-            if term1.expressions[1] == term2.expressions[1] then
+            if term1.expressions[1] == term2.expressions[1]
+                    and term1.expressions[2].getRing() ~= Rational and term2.expressions[2].getRing() ~= Rational then
                 local result = BinaryOperation(BinaryOperation.POW,
                                     {term1.expressions[1],
                                     BinaryOperation(BinaryOperation.ADD,
