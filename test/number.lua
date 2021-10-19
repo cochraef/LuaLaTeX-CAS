@@ -100,7 +100,7 @@ test(g:isprime(), false, g);
 test(h:isprime(), false, h);
 test(i:isprime(), false, i);
 -- Unfortunately, our bignum library is not even efficient enough for primes of even this size
--- test(n:isprime(), true, n);
+test(n:isprime(), true, n);
 print()
 
 

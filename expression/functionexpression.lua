@@ -57,6 +57,10 @@ function FunctionExpression:autosimplify()
 end
 
 function FunctionExpression:order(other)
+    if other:type() == DerrivativeExpression then
+        return true
+    end
+
     if other:type() ~= FunctionExpression then
         return false
     end

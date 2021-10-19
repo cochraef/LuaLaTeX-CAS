@@ -8,6 +8,7 @@ function Copy(orig)
         for orig_key, orig_value in pairs(orig) do
             copy[orig_key] = orig_value
         end
+        copy = setmetatable(copy, getmetatable(orig))
     else -- number, string, boolean, etc
         copy = orig
     end

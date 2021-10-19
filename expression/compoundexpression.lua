@@ -4,7 +4,7 @@
 --      operation - the operation to apply to the list of operands
 --      expressions - a list of subexpressions associated with this expression
 -- CompoundExpressions have the following relations with other classes:
---      CompoundExpressions extend expressions
+--      CompoundExpressions extend Expressions
 
 CompoundExpression = {}
 __CompoundExpression = {}

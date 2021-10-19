@@ -35,7 +35,7 @@ end
 
 -- Atomic expressions should come before all other expressions except themselves
 function AtomicExpression:order(other)
-    if other.isEvaluatable() then
+    if self:isEvaluatable() and other:isEvaluatable() then
         return self < other
     end
 

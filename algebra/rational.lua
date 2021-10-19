@@ -1,6 +1,4 @@
 -- Represents an element of the field of rational numbers
-
--- Represents an element of the ring of integers
 -- Rationals have the following instance variables:
 --      numerator - an Integer numerator for the fractional representation of this rataionl
 --      denominator - an Integer denominator for the fractional representation of this rational
