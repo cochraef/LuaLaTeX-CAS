@@ -31,7 +31,7 @@ function Rational:new(n, d, keep)
     end
     o = setmetatable(o, __o)
 
-    if(n.getRing() ~= Integer or d.getRing() ~= Integer) then
+    if(n:getRing() ~= Integer or d:getRing() ~= Integer) then
         error("Improper arguments for constructing a rational. Should be integers.")
     end
 

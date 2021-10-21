@@ -25,7 +25,7 @@ function Expression:isAtomic()
     error("Called unimplemented method: isAtomic()")
 end
 
--- Returns whether the expression can be evaluated by compound expressions or not
+-- Returns whether the expression can be evaluated in compound expressions or not
 function Expression:isEvaluatable()
     error("Called unimplemented method: isEvaluatable()")
 end

@@ -27,6 +27,17 @@ function PolynomialRing.subrings(construction)
     return subrings
 end
 
+-- Returns the GCD of two polynomials in a ring, assuming both rings are euclidean domains
+function PolynomialRing.gcd(a, b)
+    if a.symbol ~= b.symbol then
+        error("Cannot take the gcd of two polynomials with different symbols")
+    end
+    while b.degree ~= Integer(0) do
+        a, b = b, a%(b//b:lc())
+    end
+    return a
+end
+
 
 ----------------------------
 -- Instance functionality --
@@ -35,7 +46,7 @@ end
 -- Creates a new polynomial ring given an array of coefficients and a symbol
 function PolynomialRing:new(coefficients, symbol, degree)
     local o = {}
-    local __o = Copy(__RingOperations)
+    local __o = Copy(__EuclideanOperations)
     __o.__index = PolynomialRing
     __o.__tostring = function(a)
         local out = ""
@@ -222,6 +233,11 @@ function PolynomialRing:one()
     return self.ring.one()
 end
 
+-- Returns the leading coefficient of this polynomial
+function PolynomialRing:lc()
+    return self.coefficients[self.degree]
+end
+
 -- Given a table mapping variables to expressions, replaces each variable with a new expressions
 function PolynomialRing:substitute(variables)
     if type(variables) ~= "table" then
@@ -266,6 +282,18 @@ function PolynomialRing:multiplyDegree(n)
         loc = loc + 1
     end
     return PolynomialRing(new, self.symbol, self.degree + Integer(n))
+end
+
+-- Returns the formal derrivative of this polynomial
+function PolynomialRing:derrivative()
+    if self.degree == Integer(0) then
+        return PolynomialRing({self.ring.zero()}, self.symbol, Integer(-1))
+    end
+    local new = {}
+    for e = 1, self.degree:asNumber() do
+        new[e - 1] = Integer(e) * self.coefficients[e]
+    end
+    return PolynomialRing(new, self.symbol, self.degree - Integer(1))
 end
 
 -----------------

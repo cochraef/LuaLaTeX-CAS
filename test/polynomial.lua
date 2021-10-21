@@ -72,3 +72,16 @@ test(x + a, "5x^4+4x^3+3x^2+2x^1+4x^0")
 test(b - y, "2x^2+1/12x^1+1/2x^0")
 test(a * x, "15x^4+12x^3+9x^2+6x^1+3x^0")
 test(x * a, "15x^4+12x^3+9x^2+6x^1+3x^0")
+print()
+
+print("Testing polynomial formal derrivatives...")
+test(a:derrivative(), "20x^3+12x^2+6x^1+2x^0")
+test(b:derrivative(), "4x^1+1/12x^0")
+test(c:derrivative():derrivative(), "0x^0")
+print()
+
+local d = PolynomialRing({Integer(21), Integer(10), Integer(1)}, "x")
+local e = PolynomialRing({Integer(-6), Integer(1), Integer(1)}, "x")
+
+print("Testing polynomial gcd...")
+test(PolynomialRing.gcd(d, e), "1x^1+3x^0")

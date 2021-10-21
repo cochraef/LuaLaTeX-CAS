@@ -67,6 +67,22 @@ function Logarithm:autosimplify()
     return Logarithm(base, expression)
 end
 
+function Logarithm:order(other)
+    if other:isAtomic() then
+        return false
+    end
+
+    if other:type() == Logarithm then
+        if self.base ~= other.base then
+            return self.base:order(other.base)
+        end
+        return self.expression:order(other.expression)
+    end
+
+
+    return true
+end
+
 -----------------
 -- Inheritance --
 -----------------

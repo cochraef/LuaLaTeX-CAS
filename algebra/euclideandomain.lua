@@ -27,19 +27,36 @@ __EuclideanOperations = Copy(__RingOperations)
 -- Unfortunately, this can only return 1 result, so it returns the quotient - for the remainder use a % b, or a:divremainder(b)
 __EuclideanOperations.__idiv = function(a, b)
     local aring, bring = a:getRing(), b:getRing()
-    if aring ~= bring then
-        error("Attempted to divide two different rings with remainder")
+    if aring == bring then
+        return a:divremainder(b)
     end
-    return a:divremainder(b)
+    if aring.subringof(aring, bring) then
+        return a:divremainder(bring):add(b)
+    end
+    if bring.subringof(bring, aring) then
+        return a:divremainder(b:inRing(aring))
+    end
+
+    error("Attempted to divide two elements of different rings with remainder")
 end
 
 __EuclideanOperations.__mod = function(a, b)
     local aring, bring = a:getRing(), b:getRing()
-    if aring ~= bring then
-        error("Attempted to divide two different rings with remainder")
+    if aring == bring then
+        local _,q = a:divremainder(b)
+        return q
     end
-    local _,q = a:divremainder(b)
-    return q
+    if aring.subringof(aring, bring) then
+        local _,q = a:divremainder(bring):add(b)
+        return q
+
+    end
+    if bring.subringof(bring, aring) then
+        local _,q = a:divremainder(b:inRing(aring))
+        return q
+    end
+
+    error("Attempted to divide two elements of different rings with remainder")
 end
 
 -----------------
