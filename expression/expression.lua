@@ -65,6 +65,10 @@ __ExpressionOperations.__mul = function(a, b)
     return BinaryOperation.MULEXP({a, b})
 end
 
+__ExpressionOperations.__call = function(a, b)
+    return BinaryOperation.MULEXP({a, b})
+end
+
 __ExpressionOperations.__div = function(a, b)
     return BinaryOperation.DIVEXP({a, b})
 end

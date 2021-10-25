@@ -93,8 +93,10 @@ test(PolynomialRing.gcd(f, g), "1x^2+2/3x^1+1/9x^0")
 
 local h = PolynomialRing({Integer(2), Integer(3), Integer(1)}, "x")
 local i = PolynomialRing({Integer(8), Integer(20), Integer(18), Integer(7), Integer(1)}, "x")
+local j = PolynomialRing({Integer(108), Integer(324), Integer(387), Integer(238), Integer(80), Integer(14), Integer(1)}, "x")
 
 print("Testing square-free factorization...")
 test(h:squarefreefactorization(),  "(1 * (1x^2+3x^1+2x^0 ^ 1))")
 test(i:squarefreefactorization(), "(1 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 3))")
 test((Integer(2)*i):squarefreefactorization(), "(2 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 3))")
+test(j:squarefreefactorization(), "(1 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 2) * (1x^1+3x^0 ^ 3))")

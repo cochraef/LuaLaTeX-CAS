@@ -17,6 +17,10 @@ function DerrivativeExpression:new(symbol, expression)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
+    if not symbol or not expression then
+        error("Send wrong number of parameters: derrivatives must have a variable to differentiate with respect to and an expression to differentiate.")
+    end
+
     o.symbol = symbol
     o.expression = Copy(expression)
 
@@ -109,6 +113,22 @@ function DerrivativeExpression:autosimplify()
                             DD(self.symbol, exponent),
                             LN(base)})})
                     }):autosimplify()
+    end
+
+    if simplified:type() == Logarithm then
+        local base = simplified.base
+        local expression = simplified.expression
+
+        return BinaryOperation.SUBEXP({
+                    BinaryOperation.DIVEXP({DD(self.symbol, expression),
+                        BinaryOperation.MULEXP({expression, LN(base)})}),
+
+                    BinaryOperation.DIVEXP({
+                        BinaryOperation.MULEXP({LN(expression), DD(self.symbol, base)}),
+                        BinaryOperation.MULEXP({BinaryOperation.POWEXP({LN(base), Integer(2)}), base})
+                    })
+
+                }):autosimplify()
     end
 
     return self

@@ -75,6 +75,9 @@ function Integer:new(n)
         return tostring(a.internal)
     end
     __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
+        if not b.getRing then
+            return BinaryOperation.DIVEXP({a, b});
+        end
         if(b.getRing() == Integer) then
             return Rational(a, b)
         end
