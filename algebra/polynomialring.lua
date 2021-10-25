@@ -32,10 +32,10 @@ function PolynomialRing.gcd(a, b)
     if a.symbol ~= b.symbol then
         error("Cannot take the gcd of two polynomials with different symbols")
     end
-    while b.degree ~= Integer(0) do
-        a, b = b, a%(b//b:lc())
+    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(0) do
+        a, b = b, a % b
     end
-    return a
+    return a // a:lc()
 end
 
 
@@ -235,7 +235,7 @@ end
 
 -- Returns the leading coefficient of this polynomial
 function PolynomialRing:lc()
-    return self.coefficients[self.degree]
+    return self.coefficients[self.degree:asNumber()]
 end
 
 -- Given a table mapping variables to expressions, replaces each variable with a new expressions
@@ -294,6 +294,34 @@ function PolynomialRing:derrivative()
         new[e - 1] = Integer(e) * self.coefficients[e]
     end
     return PolynomialRing(new, self.symbol, self.degree - Integer(1))
+end
+
+-- Returns the square-free factorization of a polynomial
+function PolynomialRing:squarefreefactorization()
+    local reduced = self // self:lc()
+    local terms = {}
+    terms[0] = PolynomialRing.gcd(reduced, reduced:derrivative())
+    local b = reduced // terms[0]
+    local c = reduced:derrivative() // terms[0]
+    local d = c - b:derrivative()
+    local i = 1
+    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(1) do
+        terms[i] = PolynomialRing.gcd(b, d)
+        b, c = b // terms[i], d // terms[i]
+        i = i + 1
+        d = c - b:derrivative()
+    end
+
+    local expressions = {self:lc()}
+    local j = 1
+    for index, term in ipairs(terms) do
+        if term.degree ~= Integer(0) or term.coefficients[0] ~= Integer(1) then
+            j = j + 1
+            expressions[j] = BinaryOperation.POWEXP({term, Integer(index)})
+        end
+    end
+
+    return BinaryOperation.MULEXP(expressions)
 end
 
 -----------------
