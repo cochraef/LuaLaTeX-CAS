@@ -55,13 +55,13 @@ function SymbolExpression:isEvaluatable()
     return false
 end
 
--- Symbol Expressions come after concrete expressions
 function SymbolExpression:order(other)
+    -- Symbol Expressions come after concrete expressions
     if other.isEvaluatable() then
         return false
     end
 
-    if other.isAtomic() then
+    if other:type() == SymbolExpression then
         if #other.symbol < #self.symbol then
             return false
         end

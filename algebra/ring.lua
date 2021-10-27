@@ -156,12 +156,8 @@ __RingOperations.__mul = function(a, b)
 end
 
 __RingOperations.__pow = function(a, n)
-    if not n.getRing and n.isEvaluatable then
+    if (not n.getRing and n.isEvaluatable) or (n.getRing and n:getRing() ~= Integer) then
         return BinaryOperation.POWEXP({a, n})
-    end
-
-    if n:getRing() ~= Integer then
-        error("Sent parameter of wrong type: exponent must be an integer")
     end
 
     if a == a.zero() and n == Integer(0) then

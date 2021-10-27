@@ -9,6 +9,10 @@ local function test(expected, actual)
     end
 end
 
+
+
+local x = Integer("10000000000000000000000000")
+
 local a = PolynomialRing({
     Integer(1),
     Integer(2),
