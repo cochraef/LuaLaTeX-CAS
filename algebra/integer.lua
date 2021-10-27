@@ -72,6 +72,9 @@ function Integer:new(n)
     local __o = Copy(__EuclideanOperations)
     __o.__index = Integer
     __o.__tostring = function(a)
+        if not a.isbignum then
+            return tostring(math.floor(a.internal))
+        end
         return tostring(a.internal)
     end
     __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
@@ -86,7 +89,30 @@ function Integer:new(n)
     o = setmetatable(o, __o)
 
     n = n or 0
-    o.internal = bn(n)
+
+    if (type(n) == "string" and (tonumber(n) > (2^50) or tonumber(n) < -(2^50))) or
+       (type(n) == "number" and (n > (2^50) or n < -(2^50))) or
+       (type(n) == "table" and (n > bn(2^50) or n < bn(-(2^50)))) then
+        o.internal = bn(n)
+        o.isbignum = true
+        return o
+    end
+
+    if type(n) == "string" then
+        n = tonumber(n)
+    end
+
+    if type(n) == "table" then
+        if n._digits[1] == 0 and not n._digits[2] then
+            n = 0
+        else
+            n = n:asnumber()
+        end
+    end
+
+    n = n or 0
+    o.internal = n
+    o.isbignum = false
 
     return o
 end
@@ -167,6 +193,10 @@ end
 
 -- returns this integer as a number
 function Integer:asNumber()
+    if not self.isbignum then
+        return self.internal
+    end
+
     -- The bignum library is broken for some reason and doesn't give the right answer when zero is negative
     if self.internal._digits[1] == 0 and not self.internal._digits[2] then
         return 0
@@ -296,6 +326,9 @@ end
 
 -- returns the absolute value of an integer
 function Integer:abs()
+    if not self.isbignum then
+        return Integer(math.abs(self.internal))
+    end
     return Integer(self.internal:abs())
 end
 

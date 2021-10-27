@@ -52,7 +52,7 @@ function PolynomialRing:new(coefficients, symbol, degree)
         local out = ""
         local loc = a.degree:asNumber()
         while loc >= 0 do
-            out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(loc) .. "+"
+            out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
             loc = loc - 1
         end
         return string.sub(out, 0, string.len(out) - 1)

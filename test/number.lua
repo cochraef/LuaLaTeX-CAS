@@ -92,16 +92,16 @@ local i = Integer("7766999")
 local j = Integer(4)
 local k = Integer(8)
 local m = Integer(16)
-local n = Integer(100000000003);
+local n = Integer(100000000003)
+local o = Integer(200250077)
 
 print("Testing Miller-Rabin Primes...")
-test(f:isprime(), true, f);
-test(g:isprime(), false, g);
-test(h:isprime(), false, h);
-test(i:isprime(), false, i);
--- Unfortunately, our bignum library is not even efficient enough for primes of even this size
-test(n:isprime(), true, n);
-print()
+test(f:isprime(), true, f)
+test(g:isprime(), false, g)
+test(h:isprime(), false, h)
+test(i:isprime(), false, i)
+test(n:isprime(), true, n)
+test(o:isprime(), false, o)
 
 
 print("Testing Pollard Rho Algorithm...")
@@ -119,3 +119,4 @@ test(f:primefactorization(), "(* (3 ^ 1))", f)
 test(g:primefactorization(), "((2 ^ 3) * (3 ^ 3))", g)
 test(h:primefactorization(), "((3 ^ 3) * (7 ^ 1) * (5 ^ 1))", h)
 test(i:primefactorization(), "((41 ^ 1) * (189439 ^ 1))", i)
+-- test(o:primefactorization(), "((10007 ^ 1) * (20011 ^ 1))", o)
