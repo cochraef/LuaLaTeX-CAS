@@ -93,9 +93,9 @@ function Rational:mul(b)
     return Rational(self.numerator * b.numerator, self.denominator * b.denominator)
 end
 
-function Rational:inv(b)
-    return Rational(self.numerator * b.numerator, self.denominator * b.denominator)
-end
+-- function Rational:inv(b)
+--     return Rational(self.numerator * b.numerator, self.denominator * b.denominator)
+-- end
 
 function Rational:pow(b)
     return (self.numerator ^ b) / (self.denominator ^ b)

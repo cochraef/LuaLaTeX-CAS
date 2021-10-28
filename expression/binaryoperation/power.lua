@@ -67,7 +67,7 @@ function BinaryOperation:simplifyrationalpower()
     end
 
     -- Limit for attempting simplification of rational powers automatically
-    if base > (Integer(2) ^ Integer(25)) then
+    if base > (Integer(2) ^ Integer(30)) then
         return self
     end
 

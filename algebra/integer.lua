@@ -12,7 +12,7 @@ __Integer = {}
 
 -- Returns the immediate subrings of this ring
 function Integer.subrings()
-    return {}
+    return {IntegerModN}
 end
 
 -- Method for computing the gcd of two integers using Euclid's algorithm
@@ -283,6 +283,10 @@ end
 -- uses Miller-Rabin to determine whether a number is prime up to a very large number
 function Integer:isprime()
     if self % Integer(2) == Integer(0) then
+        return false
+    end
+
+    if self == Integer(1) then
         return false
     end
 

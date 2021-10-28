@@ -13,7 +13,7 @@ function Ring.subringof(this, other)
     if this == other then
         return true
     end
-    for _, subring in ipairs(other.subrings(other)) do
+    for _, subring in ipairs(other.subrings(other, this)) do
         if this.subringof(this, subring) then
             return true
         end
