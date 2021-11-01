@@ -63,8 +63,9 @@ function BinaryOperation:simplifyproductrec()
                 term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer(1)})
                 revertterm2 = true
             end
-            if term1.expressions[1] == term2.expressions[1]
-                    and term1.expressions[2].getRing() ~= Rational and term2.expressions[2].getRing() ~= Rational then
+            if term1.expressions[1] == term2.expressions[1] and not
+                    ((term1.expressions[2].getRing and term1.expressions[2].getRing() == Rational.getRing())
+                    or (term2.expressions[2].getRing and term2.expressions[2].getRing() == Rational.getRing())) then
                 local result = BinaryOperation(BinaryOperation.POW,
                                     {term1.expressions[1],
                                     BinaryOperation(BinaryOperation.ADD,

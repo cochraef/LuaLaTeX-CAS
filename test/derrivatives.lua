@@ -23,6 +23,7 @@ local d = DD(SymbolExpression("x"), FunctionExpression("f", {SymbolExpression("x
 local e = DD(SymbolExpression("x"), SymbolExpression("x") ^ SymbolExpression("x"))
 local f = DD(SymbolExpression("x"), PolynomialRing({Integer(3), Integer(4), Integer(5)}, "x"))
 local g = DD(SymbolExpression("y"), LN(SymbolExpression("y")))
+local h = DD(SymbolExpression("x"), SymbolExpression("x") ^ SymbolExpression("n"))
 
 print("Testing Differentiation...")
 test(a, "(d/dx (x * y))")
@@ -33,3 +34,4 @@ test(d:autosimplify(), "((2 * x) * f'((x ^ 2)))", d)
 test(e:autosimplify(), "((x ^ x) * (1 + log(e, x)))", e)
 test(f:autosimplify(), "(4 + (10 * x))", f)
 test(g:autosimplify(), "(y ^ -1)", g)
+test(h:autosimplify(), "(n * (x ^ (-1 + n)))", h)

@@ -57,6 +57,9 @@ function Integer.powmod(a, b, n)
           end
           a = (a ^ Integer(2)) % n
           b = b // Integer(2)
+        --   print("a: " .. tostring(a))
+        --   print("b: " .. tostring(b))
+        --   print("r: " .. tostring(r))
         end
         return r
     end
@@ -156,7 +159,9 @@ function Integer:neg()
 end
 
 function Integer:mul(b)
-    if not self.isbignum and not b.isbignum and self.internal * b.internal > 2 ^ 50 then
+    if not self.isbignum and not b.isbignum and ((self.internal * b.internal) > (2 ^ 50)) or
+            ((self.internal * b.internal) < (- 2 ^ 50)) or
+            self.internal > 0 and b.internal > 0 and (self.internal * b.internal) < 0 then
         return Integer(bn(self.internal) * bn(b.internal))
     end
     return Integer(self.internal * b.internal)
@@ -167,7 +172,7 @@ function Integer:pow(b)
     if b < Integer(0) then
         return Integer(1) / Integer(self.internal ^ (-b.internal))
     end
-    if not self.isbignum and not b.isbignum and self.internal ^ b.internal > 2 ^ 50 then
+    if not self.isbignum and not b.isbignum and (self.internal ^ b.internal) > (2 ^ 50) then
         return Integer(bn(self.internal) ^ bn(b.internal))
     end
     return Integer(self.internal ^ b.internal)
