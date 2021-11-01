@@ -43,7 +43,7 @@ __FieldOperations.__div = function(a, b)
         return BinaryOperation.DIVEXP({a, b})
     end
 
-    if(b == b:getRing():zero()) then
+    if(b == b:zero()) then
         error("Cannot divide by zero.")
     end
 
@@ -51,10 +51,10 @@ __FieldOperations.__div = function(a, b)
     if aring == bring then
         return a:div(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):div(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:div(b:inRing(aring))
     end
 

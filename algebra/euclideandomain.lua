@@ -30,10 +30,10 @@ __EuclideanOperations.__idiv = function(a, b)
     if aring == bring then
         return a:divremainder(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):divremainder(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:divremainder(b:inRing(aring))
     end
 
@@ -46,12 +46,12 @@ __EuclideanOperations.__mod = function(a, b)
         local _,q = a:divremainder(b)
         return q
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         local _,q = a:inRing(bring):divremainder(b)
         return q
 
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         local _,q = a:divremainder(b:inRing(aring))
         return q
     end

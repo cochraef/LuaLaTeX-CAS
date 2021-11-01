@@ -15,13 +15,13 @@ __PolynomialRing = {}
 
 -- Returns the immediate subrings of this ring
 function PolynomialRing.subrings(construction)
-    local child = construction["child"]
-    local subrings = {child}
+    local child = construction.child
+    local subrings = {child.getRing()}
 
     for i, subring in ipairs(child.subrings()) do
-        local new = PolynomialRing({}, construction["symbol"])
-        new.ring = subring
-        subrings[i + 1] = new:getRing()
+        local ring = Copy(construction)
+        ring.child = subring
+        subrings[i + 1] = ring
     end
 
     return subrings
@@ -79,12 +79,12 @@ function PolynomialRing:new(coefficients, symbol, degree)
             error("Sent parameter of wrong type: Coefficients must be elements of a ring")
         end
         if not o.ring then
-            o.ring = coefficient.getRing()
+            o.ring = coefficient:getRing()
         else
             local newring = coefficient.getRing()
-            if o.ring.subringof(o.ring, newring) then
+            if Ring.subringof(o.ring, newring) then
                 o.ring = newring
-            elseif not newring.subringof(newring, o.ring) then
+            elseif not Ring.subringof(newring, o.ring) then
                 error("Sent parameter of wrong type: Coefficients must all be part of the same ring")
             end
         end
@@ -122,13 +122,19 @@ function PolynomialRing:new(coefficients, symbol, degree)
     return o
 end
 
--- Returns the type of this object
--- has a field for the type of ring used to construct this ring, like type parameterization in Java only worse
+-- Returns the ring this object is an element of
 function PolynomialRing:getRing()
-    local t = {child=self.ring, symbol=self.symbol}
-    return setmetatable(t, {__index = PolynomialRing, __eq = function(a, b)
-        return a["child"] == b["child"] and a["symbol"] == b["symbol"]
+    local t = {ring = PolynomialRing}
+    if self then
+        t.child = self.ring
+        t.symbol = self.symbol
+    end
+    t = setmetatable(t, {__index = PolynomialRing, __eq = function(a, b)
+        return a["ring"] == b["ring"] and
+                (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
+                (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
     end})
+    return t
 end
 
 -- Explicitly converts this element to an element of another ring

@@ -12,7 +12,7 @@ __Integer = {}
 
 -- Returns the immediate subrings of this ring
 function Integer.subrings()
-    return {IntegerModN}
+    return {}
 end
 
 -- Method for computing the gcd of two integers using Euclid's algorithm
@@ -81,7 +81,7 @@ function Integer:new(n)
         if not b.getRing then
             return BinaryOperation.DIVEXP({a, b});
         end
-        if(b.getRing() == Integer) then
+        if(b:getRing().ring == Integer) then
             return Rational(a, b)
         end
         return __FieldOperations.__div(a, b)
@@ -117,25 +117,30 @@ function Integer:new(n)
     return o
 end
 
--- Returns the type of this object
+-- Returns the ring this object is an element of
 function Integer:getRing()
-    return Integer
+    local t = {ring=Integer}
+    t = setmetatable(t, {__index = Integer, __eq = function(a, b)
+        return a["ring"] == b["ring"]
+    end})
+    return t;
 end
 
 -- Explicitly converts this element to an element of another ring
 function Integer:inRing(ring)
-    if ring == Integer then
+    if ring == self:getRing() then
         return self
     end
 
-    if Rational.subringof(Rational, ring) then
+    if ring.ring == IntegerModN then
+        return IntegerModN(self, ring.modulus)
+    end
+
+    if Ring.subringof(Rational.getRing(), ring) then
         return Rational(self, Integer(1), true):inRing(ring)
     end
 
-    local intring = PolynomialRing({}, ring["symbol"])
-    intring.ring = Integer
-
-    if intring.subringof(intring:getRing(), ring) then
+    if Ring.subringof(PolynomialRing.getRing(), ring) then
         return PolynomialRing({self}, ring["symbol"]):inRing(ring)
     end
 
@@ -151,6 +156,9 @@ function Integer:neg()
 end
 
 function Integer:mul(b)
+    if not self.isbignum and not b.isbignum and self.internal * b.internal > 2 ^ 50 then
+        return Integer(bn(self.internal) * bn(b.internal))
+    end
     return Integer(self.internal * b.internal)
 end
 
@@ -158,6 +166,9 @@ end
 function Integer:pow(b)
     if b < Integer(0) then
         return Integer(1) / Integer(self.internal ^ (-b.internal))
+    end
+    if not self.isbignum and not b.isbignum and self.internal ^ b.internal > 2 ^ 50 then
+        return Integer(bn(self.internal) ^ bn(b.internal))
     end
     return Integer(self.internal ^ b.internal)
 end

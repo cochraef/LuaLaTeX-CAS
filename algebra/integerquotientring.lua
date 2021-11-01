@@ -14,11 +14,9 @@ __IntegerModN = {}
 --------------------------
 
 -- Returns the immediate subrings of this ring
-function IntegerModN.subrings(_, response)
-    if response.modulus then
-        return response
-    end
-    return {}
+-- Integers are considered subrings of their quotient rings for conversion purposes
+function IntegerModN.subrings()
+    return {Integer:getRing()}
 end
 
 ----------------------------
@@ -30,7 +28,7 @@ function IntegerModN:new(i, n)
     local o = {}
     local __o
 
-    if n:getRing() ~= Integer or n < Integer(1) then
+    if not n or n:getRing() ~= Integer:getRing() or n < Integer(1) then
         error("Argument error: modulus must be an integer greater than 0.")
     end
 
@@ -57,26 +55,33 @@ function IntegerModN:new(i, n)
     return o
 end
 
--- Returns the type of this object
+-- Returns the ring this object is an element of
 function IntegerModN:getRing()
-    local t = {ring = IntegerModN, modulus=self.modulus}
-    return setmetatable(t, {__index = PolynomialRing, __eq = function(a, b)
-        return a["ring"] == b["ring"] and a["modulus"] == b["modulus"]
+    local t = {ring = IntegerModN}
+    if self then
+        t.modulus = self.modulus
+    end
+    t = setmetatable(t, {__index = IntegerModN, __eq = function(a, b)
+        return a["ring"] == b["ring"] and (a["modulus"] == b["modulus"] or a["modulus"] == nil or b["modulus"] == nil)
     end})
+    return t;
 end
 
 -- Explicitly converts this element to an element of another ring
 function IntegerModN:inRing(ring)
-    if ring == self:getRing() then
+    if ring.ring == IntegerModN then
+        if ring.modulus then
+            return IntegerModN(self.element, Integer.gcd(self.modulus, ring.modulus))
+        end
         return self
     end
 
-    if ring.ring == IntegerModN then
-        return IntegerModN(self.element, Integer(self.modulus, ring.modulus))
+    if Ring.subringof(PolynomialRing:getRing(), ring) then
+        return PolynomialRing({self}, ring["symbol"]):inRing(ring)
     end
 
-    if ring.ring == Integer then
-        return self.element
+    if Ring.subringof(Integer:getRing(), ring) then
+        return self
     end
 
     error("Unable to convert element to proper ring.")
@@ -104,7 +109,7 @@ function IntegerModN:div(b)
     return IntegerModN(self.element * b:inv().element, self.modulus)
 end
 
--- Returns the multiplicative inverse
+-- Returns the multiplicative inverse of this number if it exists
 function IntegerModN:inv()
     local t = Integer(0)
     local r = self.modulus
@@ -137,11 +142,17 @@ function IntegerModN:le(b)
 end
 
 function IntegerModN:zero()
-    return IntegerModN(0, self.modulus)
+    if not self or not self.modulus then
+        return Integer(0)
+    end
+    return IntegerModN(Integer(0), self.modulus)
 end
 
 function IntegerModN:one()
-    return IntegerModN(1, self.modulus)
+    if not self or not self.modulus then
+        return Integer(1)
+    end
+    return IntegerModN(Integer(1), self.modulus)
 end
 
 -----------------

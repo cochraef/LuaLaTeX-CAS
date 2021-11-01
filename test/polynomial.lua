@@ -9,10 +9,6 @@ local function test(expected, actual)
     end
 end
 
-
-
-local x = Integer("10000000000000000000000000")
-
 local a = PolynomialRing({
     Integer(1),
     Integer(2),
@@ -94,6 +90,7 @@ print("Testing polynomial gcd...")
 test(PolynomialRing.gcd(d, e), "1x^1+3x^0")
 test(PolynomialRing.gcd(b, c), "1x^0")
 test(PolynomialRing.gcd(f, g), "1x^2+2/3x^1+1/9x^0")
+print()
 
 local h = PolynomialRing({Integer(2), Integer(3), Integer(1)}, "x")
 local i = PolynomialRing({Integer(8), Integer(20), Integer(18), Integer(7), Integer(1)}, "x")

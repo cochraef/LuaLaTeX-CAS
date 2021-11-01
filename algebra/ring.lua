@@ -10,11 +10,12 @@ __Ring = {}
 
 -- Returns true if this ring is a subring of another ring; false otherwise
 function Ring.subringof(this, other)
-    if this == other then
+    -- second condition is to allow conversion between any two integer quotient rings
+    if this == other or (this.ring == IntegerModN and other.ring == IntegerModN) or (this.ring == Integer and other.ring == IntegerModN) then
         return true
     end
-    for _, subring in ipairs(other.subrings(other, this)) do
-        if this.subringof(this, subring) then
+    for _, subring in ipairs(other.subrings(other)) do
+        if Ring.subringof(this, subring) then
             return true
         end
     end
@@ -107,10 +108,10 @@ __RingOperations.__add = function(a, b)
     if aring == bring then
         return a:add(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):add(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:add(b:inRing(aring))
     end
 
@@ -126,10 +127,10 @@ __RingOperations.__sub = function(a, b)
     if aring == bring then
         return a:sub(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):sub(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:sub(b:inRing(aring))
     end
 
@@ -145,10 +146,10 @@ __RingOperations.__mul = function(a, b)
     if aring == bring then
         return a:mul(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):mul(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:mul(b:inRing(aring))
     end
 
@@ -156,7 +157,7 @@ __RingOperations.__mul = function(a, b)
 end
 
 __RingOperations.__pow = function(a, n)
-    if (not n.getRing and n.isEvaluatable) or (n.getRing and n:getRing() ~= Integer) then
+    if (not n.getRing and n.isEvaluatable) or (n.getRing and n:getRing().ring ~= Integer) then
         return BinaryOperation.POWEXP({a, n})
     end
 
@@ -177,10 +178,10 @@ __RingOperations.__eq = function(a, b)
     if aring == bring then
         return a:eq(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):eq(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:eq(b:inRing(aring))
     end
 
@@ -192,10 +193,10 @@ __RingOperations.__lt = function(a, b)
     if aring == bring then
         return a:lt(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):lt(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:lt(b:inRing(aring))
     end
 
@@ -207,10 +208,10 @@ __RingOperations.__le = function(a, b)
     if aring == bring then
         return a:le(b)
     end
-    if aring.subringof(aring, bring) then
+    if Ring.subringof(aring, bring) then
         return a:inRing(bring):le(b)
     end
-    if bring.subringof(bring, aring) then
+    if Ring.subringof(bring, aring) then
         return a:le(b:inRing(aring))
     end
 

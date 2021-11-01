@@ -13,7 +13,7 @@ __Rational = {}
 
 -- Returns the immediate subrings of this ring
 function Rational.subrings()
-    return {Integer}
+    return {Integer.getRing()}
 end
 
 ----------------------------
@@ -31,7 +31,7 @@ function Rational:new(n, d, keep)
     end
     o = setmetatable(o, __o)
 
-    if(n:getRing() ~= Integer or d:getRing() ~= Integer) then
+    if(n:getRing().ring ~= Integer or d:getRing().ring ~= Integer) then
         error("Improper arguments for constructing a rational. Should be integers.")
     end
 
@@ -60,21 +60,22 @@ function Rational:reduce()
 
 end
 
--- Returns the type of this object
+-- Returns the ring this object is an element of
 function Rational:getRing()
-    return Rational
+    local t = {ring=Rational}
+    t = setmetatable(t, {__index = Rational, __eq = function(a, b)
+        return a["ring"] == b["ring"]
+    end})
+    return t;
 end
 
 -- Explicitly converts this element to an element of another ring
 function Rational:inRing(ring)
-    if ring == Rational then
+    if ring == self:getRing() then
         return self
     end
 
-    local ratring = PolynomialRing({}, ring["symbol"])
-    ratring.ring = Rational
-
-    if ratring.subringof(ratring:getRing(), ring) then
+    if Ring.subringof(PolynomialRing.getRing(), ring) then
         return PolynomialRing({self}, ring["symbol"]):inRing(ring)
     end
 

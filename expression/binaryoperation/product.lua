@@ -11,7 +11,7 @@ function BinaryOperation:simplifyproduct()
     end
 
     -- Uses the property that x*0=0
-    for index, expression in ipairs(self.expressions) do
+    for _, expression in ipairs(self.expressions) do
         if expression:isEvaluatable() and expression == expression:zero() then
             return expression:zero()
         end
