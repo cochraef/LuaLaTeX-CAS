@@ -102,6 +102,7 @@ test(h:isprime(), false, h)
 test(i:isprime(), false, i)
 test(n:isprime(), true, n)
 test(o:isprime(), false, o)
+print()
 
 
 print("Testing Pollard Rho Algorithm...")
@@ -119,4 +120,4 @@ test(f:primefactorization(), "(* (3 ^ 1))", f)
 test(g:primefactorization(), "((2 ^ 3) * (3 ^ 3))", g)
 test(h:primefactorization(), "((3 ^ 3) * (5 ^ 1) * (7 ^ 1))", h)
 test(i:primefactorization(), "((41 ^ 1) * (189439 ^ 1))", i)
--- test(o:primefactorization(), "((10007 ^ 1) * (20011 ^ 1))", o)
+test(o:primefactorization(), "((10007 ^ 1) * (20011 ^ 1))", o)

@@ -81,7 +81,7 @@ function PolynomialRing:new(coefficients, symbol, degree)
         if not o.ring then
             o.ring = coefficient:getRing()
         else
-            local newring = coefficient.getRing()
+            local newring = coefficient:getRing()
             if Ring.subringof(o.ring, newring) then
                 o.ring = newring
             elseif not Ring.subringof(newring, o.ring) then
@@ -231,6 +231,11 @@ function PolynomialRing:divremainder(b)
     return PolynomialRing(q, self.symbol, self.degree), r
 end
 
+-- Polynomial rings are never fields, but when dividing by a polynomial by a constant we may want to use / instead of //
+function PolynomialRing:div(b)
+    return self:divremainder(b)
+end
+
 function PolynomialRing:zero()
     return self.ring.zero()
 end
@@ -304,18 +309,14 @@ end
 
 -- Returns the square-free factorization of a polynomial
 function PolynomialRing:squarefreefactorization()
-    local reduced = self // self:lc()
-    local terms = {}
-    terms[0] = PolynomialRing.gcd(reduced, reduced:derrivative())
-    local b = reduced // terms[0]
-    local c = reduced:derrivative() // terms[0]
-    local d = c - b:derrivative()
-    local i = 1
-    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(1) do
-        terms[i] = PolynomialRing.gcd(b, d)
-        b, c = b // terms[i], d // terms[i]
-        i = i + 1
-        d = c - b:derrivative()
+    local terms
+    if self.ring == Rational.getRing() or self.ring == Integer.getRing() then
+        terms = self:rationalsquarefreefactorization()
+    elseif self.ring == IntegerModN.getRing() then
+        if not self.ring.modulus:isprime() then
+            error("Cannot compute a square-free factorization of a polynomial ring contructed from a ring that is not a field.")
+        end
+        terms = self:modularsquarefreefactorization()
     end
 
     local expressions = {self:lc()}
@@ -328,6 +329,85 @@ function PolynomialRing:squarefreefactorization()
     end
 
     return BinaryOperation.MULEXP(expressions)
+end
+
+-- Square-free factorization in the rational field
+function PolynomialRing:rationalsquarefreefactorization()
+    local monic = self / self:lc()
+    local terms = {}
+    terms[0] = PolynomialRing.gcd(monic, monic:derrivative())
+    local b = monic // terms[0]
+    local c = monic:derrivative() // terms[0]
+    local d = c - b:derrivative()
+    local i = 1
+    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(1) do
+        terms[i] = PolynomialRing.gcd(b, d)
+        b, c = b // terms[i], d // terms[i]
+        i = i + 1
+        d = c - b:derrivative()
+    end
+
+    return terms
+end
+
+-- Square-free factorization in the modular field Zp
+function PolynomialRing:modularsquarefreefactorization()
+    local monic = self / self:lc()
+    local terms = {}
+    terms[0] = PolynomialRing.gcd(monic, monic:derrivative())
+    local b = monic // terms[0]
+    local c = monic:derrivative() // terms[0]
+    local d = c - b:derrivative()
+    local i = 1
+    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(1) do
+        terms[i] = PolynomialRing.gcd(b, d)
+        b, c = b // terms[i], d // terms[i]
+        i = i + 1
+        d = c - b:derrivative()
+    end
+
+    if not (terms[i-1]:derrivative().degree == Integer(0) and terms[i-1]:derrivative().coefficients[0] == Integer(0)) then
+        return terms
+    end
+
+    local recursiveterms = terms[i-1]:collapseterms(self.ring.modulus):modularsquarefreefactorization()
+    for k, poly in ipairs(recursiveterms) do
+        recursiveterms[k] = poly:expandterms(self.ring.modulus)
+    end
+    return JoinArrays(terms, recursiveterms)
+end
+
+-- Returns a new polnomial consisting of every nth term of the old one - helper method for square-free factorization
+function PolynomialRing:collapseterms(n)
+    local new = {}
+    local loc = 0
+    local i = 0
+    local nn = n:asNumber()
+    while loc <= self.degree:asNumber() do
+        new[i] = self.coefficients[loc]
+        loc = loc + nn
+        i = i + 1
+    end
+
+    return PolynomialRing(new, self.symbol, self.degree // n)
+end
+
+-- Returns a new polnomial consisting of every nth term of the old one - helper method for square-free factorization
+function PolynomialRing:expandterms(n)
+    local new = {}
+    local loc = 0
+    local i = 0
+    local nn = n:asNumber()
+    while i <= self.degree:asNumber() do
+        new[loc] = self.coefficients[i]
+        for j = 1, nn do
+            new[loc + j] = IntegerModN(Integer(0), n)
+        end
+        loc = loc + nn
+        i = i + 1
+    end
+
+    return PolynomialRing(new, self.symbol, self.degree * n)
 end
 
 -----------------

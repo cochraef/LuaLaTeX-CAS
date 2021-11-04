@@ -84,7 +84,7 @@ function Integer:new(n)
         if not b.getRing then
             return BinaryOperation.DIVEXP({a, b});
         end
-        if(b:getRing().ring == Integer) then
+        if(a:getRing() == Integer:getRing() and b:getRing() == Integer:getRing()) then
             return Rational(a, b)
         end
         return __FieldOperations.__div(a, b)
@@ -161,7 +161,10 @@ end
 function Integer:mul(b)
     if not self.isbignum and not b.isbignum and ((self.internal * b.internal) > (2 ^ 50)) or
             ((self.internal * b.internal) < (- 2 ^ 50)) or
-            self.internal > 0 and b.internal > 0 and (self.internal * b.internal) < 0 then
+            self.internal > 0 and b.internal > 0 and (self.internal * b.internal) < 0 or
+            self.internal < 0 and b.internal > 0 and (self.internal * b.internal) > 0 or
+            self.internal < 0 and b.internal < 0 and (self.internal * b.internal) > 0 or
+            self.internal < 0 and b.internal < 0 and (self.internal * b.internal) < 0 then
         return Integer(bn(self.internal) * bn(b.internal))
     end
     return Integer(self.internal * b.internal)
