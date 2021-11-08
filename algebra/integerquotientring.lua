@@ -104,11 +104,6 @@ function IntegerModN:pow(b)
     return IntegerModN(Integer.powmod(self.element, b, self.modulus), self.modulus)
 end
 
--- Only works if the modulus is prime
-function IntegerModN:div(b)
-    return IntegerModN(self.element * b:inv().element, self.modulus)
-end
-
 -- Returns the multiplicative inverse of this number if it exists
 function IntegerModN:inv()
     local t = Integer(0)
@@ -159,6 +154,6 @@ end
 -- Inheritance --
 -----------------
 
-__IntegerModN.__index = Ring
+__IntegerModN.__index = Field
 __IntegerModN.__call = IntegerModN.new
 IntegerModN = setmetatable(IntegerModN, __IntegerModN)

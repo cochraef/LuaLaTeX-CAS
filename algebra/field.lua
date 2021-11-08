@@ -9,7 +9,7 @@ __Field = {}
 ----------------------------
 
 function Field:div(b)
-    return self.mul(b.inv())
+    return self:mul(b:inv())
 end
 
 function Field:inv()

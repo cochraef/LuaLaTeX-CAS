@@ -244,6 +244,15 @@ function PolynomialRing:one()
     return self.ring.one()
 end
 
+function PolynomialRing:eq(b)
+    for i=0,math.max(self.degree:asNumber(), b.degree:asNumber()) do
+        if self.coefficients[i] ~= b.coefficients[i] then
+            return false
+        end
+    end
+    return true
+end
+
 -- Returns the leading coefficient of this polynomial
 function PolynomialRing:lc()
     return self.coefficients[self.degree:asNumber()]
@@ -408,6 +417,154 @@ function PolynomialRing:expandterms(n)
     end
 
     return PolynomialRing(new, self.symbol, self.degree * n)
+end
+
+
+-- Factors a polynomial into irreducible terms
+function PolynomialRing:factor()
+    local squarefree = self:squarefreefactorization()
+    local result = {squarefree.expressions[1]}
+    local j = 2
+    for i, expression in ipairs(squarefree.expressions) do
+        if i > 1 then
+            local terms
+            if self.ring == IntegerModN.getRing() then
+                terms = expression.expressions[1]:berlekampfactor()
+            end
+            for _, squarefreeexpression in ipairs(terms) do
+                result[j] = BinaryOperation.POWEXP({squarefreeexpression, expression.expressions[2]})
+                j = j + 1
+            end
+        end
+    end
+    return BinaryOperation.MULEXP(result)
+end
+
+-- Uses Berlekamp's Algorithm to factor polynomials in mod p
+function PolynomialRing:berlekampfactor()
+    if self.degree == 0 or self.degree == 1 then
+        return {self}
+    end
+
+    local R = self:RMatrix()
+    local S = self:auxillarybasis(R)
+    if #S == 1 then
+        return {self}
+    end
+    return self:findfactors(S)
+end
+
+-- Gets the R Matrix for Berlekamp factorization
+function PolynomialRing:RMatrix()
+    local R = {}
+    for i = 1, self.degree:asNumber() do
+        R[i] = {}
+    end
+    for i = 0, self.degree:asNumber()-1 do
+        local remainder = PolynomialRing({IntegerModN(Integer(1), self.ring.modulus)}, self.symbol):multiplyDegree(self.ring.modulus:asNumber()*i) % self
+        for j = 0, self.degree:asNumber()-1 do
+            R[j + 1][i + 1] = remainder.coefficients[j]
+            if j == i then
+                R[j + 1][i + 1] = R[j + 1][i + 1] - IntegerModN(Integer(1), self.ring.modulus)
+            end
+        end
+    end
+    return R
+end
+
+-- Creates an auxillary basis using the R matrix
+function PolynomialRing:auxillarybasis(R)
+    local P = {}
+    local n = self.degree:asNumber()
+    for i = 1, n do
+        P[i] = 0
+    end
+    S = {}
+    local q = 1
+    for j = 1, n do
+        local i = 1
+        local pivotfound = false
+        while not pivotfound and i <= n do
+            if R[i][j] ~= self.ring:zero() and P[i] == 0 then
+                pivotfound = true
+            else
+                i = i + 1
+            end
+        end
+        if pivotfound then
+            P[i] = j
+            local a = R[i][j]:inv()
+            for l = 1, n do
+                R[i][l] = a * R[i][l]
+            end
+            for k = 1, n do
+                if k ~= i then
+                    local f = R[k][i]
+                    for l = 1, n do
+                        R[k][l] = R[k][l] - f*R[i][l]
+                    end
+                end
+            end
+        else
+            local s = {}
+            s[j] = self.ring:one()
+            for l = 1, j - 1 do
+                local e = 0
+                i = 1
+                while e == 0 and i <= n do
+                    if l == P[i] then
+                        e = i
+                    else
+                        i = i + 1
+                    end
+                end
+                if e > 0 then
+                    local c = -R[e][j]
+                    s[l] = c
+                else
+                    s[l] = self.ring:zero()
+                end
+            end
+            S[q] = PolynomialRing(s, self.symbol)
+            q = q + 1
+        end
+    end
+    return S
+end
+
+-- Uses the auxilary basis to find the irriducible factors of the polynomial
+function PolynomialRing:findfactors(S)
+    local r = #S
+    local p = self.ring.modulus
+    local factors = {self}
+    for k = 2,r do
+        local b = S[k]
+        local old_factors = Copy(factors)
+        for i = 1,#old_factors do
+            local w = old_factors[i]
+            local j = 0
+            while j <= p:asNumber() - 1 do
+                local g = PolynomialRing.gcd(b-IntegerModN(Integer(j), p), w)
+                if g.degree == Integer(0) and g.coefficients[0] == Integer(1) then
+                    j = j + 1
+                elseif g == w then
+                    j = p:asNumber()
+                else
+                    factors = Remove(factors, w)
+                    local q = w // g
+                    factors[#factors+1] = g
+                    factors[#factors+1] = q
+                    if #factors == r then
+                        return factors
+                    else
+                        j = j + 1
+                        w = q
+                    end
+                end
+
+            end
+        end
+    end
 end
 
 -----------------

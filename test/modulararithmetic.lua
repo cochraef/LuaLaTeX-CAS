@@ -41,7 +41,6 @@ local e = IntegerModN(Integer(27), Integer(36))
 test(d * e, "0")
 test(a * d, "2")
 
-
 local p = PolynomialRing({a, b, a}, "x")
 
 test(p, "2x^2+1x^1+2x^0")

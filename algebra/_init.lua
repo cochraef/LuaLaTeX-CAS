@@ -2,6 +2,7 @@
 bn = require("_lib.nums.bn")
 require("_lib.table.copy")
 require("_lib.table.join")
+require("_lib.table.remove")
 
 require("expression._init")
 
