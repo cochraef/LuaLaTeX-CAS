@@ -75,7 +75,7 @@ function PolynomialRing:new(coefficients, symbol, degree)
         if type(index) ~= "number" then
             error("Sent parameter of wrong type: Coefficients must be in an array")
         end
-        if not coefficient.getRing() then
+        if not coefficient.getRing then
             error("Sent parameter of wrong type: Coefficients must be elements of a ring")
         end
         if not o.ring then
@@ -118,7 +118,6 @@ function PolynomialRing:new(coefficients, symbol, degree)
     o.coefficients = setmetatable(o.coefficients, {__index = function (table, key)
         return o.ring:zero()
     end})
-
     return o
 end
 
@@ -184,30 +183,54 @@ function PolynomialRing:neg()
 end
 
 function PolynomialRing:mul(b)
-    if self.degree == Integer(0) and b.degree == Integer(0) then
-        return PolynomialRing({self.coefficients[0] * b.coefficients[0]}, self.symbol, Integer(1))
+    return PolynomialRing(PolynomialRing.mul_rec(self.coefficients, b.coefficients), self.symbol, self.degree + b.degree)
+end
+
+-- Performs Karatsuba multiplication without constructing new polynomials recursively
+function PolynomialRing.mul_rec(a, b)
+    if #a==0 and #b==0 then
+        return {[0]=a[0] * b[0], [1]=Integer(0)}
     end
 
-    local k = Integer.ceillog(Integer.max(self.degree, b.degree) + Integer(1), Integer(2))
+    local k = Integer.ceillog(Integer.max(Integer(#a), Integer(#b)) + Integer(1), Integer(2))
     local n = Integer(2) ^ k
     local m = n / Integer(2)
+    local nn = n:asNumber()
+    local mn = m:asNumber()
 
     local a0, a1, b0, b1 = {}, {}, {}, {}
 
-    for e = 0, m:asNumber() - 1 do
-        a0[e] = self.coefficients[e]
-        a1[e] = self.coefficients[e + m:asNumber()]
-        b0[e] = b.coefficients[e]
-        b1[e] = b.coefficients[e + m:asNumber()]
+    for e = 0, mn - 1 do
+        a0[e] = a[e] or Integer(0)
+        a1[e] = a[e + mn] or Integer(0)
+        b0[e] = b[e] or Integer(0)
+        b1[e] = b[e + mn] or Integer(0)
     end
 
-    local p1 = PolynomialRing(a1, self.symbol, m - Integer(1)) * PolynomialRing(b1, self.symbol, m - Integer(1))
-    local p2 = PolynomialRing(a0, self.symbol, m - Integer(1)) * PolynomialRing(b0, self.symbol, m - Integer(1))
-    local p3 = (PolynomialRing(a0, self.symbol, m - Integer(1)) + PolynomialRing(a1, self.symbol, m - Integer(1))) *
-                (PolynomialRing(b0, self.symbol, m - Integer(1)) + PolynomialRing(b1, self.symbol, m - Integer(1)))
-                - p1 - p2
+    local p1 = PolynomialRing.mul_rec(a1, b1)
+    local p2a = Copy(a0)
+    local p2b = Copy(b0)
+    for e = 0, mn - 1 do
+        p2a[e] = p2a[e] + a1[e]
+        p2b[e] = p2b[e] + b1[e]
+    end
+    local p2 = PolynomialRing.mul_rec(p2a, p2b)
+    local p3 = PolynomialRing.mul_rec(a0, b0)
+    local r = {}
+    for e = 0, mn - 1 do
+        p2[e] = p2[e] - p1[e] - p3[e]
+        r[e] = p3[e]
+        r[e + mn] = p2[e]
+        r[e + nn] = p1[e]
+    end
+    for e = mn, nn - 1 do
+        p2[e] = p2[e] - p1[e] - p3[e]
+        r[e] = r[e] + p3[e]
+        r[e + mn] = r[e + mn] + p2[e]
+        r[e + nn] = p1[e]
+    end
 
-    return p1:multiplyDegree(n:asNumber()) + p3:multiplyDegree(m:asNumber()) + p2
+    return r
 end
 
 function PolynomialRing:divremainder(b)

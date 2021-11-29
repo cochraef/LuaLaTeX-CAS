@@ -6,7 +6,7 @@
 //             "type": "lua",
 //             "request": "launch",
 //             "stopOnEntry": true,
-//             "program": "${workspaceFolder}\\test\\repl.lua",
+//             "program": "${workspaceFolder}\\test\\main.lua",
 //             "console": "integratedTerminal",
 //             "outputCapture": []
 //         }

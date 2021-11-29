@@ -1,6 +1,5 @@
 require("algebra._init")
 
-
 local function test(actual, expected, initial)
     if initial then
         if tostring(expected) == tostring(actual) then
@@ -41,12 +40,13 @@ local s = PolynomialRing({IntegerModN(Integer(1), Integer(5)),
                     IntegerModN(Integer(1), Integer(5)),
                     IntegerModN(Integer(1), Integer(5))}, "x")
 
--- test(q*q, "3z^4+9z^3+0z^2+11z^1+4z^0");
--- test(p:squarefreefactorization(), "(1 * (1x^2+6x^1+2x^0 ^ 2))")
--- test(r:squarefreefactorization(), "(1 * (1x^3+0x^2+0x^1+1x^0 ^ 2))")
--- test(q:squarefreefactorization(), "(4 * (1z^2+8z^1+7z^0 ^ 1))")
--- test(s:squarefreefactorization(), "(1 * (1x^1+4x^0 ^ 4))")
--- print()
+test(q*q, "3z^4+9z^3+0z^2+11z^1+4z^0");
+test(p:squarefreefactorization(), "(1 * (1x^2+6x^1+2x^0 ^ 2))")
+test(r:squarefreefactorization(), "(1 * (1x^3+0x^2+0x^1+1x^0 ^ 2))")
+test(q:squarefreefactorization(), "(4 * (1z^2+8z^1+7z^0 ^ 1))")
+test(s:squarefreefactorization(), "(1 * (1x^1+4x^0 ^ 4))")
+print()
+
 
 local t = PolynomialRing({IntegerModN(Integer(1), Integer(7))}, "x"):multiplyDegree(7) - PolynomialRing({IntegerModN(Integer(1), Integer(7))}, "x"):multiplyDegree(1)
 
