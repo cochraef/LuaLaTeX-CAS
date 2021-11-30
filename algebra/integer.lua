@@ -69,26 +69,28 @@ end
 -- Instance functionality --
 ----------------------------
 
+-- So we don't have to copy the Euclidean operations each time
+local __o = Copy(__EuclideanOperations)
+__o.__index = Integer
+__o.__tostring = function(a)
+    if not a.isbignum then
+        return tostring(math.floor(a.internal))
+    end
+    return tostring(a.internal)
+end
+__o.__div = function(a, b)   -- Constructor for a rational number disguised as division
+    if not b.getRing then
+        return BinaryOperation.DIVEXP({a, b});
+    end
+    if(a:getRing() == Integer:getRing() and b:getRing() == Integer:getRing()) then
+        return Rational(a, b)
+    end
+    return __FieldOperations.__div(a, b)
+end
+
 -- Creates a new integer given a string or number representation of the integer
 function Integer:new(n)
     local o = {}
-    local __o = Copy(__EuclideanOperations)
-    __o.__index = Integer
-    __o.__tostring = function(a)
-        if not a.isbignum then
-            return tostring(math.floor(a.internal))
-        end
-        return tostring(a.internal)
-    end
-    __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
-        if not b.getRing then
-            return BinaryOperation.DIVEXP({a, b});
-        end
-        if(a:getRing() == Integer:getRing() and b:getRing() == Integer:getRing()) then
-            return Rational(a, b)
-        end
-        return __FieldOperations.__div(a, b)
-    end
     o = setmetatable(o, __o)
 
     n = n or 0
@@ -121,11 +123,11 @@ function Integer:new(n)
 end
 
 -- Returns the ring this object is an element of
+local t = {ring=Integer}
+t = setmetatable(t, {__index = Integer, __eq = function(a, b)
+    return a["ring"] == b["ring"]
+end})
 function Integer:getRing()
-    local t = {ring=Integer}
-    t = setmetatable(t, {__index = Integer, __eq = function(a, b)
-        return a["ring"] == b["ring"]
-    end})
     return t;
 end
 

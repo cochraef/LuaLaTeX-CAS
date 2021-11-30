@@ -43,20 +43,22 @@ end
 -- Instance functionality --
 ----------------------------
 
+-- So we don't have to copy the Euclidean operations each time
+local __o = Copy(__EuclideanOperations)
+__o.__index = PolynomialRing
+__o.__tostring = function(a)
+    local out = ""
+    local loc = a.degree:asNumber()
+    while loc >= 0 do
+        out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
+        loc = loc - 1
+    end
+    return string.sub(out, 0, string.len(out) - 1)
+end
+
 -- Creates a new polynomial ring given an array of coefficients and a symbol
 function PolynomialRing:new(coefficients, symbol, degree)
     local o = {}
-    local __o = Copy(__EuclideanOperations)
-    __o.__index = PolynomialRing
-    __o.__tostring = function(a)
-        local out = ""
-        local loc = a.degree:asNumber()
-        while loc >= 0 do
-            out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
-            loc = loc - 1
-        end
-        return string.sub(out, 0, string.len(out) - 1)
-    end
     o = setmetatable(o, __o)
 
     if type(coefficients) ~= "table" then

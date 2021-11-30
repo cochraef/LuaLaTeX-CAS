@@ -23,26 +23,24 @@ end
 -- Instance functionality --
 ----------------------------
 
+-- So we don't have to copy the field operations each time
+local __o
+__o = Copy(__FieldOperations)
+
+__o.__index = IntegerModN
+__o.__tostring = function(a)
+    return tostring(a.element)
+end
+
 -- Creates a new integer i in Z/nZ
 function IntegerModN:new(i, n)
     local o = {}
-    local __o
+
 
     if not n or n:getRing() ~= Integer:getRing() or n < Integer(1) then
         error("Argument error: modulus must be an integer greater than 0.")
     end
 
-
-    if n:isprime() then
-        __o = Copy(__FieldOperations)
-    else
-        __o = Copy(__RingOperations)
-    end
-
-    __o.__index = IntegerModN
-    __o.__tostring = function(a)
-        return tostring(a.element)
-    end
     o = setmetatable(o, __o)
 
     if i < Integer(0) or i >= n then

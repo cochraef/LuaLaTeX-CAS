@@ -20,15 +20,17 @@ end
 -- Instance functionality --
 ----------------------------
 
+-- So we don't have to copy the field operations each time
+local __o = Copy(__FieldOperations)
+__o.__index = Rational
+__o.__tostring = function(a)
+    return tostring(a.numerator).."/"..tostring(a.denominator)
+end
+
 -- Creates a new rational given an integer numerator and denominator
 -- Rational numbers should be represented uniquely
 function Rational:new(n, d, keep)
     local o = {}
-    local __o = Copy(__FieldOperations)
-    __o.__index = Rational
-    __o.__tostring = function(a)
-        return tostring(a.numerator).."/"..tostring(a.denominator)
-    end
     o = setmetatable(o, __o)
 
     if(n:getRing().ring ~= Integer or d:getRing().ring ~= Integer) then

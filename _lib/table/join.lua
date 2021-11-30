@@ -19,3 +19,12 @@ function JoinZeroArrays(a1, a2)
     end
     return a
 end
+
+-- Join two tables, using the second entry if a key appears in both tables
+function JoinTables(t1, t2)
+    local t = Copy(t1)
+    for key, value in pairs(t2) do
+        t[key] = value
+    end
+    return t
+end
