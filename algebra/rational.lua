@@ -140,7 +140,7 @@ function Rational:one()
 end
 
 function Rational:tolatex()
-    return "\\frac{" .. tostring(self.numerator).."}{"..tostring(self.denominator) .. "}"
+    return "\\frac{" .. self.numerator:tolatex() .."}{".. self.denominator:tolatex().. "}"
 end
 
 -----------------

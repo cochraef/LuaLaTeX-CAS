@@ -220,25 +220,33 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
+        if self.expressions[2]:isEvaluatable() and self.expressions[2]:getRing() == Rational:getRing() and self.expressions[2].numerator == Integer(1) then
+            if self.expressions[2].denominator == Integer(2) then
+                return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
+            end
+            return "\\sqrt[" .. self.expressions[2].denominator:tolatex() .. ']{' .. self.expressions[1]:tolatex() .. '}'
+        end
         return self.expressions[1]:tolatex() .. '^{' .. self.expressions[2]:tolatex() .. '}'
     end
     if self.operation == BinaryOperation.MUL then
         local out = ''
         local denom = ''
-        for index, expression in ipairs(self.expressions) do
+        for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
                 if expression.operation == BinaryOperation.POW and expression.expressions[2]:isEvaluatable() and expression.expressions[2] < Integer(0) then
-                    local reversed = Integer(1) / expression
-                    denom = denom .. '(' .. reversed:tolatex() .. ')'
-                elseif expression.operation == BinaryOperation.POW and index > 1 then
-                    out = out ..'(' .. expression.expressions[1]:tolatex() .. ')' .. '^{' .. expression.expressions[2]:tolatex() .. '}'
+                    local reversed = (Integer(1) / expression):autosimplify()
+                    denom = denom .. reversed:tolatex()
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
                     out = out .. '(' .. expression:tolatex() .. ')'
                 else
                     out = out .. expression:tolatex()
                 end
             else
-                out = out .. expression:tolatex()
+                if expression == Integer(-1) then
+                    out = out .. '-'
+                else
+                    out = out .. expression:tolatex()
+                end
             end
         end
         if denom ~= '' then
