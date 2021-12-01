@@ -79,6 +79,16 @@ function FunctionExpression:order(other)
     return #self.expressions < #other.expressions
 end
 
+function FunctionExpression:tolatex()
+    local out = self.name .. '(';
+    for index, expression in ipairs(self.expressions) do
+        out = out .. expression:tolatex()
+        if self.expressions[index + 1] then
+            out = out .. ', '
+        end
+    end
+    return out .. ')'
+end
 
 -----------------
 -- Inheritance --

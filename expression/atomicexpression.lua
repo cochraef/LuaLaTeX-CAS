@@ -42,6 +42,11 @@ function AtomicExpression:order(other)
     return true
 end
 
+-- Most atomic expressions should have the same __tostring as LaTeX's output
+function AtomicExpression:tolatex()
+    return tostring(self)
+end
+
 -----------------
 -- Inheritance --
 -----------------

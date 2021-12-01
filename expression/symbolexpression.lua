@@ -88,6 +88,11 @@ function SymbolExpression:order(other)
 
 end
 
+-- Variable names in LaTeX can be created with just that variable
+function AtomicExpression:tolatex()
+    return tostring(self)
+end
+
 -----------------
 -- Inheritance --
 -----------------

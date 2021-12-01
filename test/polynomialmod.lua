@@ -1,5 +1,4 @@
 require("algebra._init")
-require("_lib.pepperfish")
 
 local function test(actual, expected, initial)
     if initial then
@@ -51,15 +50,7 @@ print()
 
 local t = PolynomialRing({IntegerModN(Integer(1), Integer(7))}, "x"):multiplyDegree(7) - PolynomialRing({IntegerModN(Integer(1), Integer(7))}, "x"):multiplyDegree(1)
 
--- local profiler = newProfiler()
--- profiler:start()
-
 test(q:factor(), "(4 * (1z^1+7z^0 ^ 1) * (1z^1+1z^0 ^ 1))", q)
 test(p:factor(), "(1 * (1x^2+6x^1+2x^0 ^ 2))", p)
 test(r:factor(), "(1 * (1x^3+0x^2+0x^1+1x^0 ^ 2))", r)
 test(t:factor(), "(1 * (1x^1+0x^0 ^ 1) * (1x^1+6x^0 ^ 1) * (1x^1+5x^0 ^ 1) * (1x^1+4x^0 ^ 1) * (1x^1+3x^0 ^ 1) * (1x^1+2x^0 ^ 1) * (1x^1+1x^0 ^ 1))", t)
-
--- profiler:stop()
--- local outfile = io.open( "profile.txt", "w+" )
--- profiler:report(outfile)
--- outfile:close()

@@ -146,6 +146,10 @@ function DerrivativeExpression:order(other)
     return self.expression:order(other.expression)
 end
 
+function DerrivativeExpression:tolatex()
+    return '\\frac{d}{d' .. self.symbol:tolatex() .. '}(' .. self.expression:tolatex() .. ')'
+end
+
 
 -----------------
 -- Inheritance --

@@ -63,11 +63,11 @@ function Rational:reduce()
 end
 
 -- Returns the ring this object is an element of
+local t = {ring=Rational}
+t = setmetatable(t, {__index = Rational, __eq = function(a, b)
+    return a["ring"] == b["ring"]
+end})
 function Rational:getRing()
-    local t = {ring=Rational}
-    t = setmetatable(t, {__index = Rational, __eq = function(a, b)
-        return a["ring"] == b["ring"]
-    end})
     return t;
 end
 
@@ -137,6 +137,10 @@ end
 
 function Rational:one()
     return Integer(1)
+end
+
+function Rational:tolatex()
+    return "\\frac{" .. tostring(self.numerator).."}{"..tostring(self.denominator) .. "}"
 end
 
 -----------------

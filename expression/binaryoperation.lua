@@ -207,6 +207,7 @@ function BinaryOperation:order(other)
 
     return true
 end
+
 -- Returns whether the binary operation is associative
 function BinaryOperation:isAssociative()
     error("Called unimplemented method: isAssociative()")
@@ -215,6 +216,58 @@ end
 -- Returns whether the binary operation is commutative
 function BinaryOperation:isCommutative()
     error("Called unimplemented method: isCommutative()")
+end
+
+function BinaryOperation:tolatex()
+    if self.operation == BinaryOperation.POW then
+        return self.expressions[1]:tolatex() .. '^{' .. self.expressions[2]:tolatex() .. '}'
+    end
+    if self.operation == BinaryOperation.MUL then
+        local out = ''
+        local denom = ''
+        for _, expression in ipairs(self.expressions) do
+            if expression:type() == BinaryOperation then
+                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isEvaluatable() and expression.expressions[2] < Integer(0) then
+                    local reversed = Integer(1) / expression
+                    denom = denom .. '(' .. reversed:tolatex() .. ')'
+                elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
+                    out = out .. '(' .. expression:tolatex() .. ')'
+                else
+                    out = out .. expression:tolatex()
+                end
+            else
+                out = out .. expression:tolatex()
+            end
+        end
+        if denom ~= '' then
+            return '\\frac{' .. out .. '}{' .. denom .. '}'
+        end
+        return out
+    end
+    if self.operation == BinaryOperation.ADD then
+        local out = ''
+        for index, expression in ipairs(self.expressions) do
+            out = out .. expression:tolatex()
+            if self.expressions[index + 1] then
+                out = out .. '+'
+            end
+        end
+        return out
+    end
+    if self.operation == BinaryOperation.DIV then
+        return '\\frac{' .. self.expressions[1] .. '}{' .. self.expressions[2] .. '}'
+    end
+    if self.operation == BinaryOperation.SUB then
+        local out = ''
+        for index, expression in ipairs(self.expressions) do
+            out = out .. expression:tolatex()
+            if self.expressions[index + 1] then
+                out = out .. '-'
+            end
+        end
+        return out
+    end
+    return self
 end
 
 -----------------

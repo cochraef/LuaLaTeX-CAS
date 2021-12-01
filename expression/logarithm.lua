@@ -83,6 +83,13 @@ function Logarithm:order(other)
     return true
 end
 
+function Logarithm:tolatex()
+    if self.base == E then
+        return '\\ln(' .. self.expression:tolatex() .. ')'
+    end
+    return '\\log_' .. self.base:tolatex() .. '(' .. self.expression:tolatex() .. ')'
+end
+
 -----------------
 -- Inheritance --
 -----------------

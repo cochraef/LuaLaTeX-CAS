@@ -35,6 +35,11 @@ function Expression:order(other)
     error("Called unimplemented method: order()")
 end
 
+-- Converts this expression to LaTeX code - returns a sting with the code
+-- Should probably only be used on autosimplified expressions - otherwise it could look weird
+function Expression:tolatex()
+    error("Called Unimplemented method: tolatex()")
+end
 ----------------------
 -- Instance methods --
 ----------------------

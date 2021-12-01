@@ -57,9 +57,6 @@ function Integer.powmod(a, b, n)
           end
           a = (a ^ Integer(2)) % n
           b = b // Integer(2)
-        --   print("a: " .. tostring(a))
-        --   print("b: " .. tostring(b))
-        --   print("r: " .. tostring(r))
         end
         return r
     end
