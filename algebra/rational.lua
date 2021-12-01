@@ -121,7 +121,7 @@ function Rational:lt(b)
         return false
     end
 
-    if self.numerator > Integer(0) and b.numerator > Integer(0) then
+    if self.numerator >= Integer(0) and b.numerator >= Integer(0) then
         return self.numerator * b.denominator < self.denominator * b.numerator
     end
     return self.numerator * b.denominator > self.denominator * b.numerator

@@ -225,11 +225,13 @@ function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.MUL then
         local out = ''
         local denom = ''
-        for _, expression in ipairs(self.expressions) do
+        for index, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
                 if expression.operation == BinaryOperation.POW and expression.expressions[2]:isEvaluatable() and expression.expressions[2] < Integer(0) then
                     local reversed = Integer(1) / expression
                     denom = denom .. '(' .. reversed:tolatex() .. ')'
+                elseif expression.operation == BinaryOperation.POW and index > 1 then
+                    out = out ..'(' .. expression.expressions[1]:tolatex() .. ')' .. '^{' .. expression.expressions[2]:tolatex() .. '}'
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
                     out = out .. '(' .. expression:tolatex() .. ')'
                 else
