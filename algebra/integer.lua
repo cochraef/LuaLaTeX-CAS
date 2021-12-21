@@ -23,6 +23,21 @@ function Integer.gcd(a, b)
     return a
 end
 
+-- Method for computing the gcd of two integers using Euclid's algorithm
+-- Also returns bezouts coefficients via extended gcd
+function Integer.extendedgcd(a, b)
+    local oldr, r  = a, b
+    local olds, s  = Integer(1), Integer(0)
+    local oldt, t  = Integer(0), Integer(1)
+    while r ~= Integer(0) do
+        local q = oldr // r
+        oldr, r  = r, oldr - q*r
+        olds, s = s, olds - q*s
+        oldt, t = t, oldt - q*t
+    end
+    return oldr, olds, oldt
+end
+
 -- Method for computing the greater of two integers
 function Integer.max(a, b)
     if a > b then
@@ -85,6 +100,9 @@ __o.__div = function(a, b)   -- Constructor for a rational number disguised as d
     return __FieldOperations.__div(a, b)
 end
 
+local bignumlimit = 2^50
+local bnbignumlimit = bn(bignumlimit)
+
 -- Creates a new integer given a string or number representation of the integer
 function Integer:new(n)
     local o = {}
@@ -92,10 +110,14 @@ function Integer:new(n)
 
     n = n or 0
 
-    if (type(n) == "string" and (tonumber(n) > (2^50) or tonumber(n) < -(2^50))) or
-       (type(n) == "number" and (n > (2^50) or n < -(2^50))) or
-       (type(n) == "table" and (n > bn(2^50) or n < bn(-(2^50)))) then
-        o.internal = bn(n)
+    if (type(n) == "string" and (tonumber(n) > bignumlimit or tonumber(n) < -bignumlimit)) or
+       (type(n) == "number" and (n > bignumlimit or n < -bignumlimit)) or
+       (type(n) == "table" and (n > bnbignumlimit or n < -bnbignumlimit)) then
+        if type(n) == "table" then
+            o.internal = n
+        else
+            o.internal = bn(n)
+        end
         o.isbignum = true
         return o
     end
@@ -112,7 +134,6 @@ function Integer:new(n)
         end
     end
 
-    n = n or 0
     o.internal = n
     o.isbignum = false
 
@@ -187,7 +208,7 @@ end
 
 function Integer:eq(b)
     -- The bignum library treated signed zeros as not being equal???
-    if self:asNumber() == 0 and b:asNumber() == 0 then
+    if self == bn.ZERO and b:asNumber() == bn.ZERO then
         return true
     end
     return self.internal == b.internal

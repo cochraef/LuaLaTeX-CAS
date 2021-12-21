@@ -1,4 +1,5 @@
 require("algebra._init")
+require("_lib.pepperfish")
 
 local function test(actual, expected, initial)
     if initial then
@@ -100,7 +101,17 @@ test(f:isprime(), true, f)
 test(g:isprime(), false, g)
 test(h:isprime(), false, h)
 test(i:isprime(), false, i)
-test(n:isprime(), true, n)
+
+-- local profiler = newProfiler()
+-- profiler:start()
+
+-- test(n:isprime(), true, n)
+
+-- profiler:stop()
+-- local outfile = io.open( "profile.txt", "w+" )
+-- profiler:report( outfile )
+-- outfile:close()
+
 test(o:isprime(), false, o)
 print()
 
@@ -120,4 +131,14 @@ test(f:primefactorization(), "(* (3 ^ 1))", f)
 test(g:primefactorization(), "((2 ^ 3) * (3 ^ 3))", g)
 test(h:primefactorization(), "((3 ^ 3) * (5 ^ 1) * (7 ^ 1))", h)
 test(i:primefactorization(), "((41 ^ 1) * (189439 ^ 1))", i)
+
+
+-- local profiler = newProfiler()
+-- profiler:start()
+
 test(o:primefactorization(), "((10007 ^ 1) * (20011 ^ 1))", o)
+
+-- profiler:stop()
+-- local outfile = io.open( "profile.txt", "w+" )
+-- profiler:report( outfile )
+-- outfile:close()

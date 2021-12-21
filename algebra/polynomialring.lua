@@ -32,10 +32,25 @@ function PolynomialRing.gcd(a, b)
     if a.symbol ~= b.symbol then
         error("Cannot take the gcd of two polynomials with different symbols")
     end
-    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(0) do
+    while b ~= Integer(0) do
         a, b = b, a % b
     end
     return a // a:lc()
+end
+
+-- Returns the GCD of two polynomials in a ring, assuming both rings are euclidean domains
+-- Also returns bezouts coefficients via extended gcd
+function PolynomialRing.extendedgcd(a, b)
+    local oldr, r  = a, b
+    local olds, s  = Integer(1), Integer(0)
+    local oldt, t  = Integer(0), Integer(1)
+    while r ~= Integer(0) do
+        local q = oldr // r
+        oldr, r  = r, oldr - q*r
+        olds, s = s, olds - q*s
+        oldt, t = t, oldt - q*t
+    end
+    return oldr // oldr:lc(), olds, oldt
 end
 
 
@@ -341,11 +356,34 @@ function PolynomialRing:derrivative()
     return PolynomialRing(new, self.symbol, self.degree - Integer(1))
 end
 
+-- Factors the largest possible constant out of a polynomial whos underlying ring is a Euclidean domain but not a field
+function PolynomialRing:factorconstant()
+    local gcd = Integer(0)
+    for i = 0, self.degree:asNumber() do
+        gcd = self.ring.gcd(gcd, self.coefficients[i])
+    end
+    if gcd == Integer(0) then
+        return Integer(1), self
+    end
+    return gcd, self / gcd
+end
+
+-- Converts a polynomial in the rational polynomial ring to the integer polynomial ring
+function PolynomialRing:rationaltointeger()
+    local lcm = Integer(1)
+    for i = 0, self.degree:asNumber() do
+        if self.coefficients[i]:getRing() == Rational:getRing() then
+            lcm = lcm * self.coefficients[i].denominator / Integer.gcd(lcm, self.coefficients[i].denominator)
+        end
+    end
+    return Integer(1) / lcm, self * lcm
+end
+
 -- Returns the square-free factorization of a polynomial
-function PolynomialRing:squarefreefactorization()
+function PolynomialRing:squarefreefactorization(keeplc)
     local terms
     if self.ring == Rational.getRing() or self.ring == Integer.getRing() then
-        terms = self:rationalsquarefreefactorization()
+        terms = self:rationalsquarefreefactorization(keeplc)
     elseif self.ring == IntegerModN.getRing() then
         if not self.ring.modulus:isprime() then
             error("Cannot compute a square-free factorization of a polynomial ring contructed from a ring that is not a field.")
@@ -366,7 +404,7 @@ function PolynomialRing:squarefreefactorization()
 end
 
 -- Square-free factorization in the rational field
-function PolynomialRing:rationalsquarefreefactorization()
+function PolynomialRing:rationalsquarefreefactorization(keeplc)
     local monic = self / self:lc()
     local terms = {}
     terms[0] = PolynomialRing.gcd(monic, monic:derrivative())
@@ -380,7 +418,10 @@ function PolynomialRing:rationalsquarefreefactorization()
         i = i + 1
         d = c - b:derrivative()
     end
-
+    if keeplc and terms[1] then
+        terms[0] = Integer(1)
+        terms[1] = terms[1] * self:lc()
+    end
     return terms
 end
 
@@ -447,22 +488,211 @@ end
 
 -- Factors a polynomial into irreducible terms
 function PolynomialRing:factor()
-    local squarefree = self:squarefreefactorization()
-    local result = {squarefree.expressions[1]}
+    local squarefree
+    local result
+    if self.ring == Rational:getRing() then
+        local factor, integerpoly = self:rationaltointeger()
+        squarefree = integerpoly:squarefreefactorization(true)
+        result = {factor}
+    else
+        squarefree = self:squarefreefactorization()
+        result = {squarefree.expressions[1]}
+    end
     local j = 2
     for i, expression in ipairs(squarefree.expressions) do
         if i > 1 then
             local terms
+            if self.ring == Integer.getRing() or self.ring == Rational.getRing() then
+                terms = expression.expressions[1]:zassenhausfactor()
+            end
             if self.ring == IntegerModN.getRing() then
                 terms = expression.expressions[1]:berlekampfactor()
             end
-            for _, squarefreeexpression in ipairs(terms) do
-                result[j] = BinaryOperation.POWEXP({squarefreeexpression, expression.expressions[2]})
+            for _, factor in ipairs(terms) do
+                result[j] = BinaryOperation.POWEXP({factor, expression.expressions[2]})
                 j = j + 1
             end
         end
     end
     return BinaryOperation.MULEXP(result)
+end
+
+-- Uses Zassenhaus's Algorithm to factor polynomials over the intergers
+function PolynomialRing:zassenhausfactor()
+
+    -- Creates a monic polynomial V with related roots
+    local V = {}
+    local n = self.degree:asNumber()
+    local l = self:lc()
+    for i = 0, n - 1 do
+        V[i] = l ^ Integer(n - 1 - i) * self.coefficients[i]
+    end
+    V[n] = Integer(1)
+    V = PolynomialRing(V, "y", self.degree)
+
+    -- Performs Berlekamp Factorization in a sutable prime base
+    local p = V:findprime()
+    local P = PolynomialRing({IntegerModN(Integer(0), p)}, "y")
+    local S = V:inRing(P:getRing()):berlekampfactor()
+
+    -- If a polynomial is irreducible with coefficients in mod p, it is also irreducible over the integers
+    if #S == 1 then
+        return {self}
+    end
+
+    -- Performs Hensel lifting on the factors mod p
+    local k = V:findmaxlifts(p)
+    local W = V:henselift(S, k)
+    local M = {}
+
+    -- Returns the solutions back to the original from the monic transformation
+    for i, factor in ipairs(W) do
+        local w = {}
+        for j = 0, factor.degree:asNumber() do
+            w[j] = factor.coefficients[j]:inRing(Integer.getRing()) * l ^ Integer(j)
+        end
+        _, M[i] = PolynomialRing(w, self.symbol, factor.degree):factorconstant()
+    end
+
+    return M
+
+end
+
+-- Finds the smallest prime such that this polynomial with coefficients in mod p is square-free
+function PolynomialRing:findprime()
+
+    local smallprimes = {Integer(2), Integer(3), Integer(5), Integer(7), Integer(11), Integer(13), Integer(17), Integer(19), Integer(23),
+                            Integer(29), Integer(31), Integer(37), Integer(41), Integer(43), Integer(47), Integer(53), Integer(59)}
+
+    for _, p in pairs(smallprimes) do
+        local P = PolynomialRing({IntegerModN(Integer(1), p)}, self.symbol)
+        local s = self:inRing(P:getRing())
+        if PolynomialRing.gcd(s, s:derrivative()) == P then
+            return p
+        end
+    end
+
+    error("Execution error: No suitable prime found for factoring.")
+end
+
+-- Finds the maximum number of times Hensel Lifting will be applied to raise solutions to the appropriate power
+function PolynomialRing:findmaxlifts(p)
+    local n = self.degree:asNumber()
+    local h = self.coefficients[0]
+    for i=0 , n do
+        if self.coefficients[i] > h then
+            h = self.coefficients[i]
+        end
+    end
+
+    local B = 2^n * math.sqrt(n) * h:asNumber()
+    return Integer(math.ceil(math.log(2*B, p:asNumber())))
+end
+
+-- Uses Hensel lifting on the factors of a polynomial S mod p to find them in the integers
+function PolynomialRing:henselift(S, k)
+    if k == Integer(1) then
+        return self:truefactors(S, k)
+    end
+    local p = S[1].coefficients[0].modulus
+    G = self:genextendsigma(S)
+    local V = S
+    for j = 2, k:asNumber() do
+        local Vp = V[1]:inRing(PolynomialRing({Integer(0)}, "y"):getRing())
+        for i = 2, #V do
+            Vp = Vp * V[i]:inRing(PolynomialRing({Integer(0)}, "y"):getRing())
+        end
+        local E = self - Vp:inRing(PolynomialRing({Integer(0)}, "y"):getRing())
+        print(E)
+        if E == Integer(0) then
+            return V
+        else
+            E = E:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ Integer(j))}, "y"):getRing()):inRing(PolynomialRing({Integer(0)}, "y"):getRing())
+            F = E / p ^ (Integer(j) - Integer(1))
+            R = self:genextendR(V, G, F)
+            local Vnew = {}
+            for i, v in ipairs(V) do
+                local vnew = v:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ Integer(j))}, "y"):getRing())
+                local rnew = R[i]:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ Integer(j))}, "y"):getRing())
+                Vnew[i] = vnew + (p) ^ (Integer(j) - Integer(1)) * rnew
+            end
+            V = Vnew;
+        end
+    end
+    return self:truefactors(V, k)
+end
+
+-- Gets a list of sigma polynomials for use in hensel lifting
+function PolynomialRing:genextendsigma(S)
+    local v = S[1]
+    for i = 2, #S do
+        v = v * S[i]
+    end
+    local G = {}
+    for i, factor in ipairs(S) do
+        G[i] = v // factor
+    end
+    local _, A, B = PolynomialRing.extendedgcd(G[1], G[2])
+    local SIGMA = {A, B}
+    for i, s in ipairs(S) do
+        if i >= 3 then
+            local sum = SIGMA[1]
+            for j = 2, i-1 do
+                sum = sum + SIGMA[j] * G[j]
+            end
+            _, A, B = PolynomialRing.extendedgcd(sum, G[i])
+            for j = 1, i-1 do
+                SIGMA[j] = SIGMA[j] * A
+            end
+            SIGMA[i] = B
+        end
+    end
+
+    return SIGMA
+end
+
+-- Gets a list of r polynomials for use in hensel lifting
+function PolynomialRing:genextendR(V, G, F)
+    R = {}
+    for i, v in ipairs(V) do
+        local pring = G[1]:getRing()
+        R[i] = F:inRing(pring) * G[i] % v:inRing(pring)
+    end
+    return R
+end
+
+-- Updates factors of the polynomial to the correct ones in the integer ring
+function PolynomialRing:truefactors(l, k)
+    local U = self
+    local L = l
+    local factors = {}
+    local m = 1
+    local p = S[1].coefficients[0].modulus
+    while m <= #L / 2 do
+        local C = Subarrays(L, m)
+        while #C > 0 do
+            local t = C[1]
+            local prod = t[1]
+            for i = 2, #t do
+                prod = prod * t[i]
+            end
+            local T = prod:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ k)}, "y"):getRing())
+            local Q, R = U:divremainder(T)
+            if R == Integer(0) then
+                factors[#factors+1] = T
+                U = Q
+                L = RemoveAll(L, t)
+                C = RemoveAny(C, t)
+            else
+                C = Remove(C, t)
+            end
+        end
+        m = m + 1
+    end
+    if U ~= Integer(1) then
+        factors[#factors+1] = U
+    end
+    return factors;
 end
 
 -- Uses Berlekamp's Algorithm to factor polynomials in mod p
@@ -570,7 +800,7 @@ function PolynomialRing:findfactors(S)
             local j = 0
             while j <= p:asNumber() - 1 do
                 local g = PolynomialRing.gcd(b-IntegerModN(Integer(j), p), w)
-                if g.degree == Integer(0) and g.coefficients[0] == Integer(1) then
+                if g == Integer(1) then
                     j = j + 1
                 elseif g == w then
                     j = p:asNumber()

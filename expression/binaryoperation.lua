@@ -121,7 +121,7 @@ function BinaryOperation:substitute(variables)
     return BinaryOperation(self.operation, results)
 end
 
--- Performs automatic simplification of an expression, including evaluation
+-- Performs automatic simplification of an binary operation
 function BinaryOperation:autosimplify()
     local results = {}
     for index, expression in ipairs(self.expressions) do
@@ -248,6 +248,9 @@ function BinaryOperation:tolatex()
                     out = out .. expression:tolatex()
                 end
             end
+        end
+        if out == '-' then
+            out = '-1'
         end
         if denom ~= '' then
             return '\\frac{' .. out .. '}{' .. denom .. '}'

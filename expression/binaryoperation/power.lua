@@ -61,19 +61,19 @@ end
 function BinaryOperation:simplifyrationalpower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
-    if base:getRing() == Rational then
+    if base:getRing() == Rational.getRing() then
         return (BinaryOperation(BinaryOperation.POW, {base.numerator, exponent}):simplifyrationalpower()) /
                 (BinaryOperation(BinaryOperation.POW, {base.denominator, exponent}):simplifyrationalpower())
     end
 
     -- Limit for attempting simplification of rational powers automatically
-    if base > (Integer(2) ^ Integer(30)) then
+    if base > (Integer(2) ^ Integer(25)) then
         return self
     end
 
     local primes = base:primefactorization()
 
-    if(primes.expressions[1] and not primes.expressions[2]) then
+    if primes.expressions[1] and not primes.expressions[2] then
         local primeexponent = primes.expressions[1].expressions[2]
         local primebase = primes.expressions[1].expressions[1]
         local newexponent = primeexponent * exponent

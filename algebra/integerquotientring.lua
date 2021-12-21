@@ -69,7 +69,7 @@ end
 function IntegerModN:inRing(ring)
     if ring.ring == IntegerModN then
         if ring.modulus then
-            return IntegerModN(self.element, Integer.gcd(self.modulus, ring.modulus))
+            return IntegerModN(self.element, ring.modulus)
         end
         return self
     end
@@ -79,7 +79,7 @@ function IntegerModN:inRing(ring)
     end
 
     if Ring.subringof(Integer:getRing(), ring) then
-        return self
+        return self.element:inRing(ring)
     end
 
     error("Unable to convert element to proper ring.")
@@ -120,6 +120,10 @@ function IntegerModN:inv()
     end
 
     return IntegerModN(t, self.modulus)
+end
+
+function IntegerModN:div(b)
+    return self:mul(b:inv())
 end
 
 function IntegerModN:eq(b)
