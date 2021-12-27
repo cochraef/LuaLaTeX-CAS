@@ -39,7 +39,7 @@ local d = IntegerModN(Integer(16), Integer(36))
 local e = IntegerModN(Integer(27), Integer(36))
 
 test(d * e, "0")
-test(a * d, "2")
+test(a * d, "32")
 
 local p = PolynomialRing({a, b, a}, "x")
 

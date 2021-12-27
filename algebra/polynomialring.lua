@@ -261,7 +261,7 @@ function PolynomialRing:divremainder(b)
     local q = {}
     for i = (n-m):asNumber(), 0,-1 do
         if r.degree:asNumber() == m:asNumber() + i then
-            q[i] = r.coefficients[r.degree:asNumber()] * u
+            q[i] = r:lc() * u
             r = r - PolynomialRing({q[i]}, self.symbol):multiplyDegree(i) * b
         else
             q[i] = Integer(0)

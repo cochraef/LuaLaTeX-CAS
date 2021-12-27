@@ -67,7 +67,12 @@ function BinaryOperation:simplifyrationalpower()
     end
 
     -- Limit for attempting simplification of rational powers automatically
-    if base > (Integer(2) ^ Integer(25)) then
+    if not BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT then
+        BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT = Integer(Integer.DIGITSIZE)
+    end
+
+    -- Limit for attempting simplification of rational powers automatically
+    if base > BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT then
         return self
     end
 

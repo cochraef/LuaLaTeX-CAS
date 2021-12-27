@@ -26,6 +26,9 @@ __EuclideanOperations = Copy(__RingOperations)
 -- Division with remainder
 -- Unfortunately, this can only return 1 result, so it returns the quotient - for the remainder use a % b, or a:divremainder(b)
 __EuclideanOperations.__idiv = function(a, b)
+    if(b == b:zero()) then
+        error("Cannot divide by zero.")
+    end
     local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         return a:divremainder(b)
@@ -41,6 +44,9 @@ __EuclideanOperations.__idiv = function(a, b)
 end
 
 __EuclideanOperations.__mod = function(a, b)
+    if(b == b:zero()) then
+        error("Cannot divide by zero.")
+    end
     local aring, bring = a:getRing(), b:getRing()
     if aring == bring then
         local _,q = a:divremainder(b)

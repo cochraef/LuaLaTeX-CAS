@@ -1,6 +1,7 @@
--- Represents an element of the ring of integers
+-- Represents an element of the ring of integers.
 -- Integers have the following instance variables:
---      internal - the internal representation of the integer
+--      1, 2, 3, etc. - the unsigned digits that represent the number in 'little endian' - least significant digit first
+--      sign - 1 for positive integers, -1 for negative, 0 for 0
 -- Integers have the following relationship to other classes:
 --      Integers implement Euclidean Domains
 Integer = {}
@@ -9,6 +10,15 @@ __Integer = {}
 --------------------------
 -- Static functionality --
 --------------------------
+
+-- The length of each digit in base 10. 10^15 < 2^53 < 10^16, so 15 is the highest value that will work with double-percision numbers.
+-- For multiplication to work properly, however, this also must be even so we can take the square root of the digit size exaxtly.
+-- 10^14 is still larger than 2^26, so it is still efficient to do multiplication this way.
+Integer.DIGITLENGTH = 14;
+-- The maximum size for a digit. While this doesn't need to be a power of 10, it makes implementing converting to and from strings much easier.
+Integer.DIGITSIZE = 10 ^ Integer.DIGITLENGTH;
+-- Partition size for multiplying integers so we can get both the upper and lower bits of each digits
+Integer.PARTITIONSIZE = math.floor(math.sqrt(Integer.DIGITSIZE))
 
 -- Returns the immediate subrings of this ring
 function Integer.subrings()
@@ -24,7 +34,7 @@ function Integer.gcd(a, b)
 end
 
 -- Method for computing the gcd of two integers using Euclid's algorithm
--- Also returns bezouts coefficients via extended gcd
+-- Also returns Bezout's coefficients via extended gcd
 function Integer.extendedgcd(a, b)
     local oldr, r  = a, b
     local olds, s  = Integer(1), Integer(0)
@@ -38,12 +48,22 @@ function Integer.extendedgcd(a, b)
     return oldr, olds, oldt
 end
 
--- Method for computing the greater of two integers
+-- Method for computing the larger of two integers.
+-- Also returns the other integer for sorting purposes.
 function Integer.max(a, b)
     if a > b then
-        return a
+        return a, b
     end
-    return b
+    return b, a
+end
+
+-- Methods for computing the larger magnitude of two integers.
+-- Also returns the other integer for sorting purposes, and the number -1 if the two values were swapped, 1 if not.
+function Integer.absmax(a, b)
+    if b:ltabs(a) then
+        return a, b, 1
+    end
+    return b, a, -1
 end
 
 -- Returns the ceiling of the log base (defaults to 10) of a
@@ -84,11 +104,21 @@ end
 -- So we don't have to copy the Euclidean operations each time
 local __o = Copy(__EuclideanOperations)
 __o.__index = Integer
-__o.__tostring = function(a)
-    if not a.isbignum then
-        return tostring(math.floor(a.internal))
+__o.__tostring = function(a) -- Only works if the digit size is a power of 10
+    local out = ""
+    for i, digit in ipairs(a) do
+        local pre = tostring(math.floor(digit))
+        if i ~= #a then
+            while #pre ~= Integer.DIGITLENGTH do
+                pre = "0" .. pre
+            end
+        end
+        out = pre .. out
     end
-    return tostring(a.internal)
+    if a.sign == -1 then
+        out = "-" .. out
+    end
+    return out
 end
 __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
     if not b.getRing then
@@ -100,42 +130,76 @@ __o.__div = function(a, b)   -- Constructor for a rational number disguised as d
     return __FieldOperations.__div(a, b)
 end
 
-local bignumlimit = 2^50
-local bnbignumlimit = bn(bignumlimit)
-
 -- Creates a new integer given a string or number representation of the integer
 function Integer:new(n)
     local o = {}
     o = setmetatable(o, __o)
 
-    n = n or 0
-
-    if (type(n) == "string" and (tonumber(n) > bignumlimit or tonumber(n) < -bignumlimit)) or
-       (type(n) == "number" and (n > bignumlimit or n < -bignumlimit)) or
-       (type(n) == "table" and (n > bnbignumlimit or n < -bnbignumlimit)) then
-        if type(n) == "table" then
-            o.internal = n
-        else
-            o.internal = bn(n)
-        end
-        o.isbignum = true
+    if not n then
+        o[1] = 0
+        o.sign = 0
         return o
     end
 
-    if type(n) == "string" then
-        n = tonumber(n)
-    end
-
-    if type(n) == "table" then
-        if n._digits[1] == 0 and not n._digits[2] then
-            n = 0
+    -- Can convert any floating-point number into an integer, though we generally only want to pass whole numbers into this.
+    -- This will only approximate very large floating point numbers to a small proportion of the total significant digits
+    -- After that the result will just be nonsense - strings should probably be used for big numbers
+    if type(n) == "number" then
+        n = math.floor(n)
+        if n == 0 then
+            o[1] = 0
+            o.sign = 0
         else
-            n = n:asnumber()
+            if n < 0 then
+                n = -n
+                o.sign = -1
+            else
+                o.sign = 1
+            end
+            local i = 1
+            while n >= Integer.DIGITSIZE do
+                o[i] = n % Integer.DIGITSIZE
+                n = n // Integer.DIGITSIZE
+                i = i + 1
+            end
+            o[i] = n % Integer.DIGITSIZE
         end
-    end
+    -- Only works on strings that are exact (signed) integers
+    elseif type(n) == "string" then
+        if not tonumber(n) then
+            error("Sent parameter of wrong type: " .. n .. " is not an integer.")
+        end
+        if n == "0" then
+            o[1] = 0
+            o.sign = 0
+        else
+            local s = 1
+            if string.sub(n, 1, 1) == "-" then
+                s = s + 1
+                o.sign = -1
+            else
+                o.sign = 1
+            end
 
-    o.internal = n
-    o.isbignum = false
+            while string.sub(n, s, s) == "0" do
+                s = s + 1
+            end
+
+            local e = #n
+            local i = 1
+            while e > s + Integer.DIGITLENGTH - 1 do
+                o[i] = tonumber(string.sub(n, e - Integer.DIGITLENGTH + 1, e))
+                e = e - Integer.DIGITLENGTH
+                i = i + 1
+            end
+            o[i] = tonumber(string.sub(n, s, e)) or 0
+        end
+    -- Copying is expensive in Lua, so this constructor probably should only sparsely be called with an Integer argument.
+    elseif type(n) == "table" then
+        o = Copy(n)
+    else
+        error("Sent parameter of wrong type: Integer does not accept " .. type(n) .. ".")
+    end
 
     return o
 end
@@ -171,55 +235,373 @@ function Integer:inRing(ring)
 end
 
 function Integer:add(b)
-    return Integer(self.internal + b.internal)
+    if self.sign == 1 and b.sign == -1 then
+        return self:usub(b, 1)
+    end
+    if self.sign == -1 and b.sign == 1 then
+        return self:usub(b, -1)
+    end
+
+    local sign = self.sign
+    if sign == 0 then
+        sign = b.sign
+    end
+    return self:uadd(b, sign)
+end
+
+-- Addition without sign so we don't have to create an entire new integer when switching signs.
+function Integer:uadd(b, sign)
+    local o = Integer()
+    o.sign = sign
+
+    local c = 0
+    local n = math.max(#self, #b)
+    for i = 1, n do
+        local s = (self[i] or 0) + (b[i] or 0) + c
+        if s >= Integer.DIGITSIZE then
+            o[i] = s - Integer.DIGITSIZE
+            c = 1
+        else
+            o[i] = s
+            c = 0
+        end
+    end
+    if c == 1 then
+        o[n + 1] = c
+    end
+    return o
+end
+
+function Integer:sub(b)
+    if self.sign == 1 and b.sign == -1 then
+        return self:uadd(b, 1)
+    end
+    if self.sign == -1 and b.sign == 1 then
+        return self:uadd(b, -1)
+    end
+    local sign = self.sign
+    if sign == 0 then
+        sign = b.sign
+    end
+    return self:usub(b, sign)
+end
+
+-- Subtraction without sign so we don't have to create an entire new integer when switching signs.
+-- Uses subtraction by compliments.
+function Integer:usub(b, sign)
+    local a, b, swap = Integer.absmax(self, b)
+    local o = Integer()
+    o.sign = sign * swap
+
+    local c = 0
+    local n = #a
+    for i = 1, n do
+        local s = (a[i] or 0) + Integer.DIGITSIZE - 1 - (b[i] or 0) + c
+        if i == 1 then
+            s = s + 1
+        end
+        if s >= Integer.DIGITSIZE then
+            o[i] = s - Integer.DIGITSIZE
+            c = 1
+        else
+            o[i] = s
+            c = 0
+        end
+    end
+
+    -- Remove leading zero digits, since we want integer representations to be unique.
+    while o[n] == 0 do
+        o[n] = nil
+        n = n - 1
+    end
+
+    if not o[1] then
+        o[1] = 0
+        o.sign = 0
+    end
+
+    return o
 end
 
 function Integer:neg()
-    return Integer(-self.internal)
+    local o = Integer()
+    o.sign = -self.sign
+    for i, digit in ipairs(self) do
+        o[i] = digit
+    end
+    return o
 end
 
 function Integer:mul(b)
-    if not self.isbignum and not b.isbignum and ((self.internal * b.internal) > (2 ^ 50)) or
-            ((self.internal * b.internal) < (- 2 ^ 50)) or
-            self.internal > 0 and b.internal > 0 and (self.internal * b.internal) < 0 or
-            self.internal < 0 and b.internal > 0 and (self.internal * b.internal) > 0 or
-            self.internal < 0 and b.internal < 0 and (self.internal * b.internal) > 0 or
-            self.internal < 0 and b.internal < 0 and (self.internal * b.internal) < 0 then
-        return Integer(bn(self.internal) * bn(b.internal))
+    local o = Integer()
+    o.sign = self.sign * b.sign
+    if o.sign == 0 then
+        o[1] = 0
+        return o
     end
-    return Integer(self.internal * b.internal)
+
+    -- Fast single-digit multiplication in the most common case
+    if #self == 1 and #b == 1 then
+        o[2], o[1] = self:mulone(self[1], b[1])
+
+        if o[2] == 0 then
+            o[2] = nil
+        end
+
+        return o
+    end
+
+    -- "Grade school" multiplication algorithm for numbers with small numbers of digits works faster than Karatsuba
+    local n = #self
+    local m = #b
+    o[1] = 0
+    o[2] = 0
+    for i = 2, n+m do
+        o[i + 1] = 0
+        for j = math.max(1, i-m), math.min(n, i-1) do
+            local u, l = self:mulone(self[j], b[i - j])
+            o[i - 1] = o[i - 1] + l
+            o[i] = o[i] + u
+            if o[i - 1] >= Integer.DIGITSIZE then
+                o[i - 1] = o[i - 1] - Integer.DIGITSIZE
+                o[i] = o[i] + 1
+            end
+            if o[i] >= Integer.DIGITSIZE then
+                o[i] = o[i] - Integer.DIGITSIZE
+                o[i + 1] = o[i + 1] + 1
+            end
+        end
+    end
+
+    -- Remove leading zero digits, since we want integer representations to be unique.
+    if o[n+m+1] == 0 then
+        o[n+m+1] = nil
+    end
+
+    if o[n+m] == 0 then
+        o[n+m] = nil
+    end
+
+    return o
 end
 
--- Overrides the generic power method with the bignum library's more efficient method
+-- Multiplies two single-digit numbers and returns two digits
+function Integer:mulone(a, b)
+    local P = Integer.PARTITIONSIZE
+
+    local a1 = a // P
+    local a2 = a % P
+    local b1 = b // P
+    local b2 = b % P
+
+    local u = a1 * b1
+    local l = a2 * b2
+
+    local m = ((a1 * b2) + (b1 * a2))
+    local mu = m // P
+    local ml = m % P
+
+    u = u + mu
+    l = l + ml * P
+
+    if l >= Integer.DIGITSIZE then
+        l = l - Integer.DIGITSIZE
+        u = u + 1
+    end
+
+    return u, l
+end
+
+-- Naive exponentiation is slow even for small exponents, so this uses binary exponentiation.
 function Integer:pow(b)
     if b < Integer(0) then
-        return Integer(1) / Integer(self.internal ^ (-b.internal))
+        return Integer(1) / (self ^ -b)
     end
-    if not self.isbignum and not b.isbignum and (self.internal ^ b.internal) > (2 ^ 50) then
-        return Integer(bn(self.internal) ^ bn(b.internal))
+
+    if b == Integer(0) then
+        return Integer(1)
     end
-    return Integer(self.internal ^ b.internal)
+
+    -- Fast single-digit exponentiation
+    if #self == 1 and #b == 1 then
+        local test = (self.sign * self[1]) ^ b[1]
+        if test < Integer.DIGITSIZE and test > -Integer.DIGITSIZE then
+            return Integer(test)
+        end
+    end
+
+    local x = self
+    local y = Integer(1)
+    while b > Integer(1) do
+        if b[1] % 2 == 0 then
+            x = x * x
+            b = b:divbytwo()
+        else
+            y = x * y
+            x = x * x
+            b = b:divbytwo()
+        end
+    end
+
+    return x * y
 end
 
--- Division with remainder in integers
+-- Fast integer division by two for binary exponentiation.
+function Integer:divbytwo()
+    local o = Integer()
+    o.sign = self.sign
+    for i = #self, 1, -1 do
+        if self[i] % 2 == 0 then
+            o[i] = self[i] // 2
+        else
+            o[i] = self[i] // 2
+            if i ~= 1 then
+                o[i - 1] = self[i - 1] * 2
+            end
+        end
+    end
+    return o
+end
+
+-- Division with remainder over the integers. Uses the standard base 10 long division algorithm.
 function Integer:divremainder(b)
-    return Integer(self.internal // b.internal), Integer(self.internal % b.internal)
+    if self >= Integer(0) and b > self or self <= Integer(0) and b < self then
+        return Integer(0), Integer(self)
+    end
+
+    if #self == 1 and #b == 1 then
+        return Integer((self[1]*self.sign) // (b[1]*b.sign)), Integer((self[1]*self.sign) % (b[1]*b.sign))
+    end
+
+    local Q = Integer()
+    local R = Integer()
+
+    Q.sign = self.sign * b.sign
+    R.sign = 1
+    local negativemod = false
+    if b.sign == -1 then
+        b = -b
+        negativemod = true
+    end
+
+    for i = #self, 1, -1 do
+        local s = tostring(math.floor(self[i]))
+        while i ~= #self and #s ~= Integer.DIGITLENGTH do
+            s = "0" .. s
+        end
+        Q[i] = 0
+        for j = 1, #s do
+            R = R:mulbyten()
+            R[1] = R[1] + tonumber(string.sub(s, j, j))
+            if R[1] > 0 then
+                R.sign = 1
+            end
+            while R >= b do
+                R = R - b
+                Q[i] = Q[i] + 10^(#s - j)
+            end
+        end
+    end
+
+    -- Remove leading zero digits, since we want integer representations to be unique.
+    while Q[#Q] == 0 do
+        Q[#Q] = nil
+    end
+
+    if negativemod then
+        R = -R
+    end
+    return Q, R
+end
+
+-- Fast in-place multiplication by ten for the division algorithm. This means the number IS MODIFIED by this method unlike the rest of the library.
+function Integer:mulbyten()
+    local DIGITSIZE = Integer.DIGITSIZE
+    for i, _ in ipairs(self) do
+        self[i] = self[i] * 10
+    end
+    for i, _ in ipairs(self) do
+        if self[i] > DIGITSIZE then
+            local msd = self[i] // DIGITSIZE
+            if self[i+1] then
+                self[i+1] = self[i+1] + msd
+            else
+                self[i+1] = msd
+            end
+            self[i] = self[i] - DIGITSIZE*msd
+        end
+    end
+    return self
 end
 
 function Integer:eq(b)
-    -- The bignum library treated signed zeros as not being equal???
-    if self == bn.ZERO and b:asNumber() == bn.ZERO then
-        return true
+    for i, digit in ipairs(self) do
+        if not b[i] or not (b[i] == digit) then
+            return false
+        end
     end
-    return self.internal == b.internal
+    return #self == #b and self.sign == b.sign
 end
 
 function Integer:lt(b)
-    return self.internal < b.internal
+    if #self < #b then
+        return b.sign == 1
+    end
+    if #self > #b then
+        return self.sign == -1
+    end
+    local n = #self
+    while n > 0 do
+        if self[n]*self.sign < b[n]*b.sign then
+            return true
+        end
+        if self[n]*self.sign > b[n]*b.sign then
+            return false
+        end
+        n = n - 1
+    end
+    return false
+end
+
+-- Same as less than, but ignores signs.
+function Integer:ltabs(b)
+    if #self < #b then
+        return true
+    end
+    if #self > #b then
+        return false
+    end
+    local n = #self
+    while n > 0 do
+        if self[n] < b[n] then
+            return true
+        end
+        if self[n] > b[n] then
+            return false
+        end
+        n = n - 1
+    end
+    return false
 end
 
 function Integer:le(b)
-    return self.internal <= b.internal
+    if #self < #b then
+        return b.sign == 1
+    end
+    if #self > #b then
+        return self.sign == -1
+    end
+    local n = #self
+    while n > 0 do
+        if self[n]*self.sign < b[n]*b.sign then
+            return true
+        end
+        if self[n]*self.sign > b[n]*b.sign then
+            return false
+        end
+        n = n - 1
+    end
+    return true
 end
 
 function Integer:zero()
@@ -230,20 +612,16 @@ function Integer:one()
     return Integer(1)
 end
 
--- returns this integer as a number
+-- Returns this integer as a floating point number. Can only approximate the value of large integers.
 function Integer:asNumber()
-    if not self.isbignum then
-        return self.internal
+    local n = 0
+    for i, digit in ipairs(self) do
+        n = n + digit * Integer.DIGITSIZE ^ (i - 1)
     end
-
-    -- The bignum library is broken for some reason and doesn't give the right answer when zero is negative
-    if self.internal._digits[1] == 0 and not self.internal._digits[2] then
-        return 0
-    end
-    return self.internal:asnumber()
+    return math.floor(n)
 end
 
--- returns the prime factorization of this integer as a expression
+-- Returns the prime factorization of this integer as a expression.
 function Integer:primefactorization()
     local result = self:primefactorizationrec()
     local mul = {}
@@ -255,7 +633,7 @@ function Integer:primefactorization()
     return BinaryOperation.MULEXP(mul)
 end
 
--- Recursive part of prime factorization using Pollard Rho
+-- Recursive part of prime factorization using Pollard Rho.
 function Integer:primefactorizationrec()
     local result = self:findafactor()
     if result == self then
@@ -284,7 +662,6 @@ end
 
 -- return a non-trivial factor of n via Pollard Rho, or returns n if n is prime
 function Integer:findafactor()
-
     if self:isprime() then
         return self + Integer(0)
     end
@@ -319,7 +696,7 @@ function Integer:findafactor()
     end
 end
 
--- uses Miller-Rabin to determine whether a number is prime up to a very large number
+-- uses Miller-Rabin to determine whether a number is prime up to a very large number.
 function Integer:isprime()
     if self % Integer(2) == Integer(0) then
         return false
@@ -369,10 +746,10 @@ end
 
 -- returns the absolute value of an integer
 function Integer:abs()
-    if not self.isbignum then
-        return Integer(math.abs(self.internal))
+    if self.sign >= 0 then
+        return Integer(self)
     end
-    return Integer(self.internal:abs())
+    return -self
 end
 
 -----------------

@@ -1,5 +1,4 @@
 -- Loads algebra files in the correct order.
-bn = require("_lib.nums.bn")
 require("_lib.table.copy")
 require("_lib.table.join")
 require("_lib.table.remove")
