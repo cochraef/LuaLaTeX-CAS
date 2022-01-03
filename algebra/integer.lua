@@ -510,7 +510,10 @@ function Integer:divremainder(b)
 
     if negativemod then
         R = -R
+    elseif self.sign == -1 then
+        R = b - R
     end
+
     return Q, R
 end
 

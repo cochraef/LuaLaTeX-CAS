@@ -19,6 +19,11 @@ function IntegerModN.subrings()
     return {Integer:getRing()}
 end
 
+-- Shorthand constructor for a ring with a particular modulus
+function IntegerModN.R(modulus)
+    return IntegerModN(Integer(0), modulus):getRing()
+end
+
 ----------------------------
 -- Instance functionality --
 ----------------------------
@@ -36,8 +41,7 @@ end
 function IntegerModN:new(i, n)
     local o = {}
 
-
-    if not n or n:getRing() ~= Integer:getRing() or n < Integer(1) then
+    if n:getRing() ~= Integer:getRing() or n < Integer(1) then
         error("Argument error: modulus must be an integer greater than 0.")
     end
 
@@ -54,11 +58,12 @@ function IntegerModN:new(i, n)
 end
 
 -- Returns the ring this object is an element of
-function IntegerModN:getRing()
+function IntegerModN:getRing(_)
     local t = {ring = IntegerModN}
     if self then
         t.modulus = self.modulus
     end
+    t.modulus = t.modulus or self
     t = setmetatable(t, {__index = IntegerModN, __eq = function(a, b)
         return a["ring"] == b["ring"] and (a["modulus"] == b["modulus"] or a["modulus"] == nil or b["modulus"] == nil)
     end})

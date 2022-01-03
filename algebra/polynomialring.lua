@@ -27,6 +27,14 @@ function PolynomialRing.subrings(construction)
     return subrings
 end
 
+-- Shorthand constructor for a polynomial ring with integer or integer mod ring coefficients
+function PolynomialRing.R(symbol, modulus)
+    if modulus then
+        return PolynomialRing({IntegerModN(Integer(0), modulus)}, symbol):getRing()
+    end
+    return PolynomialRing({Integer(0)}, symbol):getRing()
+end
+
 -- Returns the GCD of two polynomials in a ring, assuming both rings are euclidean domains
 function PolynomialRing.gcd(a, b)
     if a.symbol ~= b.symbol then
@@ -50,7 +58,7 @@ function PolynomialRing.extendedgcd(a, b)
         olds, s = s, olds - q*s
         oldt, t = t, oldt - q*t
     end
-    return oldr // oldr:lc(), olds, oldt
+    return oldr // oldr:lc(), olds // oldr:lc(), oldt // oldr:lc()
 end
 
 
@@ -532,8 +540,7 @@ function PolynomialRing:zassenhausfactor()
 
     -- Performs Berlekamp Factorization in a sutable prime base
     local p = V:findprime()
-    local P = PolynomialRing({IntegerModN(Integer(0), p)}, "y")
-    local S = V:inRing(P:getRing()):berlekampfactor()
+    local S = V:inRing(PolynomialRing.R("y", p)):berlekampfactor()
 
     -- If a polynomial is irreducible with coefficients in mod p, it is also irreducible over the integers
     if #S == 1 then
@@ -598,49 +605,48 @@ function PolynomialRing:henselift(S, k)
     G = self:genextendsigma(S)
     local V = S
     for j = 2, k:asNumber() do
-        local Vp = V[1]:inRing(PolynomialRing({Integer(0)}, "y"):getRing())
+        -- print("Hensel lifting step: " .. tostring(j))
+        -- print("Current terms: " .. tostring(V[1]) .. " ," .. tostring(V[2]) .. " ," .. tostring(V[3]) .. " ," .. tostring(V[4]))
+        local Vp = V[1]:inRing(PolynomialRing.R("y"))
         for i = 2, #V do
-            Vp = Vp * V[i]:inRing(PolynomialRing({Integer(0)}, "y"):getRing())
+            Vp = Vp * V[i]:inRing(PolynomialRing.R("y"))
         end
-        local E = self - Vp:inRing(PolynomialRing({Integer(0)}, "y"):getRing())
-        print(E)
+        -- print("Vp: " .. tostring(Vp))
+        local E = self - Vp:inRing(PolynomialRing.R("y"))
+        -- print("E: " .. tostring(E))
         if E == Integer(0) then
             return V
-        else
-            E = E:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ Integer(j))}, "y"):getRing()):inRing(PolynomialRing({Integer(0)}, "y"):getRing())
-            F = E / p ^ (Integer(j) - Integer(1))
-            R = self:genextendR(V, G, F)
-            local Vnew = {}
-            for i, v in ipairs(V) do
-                local vnew = v:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ Integer(j))}, "y"):getRing())
-                local rnew = R[i]:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ Integer(j))}, "y"):getRing())
-                Vnew[i] = vnew + (p) ^ (Integer(j) - Integer(1)) * rnew
-            end
-            V = Vnew;
         end
+        E = E:inRing(PolynomialRing.R("y", p ^ Integer(j))):inRing(PolynomialRing.R("y"))
+        F = E / p ^ (Integer(j) - Integer(1))
+        -- print("F: " .. tostring(F))
+        R = self:genextendR(V, G, F)
+        -- print("R: " .. tostring(R[1]) .. " ," .. tostring(R[2]) .. " ," .. tostring(R[3]) .. " ," .. tostring(R[4]))
+        local Vnew = {}
+        for i, v in ipairs(V) do
+            local vnew = v:inRing(PolynomialRing.R("y", p ^ Integer(j)))
+            local rnew = R[i]:inRing(PolynomialRing.R("y", p ^ Integer(j)))
+            Vnew[i] = vnew + (p) ^ (Integer(j) - Integer(1)) * rnew
+        end
+        V = Vnew;
     end
+    -- print("Final terms: " .. tostring(V[1]) .. " ," .. tostring(V[2]) .. " ," .. tostring(V[3]) .. " ," .. tostring(V[4]))
     return self:truefactors(V, k)
 end
 
 -- Gets a list of sigma polynomials for use in hensel lifting
 function PolynomialRing:genextendsigma(S)
-    local v = S[1]
-    for i = 2, #S do
-        v = v * S[i]
-    end
-    local G = {}
-    for i, factor in ipairs(S) do
-        G[i] = v // factor
-    end
-    local _, A, B = PolynomialRing.extendedgcd(G[1], G[2])
+    local v = S[1] * S[2]
+    local _, A, B = PolynomialRing.extendedgcd(S[2], S[1])
     local SIGMA = {A, B}
-    for i, s in ipairs(S) do
+    for i, _ in ipairs(S) do
         if i >= 3 then
-            local sum = SIGMA[1]
+            v = v * S[i]
+            local sum = SIGMA[1] * (v // S[1])
             for j = 2, i-1 do
-                sum = sum + SIGMA[j] * G[j]
+                sum = sum + SIGMA[j] * (v // S[j])
             end
-            _, A, B = PolynomialRing.extendedgcd(sum, G[i])
+            _, A, B = PolynomialRing.extendedgcd(sum, v // S[i])
             for j = 1, i-1 do
                 SIGMA[j] = SIGMA[j] * A
             end
@@ -676,7 +682,13 @@ function PolynomialRing:truefactors(l, k)
             for i = 2, #t do
                 prod = prod * t[i]
             end
-            local T = prod:inRing(PolynomialRing({IntegerModN(Integer(0), p ^ k)}, "y"):getRing())
+            local T = prod:inRing(PolynomialRing.R("y", p ^ k)):inRing(PolynomialRing.R("y"))
+            -- Convert to symmetric representation - this is the only place it actually matters
+            for i = 0, T.degree:asNumber() do
+                if T.coefficients[i] > p ^ k / Integer(2) then
+                    T.coefficients[i] = T.coefficients[i] - p^k
+                end
+            end
             local Q, R = U:divremainder(T)
             if R == Integer(0) then
                 factors[#factors+1] = T
@@ -754,7 +766,7 @@ function PolynomialRing:auxillarybasis(R)
             end
             for k = 1, n do
                 if k ~= i then
-                    local f = R[k][i]
+                    local f = R[k][j]
                     for l = 1, n do
                         R[k][l] = R[k][l] - f*R[i][l]
                     end
@@ -780,8 +792,7 @@ function PolynomialRing:auxillarybasis(R)
                     s[l] = self.ring:zero()
                 end
             end
-            S[q] = PolynomialRing(s, self.symbol)
-            q = q + 1
+            S[#S+1] = PolynomialRing(s, self.symbol)
         end
     end
     return S
