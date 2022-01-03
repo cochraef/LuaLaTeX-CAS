@@ -214,7 +214,7 @@ function Integer:getRing()
 end
 
 -- Explicitly converts this element to an element of another ring
-function Integer:inRing(ring)
+function Integer:inring(ring)
     if ring == self:getRing() then
         return self
     end
@@ -224,11 +224,11 @@ function Integer:inRing(ring)
     end
 
     if Ring.subringof(Rational.getRing(), ring) then
-        return Rational(self, Integer(1), true):inRing(ring)
+        return Rational(self, Integer(1), true):inring(ring)
     end
 
     if Ring.subringof(PolynomialRing.getRing(), ring) then
-        return PolynomialRing({self}, ring["symbol"]):inRing(ring)
+        return PolynomialRing({self}, ring["symbol"]):inring(ring)
     end
 
     error("Unable to convert element to proper ring.")
@@ -622,6 +622,12 @@ function Integer:asNumber()
         n = n + digit * Integer.DIGITSIZE ^ (i - 1)
     end
     return math.floor(n)
+end
+
+-- Returns all divisors, positive and negative, of the integer.
+function Integer:divisors()
+    local primefactors = self:primefactorizationrec()
+    local counts = {}
 end
 
 -- Returns the prime factorization of this integer as a expression.

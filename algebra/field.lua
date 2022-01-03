@@ -52,10 +52,10 @@ __FieldOperations.__div = function(a, b)
         return a:div(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):div(b)
+        return a:inring(bring):div(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:div(b:inRing(aring))
+        return a:div(b:inring(aring))
     end
 
 end

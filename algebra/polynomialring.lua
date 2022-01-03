@@ -162,11 +162,11 @@ function PolynomialRing:getRing()
 end
 
 -- Explicitly converts this element to an element of another ring
-function PolynomialRing:inRing(ring)
+function PolynomialRing:inring(ring)
     local coefficients = {}
     local loc = 0
     while loc <= self.degree:asNumber() do
-        coefficients[loc] = self.coefficients[loc]:inRing(ring["child"])
+        coefficients[loc] = self.coefficients[loc]:inring(ring["child"])
         loc = loc + 1
     end
     return PolynomialRing(coefficients, self.symbol, self.degree)
@@ -336,6 +336,16 @@ function PolynomialRing:toCompoundExpression()
                                                 BinaryOperation(BinaryOperation.POW, {SymbolExpression(self.symbol), Integer(exponent)})})
     end
     return BinaryOperation(BinaryOperation.ADD, terms)
+end
+
+-- Uses Horner's rule to evaluate a polynomial at a point
+function PolynomialRing:evaluateAt(x)
+    local out = self.ring:zero()
+    for i = self.degree:asNumber(), 0, -1 do
+        out = out + self.coefficients[i]
+        out = out * x
+    end
+    return out
 end
 
 -- Multiplies this polynomial by x^n
@@ -510,8 +520,15 @@ function PolynomialRing:factor()
     for i, expression in ipairs(squarefree.expressions) do
         if i > 1 then
             local terms
-            if self.ring == Integer.getRing() or self.ring == Rational.getRing() then
-                terms = expression.expressions[1]:zassenhausfactor()
+            if self.ring == Integer.getRing() then
+                local remaining, factors = expression.expressions[1]:rationalroots()
+                terms = factors
+                if remaining ~= Integer(1) then
+                    remaining = remaining:zassenhausfactor()
+                    for _, exp in ipairs(remaining) do
+                        terms[#terms+1] = exp
+                    end
+                end
             end
             if self.ring == IntegerModN.getRing() then
                 terms = expression.expressions[1]:berlekampfactor()
@@ -525,7 +542,36 @@ function PolynomialRing:factor()
     return BinaryOperation.MULEXP(result)
 end
 
--- Uses Zassenhaus's Algorithm to factor polynomials over the intergers
+-- Uses the Rational Root test to factor out monomials of a square-free polynomial
+function PolynomialRing:rationalroots()
+    local remaining = self
+    local roots = self
+    if self.coefficients[0] == Integer(0) then
+        roots[1] = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
+        remaining = remaining // roots[1]
+    end
+    while remaining ~= Integer(1) do
+        :: nextfactor ::
+        local a = remaining.coefficients[0]
+        local b = remaining:lc()
+        local afactors = a:divisors()
+        local bfactors = b:divisors()
+        for _, af in ipairs(afactors) do
+            for _, bf in ipairs(bfactors) do
+                if remaining:evaluateAt(af/bf) == Integer(0) then
+                    roots[#roots+1] = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
+                    remaining = remaining // roots[#roots]
+                    goto nextfactor
+                end
+            end
+        end
+        break
+    end
+
+    return remaining, roots
+end
+
+-- Uses Zassenhaus's Algorithm to factor sqaure-free polynomials over the intergers
 function PolynomialRing:zassenhausfactor()
 
     -- Creates a monic polynomial V with related roots
@@ -540,7 +586,7 @@ function PolynomialRing:zassenhausfactor()
 
     -- Performs Berlekamp Factorization in a sutable prime base
     local p = V:findprime()
-    local S = V:inRing(PolynomialRing.R("y", p)):berlekampfactor()
+    local S = V:inring(PolynomialRing.R("y", p)):berlekampfactor()
 
     -- If a polynomial is irreducible with coefficients in mod p, it is also irreducible over the integers
     if #S == 1 then
@@ -556,7 +602,7 @@ function PolynomialRing:zassenhausfactor()
     for i, factor in ipairs(W) do
         local w = {}
         for j = 0, factor.degree:asNumber() do
-            w[j] = factor.coefficients[j]:inRing(Integer.getRing()) * l ^ Integer(j)
+            w[j] = factor.coefficients[j]:inring(Integer.getRing()) * l ^ Integer(j)
         end
         _, M[i] = PolynomialRing(w, self.symbol, factor.degree):factorconstant()
     end
@@ -573,7 +619,7 @@ function PolynomialRing:findprime()
 
     for _, p in pairs(smallprimes) do
         local P = PolynomialRing({IntegerModN(Integer(1), p)}, self.symbol)
-        local s = self:inRing(P:getRing())
+        local s = self:inring(P:getRing())
         if PolynomialRing.gcd(s, s:derrivative()) == P then
             return p
         end
@@ -607,25 +653,25 @@ function PolynomialRing:henselift(S, k)
     for j = 2, k:asNumber() do
         -- print("Hensel lifting step: " .. tostring(j))
         -- print("Current terms: " .. tostring(V[1]) .. " ," .. tostring(V[2]) .. " ," .. tostring(V[3]) .. " ," .. tostring(V[4]))
-        local Vp = V[1]:inRing(PolynomialRing.R("y"))
+        local Vp = V[1]:inring(PolynomialRing.R("y"))
         for i = 2, #V do
-            Vp = Vp * V[i]:inRing(PolynomialRing.R("y"))
+            Vp = Vp * V[i]:inring(PolynomialRing.R("y"))
         end
         -- print("Vp: " .. tostring(Vp))
-        local E = self - Vp:inRing(PolynomialRing.R("y"))
+        local E = self - Vp:inring(PolynomialRing.R("y"))
         -- print("E: " .. tostring(E))
         if E == Integer(0) then
             return V
         end
-        E = E:inRing(PolynomialRing.R("y", p ^ Integer(j))):inRing(PolynomialRing.R("y"))
+        E = E:inring(PolynomialRing.R("y", p ^ Integer(j))):inring(PolynomialRing.R("y"))
         F = E / p ^ (Integer(j) - Integer(1))
         -- print("F: " .. tostring(F))
         R = self:genextendR(V, G, F)
         -- print("R: " .. tostring(R[1]) .. " ," .. tostring(R[2]) .. " ," .. tostring(R[3]) .. " ," .. tostring(R[4]))
         local Vnew = {}
         for i, v in ipairs(V) do
-            local vnew = v:inRing(PolynomialRing.R("y", p ^ Integer(j)))
-            local rnew = R[i]:inRing(PolynomialRing.R("y", p ^ Integer(j)))
+            local vnew = v:inring(PolynomialRing.R("y", p ^ Integer(j)))
+            local rnew = R[i]:inring(PolynomialRing.R("y", p ^ Integer(j)))
             Vnew[i] = vnew + (p) ^ (Integer(j) - Integer(1)) * rnew
         end
         V = Vnew;
@@ -662,7 +708,7 @@ function PolynomialRing:genextendR(V, G, F)
     R = {}
     for i, v in ipairs(V) do
         local pring = G[1]:getRing()
-        R[i] = F:inRing(pring) * G[i] % v:inRing(pring)
+        R[i] = F:inring(pring) * G[i] % v:inring(pring)
     end
     return R
 end
@@ -682,7 +728,7 @@ function PolynomialRing:truefactors(l, k)
             for i = 2, #t do
                 prod = prod * t[i]
             end
-            local T = prod:inRing(PolynomialRing.R("y", p ^ k)):inRing(PolynomialRing.R("y"))
+            local T = prod:inring(PolynomialRing.R("y", p ^ k)):inring(PolynomialRing.R("y"))
             -- Convert to symmetric representation - this is the only place it actually matters
             for i = 0, T.degree:asNumber() do
                 if T.coefficients[i] > p ^ k / Integer(2) then

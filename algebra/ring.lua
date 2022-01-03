@@ -109,10 +109,10 @@ __RingOperations.__add = function(a, b)
         return a:add(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):add(b)
+        return a:inring(bring):add(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:add(b:inRing(aring))
+        return a:add(b:inring(aring))
     end
 
     error("Attempted to add two elements of different rings")
@@ -128,10 +128,10 @@ __RingOperations.__sub = function(a, b)
         return a:sub(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):sub(b)
+        return a:inring(bring):sub(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:sub(b:inRing(aring))
+        return a:sub(b:inring(aring))
     end
 
     error("Attempted to subtract two elements of different rings")
@@ -147,10 +147,10 @@ __RingOperations.__mul = function(a, b)
         return a:mul(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):mul(b)
+        return a:inring(bring):mul(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:mul(b:inRing(aring))
+        return a:mul(b:inring(aring))
     end
 
     error("Attempted to multiply two elements of different rings")
@@ -179,10 +179,10 @@ __RingOperations.__eq = function(a, b)
         return a:eq(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):eq(b)
+        return a:inring(bring):eq(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:eq(b:inRing(aring))
+        return a:eq(b:inring(aring))
     end
 
     error("Attempted to compare two elements of different rings")
@@ -194,10 +194,10 @@ __RingOperations.__lt = function(a, b)
         return a:lt(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):lt(b)
+        return a:inring(bring):lt(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:lt(b:inRing(aring))
+        return a:lt(b:inring(aring))
     end
 
     error("Attempted to compare two elements of different rings")
@@ -209,10 +209,10 @@ __RingOperations.__le = function(a, b)
         return a:le(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):le(b)
+        return a:inring(bring):le(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:le(b:inRing(aring))
+        return a:le(b:inring(aring))
     end
 
     error("Attempted to compare two elements of different rings")

@@ -72,13 +72,13 @@ function Rational:getRing()
 end
 
 -- Explicitly converts this element to an element of another ring
-function Rational:inRing(ring)
+function Rational:inring(ring)
     if ring == self:getRing() then
         return self
     end
 
     if Ring.subringof(PolynomialRing.getRing(), ring) then
-        return PolynomialRing({self}, ring["symbol"]):inRing(ring)
+        return PolynomialRing({self}, ring["symbol"]):inring(ring)
     end
 
     error("Unable to convert element to proper ring.")

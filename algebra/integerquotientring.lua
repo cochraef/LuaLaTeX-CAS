@@ -71,7 +71,7 @@ function IntegerModN:getRing(_)
 end
 
 -- Explicitly converts this element to an element of another ring
-function IntegerModN:inRing(ring)
+function IntegerModN:inring(ring)
     if ring.ring == IntegerModN then
         if ring.modulus then
             return IntegerModN(self.element, ring.modulus)
@@ -80,11 +80,11 @@ function IntegerModN:inRing(ring)
     end
 
     if Ring.subringof(PolynomialRing:getRing(), ring) then
-        return PolynomialRing({self}, ring["symbol"]):inRing(ring)
+        return PolynomialRing({self}, ring["symbol"]):inring(ring)
     end
 
     if Ring.subringof(Integer:getRing(), ring) then
-        return self.element:inRing(ring)
+        return self.element:inring(ring)
     end
 
     error("Unable to convert element to proper ring.")

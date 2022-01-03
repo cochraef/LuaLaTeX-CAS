@@ -34,10 +34,10 @@ __EuclideanOperations.__idiv = function(a, b)
         return a:divremainder(b)
     end
     if Ring.subringof(aring, bring) then
-        return a:inRing(bring):divremainder(b)
+        return a:inring(bring):divremainder(b)
     end
     if Ring.subringof(bring, aring) then
-        return a:divremainder(b:inRing(aring))
+        return a:divremainder(b:inring(aring))
     end
 
     error("Attempted to divide two elements of different rings with remainder")
@@ -53,12 +53,12 @@ __EuclideanOperations.__mod = function(a, b)
         return q
     end
     if Ring.subringof(aring, bring) then
-        local _,q = a:inRing(bring):divremainder(b)
+        local _,q = a:inring(bring):divremainder(b)
         return q
 
     end
     if Ring.subringof(bring, aring) then
-        local _,q = a:divremainder(b:inRing(aring))
+        local _,q = a:divremainder(b:inring(aring))
         return q
     end
 
