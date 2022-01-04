@@ -624,10 +624,39 @@ function Integer:asNumber()
     return math.floor(n)
 end
 
--- Returns all divisors, positive and negative, of the integer.
+-- Returns all positive divisors of the integer. Not guarenteed to be in any order.
 function Integer:divisors()
     local primefactors = self:primefactorizationrec()
-    local counts = {}
+    local divisors = {}
+
+    local terms = {}
+    for prime in pairs(primefactors) do
+        if prime == Integer(-1) then
+            primefactors[prime] = nil
+        end
+        terms[prime] = Integer(0)
+    end
+
+    local divisor = Integer(1)
+
+    while true do
+        divisors[#divisors+1] = divisor
+        for prime, power in pairs(primefactors) do
+            if terms[prime] < power then
+                terms[prime] = terms[prime] + Integer(1)
+                divisor = divisor * prime
+                break
+            else
+                terms[prime] = Integer(0)
+                divisor = divisor / (prime ^ power)
+            end
+        end
+        if divisor == Integer(1) then
+            break
+        end
+    end
+
+    return divisors
 end
 
 -- Returns the prime factorization of this integer as a expression.
@@ -644,6 +673,12 @@ end
 
 -- Recursive part of prime factorization using Pollard Rho.
 function Integer:primefactorizationrec()
+    if self < Integer(0) then
+        return Integer.mergefactors({[Integer(-1)]=Integer(1)}, (-self):primefactorizationrec())
+    end
+    if self == Integer(1) then
+        return {[Integer(1)]=Integer(1)}
+    end
     local result = self:findafactor()
     if result == self then
         return {[result]=Integer(1)}

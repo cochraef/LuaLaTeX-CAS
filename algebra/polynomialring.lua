@@ -520,7 +520,7 @@ function PolynomialRing:factor()
     for i, expression in ipairs(squarefree.expressions) do
         if i > 1 then
             local terms
-            if self.ring == Integer.getRing() then
+            if expression.expressions[1].ring == Integer.getRing() then
                 local remaining, factors = expression.expressions[1]:rationalroots()
                 terms = factors
                 if remaining ~= Integer(1) then
@@ -530,7 +530,7 @@ function PolynomialRing:factor()
                     end
                 end
             end
-            if self.ring == IntegerModN.getRing() then
+            if expression.expressions[1].ring == IntegerModN.getRing() then
                 terms = expression.expressions[1]:berlekampfactor()
             end
             for _, factor in ipairs(terms) do
@@ -542,13 +542,17 @@ function PolynomialRing:factor()
     return BinaryOperation.MULEXP(result)
 end
 
--- Uses the Rational Root test to factor out monomials of a square-free polynomial
+-- Uses the Rational Root test to factor out monomials of a square-free polynomial.
 function PolynomialRing:rationalroots()
     local remaining = self
-    local roots = self
+    local roots = {}
     if self.coefficients[0] == Integer(0) then
         roots[1] = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
         remaining = remaining // roots[1]
+    end
+    -- This can be slower than Zassenhaus if the digits are large enough, since factoring integers is slow
+    if self.coefficients[0] > Integer(Integer.DIGITSIZE - 1) or self:lc() > Integer(Integer.DIGITSIZE - 1) then
+        return remaining, roots
     end
     while remaining ~= Integer(1) do
         :: nextfactor ::
@@ -558,8 +562,14 @@ function PolynomialRing:rationalroots()
         local bfactors = b:divisors()
         for _, af in ipairs(afactors) do
             for _, bf in ipairs(bfactors) do
-                if remaining:evaluateAt(af/bf) == Integer(0) then
-                    roots[#roots+1] = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
+                local testroot = Rational(af, bf, true)
+                if remaining:evaluateAt(testroot) == Integer(0) then
+                    roots[#roots+1] = PolynomialRing({-testroot.numerator, testroot.denominator}, self.symbol)
+                    remaining = remaining // roots[#roots]
+                    goto nextfactor
+                end
+                if remaining:evaluateAt(-testroot) == Integer(0) then
+                    roots[#roots+1] = PolynomialRing({testroot.numerator, testroot.denominator}, self.symbol)
                     remaining = remaining // roots[#roots]
                     goto nextfactor
                 end
