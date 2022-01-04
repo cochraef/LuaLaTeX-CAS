@@ -121,13 +121,6 @@ test(o:squarefreefactorization(), "(1 * (1x^6+10x^5+36x^4+60x^3+59x^2+50x^1+24x^
 -- local profiler = newProfiler()
 -- profiler:start()
 
--- test(n:factor(), "(1 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 1) * (1x^2+0x^1+1x^0 ^ 1) * (1x^1+3x^0 ^ 1) * (1x^1+4x^0 ^ 1) * (1x^4+0x^3+-1x^2+0x^1+1x^0 ^ 1))")
-
--- profiler:stop()
--- local outfile = io.open( "profile.txt", "w+" )
--- profiler:report( outfile )
--- outfile:close()
-
 print()
 
 print("Testing factorization...")
@@ -141,3 +134,8 @@ test(m:factor(), "(1 * (1x^1+1x^0 ^ 10))", m)
 test(b:factor(), "(1/12 * (24x^2+1x^1+4x^0 ^ 1))", b)
 test(o:factor(), "(1 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 1) * (1x^2+0x^1+1x^0 ^ 1) * (1x^1+4x^0 ^ 1) * (1x^1+3x^0 ^ 1))", o)
 test(n:factor(), "(1 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 1) * (1x^2+0x^1+1x^0 ^ 1) * (1x^1+3x^0 ^ 1) * (1x^1+4x^0 ^ 1) * (1x^4+0x^3+-1x^2+0x^1+1x^0 ^ 1))", n)
+
+-- profiler:stop()
+-- local outfile = io.open( "profile.txt", "w+" )
+-- profiler:report( outfile )
+-- outfile:close()
