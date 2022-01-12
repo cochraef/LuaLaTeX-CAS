@@ -13,3 +13,7 @@ require("algebra.polynomialring")
 require("algebra.integer")
 require("algebra.rational")
 require("algebra.integerquotientring")
+
+require("algebra.polynomialring.berlekampfactoring")
+require("algebra.polynomialring.zassenhausfactoring")
+require("algebra.polynomialring.decomposition")

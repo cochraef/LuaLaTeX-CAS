@@ -1,0 +1,93 @@
+-- Methods related to polynomial decomposition.
+
+-- Returns a list of polynomials that form a complete decomposition of a polynomial.
+function PolynomialRing:decompose()
+    local U = self - self.coefficients[0]
+    local S = U:divisors()
+    local decomposition = {}
+    local C = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
+    local finalcomponent
+
+    while S[1] do
+        local w = S[1]
+        for _, poly in ipairs(S) do
+            if poly.degree < w.degree then
+                w = poly
+            end
+        end
+        S = Remove(S, w)
+        if C.degree < w.degree and w.degree < self.degree and self.degree % w.degree == Integer(0) then
+            local g = w:expand(C, self.symbol)
+            local R = self:expand(w, self.symbol)
+            if g.degree == Integer(0) and R.degree == Integer(0) then
+                g.symbol = self.symbol
+                decomposition[#decomposition+1] = g.coefficients[0]
+                decomposition[#decomposition].symbol = self.symbol
+                C = w
+                finalcomponent = R.coefficients[0]
+            end
+        end
+    end
+
+    if not decomposition[1] then
+        return {self}
+    end
+
+    finalcomponent.symbol = self.symbol
+    decomposition[#decomposition+1] = finalcomponent
+    return decomposition
+end
+
+-- Returns a list of all monic divisors of positive degree of the polynomial, assuming the polynomial ring is a Euclidean Domain.
+function PolynomialRing:divisors()
+    local factors = self:factor()
+    -- Converts each factor to a monic factor (we don't need to worry updating the constant term)
+    for i, factor in ipairs(factors.expressions) do
+        if i > 1 then
+            factor.expressions[1] = factor.expressions[1] / factor.expressions[1]:lc()
+        end
+    end
+
+    local terms = {}
+    for i, _ in ipairs(factors.expressions) do
+        if i > 1 then
+            terms[i] = Integer(0)
+        end
+    end
+
+    local divisors = {}
+    local divisor = PolynomialRing({self:one()}, self.symbol)
+    while true do
+        for i, factor in ipairs(factors.expressions) do
+            if i > 1 then
+                local base = factor.expressions[1]
+                local power = factor.expressions[2]
+                if terms[i] < power then
+                    terms[i] = terms[i] + Integer(1)
+                    divisor = divisor * base
+                    break
+                else
+                    terms[i] = Integer(0)
+                    divisor = divisor // (base ^ power)
+                end
+            end
+        end
+        if divisor == Integer(1) then
+            break
+        end
+        divisors[#divisors+1] = divisor
+    end
+
+    return divisors
+
+end
+
+-- Polynomial expansion as a subroutine of decomposition.
+function PolynomialRing:expand(v, x)
+    local u = self
+    if u == Integer(0) then
+        return Integer(0)
+    end
+    local q,r = u:divremainder(v)
+    return PolynomialRing({PolynomialRing({Integer(0), Integer(1)}, "t")}, x) * q:expand(v, x) + r
+end

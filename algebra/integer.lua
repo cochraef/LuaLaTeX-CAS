@@ -279,6 +279,7 @@ function Integer:sub(b)
     if self.sign == -1 and b.sign == 1 then
         return self:uadd(b, -1)
     end
+    
     local sign = self.sign
     if sign == 0 then
         sign = b.sign

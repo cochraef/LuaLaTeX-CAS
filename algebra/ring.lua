@@ -58,9 +58,9 @@ function Ring:pow(n)
         error("Execution error: Negative exponentiation is undefined over general rings")
     end
     local k = Integer(0)
-    local b = self.getRing().one(self)
+    local b = self:one()
     while k < n do
-        b = b.mul(self)
+        b = b * self
         k = k + Integer(1)
     end
     return b
@@ -161,9 +161,10 @@ __RingOperations.__pow = function(a, n)
         return BinaryOperation.POWEXP({a, n})
     end
 
-    if a == a.zero() and n == Integer(0) then
+    if a == a:zero() and n == Integer(0) then
         error("Cannot raise 0 to the power of 0")
     end
+
     return a:pow(n)
 end
 
