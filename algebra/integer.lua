@@ -121,10 +121,10 @@ __o.__tostring = function(a) -- Only works if the digit size is a power of 10
     return out
 end
 __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
-    if not b.getRing then
+    if not b.getring then
         return BinaryOperation.DIVEXP({a, b});
     end
-    if(a:getRing() == Integer:getRing() and b:getRing() == Integer:getRing()) then
+    if(a:getring() == Integer:getring() and b:getring() == Integer:getring()) then
         return Rational(a, b)
     end
     return __FieldOperations.__div(a, b)
@@ -162,7 +162,7 @@ function Integer:new(n)
                 n = n // Integer.DIGITSIZE
                 i = i + 1
             end
-            o[i] = n % Integer.DIGITSIZE
+            o[i] = n
         end
     -- Only works on strings that are exact (signed) integers
     elseif type(n) == "string" then
@@ -208,27 +208,29 @@ end
 local t = {ring=Integer}
 t = setmetatable(t, {__index = Integer, __eq = function(a, b)
     return a["ring"] == b["ring"]
+end, __tostring = function(a)
+    return "ZZ"
 end})
-function Integer:getRing()
+function Integer:getring()
     return t;
 end
 
--- Explicitly converts this element to an element of another ring
+-- Explicitly converts this element to an element of another ring.
 function Integer:inring(ring)
-    if ring == self:getRing() then
+    if ring == self:getring() then
         return self
     end
 
-    if ring.ring == IntegerModN then
-        return IntegerModN(self, ring.modulus)
+    if ring == PolynomialRing:getring() then
+        return PolynomialRing({self:inring(ring.child)}, ring.symbol)
     end
 
-    if Ring.subringof(Rational.getRing(), ring) then
+    if ring == Rational:getring() then
         return Rational(self, Integer(1), true):inring(ring)
     end
 
-    if Ring.subringof(PolynomialRing.getRing(), ring) then
-        return PolynomialRing({self}, ring["symbol"]):inring(ring)
+    if ring == IntegerModN:getring() then
+        return IntegerModN(self, ring.modulus)
     end
 
     error("Unable to convert element to proper ring.")
@@ -481,7 +483,7 @@ function Integer:divremainder(b)
     R.sign = 1
     local negativemod = false
     if b.sign == -1 then
-        b = -b
+        b.sign = -b.sign
         negativemod = true
     end
 
@@ -511,6 +513,7 @@ function Integer:divremainder(b)
 
     if negativemod then
         R = -R
+        b.sign = -b.sign
     elseif self.sign == -1 then
         R = b - R
     end
@@ -617,7 +620,7 @@ function Integer:one()
 end
 
 -- Returns this integer as a floating point number. Can only approximate the value of large integers.
-function Integer:asNumber()
+function Integer:asnumber()
     local n = 0
     for i, digit in ipairs(self) do
         n = n + digit * Integer.DIGITSIZE ^ (i - 1)

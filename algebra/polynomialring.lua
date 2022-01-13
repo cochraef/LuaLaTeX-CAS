@@ -9,11 +9,20 @@
 PolynomialRing = {}
 __PolynomialRing = {}
 
+-- Metatable for ring objects.
+local __obj = {__index = PolynomialRing, __eq = function(a, b)
+    return a["ring"] == b["ring"] and
+            (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
+            (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
+end, __tostring = function(a)
+    if a.child and a.symbol then return tostring(a.child) .. "[" .. a.symbol .. "]" else return "(Generic Polynomial Ring)" end
+end}
+
 --------------------------
 -- Static functionality --
 --------------------------
 
--- Returns the immediate subrings of this ring
+-- Returns the immediate subrings of this ring.
 function PolynomialRing.subrings(construction)
     local child = construction.child
     local subrings = {child}
@@ -27,12 +36,21 @@ function PolynomialRing.subrings(construction)
     return subrings
 end
 
+-- Creates a new ring with the given symbol and child ring.
+function PolynomialRing.makering(symbol, child)
+    local t = {ring = PolynomialRing}
+    t.symbol = symbol
+    t.child = child
+    t = setmetatable(t, __obj)
+    return t
+end
+
 -- Shorthand constructor for a polynomial ring with integer or integer mod ring coefficients
 function PolynomialRing.R(symbol, modulus)
     if modulus then
-        return PolynomialRing({IntegerModN(Integer(0), modulus)}, symbol):getRing()
+        return PolynomialRing.makering(symbol, IntegerModN.makering(modulus))
     end
-    return PolynomialRing({Integer(0)}, symbol):getRing()
+    return PolynomialRing.makering(symbol, Integer.getring())
 end
 
 -- Returns the GCD of two polynomials in a ring, assuming both rings are euclidean domains
@@ -71,9 +89,9 @@ local __o = Copy(__EuclideanOperations)
 __o.__index = PolynomialRing
 __o.__tostring = function(a)
     local out = ""
-    local loc = a.degree:asNumber()
+    local loc = a.degree:asnumber()
     while loc >= 0 do
-        if a.ring == PolynomialRing.getRing() then
+        if a.ring == PolynomialRing.getring() then
             out = out .. "(" .. tostring(a.coefficients[loc]) .. ")" .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
         else
             out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
@@ -104,16 +122,17 @@ function PolynomialRing:new(coefficients, symbol, degree)
         if type(index) ~= "number" then
             error("Sent parameter of wrong type: Coefficients must be in an array")
         end
-        if not coefficient.getRing then
+        if not coefficient.getring then
             error("Sent parameter of wrong type: Coefficients must be elements of a ring")
         end
         if not o.ring then
-            o.ring = coefficient:getRing()
+            o.ring = coefficient:getring()
         else
-            local newring = coefficient:getRing()
-            if Ring.subringof(o.ring, newring) then
+            local newring = coefficient:getring()
+            local combinedring = Ring.resultantring(o.ring, newring)
+            if combinedring == newring then
                 o.ring = newring
-            elseif not Ring.subringof(newring, o.ring) then
+            elseif not o.ring == combinedring then
                 error("Sent parameter of wrong type: Coefficients must all be part of the same ring")
             end
         end
@@ -127,7 +146,7 @@ function PolynomialRing:new(coefficients, symbol, degree)
         end
     else
         -- Constructs the coefficients from an existing polynomial of coefficients
-        local loc = o.degree:asNumber()
+        local loc = o.degree:asnumber()
         while loc > 0 do
             if not coefficients[loc] or coefficients[loc] == coefficients[loc]:zero() then
                 o.degree = o.degree - Integer(1)
@@ -145,35 +164,43 @@ function PolynomialRing:new(coefficients, symbol, degree)
 
     -- Each value of the polynomial greater than its degree is implicitly zero
     o.coefficients = setmetatable(o.coefficients, {__index = function (table, key)
-        return o:zero()
+        return o:zeroc()
     end})
     return o
 end
 
 -- Returns the ring this object is an element of
-function PolynomialRing:getRing()
+function PolynomialRing:getring()
     local t = {ring = PolynomialRing}
     if self then
         t.child = self.ring
         t.symbol = self.symbol
     end
-    t = setmetatable(t, {__index = PolynomialRing, __eq = function(a, b)
-        return a["ring"] == b["ring"] and
-                (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
-                (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
-    end})
+    t = setmetatable(t, __obj)
     return t
 end
 
 -- Explicitly converts this element to an element of another ring
 function PolynomialRing:inring(ring)
-    local coefficients = {}
-    local loc = 0
-    while loc <= self.degree:asNumber() do
-        coefficients[loc] = self.coefficients[loc]:inring(ring["child"])
-        loc = loc + 1
+
+    -- Faster equality check
+    if ring == self:getring() then
+        return self
     end
-    return PolynomialRing(coefficients, self.symbol, self.degree)
+
+    if ring.symbol == self.symbol then
+        local out = {}
+        for i = 0, self.degree:asnumber() do
+            out[i + 1] = self.coefficients[i]:inring(ring.child)
+        end
+        return PolynomialRing(out, self.symbol)
+    end
+
+    if ring == PolynomialRing:getring() then
+        return PolynomialRing({self:inring(ring.child)}, ring.symbol)
+    end
+
+    error("Unable to convert element to proper ring.")
 end
 
 
@@ -193,7 +220,7 @@ function PolynomialRing:add(b)
 
     local new = {}
     local loc = 0
-    while loc <= larger.degree:asNumber() do
+    while loc <= larger.degree:asnumber() do
         new[loc] = self.coefficients[loc] + b.coefficients[loc]
         loc = loc + 1
     end
@@ -204,7 +231,7 @@ end
 function PolynomialRing:neg()
     local new = {}
     local loc = 0
-    while loc <= self.degree:asNumber() do
+    while loc <= self.degree:asnumber() do
         new[loc] = -self.coefficients[loc]
         loc = loc + 1
     end
@@ -224,8 +251,8 @@ function PolynomialRing.mul_rec(a, b)
     local k = Integer.ceillog(Integer.max(Integer(#a), Integer(#b)) + Integer(1), Integer(2))
     local n = Integer(2) ^ k
     local m = n / Integer(2)
-    local nn = n:asNumber()
-    local mn = m:asNumber()
+    local nn = n:asnumber()
+    local mn = m:asnumber()
 
     local a0, a1, b0, b1 = {}, {}, {}, {}
 
@@ -264,15 +291,15 @@ end
 
 function PolynomialRing:divremainder(b)
     local n, m = self.degree, b.degree
-    local r, u = PolynomialRing(self.coefficients, self.symbol, self.degree), Integer(1) / b.coefficients[m:asNumber()]
+    local r, u = PolynomialRing(self.coefficients, self.symbol, self.degree), Integer(1) / b.coefficients[m:asnumber()]
 
-    if(m > n) then
-        return PolynomialRing({Integer(0)}, self.symbol, Integer(0)), self
+    if m > n then
+        return self:zero(), self
     end
 
     local q = {}
-    for i = (n-m):asNumber(), 0,-1 do
-        if r.degree:asNumber() == m:asNumber() + i then
+    for i = (n-m):asnumber(), 0,-1 do
+        if r.degree:asnumber() == m:asnumber() + i then
             q[i] = r:lc() * u
             r = r - PolynomialRing({q[i]}, self.symbol):multiplyDegree(i) * b
         else
@@ -289,15 +316,23 @@ function PolynomialRing:div(b)
 end
 
 function PolynomialRing:zero()
+    return self.coefficients[0]:zero():inring(self:getring())
+end
+
+function PolynomialRing:zeroc()
     return self.coefficients[0]:zero()
 end
 
 function PolynomialRing:one()
+    return self.coefficients[0]:one():inring(self:getring())
+end
+
+function PolynomialRing:onec()
     return self.coefficients[0]:one()
 end
 
 function PolynomialRing:eq(b)
-    for i=0,math.max(self.degree:asNumber(), b.degree:asNumber()) do
+    for i=0,math.max(self.degree:asnumber(), b.degree:asnumber()) do
         if self.coefficients[i] ~= b.coefficients[i] then
             return false
         end
@@ -307,7 +342,7 @@ end
 
 -- Returns the leading coefficient of this polynomial
 function PolynomialRing:lc()
-    return self.coefficients[self.degree:asNumber()]
+    return self.coefficients[self.degree:asnumber()]
 end
 
 -- Given a table mapping variables to expressions, replaces each variable with a new expressions
@@ -345,7 +380,7 @@ end
 -- Uses Horner's rule to evaluate a polynomial at a point
 function PolynomialRing:evaluateAt(x)
     local out = self:zero()
-    for i = self.degree:asNumber(), 0, -1 do
+    for i = self.degree:asnumber(), 0, -1 do
         out = out + self.coefficients[i]
         out = out * x
     end
@@ -356,10 +391,10 @@ end
 function PolynomialRing:multiplyDegree(n)
     local new = {}
     for e = 0, n-1 do
-        new[e] = self:zero()
+        new[e] = self:zeroc()
     end
     local loc = n
-    while loc <= self.degree:asNumber() + n do
+    while loc <= self.degree:asnumber() + n do
         new[loc] = self.coefficients[loc - n]
         loc = loc + 1
     end
@@ -369,10 +404,10 @@ end
 -- Returns the formal derrivative of this polynomial
 function PolynomialRing:derrivative()
     if self.degree == Integer(0) then
-        return PolynomialRing({self:zero()}, self.symbol, Integer(-1))
+        return PolynomialRing({self:zeroc()}, self.symbol, Integer(-1))
     end
     local new = {}
-    for e = 1, self.degree:asNumber() do
+    for e = 1, self.degree:asnumber() do
         new[e - 1] = Integer(e) * self.coefficients[e]
     end
     return PolynomialRing(new, self.symbol, self.degree - Integer(1))
@@ -381,9 +416,9 @@ end
 -- Returns the square-free factorization of a polynomial
 function PolynomialRing:squarefreefactorization()
     local terms
-    if self.ring == Rational.getRing() or self.ring == Integer.getRing() then
+    if self.ring == Rational.getring() or self.ring == Integer.getring() then
         terms = self:rationalsquarefreefactorization()
-    elseif self.ring == IntegerModN.getRing() then
+    elseif self.ring == IntegerModN.getring() then
         if not self.ring.modulus:isprime() then
             error("Cannot compute a square-free factorization of a polynomial ring contructed from a ring that is not a field.")
         end
@@ -411,7 +446,7 @@ function PolynomialRing:factor()
     for i, expression in ipairs(squarefree.expressions) do
         if i > 1 then
             -- Converts square-free polynomials with rational coefficients to integer coefficients so Rational Roots / Zassenhaus can factor them
-            if expression.expressions[1].ring == Rational.getRing() then
+            if expression.expressions[1].ring == Rational.getring() then
                 local factor, integerpoly = expression.expressions[1]:rationaltointeger()
                 result[1] = result[1] * factor ^ expression.expressions[2]
                 squarefreeterms[i - 1] = integerpoly
@@ -423,7 +458,7 @@ function PolynomialRing:factor()
 
     for i, expression in ipairs(squarefreeterms) do
         local terms
-        if expression.ring == Integer.getRing() then
+        if expression.ring == Integer.getring() then
             -- Factoring over the integers first uses the rational roots test to factor out monomials (for efficiency purposes)
             local remaining, factors = expression:rationalroots()
             terms = factors
@@ -435,7 +470,7 @@ function PolynomialRing:factor()
                 end
             end
         end
-        if expression.ring == IntegerModN.getRing() then
+        if expression.ring == IntegerModN.getring() then
             -- Berlekamp factorization is used for rings with integers mod a prime as coefficients
             terms = expression:berlekampfactor()
         end

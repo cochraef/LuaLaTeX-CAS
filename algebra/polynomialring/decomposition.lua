@@ -56,7 +56,7 @@ function PolynomialRing:divisors()
     end
 
     local divisors = {}
-    local divisor = PolynomialRing({self:one()}, self.symbol)
+    local divisor = PolynomialRing({self:onec()}, self.symbol)
     while true do
         for i, factor in ipairs(factors.expressions) do
             if i > 1 then

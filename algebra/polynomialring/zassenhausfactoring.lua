@@ -26,7 +26,7 @@ end
 -- Factors the largest possible constant out of a polynomial whos underlying ring is a Euclidean domain but not a field
 function PolynomialRing:factorconstant()
     local gcd = Integer(0)
-    for i = 0, self.degree:asNumber() do
+    for i = 0, self.degree:asnumber() do
         gcd = self.ring.gcd(gcd, self.coefficients[i])
     end
     if gcd == Integer(0) then
@@ -38,8 +38,8 @@ end
 -- Converts a polynomial in the rational polynomial ring to the integer polynomial ring
 function PolynomialRing:rationaltointeger()
     local lcm = Integer(1)
-    for i = 0, self.degree:asNumber() do
-        if self.coefficients[i]:getRing() == Rational:getRing() then
+    for i = 0, self.degree:asnumber() do
+        if self.coefficients[i]:getring() == Rational:getring() then
             lcm = lcm * self.coefficients[i].denominator / Integer.gcd(lcm, self.coefficients[i].denominator)
         end
     end
@@ -51,7 +51,7 @@ function PolynomialRing:zassenhausfactor()
 
     -- Creates a monic polynomial V with related roots
     local V = {}
-    local n = self.degree:asNumber()
+    local n = self.degree:asnumber()
     local l = self:lc()
     for i = 0, n - 1 do
         V[i] = l ^ Integer(n - 1 - i) * self.coefficients[i]
@@ -76,8 +76,8 @@ function PolynomialRing:zassenhausfactor()
     -- Returns the solutions back to the original from the monic transformation
     for i, factor in ipairs(W) do
         local w = {}
-        for j = 0, factor.degree:asNumber() do
-            w[j] = factor.coefficients[j]:inring(Integer.getRing()) * l ^ Integer(j)
+        for j = 0, factor.degree:asnumber() do
+            w[j] = factor.coefficients[j]:inring(Integer.getring()) * l ^ Integer(j)
         end
         _, M[i] = PolynomialRing(w, self.symbol, factor.degree):factorconstant()
     end
@@ -94,7 +94,7 @@ function PolynomialRing:findprime()
 
     for _, p in pairs(smallprimes) do
         local P = PolynomialRing({IntegerModN(Integer(1), p)}, self.symbol)
-        local s = self:inring(P:getRing())
+        local s = self:inring(P:getring())
         if PolynomialRing.gcd(s, s:derrivative()) == P then
             return p
         end
@@ -105,7 +105,7 @@ end
 
 -- Finds the maximum number of times Hensel Lifting will be applied to raise solutions to the appropriate power
 function PolynomialRing:findmaxlifts(p)
-    local n = self.degree:asNumber()
+    local n = self.degree:asnumber()
     local h = self.coefficients[0]
     for i=0 , n do
         if self.coefficients[i] > h then
@@ -113,19 +113,19 @@ function PolynomialRing:findmaxlifts(p)
         end
     end
 
-    local B = 2^n * math.sqrt(n) * h:asNumber()
-    return Integer(math.ceil(math.log(2*B, p:asNumber())))
+    local B = 2^n * math.sqrt(n) * h:asnumber()
+    return Integer(math.ceil(math.log(2*B, p:asnumber())))
 end
 
 -- Uses Hensel lifting on the factors of a polynomial S mod p to find them in the integers
 function PolynomialRing:henselift(S, k)
+    local p = S[1].ring.modulus
     if k == Integer(1) then
-        return self:truefactors(S, k)
+        return self:truefactors(S, p, k)
     end
-    local p = S[1].coefficients[0].modulus
     G = self:genextendsigma(S)
     local V = S
-    for j = 2, k:asNumber() do
+    for j = 2, k:asnumber() do
         local Vp = V[1]:inring(PolynomialRing.R("y"))
         for i = 2, #V do
             Vp = Vp * V[i]:inring(PolynomialRing.R("y"))
@@ -145,7 +145,7 @@ function PolynomialRing:henselift(S, k)
         end
         V = Vnew;
     end
-    return self:truefactors(V, k)
+    return self:truefactors(V, p, k)
 end
 
 -- Gets a list of sigma polynomials for use in hensel lifting
@@ -175,19 +175,18 @@ end
 function PolynomialRing:genextendR(V, G, F)
     R = {}
     for i, v in ipairs(V) do
-        local pring = G[1]:getRing()
+        local pring = G[1]:getring()
         R[i] = F:inring(pring) * G[i] % v:inring(pring)
     end
     return R
 end
 
 -- Updates factors of the polynomial to the correct ones in the integer ring
-function PolynomialRing:truefactors(l, k)
+function PolynomialRing:truefactors(l, p, k)
     local U = self
     local L = l
     local factors = {}
     local m = 1
-    local p = L[1].coefficients[0].modulus
     while m <= #L / 2 do
         local C = Subarrays(L, m)
         while #C > 0 do
@@ -198,7 +197,7 @@ function PolynomialRing:truefactors(l, k)
             end
             local T = prod:inring(PolynomialRing.R("y", p ^ k)):inring(PolynomialRing.R("y"))
             -- Convert to symmetric representation - this is the only place it actually matters
-            for i = 0, T.degree:asNumber() do
+            for i = 0, T.degree:asnumber() do
                 if T.coefficients[i] > p ^ k / Integer(2) then
                     T.coefficients[i] = T.coefficients[i] - p^k
                 end

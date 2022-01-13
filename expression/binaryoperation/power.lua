@@ -5,7 +5,7 @@ function BinaryOperation:simplifypower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
 
-    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getRing() == Rational.getRing() then
+    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getring() == Rational.getring() then
         return self:simplifyrationalpower()
     end
 
@@ -61,7 +61,7 @@ end
 function BinaryOperation:simplifyrationalpower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
-    if base:getRing() == Rational.getRing() then
+    if base:getring() == Rational.getring() then
         return (BinaryOperation(BinaryOperation.POW, {base.numerator, exponent}):simplifyrationalpower()) /
                 (BinaryOperation(BinaryOperation.POW, {base.denominator, exponent}):simplifyrationalpower())
     end
@@ -83,7 +83,7 @@ function BinaryOperation:simplifyrationalpower()
         local primebase = primes.expressions[1].expressions[1]
         local newexponent = primeexponent * exponent
         local integerpart
-        if newexponent.getRing() == Rational.getRing() then
+        if newexponent.getring() == Rational.getring() then
             integerpart = newexponent.numerator // newexponent.denominator
         else
             integerpart = newexponent

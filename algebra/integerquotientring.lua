@@ -9,6 +9,13 @@
 IntegerModN = {}
 __IntegerModN = {}
 
+-- Metatable for ring objects.
+local __obj = {__index = IntegerModN, __eq = function(a, b)
+    return a["ring"] == b["ring"] and (a["modulus"] == b["modulus"] or a["modulus"] == nil or b["modulus"] == nil)
+end, __tostring = function(a)
+    if a.modulus then return "Z/Z" .. tostring(a.modulus) else return "(Generic Integer Mod Ring)" end
+end}
+
 --------------------------
 -- Static functionality --
 --------------------------
@@ -16,12 +23,20 @@ __IntegerModN = {}
 -- Returns the immediate subrings of this ring
 -- Integers are considered subrings of their quotient rings for conversion purposes
 function IntegerModN.subrings()
-    return {Integer:getRing()}
+    return {Integer:getring()}
+end
+
+-- Creates a new ring with the given modulus.
+function IntegerModN.makering(modulus)
+    local t = {ring = IntegerModN}
+    t.modulus = modulus
+    t = setmetatable(t, __obj)
+    return t;
 end
 
 -- Shorthand constructor for a ring with a particular modulus
 function IntegerModN.R(modulus)
-    return IntegerModN(Integer(0), modulus):getRing()
+    return IntegerModN.makering(modulus)
 end
 
 ----------------------------
@@ -41,7 +56,7 @@ end
 function IntegerModN:new(i, n)
     local o = {}
 
-    if n:getRing() ~= Integer:getRing() or n < Integer(1) then
+    if n:getring() ~= Integer:getring() or n < Integer(1) then
         error("Argument error: modulus must be an integer greater than 0.")
     end
 
@@ -58,32 +73,29 @@ function IntegerModN:new(i, n)
 end
 
 -- Returns the ring this object is an element of
-function IntegerModN:getRing(_)
+function IntegerModN:getring()
     local t = {ring = IntegerModN}
     if self then
         t.modulus = self.modulus
     end
-    t.modulus = t.modulus or self
-    t = setmetatable(t, {__index = IntegerModN, __eq = function(a, b)
-        return a["ring"] == b["ring"] and (a["modulus"] == b["modulus"] or a["modulus"] == nil or b["modulus"] == nil)
-    end})
+    t = setmetatable(t, __obj)
     return t;
 end
 
 -- Explicitly converts this element to an element of another ring
 function IntegerModN:inring(ring)
-    if ring.ring == IntegerModN then
+    if ring == IntegerModN:getring() then
         if ring.modulus then
             return IntegerModN(self.element, ring.modulus)
         end
         return self
     end
 
-    if Ring.subringof(PolynomialRing:getRing(), ring) then
-        return PolynomialRing({self}, ring["symbol"]):inring(ring)
+    if ring == PolynomialRing:getring() then
+        return PolynomialRing({self:inring(ring.child)}, ring.symbol)
     end
 
-    if Ring.subringof(Integer:getRing(), ring) then
+    if ring == Integer:getring() then
         return self.element:inring(ring)
     end
 

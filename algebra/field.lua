@@ -24,7 +24,7 @@ function Field:pow(n)
         base = base:inv()
     end
     local k = Integer(0)
-    local b = self.getRing().one()
+    local b = self.getring().one()
     while k < n do
         b = b.mul(base)
         k = k + Integer(1)
@@ -39,7 +39,7 @@ end
 __FieldOperations = Copy(__EuclideanOperations)
 
 __FieldOperations.__div = function(a, b)
-    if not b.getRing and b.isEvaluatable then
+    if not b.getring and b.isEvaluatable then
         return BinaryOperation.DIVEXP({a, b})
     end
 
@@ -47,17 +47,12 @@ __FieldOperations.__div = function(a, b)
         error("Cannot divide by zero.")
     end
 
-    local aring, bring = a:getRing(), b:getRing()
-    if aring == bring then
-        return a:div(b)
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to divide two elements of incompatable rings")
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):div(b)
-    end
-    if Ring.subringof(bring, aring) then
-        return a:div(b:inring(aring))
-    end
-
+    return a:inring(oring):div(b:inring(oring))
 end
 
 -----------------

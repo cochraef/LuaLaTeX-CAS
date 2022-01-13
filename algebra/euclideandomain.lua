@@ -9,7 +9,7 @@ __EuclideanDomain = {}
 ----------------------------
 
 -- Euclidean domains are always commutative
-function EuclideanDomain:isCommutative()
+function EuclideanDomain:iscommutative()
     return true
 end
 
@@ -29,40 +29,25 @@ __EuclideanOperations.__idiv = function(a, b)
     if(b == b:zero()) then
         error("Cannot divide by zero.")
     end
-    local aring, bring = a:getRing(), b:getRing()
-    if aring == bring then
-        return a:divremainder(b)
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to divide two elements of incompatable rings")
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):divremainder(b)
-    end
-    if Ring.subringof(bring, aring) then
-        return a:divremainder(b:inring(aring))
-    end
-
-    error("Attempted to divide two elements of different rings with remainder")
+    return a:inring(oring):divremainder(b:inring(oring))
 end
 
 __EuclideanOperations.__mod = function(a, b)
     if(b == b:zero()) then
         error("Cannot divide by zero.")
     end
-    local aring, bring = a:getRing(), b:getRing()
-    if aring == bring then
-        local _,q = a:divremainder(b)
-        return q
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to divide two elements of incompatable rings")
     end
-    if Ring.subringof(aring, bring) then
-        local _,q = a:inring(bring):divremainder(b)
-        return q
-
-    end
-    if Ring.subringof(bring, aring) then
-        local _,q = a:divremainder(b:inring(aring))
-        return q
-    end
-
-    error("Attempted to divide two elements of different rings with remainder")
+    local _,q = a:inring(oring):divremainder(b:inring(oring))
+    return q
 end
 
 -----------------

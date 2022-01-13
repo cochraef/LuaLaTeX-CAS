@@ -1,8 +1,5 @@
 -- Loads algebra files in the correct order.
-require("_lib.table.copy")
-require("_lib.table.join")
-require("_lib.table.remove")
-require("_lib.table.subarrays")
+require("_lib.table")
 
 require("expression._init")
 

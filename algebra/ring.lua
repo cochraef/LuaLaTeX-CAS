@@ -8,31 +8,94 @@ __Ring = {}
 -- Static functionality --
 --------------------------
 
--- Returns true if this ring is a subring of another ring; false otherwise
-function Ring.subringof(this, other)
-    -- second condition is to allow conversion between any two integer quotient rings
-    if this == other or (this.ring == IntegerModN and other.ring == IntegerModN) or (this.ring == Integer and other.ring == IntegerModN) then
-        return true
+-- Determines which ring the output of a binary operation with inputs in ring1 and ring2 should be, if such a ring exists.
+-- If one of the rings is a subring of another ring, the result should be one of the two rings.
+function Ring.resultantring(ring1, ring2)
+    if ring1 == ring2 then
+        return ring1
     end
-    for _, subring in ipairs(other.subrings(other)) do
-        if Ring.subringof(this, subring) then
-            return true
+
+    if ring1 == PolynomialRing.getring() or ring2 == PolynomialRing.getring() then
+        local symbols = {}
+        while ring1 == PolynomialRing.getring() do
+            symbols[#symbols+1] = ring1.symbol
+            ring1 = ring1.child
+        end
+        while ring2 == PolynomialRing.getring() do
+            if not Contains(symbols, ring2.symbol) then
+                symbols[#symbols+1] = ring2.symbol
+            end
+            ring2 = ring2.child
+        end
+        local ring = Ring.resultantring(ring1, ring2)
+        for i = #symbols, 1, -1 do
+            ring = PolynomialRing.makering(symbols[i], ring)
+        end
+        return ring
+    end
+
+    if ring1 == Integer.getring() then
+        if ring2 == Integer.getring() then
+            return ring2
+        end
+
+        if ring2 == Rational.getring() then
+            return ring2
+        end
+
+        if ring2 == IntegerModN.getring() then
+            return ring2
         end
     end
-    return false
+
+    if ring1 == Rational.getring() then
+        if ring2 == Integer.getring() then
+            return ring1
+        end
+
+        if ring2 == Rational.getring() then
+            return ring2
+        end
+
+        if ring2 == IntegerModN.getring() then
+            return nil
+        end
+    end
+
+    if ring1 == IntegerModN.getring() then
+        if ring2 == Integer.getring() then
+            return ring1
+        end
+
+        if ring2 == Rational.getring() then
+            return nil
+        end
+
+        if ring2 == IntegerModN.getring() then
+            return IntegerModN.makering(Integer.gcd(ring1.modulus, ring2.modulus))
+        end
+    end
+
+    return nil
+end
+
+-- Returns a particular instantiation of a ring.
+-- Does the same thing as getring() if there is only one possible ring for a class, i.e., the integers and rationals\.
+function Ring.makering()
+    error("Called unimplemented method : makering()")
 end
 
 ----------------------------
 -- Instance functionality --
 ----------------------------
 
--- Returns the type of this object
-function Ring:getRing()
-    error("Called unimplemented method : getRing()")
+-- Returns the ring this element is part of.
+function Ring:getring()
+    error("Called unimplemented method : getring()")
 end
 
--- Returns whether the ring is commutative
-function Ring:isCommutative()
+-- Returns whether the ring is commutative.
+function Ring:iscommutative()
     error("Called unimplemented method : isCommutative()")
 end
 
@@ -93,71 +156,53 @@ end
 __RingOperations = {}
 
 -- Each of these methods just handles coverting each element in the ring to an instance of the proper ring, if possible,
--- then passing the arguments to the function in a specific ring
+-- then passing the arguments to the function in a specific ring.
 
 __RingOperations.__unm = function(a)
     return a:neg()
 end
 
 __RingOperations.__add = function(a, b)
-    if not b.getRing and b.isEvaluatable then
+    if not b.getring and b.isEvaluatable then
         return BinaryOperation.ADDEXP({a, b})
     end
 
-    local aring, bring = a:getRing(), b:getRing()
-    if aring == bring then
-        return a:add(b)
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to add two elements of incompatable rings")
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):add(b)
-    end
-    if Ring.subringof(bring, aring) then
-        return a:add(b:inring(aring))
-    end
-
-    error("Attempted to add two elements of different rings")
+    return a:inring(oring):add(b:inring(oring))
 end
 
 __RingOperations.__sub = function(a, b)
-    if not b.getRing and b.isEvaluatable then
+    if not b.getring and b.isEvaluatable then
         return BinaryOperation.SUBEXP({a, b})
     end
 
-    local aring, bring = a:getRing(), b:getRing()
-    if aring == bring then
-        return a:sub(b)
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to subtract two elements of incompatable rings")
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):sub(b)
-    end
-    if Ring.subringof(bring, aring) then
-        return a:sub(b:inring(aring))
-    end
-
-    error("Attempted to subtract two elements of different rings")
+    return a:inring(oring):sub(b:inring(oring))
 end
 
 __RingOperations.__mul = function(a, b)
-    if not b.getRing and b.isEvaluatable then
+    if not b.getring and b.isEvaluatable then
         return BinaryOperation.MULEXP({a, b})
     end
 
-    local aring, bring = a:getRing(), b:getRing()
-    if aring == bring then
-        return a:mul(b)
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to muliply two elements of incompatable rings")
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):mul(b)
-    end
-    if Ring.subringof(bring, aring) then
-        return a:mul(b:inring(aring))
-    end
-
-    error("Attempted to multiply two elements of different rings")
+    return a:inring(oring):mul(b:inring(oring))
 end
 
 __RingOperations.__pow = function(a, n)
-    if (not n.getRing and n.isEvaluatable) or (n.getRing and n:getRing().ring ~= Integer) then
+    if (not n.getring and n.isEvaluatable) or (n.getring and n:getring().ring ~= Integer) then
         return BinaryOperation.POWEXP({a, n})
     end
 
@@ -172,51 +217,42 @@ end
 -- All elements of all rings need these metamethods, since in Lua comparisons on tables only fire if both objects have the table
 __RingOperations.__eq = function(a, b)
     -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
-    if not a.getRing or not b.getRing then
+    if not a.getring or not b.getring then
         return false
     end
-    local aring, bring = a:getRing(), b:getRing()
+    local aring, bring = a:getring(), b:getring()
     if aring == bring then
         return a:eq(b)
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):eq(b)
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to compare two elements of incompatable rings")
     end
-    if Ring.subringof(bring, aring) then
-        return a:eq(b:inring(aring))
-    end
-
-    error("Attempted to compare two elements of different rings")
+    return a:inring(oring):eq(b:inring(oring))
 end
 
 __RingOperations.__lt = function(a, b)
-    local aring, bring = a:getRing(), b:getRing()
+    local aring, bring = a:getring(), b:getring()
     if aring == bring then
         return a:lt(b)
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):lt(b)
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to compare two elements of incompatable rings")
     end
-    if Ring.subringof(bring, aring) then
-        return a:lt(b:inring(aring))
-    end
-
-    error("Attempted to compare two elements of different rings")
+    return a:inring(oring):lt(b:inring(oring))
 end
 
 __RingOperations.__le = function(a, b)
-    local aring, bring = a:getRing(), b:getRing()
+    local aring, bring = a:getring(), b:getring()
     if aring == bring then
         return a:le(b)
     end
-    if Ring.subringof(aring, bring) then
-        return a:inring(bring):le(b)
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to compare two elements of incompatable rings")
     end
-    if Ring.subringof(bring, aring) then
-        return a:le(b:inring(aring))
-    end
-
-    error("Attempted to compare two elements of different rings")
+    return a:inring(oring):le(b:inring(oring))
 end
 
 -----------------

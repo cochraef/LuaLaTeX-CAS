@@ -9,7 +9,7 @@ function PolynomialRing:modularsquarefreefactorization()
     local c = monic:derrivative() // terms[0]
     local d = c - b:derrivative()
     local i = 1
-    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(1) do
+    while b ~= Integer(1) do
         terms[i] = PolynomialRing.gcd(b, d)
         b, c = b // terms[i], d // terms[i]
         i = i + 1
@@ -32,8 +32,8 @@ function PolynomialRing:collapseterms(n)
     local new = {}
     local loc = 0
     local i = 0
-    local nn = n:asNumber()
-    while loc <= self.degree:asNumber() do
+    local nn = n:asnumber()
+    while loc <= self.degree:asnumber() do
         new[i] = self.coefficients[loc]
         loc = loc + nn
         i = i + 1
@@ -47,8 +47,8 @@ function PolynomialRing:expandterms(n)
     local new = {}
     local loc = 0
     local i = 0
-    local nn = n:asNumber()
-    while i <= self.degree:asNumber() do
+    local nn = n:asnumber()
+    while i <= self.degree:asnumber() do
         new[loc] = self.coefficients[i]
         for j = 1, nn do
             new[loc + j] = IntegerModN(Integer(0), n)
@@ -77,12 +77,12 @@ end
 -- Gets the R Matrix for Berlekamp factorization
 function PolynomialRing:RMatrix()
     local R = {}
-    for i = 1, self.degree:asNumber() do
+    for i = 1, self.degree:asnumber() do
         R[i] = {}
     end
-    for i = 0, self.degree:asNumber()-1 do
-        local remainder = PolynomialRing({IntegerModN(Integer(1), self.ring.modulus)}, self.symbol):multiplyDegree(self.ring.modulus:asNumber()*i) % self
-        for j = 0, self.degree:asNumber()-1 do
+    for i = 0, self.degree:asnumber()-1 do
+        local remainder = PolynomialRing({IntegerModN(Integer(1), self.ring.modulus)}, self.symbol):multiplyDegree(self.ring.modulus:asnumber()*i) % self
+        for j = 0, self.degree:asnumber()-1 do
             R[j + 1][i + 1] = remainder.coefficients[j]
             if j == i then
                 R[j + 1][i + 1] = R[j + 1][i + 1] - IntegerModN(Integer(1), self.ring.modulus)
@@ -95,7 +95,7 @@ end
 -- Creates an auxillary basis using the R matrix
 function PolynomialRing:auxillarybasis(R)
     local P = {}
-    local n = self.degree:asNumber()
+    local n = self.degree:asnumber()
     for i = 1, n do
         P[i] = 0
     end
@@ -105,7 +105,7 @@ function PolynomialRing:auxillarybasis(R)
         local i = 1
         local pivotfound = false
         while not pivotfound and i <= n do
-            if R[i][j] ~= self.ring:zero() and P[i] == 0 then
+            if R[i][j] ~= self:zeroc() and P[i] == 0 then
                 pivotfound = true
             else
                 i = i + 1
@@ -127,7 +127,7 @@ function PolynomialRing:auxillarybasis(R)
             end
         else
             local s = {}
-            s[j] = self:one()
+            s[j] = self:onec()
             for l = 1, j - 1 do
                 local e = 0
                 i = 1
@@ -142,7 +142,7 @@ function PolynomialRing:auxillarybasis(R)
                     local c = -R[e][j]
                     s[l] = c
                 else
-                    s[l] = self.ring:zero()
+                    s[l] = self:zeroc()
                 end
             end
             S[#S+1] = PolynomialRing(s, self.symbol)
@@ -162,12 +162,12 @@ function PolynomialRing:findfactors(S)
         for i = 1,#old_factors do
             local w = old_factors[i]
             local j = 0
-            while j <= p:asNumber() - 1 do
+            while j <= p:asnumber() - 1 do
                 local g = PolynomialRing.gcd(b-IntegerModN(Integer(j), p), w)
                 if g == Integer(1) then
                     j = j + 1
                 elseif g == w then
-                    j = p:asNumber()
+                    j = p:asnumber()
                 else
                     factors = Remove(factors, w)
                     local q = w // g

@@ -220,7 +220,7 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
-        if self.expressions[2]:isEvaluatable() and self.expressions[2]:getRing() == Rational:getRing() and self.expressions[2].numerator == Integer(1) then
+        if self.expressions[2]:isEvaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer(1) then
             if self.expressions[2].denominator == Integer(2) then
                 return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
             end
