@@ -27,7 +27,7 @@ end
 
 -- Method for computing the gcd of two integers using Euclid's algorithm
 function Integer.gcd(a, b)
-    while b ~= Integer(0) do
+    while b ~= Integer.zero() do
         a, b = b, a%b
     end
     return a
@@ -37,9 +37,9 @@ end
 -- Also returns Bezout's coefficients via extended gcd
 function Integer.extendedgcd(a, b)
     local oldr, r  = a, b
-    local olds, s  = Integer(1), Integer(0)
-    local oldt, t  = Integer(0), Integer(1)
-    while r ~= Integer(0) do
+    local olds, s  = Integer.one(), Integer.zero()
+    local oldt, t  = Integer.zero(), Integer.one()
+    while r ~= Integer.zero() do
         local q = oldr // r
         oldr, r  = r, oldr - q*r
         olds, s = s, olds - q*s
@@ -70,10 +70,10 @@ end
 -- In other words, returns the least n such that base^n > a
 function Integer.ceillog(a, base)
     base = base or Integer(10)
-    local k = Integer(0)
+    local k = Integer.zero()
 
     while (base ^ k) < a do
-        k = k + Integer(1)
+        k = k + Integer.one()
     end
 
     return k
@@ -81,13 +81,13 @@ end
 
 -- Returns a ^ b (mod n). This should be used when a ^ b is potentially large.
 function Integer.powmod(a, b, n)
-    if n == Integer(1) then
-        return Integer(0)
+    if n == Integer.one() then
+        return Integer.zero()
     else
-        local r = Integer(1)
+        local r = Integer.one()
         a = a % n
-        while b > Integer(0) do
-          if b % Integer(2) == Integer(1) then
+        while b > Integer.zero() do
+          if b % Integer(2) == Integer.one() then
             r = (r * a) % n
           end
           a = (a ^ Integer(2)) % n
@@ -226,7 +226,7 @@ function Integer:inring(ring)
     end
 
     if ring == Rational:getring() then
-        return Rational(self, Integer(1), true):inring(ring)
+        return Rational(self, Integer.one(), true):inring(ring)
     end
 
     if ring == IntegerModN:getring() then
@@ -417,12 +417,12 @@ end
 
 -- Naive exponentiation is slow even for small exponents, so this uses binary exponentiation.
 function Integer:pow(b)
-    if b < Integer(0) then
-        return Integer(1) / (self ^ -b)
+    if b < Integer.zero() then
+        return Integer.one() / (self ^ -b)
     end
 
-    if b == Integer(0) then
-        return Integer(1)
+    if b == Integer.zero() then
+        return Integer.one()
     end
 
     -- Fast single-digit exponentiation
@@ -434,8 +434,8 @@ function Integer:pow(b)
     end
 
     local x = self
-    local y = Integer(1)
-    while b > Integer(1) do
+    local y = Integer.one()
+    while b > Integer.one() do
         if b[1] % 2 == 0 then
             x = x * x
             b = b:divbytwo()
@@ -468,8 +468,8 @@ end
 
 -- Division with remainder over the integers. Uses the standard base 10 long division algorithm.
 function Integer:divremainder(b)
-    if self >= Integer(0) and b > self or self <= Integer(0) and b < self then
-        return Integer(0), Integer(self)
+    if self >= Integer.zero() and b > self or self <= Integer.zero() and b < self then
+        return Integer.zero(), Integer(self)
     end
 
     if #self == 1 and #b == 1 then
@@ -611,12 +611,14 @@ function Integer:le(b)
     return true
 end
 
+local zero = Integer:new(0)
 function Integer:zero()
-    return Integer(0)
+    return zero
 end
 
+local one = Integer:new(1)
 function Integer:one()
-    return Integer(1)
+    return one
 end
 
 -- Returns this integer as a floating point number. Can only approximate the value of large integers.
@@ -638,24 +640,24 @@ function Integer:divisors()
         if prime == Integer(-1) then
             primefactors[prime] = nil
         end
-        terms[prime] = Integer(0)
+        terms[prime] = Integer.zero()
     end
 
-    local divisor = Integer(1)
+    local divisor = Integer.one()
 
     while true do
         divisors[#divisors+1] = divisor
         for prime, power in pairs(primefactors) do
             if terms[prime] < power then
-                terms[prime] = terms[prime] + Integer(1)
+                terms[prime] = terms[prime] + Integer.one()
                 divisor = divisor * prime
                 break
             else
-                terms[prime] = Integer(0)
+                terms[prime] = Integer.zero()
                 divisor = divisor / (prime ^ power)
             end
         end
-        if divisor == Integer(1) then
+        if divisor == Integer.one() then
             break
         end
     end
@@ -677,15 +679,15 @@ end
 
 -- Recursive part of prime factorization using Pollard Rho.
 function Integer:primefactorizationrec()
-    if self < Integer(0) then
-        return Integer.mergefactors({[Integer(-1)]=Integer(1)}, (-self):primefactorizationrec())
+    if self < Integer.zero() then
+        return Integer.mergefactors({[Integer(-1)]=Integer.one()}, (-self):primefactorizationrec())
     end
-    if self == Integer(1) then
-        return {[Integer(1)]=Integer(1)}
+    if self == Integer.one() then
+        return {[Integer.one()]=Integer.one()}
     end
     local result = self:findafactor()
     if result == self then
-        return {[result]=Integer(1)}
+        return {[result]=Integer.one()}
     end
     local remaining = self / result
     return Integer.mergefactors(result:primefactorizationrec(), remaining:primefactorizationrec())
@@ -711,17 +713,17 @@ end
 -- return a non-trivial factor of n via Pollard Rho, or returns n if n is prime
 function Integer:findafactor()
     if self:isprime() then
-        return self + Integer(0)
+        return self + Integer.zero()
     end
 
-    if self % Integer(2) == Integer(0) then
+    if self % Integer(2) == Integer.zero() then
         return Integer(2)
     end
 
     local g = function(x)
         local temp = Integer.powmod(x, Integer(2), self)
         if temp == self then
-            temp = Integer(0)
+            temp = Integer.zero()
         end
         return temp
     end
@@ -729,8 +731,8 @@ function Integer:findafactor()
     local x = Integer(2)
     while x < self do
         local y = Integer(2)
-        local d = Integer(1)
-        while d == Integer(1) do
+        local d = Integer.one()
+        while d == Integer.one() do
             x = g(x)
             y = g(g(y))
             d = Integer.gcd((x - y):abs(), self)
@@ -740,17 +742,17 @@ function Integer:findafactor()
             return d
         end
 
-        x = x + Integer(1)
+        x = x + Integer.one()
     end
 end
 
 -- uses Miller-Rabin to determine whether a number is prime up to a very large number.
 function Integer:isprime()
-    if self % Integer(2) == Integer(0) then
+    if self % Integer(2) == Integer.zero() then
         return false
     end
 
-    if self == Integer(1) then
+    if self == Integer.one() then
         return false
     end
 
@@ -763,25 +765,25 @@ function Integer:isprime()
         end
     end
 
-    local r = Integer(0)
-    local d = self - Integer(1)
-    while d % Integer(2) == Integer(0) do
-        r = r + Integer(1)
+    local r = Integer.zero()
+    local d = self - Integer.one()
+    while d % Integer(2) == Integer.zero() do
+        r = r + Integer.one()
         d = d / Integer(2)
     end
 
     for _, a in ipairs(smallprimes) do
         local x = Integer.powmod(a, d, self)
-        if x == Integer(1) or x == self - Integer(1) then
+        if x == Integer.one() or x == self - Integer.one() then
             goto continue
         end
 
-        while r > Integer(0) do
+        while r > Integer.zero() do
             x = Integer.powmod(x, Integer(2), self)
-            if x == self - Integer(1) then
+            if x == self - Integer.one() then
                 goto continue
             end
-            r = r - Integer(1)
+            r = r - Integer.one()
         end
         do
             return false

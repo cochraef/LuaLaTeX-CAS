@@ -117,14 +117,14 @@ end
 
 -- Ring exponentiation based on the definition. Specific rings may implement more efficient methods.
 function Ring:pow(n)
-    if(n < Integer(0)) then
+    if(n < Integer.zero()) then
         error("Execution error: Negative exponentiation is undefined over general rings")
     end
-    local k = Integer(0)
+    local k = Integer.zero()
     local b = self:one()
     while k < n do
         b = b * self
-        k = k + Integer(1)
+        k = k + Integer.one()
     end
     return b
 end
@@ -206,7 +206,7 @@ __RingOperations.__pow = function(a, n)
         return BinaryOperation.POWEXP({a, n})
     end
 
-    if a == a:zero() and n == Integer(0) then
+    if a == a:zero() and n == Integer.zero() then
         error("Cannot raise 0 to the power of 0")
     end
 

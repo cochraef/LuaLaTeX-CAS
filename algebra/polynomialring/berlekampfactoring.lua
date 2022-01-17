@@ -9,14 +9,14 @@ function PolynomialRing:modularsquarefreefactorization()
     local c = monic:derrivative() // terms[0]
     local d = c - b:derrivative()
     local i = 1
-    while b ~= Integer(1) do
+    while b ~= Integer.one() do
         terms[i] = PolynomialRing.gcd(b, d)
         b, c = b // terms[i], d // terms[i]
         i = i + 1
         d = c - b:derrivative()
     end
 
-    if not (terms[i-1]:derrivative().degree == Integer(0) and terms[i-1]:derrivative().coefficients[0] == Integer(0)) then
+    if not (terms[i-1]:derrivative().degree == Integer.zero() and terms[i-1]:derrivative().coefficients[0] == Integer.zero()) then
         return terms
     end
 
@@ -51,7 +51,7 @@ function PolynomialRing:expandterms(n)
     while i <= self.degree:asnumber() do
         new[loc] = self.coefficients[i]
         for j = 1, nn do
-            new[loc + j] = IntegerModN(Integer(0), n)
+            new[loc + j] = IntegerModN(Integer.zero(), n)
         end
         loc = loc + nn
         i = i + 1
@@ -81,11 +81,11 @@ function PolynomialRing:RMatrix()
         R[i] = {}
     end
     for i = 0, self.degree:asnumber()-1 do
-        local remainder = PolynomialRing({IntegerModN(Integer(1), self.ring.modulus)}, self.symbol):multiplyDegree(self.ring.modulus:asnumber()*i) % self
+        local remainder = PolynomialRing({IntegerModN(Integer.one(), self.ring.modulus)}, self.symbol):multiplyDegree(self.ring.modulus:asnumber()*i) % self
         for j = 0, self.degree:asnumber()-1 do
             R[j + 1][i + 1] = remainder.coefficients[j]
             if j == i then
-                R[j + 1][i + 1] = R[j + 1][i + 1] - IntegerModN(Integer(1), self.ring.modulus)
+                R[j + 1][i + 1] = R[j + 1][i + 1] - IntegerModN(Integer.one(), self.ring.modulus)
             end
         end
     end
@@ -164,7 +164,7 @@ function PolynomialRing:findfactors(S)
             local j = 0
             while j <= p:asnumber() - 1 do
                 local g = PolynomialRing.gcd(b-IntegerModN(Integer(j), p), w)
-                if g == Integer(1) then
+                if g == Integer.one() then
                     j = j + 1
                 elseif g == w then
                     j = p:asnumber()

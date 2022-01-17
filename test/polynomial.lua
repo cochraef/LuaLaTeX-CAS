@@ -137,6 +137,9 @@ test(n:factor(), "(1 * (1x^1+1x^0 ^ 1) * (1x^1+2x^0 ^ 1) * (1x^1+4x^0 ^ 1) * (1x
 print()
 
 local q = PolynomialRing({Integer(3), Integer(-9), Integer(27), Integer(-36), Integer(36)}, "z")
+local r = PolynomialRing({Integer(0), Integer(0), Integer(0), Integer(0), Integer(0), Integer(0), Integer(4)}, "x");
+
+local s = PolynomialRing({Integer(1), Integer(0), Integer(-4), Integer(0), Integer(1)}, "x")
 
 print("Testing decomposition...")
 
@@ -150,6 +153,8 @@ test(ToStringArray(b:decompose()), "{2x^2+1/12x^1+1/3x^0}", b)
 test(ToStringArray(o:decompose()), "{1x^6+10x^5+36x^4+60x^3+59x^2+50x^1+24x^0}", o)
 test(ToStringArray(n:decompose()), "{1x^10+10x^9+35x^8+50x^7+24x^6+0x^5+1x^4+10x^3+35x^2+50x^1+24x^0}", n)
 test(ToStringArray(q:decompose()), "{1z^2+-1/2z^1+0z^0, 36z^2+18z^1+3z^0}", q)
+test(ToStringArray(r:decompose()),"{1x^2+0x^1+0x^0, 4x^3+0x^2+0x^1+0x^0}" ,r)
+test(ToStringArray(s:decompose()), "{1x^2+0x^1+-4x^0, 1x^2+4x^1+1x^0}", s)
 
 profiler:stop()
 local outfile = io.open( "profile.txt", "w+" )

@@ -37,13 +37,13 @@ function Rational:new(n, d, keep)
         error("Improper arguments for constructing a rational. Should be integers.")
     end
 
-    n = n or Integer(0)
-    d = d or Integer(1)
+    n = n or Integer.zero()
+    d = d or Integer.one()
     o.numerator = n
     o.denominator = d
     o:reduce()
 
-    if (not keep) and o.denominator == Integer(1) then
+    if (not keep) and o.denominator == Integer.one() then
         return o.numerator
     end
 
@@ -52,7 +52,7 @@ end
 
 -- Reduces a rational number to standard form.
 function Rational:reduce()
-    if self.denominator < Integer(0) then
+    if self.denominator < Integer.zero() then
         self.denominator = -self.denominator
         self.numerator = -self.numerator
     end
@@ -116,14 +116,14 @@ function Rational:eq(b)
 end
 
 function Rational:lt(b)
-    if self.numerator < Integer(0) and b.numerator > Integer(0) then
+    if self.numerator < Integer.zero() and b.numerator > Integer.zero() then
         return true
     end
-    if self.numerator > Integer(0) and b.numerator < Integer(0) then
+    if self.numerator > Integer.zero() and b.numerator < Integer.zero() then
         return false
     end
 
-    if self.numerator >= Integer(0) and b.numerator >= Integer(0) then
+    if self.numerator >= Integer.zero() and b.numerator >= Integer.zero() then
         return self.numerator * b.denominator < self.denominator * b.numerator
     end
     return self.numerator * b.denominator > self.denominator * b.numerator
@@ -134,11 +134,11 @@ function Rational:le(b)
 end
 
 function Rational:zero()
-    return Integer(0)
+    return Integer.zero()
 end
 
 function Rational:one()
-    return Integer(1)
+    return Integer.one()
 end
 
 function Rational:tolatex()

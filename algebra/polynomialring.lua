@@ -58,7 +58,7 @@ function PolynomialRing.gcd(a, b)
     if a.symbol ~= b.symbol then
         error("Cannot take the gcd of two polynomials with different symbols")
     end
-    while b ~= Integer(0) do
+    while b ~= Integer.zero() do
         a, b = b, a % b
     end
     return a // a:lc()
@@ -68,9 +68,9 @@ end
 -- Also returns bezouts coefficients via extended gcd
 function PolynomialRing.extendedgcd(a, b)
     local oldr, r  = a, b
-    local olds, s  = Integer(1), Integer(0)
-    local oldt, t  = Integer(0), Integer(1)
-    while r ~= Integer(0) do
+    local olds, s  = Integer.one(), Integer.zero()
+    local oldt, t  = Integer.zero(), Integer.one()
+    while r ~= Integer.zero() do
         local q = oldr // r
         oldr, r  = r, oldr - q*r
         olds, s = s, olds - q*s
@@ -142,14 +142,14 @@ function PolynomialRing:new(coefficients, symbol, degree)
         -- Constructs the coefficients when a new polynomial is instantiated as an array
         for index, coefficient in ipairs(coefficients) do
             o.coefficients[index - 1] = coefficient
-            o.degree = o.degree + Integer(1)
+            o.degree = o.degree + Integer.one()
         end
     else
         -- Constructs the coefficients from an existing polynomial of coefficients
         local loc = o.degree:asnumber()
         while loc > 0 do
             if not coefficients[loc] or coefficients[loc] == coefficients[loc]:zero() then
-                o.degree = o.degree - Integer(1)
+                o.degree = o.degree - Integer.one()
             else
                 break
             end
@@ -245,10 +245,10 @@ end
 -- Performs Karatsuba multiplication without constructing new polynomials recursively
 function PolynomialRing.mul_rec(a, b)
     if #a==0 and #b==0 then
-        return {[0]=a[0] * b[0], [1]=Integer(0)}
+        return {[0]=a[0] * b[0], [1]=Integer.zero()}
     end
 
-    local k = Integer.ceillog(Integer.max(Integer(#a), Integer(#b)) + Integer(1), Integer(2))
+    local k = Integer.ceillog(Integer.max(Integer(#a), Integer(#b)) + Integer.one(), Integer(2))
     local n = Integer(2) ^ k
     local m = n / Integer(2)
     local nn = n:asnumber()
@@ -257,10 +257,10 @@ function PolynomialRing.mul_rec(a, b)
     local a0, a1, b0, b1 = {}, {}, {}, {}
 
     for e = 0, mn - 1 do
-        a0[e] = a[e] or Integer(0)
-        a1[e] = a[e + mn] or Integer(0)
-        b0[e] = b[e] or Integer(0)
-        b1[e] = b[e + mn] or Integer(0)
+        a0[e] = a[e] or Integer.zero()
+        a1[e] = a[e + mn] or Integer.zero()
+        b0[e] = b[e] or Integer.zero()
+        b1[e] = b[e + mn] or Integer.zero()
     end
 
     local p1 = PolynomialRing.mul_rec(a1, b1)
@@ -291,7 +291,7 @@ end
 
 function PolynomialRing:divremainder(b)
     local n, m = self.degree, b.degree
-    local r, u = PolynomialRing(self.coefficients, self.symbol, self.degree), Integer(1) / b.coefficients[m:asnumber()]
+    local r, u = PolynomialRing(self.coefficients, self.symbol, self.degree), Integer.one() / b.coefficients[m:asnumber()]
 
     if m > n then
         return self:zero(), self
@@ -303,7 +303,7 @@ function PolynomialRing:divremainder(b)
             q[i] = r:lc() * u
             r = r - PolynomialRing({q[i]}, self.symbol):multiplyDegree(i) * b
         else
-            q[i] = Integer(0)
+            q[i] = Integer.zero()
         end
     end
 
@@ -403,14 +403,14 @@ end
 
 -- Returns the formal derrivative of this polynomial
 function PolynomialRing:derrivative()
-    if self.degree == Integer(0) then
+    if self.degree == Integer.zero() then
         return PolynomialRing({self:zeroc()}, self.symbol, Integer(-1))
     end
     local new = {}
     for e = 1, self.degree:asnumber() do
         new[e - 1] = Integer(e) * self.coefficients[e]
     end
-    return PolynomialRing(new, self.symbol, self.degree - Integer(1))
+    return PolynomialRing(new, self.symbol, self.degree - Integer.one())
 end
 
 -- Returns the square-free factorization of a polynomial
@@ -428,7 +428,7 @@ function PolynomialRing:squarefreefactorization()
     local expressions = {self:lc()}
     local j = 1
     for index, term in ipairs(terms) do
-        if term.degree ~= Integer(0) or term.coefficients[0] ~= Integer(1) then
+        if term.degree ~= Integer.zero() or term.coefficients[0] ~= Integer.one() then
             j = j + 1
             expressions[j] = BinaryOperation.POWEXP({term, Integer(index)})
         end
@@ -463,7 +463,7 @@ function PolynomialRing:factor()
             local remaining, factors = expression:rationalroots()
             terms = factors
             -- Then applies the Zassenhaus algorithm if there entire polynomial has not been factored into monomial
-            if remaining ~= Integer(1) then
+            if remaining ~= Integer.one() then
                 remaining = remaining:zassenhausfactor()
                 for _, exp in ipairs(remaining) do
                     terms[#terms+1] = exp
@@ -485,15 +485,15 @@ end
 function PolynomialRing:rationalroots()
     local remaining = self
     local roots = {}
-    if self.coefficients[0] == Integer(0) then
-        roots[1] = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
+    if self.coefficients[0] == Integer.zero() then
+        roots[1] = PolynomialRing({Integer.zero(), Integer.one()}, self.symbol)
         remaining = remaining // roots[1]
     end
     -- This can be slower than Zassenhaus if the digits are large enough, since factoring integers is slow
     if self.coefficients[0] > Integer(Integer.DIGITSIZE - 1) or self:lc() > Integer(Integer.DIGITSIZE - 1) then
         return remaining, roots
     end
-    while remaining ~= Integer(1) do
+    while remaining ~= Integer.one() do
         :: nextfactor ::
         local a = remaining.coefficients[0]
         local b = remaining:lc()
@@ -502,12 +502,12 @@ function PolynomialRing:rationalroots()
         for _, af in ipairs(afactors) do
             for _, bf in ipairs(bfactors) do
                 local testroot = Rational(af, bf, true)
-                if remaining:evaluateAt(testroot) == Integer(0) then
+                if remaining:evaluateAt(testroot) == Integer.zero() then
                     roots[#roots+1] = PolynomialRing({-testroot.numerator, testroot.denominator}, self.symbol)
                     remaining = remaining // roots[#roots]
                     goto nextfactor
                 end
-                if remaining:evaluateAt(-testroot) == Integer(0) then
+                if remaining:evaluateAt(-testroot) == Integer.zero() then
                     roots[#roots+1] = PolynomialRing({testroot.numerator, testroot.denominator}, self.symbol)
                     remaining = remaining // roots[#roots]
                     goto nextfactor

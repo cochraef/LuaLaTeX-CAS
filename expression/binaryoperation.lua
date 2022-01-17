@@ -154,7 +154,7 @@ function BinaryOperation:order(other)
 
     if other.isAtomic() then
         if self.operation == BinaryOperation.POW then
-            return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer(1)}))
+            return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer.one()}))
         end
 
         if self.operation == BinaryOperation.MUL then
@@ -194,7 +194,7 @@ function BinaryOperation:order(other)
     end
 
     if (self.operation == BinaryOperation.POW) and (other.operation == BinaryOperation.ADD) then
-        return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer(1)}))
+        return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer.one()}))
     end
 
     if (self.operation == BinaryOperation.ADD) and (other.operation == BinaryOperation.MUL) then
@@ -202,7 +202,7 @@ function BinaryOperation:order(other)
     end
 
     if (self.operation == BinaryOperation.ADD) and (other.operation == BinaryOperation.POW) then
-        return BinaryOperation(BinaryOperation.POW, {self, Integer(1)}):order(other)
+        return BinaryOperation(BinaryOperation.POW, {self, Integer.one()}):order(other)
     end
 
     return true
@@ -220,7 +220,7 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
-        if self.expressions[2]:isEvaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer(1) then
+        if self.expressions[2]:isEvaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
             if self.expressions[2].denominator == Integer(2) then
                 return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
             end
@@ -233,8 +233,8 @@ function BinaryOperation:tolatex()
         local denom = ''
         for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
-                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isEvaluatable() and expression.expressions[2] < Integer(0) then
-                    local reversed = (Integer(1) / expression):autosimplify()
+                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isEvaluatable() and expression.expressions[2] < Integer.zero() then
+                    local reversed = (Integer.one() / expression):autosimplify()
                     denom = denom .. reversed:tolatex()
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
                     out = out .. '(' .. expression:tolatex() .. ')'

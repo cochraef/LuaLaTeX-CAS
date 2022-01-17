@@ -19,15 +19,15 @@ end
 -- Field exponentiation based on the definition. Specific rings may implement more efficient methods.
 function Field:pow(n)
     local base = self
-    if(n < Integer(0)) then
+    if(n < Integer.zero()) then
         n = -n
         base = base:inv()
     end
-    local k = Integer(0)
+    local k = Integer.zero()
     local b = self.getring().one()
     while k < n do
         b = b.mul(base)
-        k = k + Integer(1)
+        k = k + Integer.one()
     end
     return b
 end

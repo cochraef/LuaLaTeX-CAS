@@ -21,7 +21,7 @@ function BinaryOperation:simplifyproduct()
 
     -- We don't really know what ring we are working in here, so just assume the integer ring
     if not result.expressions[1] then
-        return Integer(1)
+        return Integer.one()
     end
 
     if not result.expressions[2] then
@@ -56,11 +56,11 @@ function BinaryOperation:simplifyproductrec()
             local revertterm1 = false
             local revertterm2 = false
             if term1.operation ~= BinaryOperation.POW then
-                term1 = BinaryOperation(BinaryOperation.POW, {term1, Integer(1)})
+                term1 = BinaryOperation(BinaryOperation.POW, {term1, Integer.one()})
                 revertterm1 = true
             end
             if term2.operation ~= BinaryOperation.POW then
-                term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer(1)})
+                term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer.one()})
                 revertterm2 = true
             end
             if term1.expressions[1] == term2.expressions[1] and not

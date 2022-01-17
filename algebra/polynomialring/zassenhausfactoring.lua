@@ -10,14 +10,14 @@ function PolynomialRing:rationalsquarefreefactorization(keeplc)
     local c = monic:derrivative() // terms[0]
     local d = c - b:derrivative()
     local i = 1
-    while b.degree ~= Integer(0) or b.coefficients[0] ~= Integer(1) do
+    while b.degree ~= Integer.zero() or b.coefficients[0] ~= Integer.one() do
         terms[i] = PolynomialRing.gcd(b, d)
         b, c = b // terms[i], d // terms[i]
         i = i + 1
         d = c - b:derrivative()
     end
     if keeplc and terms[1] then
-        terms[0] = Integer(1)
+        terms[0] = Integer.one()
         terms[1] = terms[1] * self:lc()
     end
     return terms
@@ -25,25 +25,25 @@ end
 
 -- Factors the largest possible constant out of a polynomial whos underlying ring is a Euclidean domain but not a field
 function PolynomialRing:factorconstant()
-    local gcd = Integer(0)
+    local gcd = Integer.zero()
     for i = 0, self.degree:asnumber() do
         gcd = self.ring.gcd(gcd, self.coefficients[i])
     end
-    if gcd == Integer(0) then
-        return Integer(1), self
+    if gcd == Integer.zero() then
+        return Integer.one(), self
     end
     return gcd, self / gcd
 end
 
 -- Converts a polynomial in the rational polynomial ring to the integer polynomial ring
 function PolynomialRing:rationaltointeger()
-    local lcm = Integer(1)
+    local lcm = Integer.one()
     for i = 0, self.degree:asnumber() do
         if self.coefficients[i]:getring() == Rational:getring() then
             lcm = lcm * self.coefficients[i].denominator / Integer.gcd(lcm, self.coefficients[i].denominator)
         end
     end
-    return Integer(1) / lcm, self * lcm
+    return Integer.one() / lcm, self * lcm
 end
 
 -- Uses Zassenhaus's Algorithm to factor sqaure-free polynomials over the intergers
@@ -56,7 +56,7 @@ function PolynomialRing:zassenhausfactor()
     for i = 0, n - 1 do
         V[i] = l ^ Integer(n - 1 - i) * self.coefficients[i]
     end
-    V[n] = Integer(1)
+    V[n] = Integer.one()
     V = PolynomialRing(V, "y", self.degree)
 
     -- Performs Berlekamp Factorization in a sutable prime base
@@ -93,7 +93,7 @@ function PolynomialRing:findprime()
                             Integer(29), Integer(31), Integer(37), Integer(41), Integer(43), Integer(47), Integer(53), Integer(59)}
 
     for _, p in pairs(smallprimes) do
-        local P = PolynomialRing({IntegerModN(Integer(1), p)}, self.symbol)
+        local P = PolynomialRing({IntegerModN(Integer.one(), p)}, self.symbol)
         local s = self:inring(P:getring())
         if PolynomialRing.gcd(s, s:derrivative()) == P then
             return p
@@ -120,7 +120,7 @@ end
 -- Uses Hensel lifting on the factors of a polynomial S mod p to find them in the integers
 function PolynomialRing:henselift(S, k)
     local p = S[1].ring.modulus
-    if k == Integer(1) then
+    if k == Integer.one() then
         return self:truefactors(S, p, k)
     end
     G = self:genextendsigma(S)
@@ -131,17 +131,17 @@ function PolynomialRing:henselift(S, k)
             Vp = Vp * V[i]:inring(PolynomialRing.R("y"))
         end
         local E = self - Vp:inring(PolynomialRing.R("y"))
-        if E == Integer(0) then
+        if E == Integer.zero() then
             return V
         end
         E = E:inring(PolynomialRing.R("y", p ^ Integer(j))):inring(PolynomialRing.R("y"))
-        F = E / p ^ (Integer(j) - Integer(1))
+        F = E / p ^ (Integer(j) - Integer.one())
         R = self:genextendR(V, G, F)
         local Vnew = {}
         for i, v in ipairs(V) do
             local vnew = v:inring(PolynomialRing.R("y", p ^ Integer(j)))
             local rnew = R[i]:inring(PolynomialRing.R("y", p ^ Integer(j)))
-            Vnew[i] = vnew + (p) ^ (Integer(j) - Integer(1)) * rnew
+            Vnew[i] = vnew + (p) ^ (Integer(j) - Integer.one()) * rnew
         end
         V = Vnew;
     end
@@ -203,7 +203,7 @@ function PolynomialRing:truefactors(l, p, k)
                 end
             end
             local Q, R = U:divremainder(T)
-            if R == Integer(0) then
+            if R == Integer.zero() then
                 factors[#factors+1] = T
                 U = Q
                 L = RemoveAll(L, t)
@@ -214,7 +214,7 @@ function PolynomialRing:truefactors(l, p, k)
         end
         m = m + 1
     end
-    if U ~= Integer(1) then
+    if U ~= Integer.one() then
         factors[#factors+1] = U
     end
     return factors;

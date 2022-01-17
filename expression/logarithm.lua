@@ -49,13 +49,13 @@ function Logarithm:autosimplify()
     local expression = self.expression:autosimplify()
 
     -- Uses the property that log(b, 1) = 0
-    if expression == Integer(1) then
-        return Integer(0)
+    if expression == Integer.one() then
+        return Integer.zero()
     end
 
     -- Uses the property that log(b, b) = 1
     if expression == base then
-        return Integer(1)
+        return Integer.one()
     end
 
     -- Uses the propery that log(b, x^y) = y * log(b, x)

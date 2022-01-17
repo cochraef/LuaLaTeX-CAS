@@ -15,7 +15,7 @@ function BinaryOperation:simplifypower()
 
     -- Uses the property that 0^x = 0 if x does not equal 0
     if base:isEvaluatable() and base == base:zero() then
-        return Integer(0)
+        return Integer.zero()
     end
 
     -- Uses the property that 1^x = 1
@@ -89,7 +89,7 @@ function BinaryOperation:simplifyrationalpower()
             integerpart = newexponent
         end
 
-        if integerpart == Integer(0) then
+        if integerpart == Integer.zero() then
             return BinaryOperation(BinaryOperation.POW, {primebase, newexponent})
         end
         return BinaryOperation(BinaryOperation.MUL,

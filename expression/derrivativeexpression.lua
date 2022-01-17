@@ -52,15 +52,15 @@ function DerrivativeExpression:autosimplify()
     -- The derrivative of a constant is 0
     -- This is dumb but it works
     if simplified:isEvaluatable() or simplified.isConstant then
-        return Integer(0)
+        return Integer.zero()
     end
 
     -- The derrivative of a symbol is either 1 or 0
     if simplified:type() == SymbolExpression then
         if self.symbol == simplified then
-            return Integer(1)
+            return Integer.one()
         end
-        return Integer(0)
+        return Integer.zero()
     end
 
     -- Chain rule for arbitrary functions

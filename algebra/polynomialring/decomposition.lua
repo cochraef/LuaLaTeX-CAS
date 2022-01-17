@@ -5,7 +5,7 @@ function PolynomialRing:decompose()
     local U = self - self.coefficients[0]
     local S = U:divisors()
     local decomposition = {}
-    local C = PolynomialRing({Integer(0), Integer(1)}, self.symbol)
+    local C = PolynomialRing({Integer.zero(), Integer.one()}, self.symbol)
     local finalcomponent
 
     while S[1] do
@@ -16,10 +16,10 @@ function PolynomialRing:decompose()
             end
         end
         S = Remove(S, w)
-        if C.degree < w.degree and w.degree < self.degree and self.degree % w.degree == Integer(0) then
+        if C.degree < w.degree and w.degree < self.degree and self.degree % w.degree == Integer.zero() then
             local g = w:expand(C, self.symbol)
             local R = self:expand(w, self.symbol)
-            if g.degree == Integer(0) and R.degree == Integer(0) then
+            if g.degree == Integer.zero() and R.degree == Integer.zero() then
                 g.symbol = self.symbol
                 decomposition[#decomposition+1] = g.coefficients[0]
                 decomposition[#decomposition].symbol = self.symbol
@@ -51,7 +51,7 @@ function PolynomialRing:divisors()
     local terms = {}
     for i, _ in ipairs(factors.expressions) do
         if i > 1 then
-            terms[i] = Integer(0)
+            terms[i] = Integer.zero()
         end
     end
 
@@ -63,16 +63,16 @@ function PolynomialRing:divisors()
                 local base = factor.expressions[1]
                 local power = factor.expressions[2]
                 if terms[i] < power then
-                    terms[i] = terms[i] + Integer(1)
+                    terms[i] = terms[i] + Integer.one()
                     divisor = divisor * base
                     break
                 else
-                    terms[i] = Integer(0)
+                    terms[i] = Integer.zero()
                     divisor = divisor // (base ^ power)
                 end
             end
         end
-        if divisor == Integer(1) then
+        if divisor == Integer.one() then
             break
         end
         divisors[#divisors+1] = divisor
@@ -85,9 +85,9 @@ end
 -- Polynomial expansion as a subroutine of decomposition.
 function PolynomialRing:expand(v, x)
     local u = self
-    if u == Integer(0) then
-        return Integer(0)
+    if u == Integer.zero() then
+        return Integer.zero()
     end
     local q,r = u:divremainder(v)
-    return PolynomialRing({PolynomialRing({Integer(0), Integer(1)}, "t")}, x) * q:expand(v, x) + r
+    return PolynomialRing({PolynomialRing({Integer.zero(), Integer.one()}, "t")}, x) * q:expand(v, x) + r
 end

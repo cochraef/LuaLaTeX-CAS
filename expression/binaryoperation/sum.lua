@@ -14,7 +14,7 @@ function BinaryOperation:simplifysum()
 
     -- We don't really know what ring we are working in here, so just assume the integer ring
     if not result.expressions[1] then
-        return Integer(0)
+        return Integer.zero()
     end
 
     -- Simplifies single sums to their operands
@@ -52,11 +52,11 @@ function BinaryOperation:simplifysumrec()
             -- This is only done if a and b are constant, since otherwise this could be counterproductive
             -- We SHOULD be okay to only check left distributivity, since constants always come first when ordered
             if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1].isEvaluatable() then
-                term1 = BinaryOperation(BinaryOperation.MUL, {Integer(1), term1})
+                term1 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term1})
                 revertterm1 = true
             end
             if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1].isEvaluatable() then
-                term2 = BinaryOperation(BinaryOperation.MUL, {Integer(1), term2})
+                term2 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term2})
                 revertterm2 = true
             end
             if term1.expressions[2] == term2.expressions[2] and term1.expressions[1].isEvaluatable() and term2.expressions[1].isEvaluatable() then

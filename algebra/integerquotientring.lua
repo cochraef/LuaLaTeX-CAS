@@ -56,13 +56,13 @@ end
 function IntegerModN:new(i, n)
     local o = {}
 
-    if n:getring() ~= Integer:getring() or n < Integer(1) then
+    if n:getring() ~= Integer:getring() or n < Integer.one() then
         error("Argument error: modulus must be an integer greater than 0.")
     end
 
     o = setmetatable(o, __o)
 
-    if i < Integer(0) or i >= n then
+    if i < Integer.zero() or i >= n then
         i = i % n
     end
 
@@ -121,18 +121,18 @@ end
 
 -- Returns the multiplicative inverse of this number if it exists
 function IntegerModN:inv()
-    local t = Integer(0)
+    local t = Integer.zero()
     local r = self.modulus
-    local newt = Integer(1)
+    local newt = Integer.one()
     local newr = self.element
 
-    while newr ~= Integer(0) do
+    while newr ~= Integer.zero() do
         local q = r // newr
         t, newt = newt, t - q * newt
         r, newr = newr, r - q * newr
     end
 
-    if r > Integer(1) then
+    if r > Integer.one() then
         error("Element does not have an inverse in this ring")
     end
 
@@ -157,16 +157,16 @@ end
 
 function IntegerModN:zero()
     if not self or not self.modulus then
-        return Integer(0)
+        return Integer.zero()
     end
-    return IntegerModN(Integer(0), self.modulus)
+    return IntegerModN(Integer.zero(), self.modulus)
 end
 
 function IntegerModN:one()
     if not self or not self.modulus then
-        return Integer(1)
+        return Integer.one()
     end
-    return IntegerModN(Integer(1), self.modulus)
+    return IntegerModN(Integer.one(), self.modulus)
 end
 
 -----------------

@@ -75,7 +75,7 @@ function SymbolExpression:order(other)
     end
 
     if other.operation == BinaryOperation.POW then
-        return BinaryOperation(BinaryOperation.POW, {self, Integer(1)}):order(other)
+        return BinaryOperation(BinaryOperation.POW, {self, Integer.one()}):order(other)
     end
 
     if other.operation == BinaryOperation.MUL then
