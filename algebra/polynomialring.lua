@@ -239,7 +239,20 @@ function PolynomialRing:neg()
 end
 
 function PolynomialRing:mul(b)
-    return PolynomialRing(PolynomialRing.mul_rec(self.coefficients, b.coefficients), self.symbol, self.degree + b.degree)
+    -- Grade-school multiplication is actually faster up to a very large polynomial size due to Lua's overhead.
+    local new = {}
+
+    local sd = self.degree:asnumber()
+    local bd = b.degree:asnumber()
+
+    for i = 0, sd+bd do
+        new[i] = self:zeroc()
+        for j = math.max(0, i-bd), math.min(sd, i) do
+            new[i] = new[i] + self.coefficients[j]*b.coefficients[i-j]
+        end
+    end
+    return PolynomialRing(new, self.symbol, self.degree + b.degree)
+    -- return PolynomialRing(PolynomialRing.mul_rec(self.coefficients, b.coefficients), self.symbol, self.degree + b.degree)
 end
 
 -- Performs Karatsuba multiplication without constructing new polynomials recursively

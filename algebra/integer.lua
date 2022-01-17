@@ -551,13 +551,15 @@ function Integer:eq(b)
 end
 
 function Integer:lt(b)
-    if #self < #b then
+    local selfsize = #self
+    local bsize = #b
+    if selfsize < bsize then
         return b.sign == 1
     end
-    if #self > #b then
+    if selfsize > bsize then
         return self.sign == -1
     end
-    local n = #self
+    local n = selfsize
     while n > 0 do
         if self[n]*self.sign < b[n]*b.sign then
             return true
@@ -592,13 +594,15 @@ function Integer:ltabs(b)
 end
 
 function Integer:le(b)
-    if #self < #b then
+    local selfsize = #self
+    local bsize = #b
+    if selfsize < bsize then
         return b.sign == 1
     end
-    if #self > #b then
+    if selfsize > bsize then
         return self.sign == -1
     end
-    local n = #self
+    local n = selfsize
     while n > 0 do
         if self[n]*self.sign < b[n]*b.sign then
             return true
