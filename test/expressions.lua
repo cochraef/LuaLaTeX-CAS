@@ -71,7 +71,7 @@ local f = PolynomialRing({Integer(6), Integer(5), Integer(1)}, "x")
 
 print("Testing polynomial expressions...")
 test(f, "1x^2+5x^1+6x^0")
-test(f:toCompoundExpression(), "((6 * (x ^ 0)) + (5 * (x ^ 1)) + (1 * (x ^ 2)))")
+test(f:tocompoundexpression(), "((6 * (x ^ 0)) + (5 * (x ^ 1)) + (1 * (x ^ 2)))")
 test(f:evaluate(), "1x^2+5x^1+6x^0")
 test(f:substitute({x=Integer(1)}), "((6 * (1 ^ 0)) + (5 * (1 ^ 1)) + (1 * (1 ^ 2)))")
 test(f:substitute({x=Integer(1)}):evaluate(), 12)

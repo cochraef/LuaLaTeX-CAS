@@ -40,7 +40,11 @@ function BinaryOperation:simplifyproductrec()
             (term2:isEvaluatable() or not (term2.operation == BinaryOperation.MUL)) then
 
             if term1:isEvaluatable() and term2:isEvaluatable() then
-                return BinaryOperation(BinaryOperation.MUL, {self:evaluate()})
+                local result = self:evaluate()
+                if result == result:one() then
+                    return BinaryOperation(BinaryOperation.MUL, {})
+                end
+                return BinaryOperation(BinaryOperation.MUL, {result})
             end
 
             -- Uses the property that x*1 = x
@@ -145,17 +149,12 @@ function BinaryOperation:mergeproducts(other)
         end
     end
 
-    if first.isEvaluatable() and first == first.one() then
-        return BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
-    end
-
     if first.operation ~= BinaryOperation.MUL or not first.expressions[2] then
         local result = BinaryOperation(self.operation, selfrest):mergeproducts(BinaryOperation(other.operation, otherrest))
-        if first.operation ~= BinaryOperation.MUL then
-            table.insert(result.expressions, 1, first)
-        else
-            table.insert(result.expressions, 1, first.expressions[1])
+        if not first.expressions[1] then
+            return result
         end
+        table.insert(result.expressions, 1, first.expressions[1])
         return result
     end
 

@@ -208,14 +208,84 @@ function BinaryOperation:order(other)
     return true
 end
 
--- Returns whether the binary operation is associative
+-- Returns whether the binary operation is associative.
 function BinaryOperation:isAssociative()
     error("Called unimplemented method: isAssociative()")
 end
 
--- Returns whether the binary operation is commutative
+-- Returns whether the binary operation is commutative.
 function BinaryOperation:isCommutative()
     error("Called unimplemented method: isCommutative()")
+end
+
+-- Returns an autosimplified expression as a single-variable polynomial in a ring, if it can be converted. Returns itself otherwise.
+function BinaryOperation:topolynomial()
+    if not self.operation or self.operation ~= BinaryOperation.ADD then
+        return self, false
+    end
+
+    local poly = {}
+    local degree = 0
+    local symbol
+    for _, expression in ipairs(self.expressions) do
+        local coefficient
+        local sym
+        local power
+        -- Expressions of the form c
+        if expression:isEvaluatable() then
+            coefficient = expression
+            power = 0
+        -- Expressions of the form x
+        elseif expression:type() == SymbolExpression then
+            coefficient = Integer.one()
+            sym = expression.symbol
+            power = 1
+        -- Expressions of the form c*x
+        elseif expression.operation and expression.operation == BinaryOperation.MUL and #expression.expressions == 2
+                    and expression.expressions[1]:isEvaluatable() and expression.expressions[2]:type() == SymbolExpression then
+
+            coefficient = expression.expressions[1]
+            sym = expression.expressions[2].symbol
+            power = 1
+        -- Expressions of the form c*x^n (totally not confusing)
+        elseif expression.operation and expression.operation == BinaryOperation.MUL and #expression.expressions == 2
+                    and expression.expressions[1]:isEvaluatable() and expression.expressions[2].operation and
+                    expression.expressions[2].operation == BinaryOperation.POW and #expression.expressions[2].expressions == 2
+                    and expression.expressions[2].expressions[1]:type() == SymbolExpression and expression.expressions[2].expressions[2].getring
+                    and expression.expressions[2].expressions[2]:getring() == Integer.getring() then
+
+            coefficient = expression.expressions[1]
+            sym = expression.expressions[2].expressions[1].symbol
+            power = expression.expressions[2].expressions[2]:asnumber()
+        -- Expressions of the form x^n
+        elseif expression.operation and expression.operation == BinaryOperation.POW and #expression.expressions == 2
+                    and expression.expressions[1]:type() == SymbolExpression and expression.expressions[2].getring
+                    and expression.expressions[2]:getring() == Integer.getring() then
+
+            coefficient = Integer.one()
+            sym = expression.expressions[1].symbol
+            power = expression.expressions[2]:asnumber()
+        else
+            return self, false
+        end
+
+        if symbol and sym and symbol ~= sym then
+            return self, false
+        end
+        if not symbol then
+            symbol = sym
+        end
+        poly[power + 1] = coefficient
+        if power > degree then
+            degree = power
+        end
+    end
+
+    for i = 1,degree+1 do
+        poly[i] = poly[i] or Integer.zero()
+    end
+
+    return PolynomialRing(poly, symbol), true
 end
 
 function BinaryOperation:tolatex()

@@ -8,6 +8,7 @@ require("expression.binaryoperation")
 require("expression.functionexpression")
 require("expression.logarithm")
 require("expression.derrivativeexpression")
+require("expression.rootexpression")
 require("expression.constant")
 
 require("expression.binaryoperation.power")

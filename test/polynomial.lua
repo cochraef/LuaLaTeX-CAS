@@ -120,8 +120,8 @@ test(o:squarefreefactorization(), "(1 * (1x^6+10x^5+36x^4+60x^3+59x^2+50x^1+24x^
 print()
 
 
-local profiler = newProfiler()
-profiler:start()
+-- local profiler = newProfiler()
+-- profiler:start()
 
 print("Testing factorization...")
 test(c:factor(), "(4 * (1x^1+3x^0 ^ 1))", c)
@@ -156,7 +156,7 @@ test(ToStringArray(q:decompose()), "{1z^2+-1/2z^1+0z^0, 36z^2+18z^1+3z^0}", q)
 test(ToStringArray(r:decompose()),"{1x^2+0x^1+0x^0, 4x^3+0x^2+0x^1+0x^0}" ,r)
 test(ToStringArray(s:decompose()), "{1x^2+0x^1+-4x^0, 1x^2+4x^1+1x^0}", s)
 
-profiler:stop()
-local outfile = io.open( "profile.txt", "w+" )
-profiler:report( outfile )
-outfile:close()
+-- profiler:stop()
+-- local outfile = io.open( "profile.txt", "w+" )
+-- profiler:report( outfile )
+-- outfile:close()

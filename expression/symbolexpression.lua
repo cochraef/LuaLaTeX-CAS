@@ -88,8 +88,12 @@ function SymbolExpression:order(other)
 
 end
 
+function SymbolExpression:topolynomial()
+    return PolynomialRing({Integer.zero(), Integer.one()}, self.symbol), true
+end
+
 -- Variable names in LaTeX can be created with just that variable
-function AtomicExpression:tolatex()
+function SymbolExpression:tolatex()
     return tostring(self)
 end
 

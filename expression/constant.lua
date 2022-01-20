@@ -36,10 +36,6 @@ function Pi:isEvaluatable()
     return false
 end
 
-function Pi:isConstant()
-    return true
-end
-
 -----------------
 -- Inheritance --
 -----------------
@@ -83,10 +79,6 @@ function E:isEvaluatable()
     return false
 end
 
-function E:isConstant()
-    return true
-end
-
 -----------------
 -- Inheritance --
 -----------------
@@ -95,8 +87,46 @@ __E.__index = AtomicExpression
 __E.__call = E.new
 E = setmetatable(E, __E)
 
+-- The (complex) constant I.
+I = {}
+__I = {}
+
+----------------------------
+-- Instance functionality --
+----------------------------
+
+-- Creates a new e expresssion
+function I:new()
+    local o = {}
+    local __o = Copy(__ExpressionOperations)
+
+    __o.__index = E
+    __o.__tostring = function(a)
+        return 'i'
+    end
+    __o.__eq = function(a, b)
+        return a:type() == b:type()
+    end
+    o = setmetatable(o, __o)
+
+    return o
+end
+
+function I:isEvaluatable()
+    return false
+end
+
+-----------------
+-- Inheritance --
+-----------------
+
+__I.__index = AtomicExpression
+__I.__call = I.new
+I = setmetatable(I, __I)
+
 ----------------------
 -- Static constants --
 ----------------------
 PI = Pi()
 E = E()
+I = I()

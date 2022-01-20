@@ -1,7 +1,7 @@
 -- An expression for a single-variable derrivative of an expression
 -- DerrivativeExpressions have the following instance variables:
 --      symbol - the SymbolExpression that the derrivative is taken with respect to
---      expression - a Symbol to take the derrivative of
+--      expression - an Expression to take the derrivative of
 -- DerrivativeExpressions have the following relations with other classes:
 --      DerrivativeExpressions extend CompoundExpressions
 
@@ -40,7 +40,7 @@ function DerrivativeExpression:new(symbol, expression)
     return o
 end
 
--- Substitutes each variable for a new one
+-- Substitutes each variable for a new one.
 function DerrivativeExpression:substitute(variables)
     return DerrivativeExpression(self.symbol:substitute(variables), self.expression:substitute(variables))
 end

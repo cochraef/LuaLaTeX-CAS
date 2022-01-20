@@ -5,12 +5,13 @@ function BinaryOperation:simplifypower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
 
-    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getring() == Rational.getring() then
-        return self:simplifyrationalpower()
+    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getring() ~= Rational:getring() then
+        return self:evaluate()
     end
 
-    if base:isEvaluatable() and exponent:isEvaluatable() then
-        return self:evaluate()
+    -- Uses the definition of the imaginary unit
+    if base == I and exponent == Integer(2) then
+        return Integer(-1)
     end
 
     -- Uses the property that 0^x = 0 if x does not equal 0
@@ -53,6 +54,10 @@ function BinaryOperation:simplifypower()
         return BinaryOperation(BinaryOperation.MUL, results):autosimplify()
     end
 
+    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getring() == Rational.getring() then
+        return self:simplifyrationalpower()
+    end
+
     -- Our expression cannot be simplified
     return self
 end
@@ -61,6 +66,7 @@ end
 function BinaryOperation:simplifyrationalpower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
+
     if base:getring() == Rational.getring() then
         return (BinaryOperation(BinaryOperation.POW, {base.numerator, exponent}):simplifyrationalpower()) /
                 (BinaryOperation(BinaryOperation.POW, {base.denominator, exponent}):simplifyrationalpower())
@@ -73,6 +79,14 @@ function BinaryOperation:simplifyrationalpower()
 
     -- Limit for attempting simplification of rational powers automatically
     if base > BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT then
+        return self
+    end
+
+    if base == Integer(-1) then
+        if exponent == Integer(1) / Integer(2) then
+            return I
+        end
+
         return self
     end
 

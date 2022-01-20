@@ -303,24 +303,37 @@ function PolynomialRing.mul_rec(a, b)
 end
 
 function PolynomialRing:divremainder(b)
-    local n, m = self.degree, b.degree
-    local r, u = PolynomialRing(self.coefficients, self.symbol, self.degree), Integer.one() / b.coefficients[m:asnumber()]
+    local n, m = self.degree:asnumber(), b.degree:asnumber()
 
     if m > n then
         return self:zero(), self
     end
 
-    local q = {}
-    for i = (n-m):asnumber(), 0,-1 do
-        if r.degree:asnumber() == m:asnumber() + i then
-            q[i] = r:lc() * u
-            r = r - PolynomialRing({q[i]}, self.symbol):multiplyDegree(i) * b
-        else
-            q[i] = Integer.zero()
+    local o = Copy(self.coefficients)
+    local lc = b:lc()
+    for i = n, m, -1 do
+        o[i] = o[i] / lc
+
+        if o[i] ~= self:zeroc() then
+            for j = 1, m do
+                o[i-j] = o[i-j] - b.coefficients[m - j] * o[i]
+            end
         end
     end
 
-    return PolynomialRing(q, self.symbol, self.degree), r
+    local q = {}
+    local r = {}
+    for i = 0, m-1 do
+        r[i] = o[i]
+    end
+
+    r[0] = r[0] or self:zeroc()
+
+    for i = m, #o do
+        q[i - m] = o[i]
+    end
+
+    return PolynomialRing(q, self.symbol, self.degree), PolynomialRing(r, self.symbol, b.degree-Integer.one())
 end
 
 -- Polynomial rings are never fields, but when dividing by a polynomial by a constant we may want to use / instead of //
@@ -358,6 +371,11 @@ function PolynomialRing:lc()
     return self.coefficients[self.degree:asnumber()]
 end
 
+-- Polynomials can not generally be evaluated to a concrete number.
+function PolynomialRing:isEvaluatable()
+    return false
+end
+
 -- Given a table mapping variables to expressions, replaces each variable with a new expressions
 function PolynomialRing:substitute(variables)
     if type(variables) ~= "table" then
@@ -369,7 +387,7 @@ function PolynomialRing:substitute(variables)
             error("Sent parameter of wrong type: variables must have strings as indicies")
         end
         if index == self.symbol then
-            return self:toCompoundExpression():substitute(variables)
+            return self:tocompoundexpression():substitute(variables)
         end
     end
 
@@ -377,11 +395,11 @@ function PolynomialRing:substitute(variables)
 end
 
 function PolynomialRing:autosimplify()
-    return self:toCompoundExpression():autosimplify()
+    return self:tocompoundexpression():autosimplify()
 end
 
--- Transforms from array format to an expression format
-function PolynomialRing:toCompoundExpression()
+-- Transforms from array format to an expression format.
+function PolynomialRing:tocompoundexpression()
     local terms = {}
     for exponent, coefficient in pairs(self.coefficients) do
         terms[exponent + 1] = BinaryOperation(BinaryOperation.MUL, {coefficient,
@@ -531,6 +549,42 @@ function PolynomialRing:rationalroots()
     end
 
     return remaining, roots
+end
+
+-- Returns a list of roots of the polynomial, simplified up to quadratics.
+function PolynomialRing:roots()
+    local roots = {}
+    local factorization = self:factor()
+
+    for i, factor in ipairs(factorization.expressions) do
+        if i > 1 then
+            local decomp = factor.expressions[1]:decompose()
+            local factorroots = RootExpression(decomp[#decomp]):autosimplify()
+            if factorroots == true then
+                return true
+            end
+            if factorroots == false then
+                goto nextfactor
+            end
+            local replaceroots = {}
+            for j = #decomp - 1,1,-1 do
+                for _, root in ipairs(factorroots) do
+                    local temp = RootExpression(decomp[j]):autosimplify(root)
+                    if temp == true then
+                        return true
+                    end
+                    if factorroots == false then
+                        goto nextfactor
+                    end
+                    replaceroots = JoinArrays(replaceroots, temp)
+                end
+                factorroots = replaceroots
+            end
+            roots = JoinArrays(roots, factorroots)
+        end
+    end
+    ::nextfactor::
+    return roots
 end
 
 -----------------

@@ -39,6 +39,10 @@ function AtomicExpression:order(other)
         return self < other
     end
 
+    if self == E or self == PI or self == I then
+        return false
+    end
+
     return true
 end
 
