@@ -42,7 +42,7 @@ function BinaryOperation:simplifypower()
     -- Uses the property that (x^a)^b = x^(a*b)
     if not base:isatomic() and base.operation == BinaryOperation.POW then
         base, exponent = base.expressions[1], BinaryOperation(BinaryOperation.MUL, {exponent, base.expressions[2]}):autosimplify()
-        return BinaryOperation(BinaryOperation.POW, {base, exponent})
+        return BinaryOperation(BinaryOperation.POW, {base, exponent}):autosimplify()
     end
 
     -- Uses the property that (x_1*x_2*...*x_n)^a = x_1^a*x_2^a*..x_n^a

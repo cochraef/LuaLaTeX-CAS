@@ -36,6 +36,10 @@ function Pi:isevaluatable()
     return false
 end
 
+function Pi:isconstant()
+    return true
+end
+
 -----------------
 -- Inheritance --
 -----------------
@@ -79,6 +83,10 @@ function E:isevaluatable()
     return false
 end
 
+function E:isconstant()
+    return true
+end
+
 -----------------
 -- Inheritance --
 -----------------
@@ -114,6 +122,10 @@ end
 
 function I:isevaluatable()
     return false
+end
+
+function I:isconstant()
+    return true
 end
 
 -----------------

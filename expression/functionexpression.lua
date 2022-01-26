@@ -1,4 +1,4 @@
--- Represents an unspecified function from one expression to another
+-- Represents an unspecified function from a tuple of expressions to an expression.
 -- FunctionExpressions have the following instance variables:
 --      name - the string name of the function
 --      expressions - a list of expressions that are passed in to the function

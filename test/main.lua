@@ -33,4 +33,4 @@ function parse(input)
 end
 
 
-print(parse("(x-1)*(x-2)*(x-3)*(x-4)*(x-5)/-120"):autosimplify():tolatex())
+print(parse("(x ^ 2) ^ (1/2)"))

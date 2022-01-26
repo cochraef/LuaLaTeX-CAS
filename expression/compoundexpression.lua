@@ -23,6 +23,10 @@ function CompoundExpression:isevaluatable()
     return false
 end
 
+function CompoundExpression:isconstant()
+    return false
+end
+
 -----------------
 -- Inheritance --
 -----------------

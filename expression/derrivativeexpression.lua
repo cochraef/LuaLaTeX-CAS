@@ -50,8 +50,7 @@ function DerrivativeExpression:autosimplify()
     local simplified = self.expression:autosimplify()
 
     -- The derrivative of a constant is 0
-    -- This is dumb but it works
-    if simplified:isevaluatable() or simplified.isConstant then
+    if simplified:isconstant() then
         return Integer.zero()
     end
 

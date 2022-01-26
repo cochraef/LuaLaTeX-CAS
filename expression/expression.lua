@@ -30,6 +30,11 @@ function Expression:isevaluatable()
     error("Called unimplemented method: isevaluatable()")
 end
 
+-- Returns whether or not the expression is a constant. Similar to isevaluatable, but also works on constant expressions like e, pi, etc.
+function Expression:isconstant()
+    return self:isevaluatable()
+end
+
 -- Returns true if this expression comes before the other expressions in commutative binary operations, false otherwise
 function Expression:order(other)
     error("Called unimplemented method: order()")
