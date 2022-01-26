@@ -14,12 +14,12 @@ __CompoundExpression = {}
 ----------------------
 
 -- Returns whether the expression is atomic or not
-function CompoundExpression:isAtomic()
+function CompoundExpression:isatomic()
     return false
 end
 
 -- Returns whether the expression can be evaluated by compound expressions or not
-function CompoundExpression:isEvaluatable()
+function CompoundExpression:isevaluatable()
     return false
 end
 

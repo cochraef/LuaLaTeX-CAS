@@ -5,7 +5,7 @@ function BinaryOperation:simplifyquotient()
     local numerator = self.expressions[1]
     local denominator = self.expressions[2]
 
-    if numerator:isEvaluatable() and denominator:isEvaluatable() then
+    if numerator:isevaluatable() and denominator:isevaluatable() then
         return self:evaluate()
     end
 

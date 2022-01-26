@@ -27,13 +27,13 @@ __o.__tostring = function(a)
     return tostring(a.numerator).."/"..tostring(a.denominator)
 end
 
--- Creates a new rational given an integer numerator and denominator
--- Rational numbers should be represented uniquely
+-- Creates a new rational given an integer numerator and denominator.
+-- Rational numbers are represented uniquely.
 function Rational:new(n, d, keep)
     local o = {}
     o = setmetatable(o, __o)
 
-    if(n:getring().ring ~= Integer or d:getring().ring ~= Integer) then
+    if n:getring() ~= Integer.getring() or d:getring() ~= Integer.getring() then
         error("Improper arguments for constructing a rational. Should be integers.")
     end
 

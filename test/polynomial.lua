@@ -138,7 +138,6 @@ print()
 
 local q = PolynomialRing({Integer(3), Integer(-9), Integer(27), Integer(-36), Integer(36)}, "z")
 local r = PolynomialRing({Integer(0), Integer(0), Integer(0), Integer(0), Integer(0), Integer(0), Integer(4)}, "x");
-
 local s = PolynomialRing({Integer(1), Integer(0), Integer(-4), Integer(0), Integer(1)}, "x")
 
 print("Testing decomposition...")

@@ -32,7 +32,7 @@ function Pi:approx()
     return Integer(62831853) / Integer(20000000)
 end
 
-function Pi:isEvaluatable()
+function Pi:isevaluatable()
     return false
 end
 
@@ -75,7 +75,7 @@ function E:approx()
     return Integer(679570457) / Integer(250000000)
 end
 
-function E:isEvaluatable()
+function E:isevaluatable()
     return false
 end
 
@@ -112,7 +112,7 @@ function I:new()
     return o
 end
 
-function I:isEvaluatable()
+function I:isevaluatable()
     return false
 end
 

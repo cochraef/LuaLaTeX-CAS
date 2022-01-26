@@ -30,19 +30,19 @@ function BinaryOperation:simplifysumrec()
     local term2 = self.expressions[2]
 
     if self.expressions[1] and self.expressions[2] and not self.expressions[3] then
-        if (term1:isEvaluatable() or not (term1.operation == BinaryOperation.ADD)) and
-            (term2:isEvaluatable() or not (term2.operation == BinaryOperation.ADD)) then
+        if (term1:isevaluatable() or not (term1.operation == BinaryOperation.ADD)) and
+            (term2:isevaluatable() or not (term2.operation == BinaryOperation.ADD)) then
 
-            if term1:isEvaluatable() and term2:isEvaluatable() then
+            if term1:isevaluatable() and term2:isevaluatable() then
                 return BinaryOperation(BinaryOperation.ADD, {self:evaluate()})
             end
 
             -- Uses the property that x + 0 = x
-            if term1:isEvaluatable() and term1 == term1:zero() then
+            if term1:isevaluatable() and term1 == term1:zero() then
                 return BinaryOperation(BinaryOperation.ADD, {term2})
             end
 
-            if term2:isEvaluatable() and term2 == term2:zero() then
+            if term2:isevaluatable() and term2 == term2:zero() then
                 return BinaryOperation(BinaryOperation.ADD, {term1})
             end
 
@@ -51,21 +51,21 @@ function BinaryOperation:simplifysumrec()
             -- Uses the property that a*x+b*x= (a+b)*x
             -- This is only done if a and b are constant, since otherwise this could be counterproductive
             -- We SHOULD be okay to only check left distributivity, since constants always come first when ordered
-            if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1].isEvaluatable() then
+            if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1].isevaluatable() then
                 term1 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term1})
                 revertterm1 = true
             end
-            if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1].isEvaluatable() then
+            if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1].isevaluatable() then
                 term2 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term2})
                 revertterm2 = true
             end
-            if term1.expressions[2] == term2.expressions[2] and term1.expressions[1].isEvaluatable() and term2.expressions[1].isEvaluatable() then
+            if term1.expressions[2] == term2.expressions[2] and term1.expressions[1].isevaluatable() and term2.expressions[1].isevaluatable() then
                 local result = BinaryOperation(BinaryOperation.MUL,
                                     {BinaryOperation(BinaryOperation.ADD,
                                         {term1.expressions[1],
                                         term2.expressions[1]}):autosimplify(),
                                     term1.expressions[2]}):autosimplify()
-                if result.isEvaluatable() and result == result:zero() then
+                if result.isevaluatable() and result == result:zero() then
                     return BinaryOperation(BinaryOperation.ADD, {})
                 end
                 return BinaryOperation(BinaryOperation.ADD, {result})
@@ -140,7 +140,7 @@ function BinaryOperation:mergesums(other)
         end
     end
 
-    if first.isEvaluatable() and first == first.one() then
+    if first.isevaluatable() and first == first.one() then
         return BinaryOperation(self.operation, selfrest):mergesums(BinaryOperation(other.operation, otherrest))
     end
 

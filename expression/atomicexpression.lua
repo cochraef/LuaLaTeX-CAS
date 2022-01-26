@@ -24,18 +24,18 @@ function Expression:autosimplify()
 end
 
 -- Atomic expressions are atomic, suprisingly
-function AtomicExpression:isAtomic()
+function AtomicExpression:isatomic()
     return true
 end
 
 -- Most atomic expressions can be evaluated
-function AtomicExpression:isEvaluatable()
+function AtomicExpression:isevaluatable()
     return true
 end
 
 -- Atomic expressions should come before all other expressions except themselves
 function AtomicExpression:order(other)
-    if self:isEvaluatable() and other:isEvaluatable() then
+    if self:isevaluatable() and other:isevaluatable() then
         return self < other
     end
 

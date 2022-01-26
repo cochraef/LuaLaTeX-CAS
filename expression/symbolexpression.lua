@@ -51,13 +51,13 @@ function SymbolExpression:substitute(variables)
 end
 
 -- Symbols can not be evaluated to a concrete value
-function SymbolExpression:isEvaluatable()
+function SymbolExpression:isevaluatable()
     return false
 end
 
 function SymbolExpression:order(other)
     -- Symbol Expressions come after concrete expressions
-    if other.isEvaluatable() then
+    if other.isevaluatable() then
         return false
     end
 

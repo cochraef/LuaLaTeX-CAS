@@ -39,7 +39,7 @@ end
 __FieldOperations = Copy(__EuclideanOperations)
 
 __FieldOperations.__div = function(a, b)
-    if not b.getring and b.isEvaluatable then
+    if not b.getring and b.isevaluatable then
         return BinaryOperation.DIVEXP({a, b})
     end
 

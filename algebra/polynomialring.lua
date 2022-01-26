@@ -302,6 +302,7 @@ function PolynomialRing.mul_rec(a, b)
     return r
 end
 
+-- Uses synthetic division
 function PolynomialRing:divremainder(b)
     local n, m = self.degree:asnumber(), b.degree:asnumber()
 
@@ -372,7 +373,7 @@ function PolynomialRing:lc()
 end
 
 -- Polynomials can not generally be evaluated to a concrete number.
-function PolynomialRing:isEvaluatable()
+function PolynomialRing:isevaluatable()
     return false
 end
 
@@ -521,9 +522,9 @@ function PolynomialRing:rationalroots()
         remaining = remaining // roots[1]
     end
     -- This can be slower than Zassenhaus if the digits are large enough, since factoring integers is slow
-    if self.coefficients[0] > Integer(Integer.DIGITSIZE - 1) or self:lc() > Integer(Integer.DIGITSIZE - 1) then
-        return remaining, roots
-    end
+    -- if self.coefficients[0] > Integer(Integer.DIGITSIZE - 1) or self:lc() > Integer(Integer.DIGITSIZE - 1) then
+    --     return remaining, roots
+    -- end
     while remaining ~= Integer.one() do
         :: nextfactor ::
         local a = remaining.coefficients[0]
@@ -551,7 +552,7 @@ function PolynomialRing:rationalroots()
     return remaining, roots
 end
 
--- Returns a list of roots of the polynomial, simplified up to quadratics.
+-- Returns a list of roots of the polynomial, simplified up to cubics.
 function PolynomialRing:roots()
     local roots = {}
     local factorization = self:factor()

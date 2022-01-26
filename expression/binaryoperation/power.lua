@@ -5,7 +5,7 @@ function BinaryOperation:simplifypower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
 
-    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getring() ~= Rational:getring() then
+    if base:isevaluatable() and exponent:isevaluatable() and exponent:getring() ~= Rational:getring() then
         return self:evaluate()
     end
 
@@ -15,22 +15,22 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that 0^x = 0 if x does not equal 0
-    if base:isEvaluatable() and base == base:zero() then
+    if base:isevaluatable() and base == base:zero() then
         return Integer.zero()
     end
 
     -- Uses the property that 1^x = 1
-    if base:isEvaluatable() and base == base:one() then
+    if base:isevaluatable() and base == base:one() then
         return base:one()
     end
 
     -- Uses the property that x^0 = 1
-    if exponent:isEvaluatable() and exponent == exponent:zero() then
+    if exponent:isevaluatable() and exponent == exponent:zero() then
         return exponent:one()
     end
 
     -- Uses the property that x^1 = x
-    if exponent:isEvaluatable() and exponent == exponent:one() then
+    if exponent:isevaluatable() and exponent == exponent:one() then
         return base
     end
 
@@ -40,7 +40,7 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that (x^a)^b = x^(a*b)
-    if not base:isAtomic() and base.operation == BinaryOperation.POW then
+    if not base:isatomic() and base.operation == BinaryOperation.POW then
         base, exponent = base.expressions[1], BinaryOperation(BinaryOperation.MUL, {exponent, base.expressions[2]}):autosimplify()
         return BinaryOperation(BinaryOperation.POW, {base, exponent})
     end
@@ -54,7 +54,7 @@ function BinaryOperation:simplifypower()
         return BinaryOperation(BinaryOperation.MUL, results):autosimplify()
     end
 
-    if base:isEvaluatable() and exponent:isEvaluatable() and exponent:getring() == Rational.getring() then
+    if base:isevaluatable() and exponent:isevaluatable() and exponent:getring() == Rational.getring() then
         return self:simplifyrationalpower()
     end
 

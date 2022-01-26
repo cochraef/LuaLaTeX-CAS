@@ -101,7 +101,7 @@ end
 -- Instance functionality --
 ----------------------------
 
--- So we don't have to copy the Euclidean operations each time
+-- So we don't have to copy the Euclidean operations each time we create an integer.
 local __o = Copy(__EuclideanOperations)
 __o.__index = Integer
 __o.__tostring = function(a) -- Only works if the digit size is a power of 10
@@ -717,7 +717,7 @@ end
 -- return a non-trivial factor of n via Pollard Rho, or returns n if n is prime
 function Integer:findafactor()
     if self:isprime() then
-        return self + Integer.zero()
+        return self
     end
 
     if self % Integer(2) == Integer.zero() then

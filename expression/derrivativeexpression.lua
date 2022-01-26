@@ -51,7 +51,7 @@ function DerrivativeExpression:autosimplify()
 
     -- The derrivative of a constant is 0
     -- This is dumb but it works
-    if simplified:isEvaluatable() or simplified.isConstant then
+    if simplified:isevaluatable() or simplified.isConstant then
         return Integer.zero()
     end
 

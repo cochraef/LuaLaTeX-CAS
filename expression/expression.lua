@@ -21,13 +21,13 @@ function Expression:autosimplify()
 end
 
 -- Returns whether the expression is atomic or not
-function Expression:isAtomic()
-    error("Called unimplemented method: isAtomic()")
+function Expression:isatomic()
+    error("Called unimplemented method: isatomic()")
 end
 
 -- Returns whether the expression can be evaluated in compound expressions or not
-function Expression:isEvaluatable()
-    error("Called unimplemented method: isEvaluatable()")
+function Expression:isevaluatable()
+    error("Called unimplemented method: isevaluatable()")
 end
 
 -- Returns true if this expression comes before the other expressions in commutative binary operations, false otherwise

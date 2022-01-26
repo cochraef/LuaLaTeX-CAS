@@ -91,7 +91,7 @@ function BinaryOperation:evaluate()
     local reducible = true
     for index, expression in ipairs(self.expressions) do
         results[index] = expression:evaluate()
-        if not results[index]:isEvaluatable() then
+        if not results[index]:isevaluatable() then
             reducible = false
         end
     end
@@ -112,7 +112,7 @@ function BinaryOperation:evaluate()
     return result
 end
 
--- Substitutes each variable for a new one
+-- Substitutes each variable for a new one.
 function BinaryOperation:substitute(variables)
     local results = {}
     for index, expression in ipairs(self.expressions) do
@@ -148,11 +148,11 @@ end
 
 
 function BinaryOperation:order(other)
-    if other.isEvaluatable() then
+    if other.isevaluatable() then
         return false
     end
 
-    if other.isAtomic() then
+    if other.isatomic() then
         if self.operation == BinaryOperation.POW then
             return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer.one()}))
         end
@@ -220,19 +220,20 @@ end
 
 -- Returns an autosimplified expression as a single-variable polynomial in a ring, if it can be converted. Returns itself otherwise.
 function BinaryOperation:topolynomial()
+    local addexp = self
     if not self.operation or self.operation ~= BinaryOperation.ADD then
-        return self, false
+        addexp = BinaryOperation(BinaryOperation.ADD, {self})
     end
 
     local poly = {}
     local degree = 0
     local symbol
-    for _, expression in ipairs(self.expressions) do
+    for _, expression in ipairs(addexp.expressions) do
         local coefficient
         local sym
         local power
         -- Expressions of the form c
-        if expression:isEvaluatable() then
+        if expression:isevaluatable() then
             coefficient = expression
             power = 0
         -- Expressions of the form x
@@ -242,14 +243,14 @@ function BinaryOperation:topolynomial()
             power = 1
         -- Expressions of the form c*x
         elseif expression.operation and expression.operation == BinaryOperation.MUL and #expression.expressions == 2
-                    and expression.expressions[1]:isEvaluatable() and expression.expressions[2]:type() == SymbolExpression then
+                    and expression.expressions[1]:isevaluatable() and expression.expressions[2]:type() == SymbolExpression then
 
             coefficient = expression.expressions[1]
             sym = expression.expressions[2].symbol
             power = 1
         -- Expressions of the form c*x^n (totally not confusing)
         elseif expression.operation and expression.operation == BinaryOperation.MUL and #expression.expressions == 2
-                    and expression.expressions[1]:isEvaluatable() and expression.expressions[2].operation and
+                    and expression.expressions[1]:isevaluatable() and expression.expressions[2].operation and
                     expression.expressions[2].operation == BinaryOperation.POW and #expression.expressions[2].expressions == 2
                     and expression.expressions[2].expressions[1]:type() == SymbolExpression and expression.expressions[2].expressions[2].getring
                     and expression.expressions[2].expressions[2]:getring() == Integer.getring() then
@@ -290,7 +291,7 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
-        if self.expressions[2]:isEvaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
+        if self.expressions[2]:isevaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
             if self.expressions[2].denominator == Integer(2) then
                 return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
             end
@@ -303,7 +304,7 @@ function BinaryOperation:tolatex()
         local denom = ''
         for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
-                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isEvaluatable() and expression.expressions[2] < Integer.zero() then
+                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isevaluatable() and expression.expressions[2] < Integer.zero() then
                     local reversed = (Integer.one() / expression):autosimplify()
                     denom = denom .. reversed:tolatex()
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then

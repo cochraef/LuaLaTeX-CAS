@@ -68,7 +68,7 @@ function Logarithm:autosimplify()
 end
 
 function Logarithm:order(other)
-    if other:isAtomic() then
+    if other:isatomic() then
         return false
     end
 

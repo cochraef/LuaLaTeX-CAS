@@ -163,7 +163,7 @@ __RingOperations.__unm = function(a)
 end
 
 __RingOperations.__add = function(a, b)
-    if not b.getring and b.isEvaluatable then
+    if not b.getring and b.isevaluatable then
         return BinaryOperation.ADDEXP({a, b})
     end
 
@@ -176,7 +176,7 @@ __RingOperations.__add = function(a, b)
 end
 
 __RingOperations.__sub = function(a, b)
-    if not b.getring and b.isEvaluatable then
+    if not b.getring and b.isevaluatable then
         return BinaryOperation.SUBEXP({a, b})
     end
 
@@ -189,7 +189,7 @@ __RingOperations.__sub = function(a, b)
 end
 
 __RingOperations.__mul = function(a, b)
-    if not b.getring and b.isEvaluatable then
+    if not b.getring and b.isevaluatable then
         return BinaryOperation.MULEXP({a, b})
     end
 
@@ -202,7 +202,7 @@ __RingOperations.__mul = function(a, b)
 end
 
 __RingOperations.__pow = function(a, n)
-    if (not n.getring and n.isEvaluatable) or (n.getring and n:getring().ring ~= Integer) then
+    if (not n.getring and n.isevaluatable) or (n.getring and n:getring().ring ~= Integer) then
         return BinaryOperation.POWEXP({a, n})
     end
 

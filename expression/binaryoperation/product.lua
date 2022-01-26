@@ -12,7 +12,7 @@ function BinaryOperation:simplifyproduct()
 
     -- Uses the property that x*0=0
     for _, expression in ipairs(self.expressions) do
-        if expression:isEvaluatable() and expression == expression:zero() then
+        if expression:isevaluatable() and expression == expression:zero() then
             return expression:zero()
         end
     end
@@ -36,10 +36,10 @@ function BinaryOperation:simplifyproductrec()
     local term2 = self.expressions[2]
 
     if not self.expressions[3] then
-        if (term1:isEvaluatable() or not (term1.operation == BinaryOperation.MUL)) and
-            (term2:isEvaluatable() or not (term2.operation == BinaryOperation.MUL)) then
+        if (term1:isevaluatable() or not (term1.operation == BinaryOperation.MUL)) and
+            (term2:isevaluatable() or not (term2.operation == BinaryOperation.MUL)) then
 
-            if term1:isEvaluatable() and term2:isEvaluatable() then
+            if term1:isevaluatable() and term2:isevaluatable() then
                 local result = self:evaluate()
                 if result == result:one() then
                     return BinaryOperation(BinaryOperation.MUL, {})
@@ -48,11 +48,11 @@ function BinaryOperation:simplifyproductrec()
             end
 
             -- Uses the property that x*1 = x
-            if term1:isEvaluatable() and term1 == term1:one() then
+            if term1:isevaluatable() and term1 == term1:one() then
                 return BinaryOperation(BinaryOperation.MUL, {term2})
             end
 
-            if term2:isEvaluatable() and term2 == term2:one() then
+            if term2:isevaluatable() and term2 == term2:one() then
                 return BinaryOperation(BinaryOperation.MUL, {term1})
             end
 
@@ -74,7 +74,7 @@ function BinaryOperation:simplifyproductrec()
                                     {term1.expressions[1],
                                     BinaryOperation(BinaryOperation.ADD,
                                         {term1.expressions[2], term2.expressions[2]}):autosimplify()}):autosimplify()
-                if result.isEvaluatable() and result == result:one() then
+                if result.isevaluatable() and result == result:one() then
                     return BinaryOperation(BinaryOperation.MUL, {})
                 end
                 return BinaryOperation(BinaryOperation.MUL, {result})

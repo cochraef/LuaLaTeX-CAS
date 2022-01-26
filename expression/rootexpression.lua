@@ -45,7 +45,7 @@ function RootExpression:autosimplify(subpart)
     local simplified = self.expression:autosimplify()
     local simplified, ispoly = simplified:topolynomial()
 
-    if simplified:isEvaluatable() then
+    if simplified:isevaluatable() then
         -- 0 = 0 is always true (obviously).
         return simplified == simplified:zero()
     end
