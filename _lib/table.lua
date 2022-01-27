@@ -104,6 +104,21 @@ function ToStringArray(t)
     return tostring(t)
 end
 
+-- Converts a table to a string recursively
+function ToStringTable(t)
+    if string.sub(tostring(t), 1, 6) == "table:" then
+        local out = "{"
+        for index, value in pairs(t) do
+            out = out .. ToStringTable(index) .. " : " .. ToStringTable(value)
+            if t[index + 1] then
+                out = out .. ", "
+            end
+        end
+        return out .. "}"
+    end
+    return tostring(t)
+end
+
 -- Check if a table contains an element
 function Contains(t, e)
     for _, value in pairs(t) do

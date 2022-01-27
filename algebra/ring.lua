@@ -188,6 +188,11 @@ __RingOperations.__sub = function(a, b)
     return a:inring(oring):sub(b:inring(oring))
 end
 
+-- Allows for multiplication by writing two expressions next to each other.
+__RingOperations.__call = function (a, b)
+    return a * b
+end
+
 __RingOperations.__mul = function(a, b)
     if not b.getring and b.isevaluatable then
         return BinaryOperation.MULEXP({a, b})

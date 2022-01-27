@@ -67,7 +67,7 @@ function BinaryOperation:new(operation, expressions, name)
     end
     __o.__eq = function(a, b)
         -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
-        if not b.operation then
+        if not a.operation or not b.operation then
             return false
         end
         local loc = 1
@@ -365,8 +365,6 @@ BinaryOperation = setmetatable(BinaryOperation, __BinaryOperation)
 ----------------------
 -- Static constants --
 ----------------------
-
--- Ring Operations
 
 BinaryOperation.ADD = function(a, b)
     return a + b

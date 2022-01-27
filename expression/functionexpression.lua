@@ -14,14 +14,22 @@ __FunctionExpression = {}
 -- Creates a new function expression with the given operation
 function FunctionExpression:new(name, expressions)
     local o = {}
-    local __o = {}
+    local __o = Copy(__ExpressionOperations)
+
+    if type(name) == "table" and name:type() == SymbolExpression then
+        name = name.symbol
+    end
+
+    if TrigExpression.NAMES[name] and #expressions == 1 then
+        return TrigExpression(name, expressions[1])
+    end
 
     o.name = name
     o.expressions = expressions
 
     __o.__index = FunctionExpression
     __o.__tostring = function(a)
-        local expressionnames = name .. '(';
+        local expressionnames = a.name .. '(';
         for index, expression in ipairs(a.expressions) do
             expressionnames = expressionnames .. tostring(expression)
             if a.expressions[index + 1] then

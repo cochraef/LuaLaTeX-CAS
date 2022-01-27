@@ -49,7 +49,7 @@ end
 -- Instance methods --
 ----------------------
 
--- Returns the type of the expression - may not be accurate
+-- Returns the type of the expression.
 function Expression:type()
     return getmetatable(self).__index
 end
@@ -75,8 +75,11 @@ __ExpressionOperations.__mul = function(a, b)
     return BinaryOperation.MULEXP({a, b})
 end
 
-__ExpressionOperations.__call = function(a, b)
-    return BinaryOperation.MULEXP({a, b})
+__ExpressionOperations.__call = function(a, ...)
+    if a:type() == SymbolExpression then
+        return FunctionExpression(a, table.pack(...))
+    end
+    return BinaryOperation.MULEXP({a, table.pack(...)[1]})
 end
 
 __ExpressionOperations.__div = function(a, b)

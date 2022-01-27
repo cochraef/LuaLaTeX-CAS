@@ -67,9 +67,55 @@ function DerrivativeExpression:autosimplify()
         if simplified.expressions[2] then
             return self
         end
-        return DerrivativeExpression(self.symbol, simplified.expressions[1]):autosimplify() * FunctionExpression(simplified.name .. "'", simplified.expressions)
+        return (DerrivativeExpression(self.symbol, simplified.expressions[1]) * FunctionExpression(simplified.name .. "'", simplified.expressions)):autosimplify()
     end
 
+    -- Chain rule for trig functions
+    if simplified:type() == TrigExpression then
+        local internal = DerrivativeExpression(self.symbol, simplified.expression)
+
+        if simplified.name == "sin" then
+            return (internal * COS(simplified.expression)):autosimplify()
+        end
+        if simplified.name == "cos" then
+            return (internal * -SIN(simplified.expression)):autosimplify()
+        end
+        if simplified.name == "tan" then
+            return (internal * SEC(simplified.expression)^Integer(2)):autosimplify()
+        end
+        if simplified.name == "csc" then
+            return (internal * -CSC(simplified.expression)*COT(simplified.expression)):autosimplify()
+        end
+        if simplified.name == "sec" then
+            return (internal * -SEC(simplified.expression)*TAN(simplified.expression)):autosimplify()
+        end
+        if simplified.name == "cot" then
+            return (internal * -CSC(simplified.expression)^Integer(2)):autosimplify()
+        end
+        if simplified.name == "arcsin" then
+            return (internal / (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2))):autosimplify()
+        end
+        if simplified.name == "arccos" then
+            return (-internal / (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2))):autosimplify()
+        end
+        if simplified.name == "arctan" then
+            return (internal / (Integer(1)+simplified.expression^Integer(2))):autosimplify()
+        end
+        if simplified.name == "arccsc" then
+            return (-internal / (ABS(simplified.expression) * (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2)))):autosimplify()
+        end
+        if simplified.name == "arcsec" then
+            return (internal / (ABS(simplified.expression) * (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2)))):autosimplify()
+        end
+        if simplified.name == "arccot" then
+            return (-internal / (Integer(1)+simplified.expression^Integer(2))):autosimplify()
+        end
+    end
+
+    -- TODO: Piecewise functions
+    if self:type() == AbsExpression then
+        return DerrivativeExpression(self.symbol, self.expression):autosimplify()
+    end
 
     -- Uses linearity of derrivatives to evaluate sum expressions
     if simplified.operation == BinaryOperation.ADD then
@@ -160,7 +206,6 @@ DerrivativeExpression = setmetatable(DerrivativeExpression, __DerrivativeExpress
 ----------------------
 -- Static constants --
 ----------------------
-
 DD = function(symbol, expression)
     return DerrivativeExpression(symbol, expression)
 end

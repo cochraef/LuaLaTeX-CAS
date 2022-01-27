@@ -694,6 +694,8 @@ function Integer:primefactorizationrec()
         return {[result]=Integer.one()}
     end
     local remaining = self / result
+    -- print("Result: " .. tostring(result))
+    -- print("Remaning: " .. tostring(remaining))
     return Integer.mergefactors(result:primefactorizationrec(), remaining:primefactorizationrec())
 end
 
@@ -724,17 +726,23 @@ function Integer:findafactor()
         return Integer(2)
     end
 
+    if self % Integer(3) == Integer.zero() then
+        return Integer(3)
+    end
+
+    if self % Integer(5) == Integer.zero() then
+        return Integer(5)
+    end
+
     local g = function(x)
         local temp = Integer.powmod(x, Integer(2), self)
-        if temp == self then
-            temp = Integer.zero()
-        end
         return temp
     end
 
-    local x = Integer(2)
-    while x < self do
-        local y = Integer(2)
+    local xstart = Integer(2)
+    while xstart < self do
+        local x = xstart
+        local y = xstart
         local d = Integer.one()
         while d == Integer.one() do
             x = g(x)
@@ -746,11 +754,14 @@ function Integer:findafactor()
             return d
         end
 
-        x = x + Integer.one()
+        xstart = xstart + Integer.one()
     end
 end
 
 -- uses Miller-Rabin to determine whether a number is prime up to a very large number.
+local smallprimes = {Integer:new(2), Integer:new(3), Integer:new(5), Integer:new(7), Integer:new(11), Integer:new(13), Integer:new(17),
+Integer:new(19), Integer:new(23), Integer:new(29), Integer:new(31), Integer:new(37), Integer:new(41), Integer:new(43), Integer:new(47)}
+
 function Integer:isprime()
     if self % Integer(2) == Integer.zero() then
         return false
@@ -759,9 +770,6 @@ function Integer:isprime()
     if self == Integer.one() then
         return false
     end
-
-    local smallprimes = {Integer(2), Integer(3), Integer(5), Integer(7), Integer(11), Integer(13), Integer(17), Integer(19), Integer(23),
-                            Integer(29), Integer(31), Integer(37), Integer(41), Integer(43), Integer(47), Integer(53), Integer(59)}
 
     for _, value in pairs(smallprimes) do
         if value == self then
