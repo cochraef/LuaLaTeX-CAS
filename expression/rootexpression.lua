@@ -34,9 +34,14 @@ function RootExpression:new(expression)
     return o
 end
 
--- Substitutes each variable for a new one.
-function RootExpression:substitute(variables)
-    return RootExpression(self.expression:substitute(variables))
+-- Substitutes each expression for a new one.
+function RootExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
+    return RootExpression(self.expression:substitute(map))
 end
 
 -- Performs automatic simplification of a root expression, i.e., solves simple equations.

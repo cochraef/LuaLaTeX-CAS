@@ -40,9 +40,20 @@ function DerrivativeExpression:new(symbol, expression)
     return o
 end
 
--- Substitutes each variable for a new one.
-function DerrivativeExpression:substitute(variables)
-    return DerrivativeExpression(self.symbol:substitute(variables), self.expression:substitute(variables))
+function DerrivativeExpression:freeof(symbol)
+    return self.symbol.freeof(symbol) and self.expression:freeof(symbol)
+end
+
+-- Substitutes each expression for a new one.
+function DerrivativeExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
+    -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
+    -- substituting and then evaluating the derrivative may not return the same thing as evaluating the derrivative and then substituting.
+    return DerrivativeExpression(self.symbol, self.expression:substitute(map))
 end
 
 -- Performs automatic simplification of a derrivative
@@ -180,6 +191,10 @@ function DerrivativeExpression:autosimplify()
 end
 
 function DerrivativeExpression:order(other)
+    if other:type() == IntegralExpression then
+        return true
+    end
+
     if other:type() ~= DerrivativeExpression then
         return false
     end

@@ -27,7 +27,13 @@ function TrigExpression:new(name, expression)
     __o.__tostring = function(a)
         return tostring(a.name) .. '(' .. tostring(a.expression) .. ')'
     end
-
+    __o.__eq = function(a, b)
+        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
+        if not b:type() == TrigExpression then
+            return false
+        end
+        return a.name == b.name and a.expression == b.expression
+    end
 
     o = setmetatable(o, __o)
     return o
@@ -37,8 +43,17 @@ function TrigExpression:evaluate()
     return self
 end
 
-function TrigExpression:substitute(variables)
-    return TrigExpression(self.name, self.expression:substitute(variables))
+function TrigExpression:freeof(symbol)
+    return self.expression:freeof(symbol)
+end
+
+function TrigExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
+    return TrigExpression(self.name, self.expression:substitute(map))
 end
 
 -- TODO : Trigonometric autosimplification

@@ -85,6 +85,14 @@ function BinaryOperation:new(operation, expressions, name)
     return o
 end
 
+function BinaryOperation:freeof(symbol)
+    local result = true
+    for _, expression in ipairs(self.expressions) do
+        result = result and expression:freeof(symbol)
+    end
+    return result
+end
+
 -- Evaluates each sub-expression and returns the evaluation of this expression
 function BinaryOperation:evaluate()
     local results = {}
@@ -112,13 +120,51 @@ function BinaryOperation:evaluate()
     return result
 end
 
--- Substitutes each variable for a new one.
-function BinaryOperation:substitute(variables)
+-- Substitutes each expression for a new one.
+function BinaryOperation:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
     local results = {}
     for index, expression in ipairs(self.expressions) do
-        results[index] = expression:substitute(variables)
+        results[index] = expression:substitute(map)
     end
     return BinaryOperation(self.operation, results)
+end
+
+
+-- Expands a binary operation.
+function BinaryOperation:expand()
+    local results = {}
+    for index, expression in ipairs(self.expressions) do
+        results[index] = expression:expand()
+    end
+    local expanded = BinaryOperation(self.operation, results)
+    if expanded.operation == BinaryOperation.MUL then
+        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()});
+        for _, expression in ipairs(expanded.expressions) do
+            allsums = allsums:expand2(expression)
+        end
+        return allsums:autosimplify()
+    end
+    return expanded:autosimplify()
+end
+
+-- Helper for expand - multiplies two addition expressions.
+function BinaryOperation:expand2(other)
+    local result = {}
+    for _, expression in ipairs(self.expressions) do
+        if other:type() == BinaryOperation and other.operation == BinaryOperation.ADD then
+            for _, expression2 in ipairs(other.expressions) do
+                result[#result+1] = expression * expression2
+            end
+        else
+            result[#result+1] = expression * other
+        end
+    end
+    return BinaryOperation(BinaryOperation.ADD, result)
 end
 
 -- Performs automatic simplification of an binary operation

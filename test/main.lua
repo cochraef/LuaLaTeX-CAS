@@ -1,7 +1,10 @@
+---@diagnostic disable: lowercase-global
+-- Runs test code from test files.
+
 require("algebra._init")
 
-
-local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD"}
+-- Stuff required for the basic parser.
+local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT"}
 
 local function parser(s)
     if string.find(s, "[0-9]+") then
@@ -32,5 +35,68 @@ function parse(input)
     end
 end
 
+-- Stuff required for test code.
+local tests
+local failures
+local totaltests = 0
+local totalfailures = 0
+function starttest(name)
+    print("Testing " .. name .. "...")
+    print()
+    tests = 0
+    failures = 0
+end
 
-print(parse("(x ^ 2) ^ (1/2)"))
+function test(actual, expected, initial)
+    if initial then
+        if tostring(expected) == tostring(actual) then
+            print(tostring(initial) .. " -> " .. tostring(actual))
+        else
+            print(tostring(initial) .. " -> " .. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+            failures = failures + 1
+        end
+    else
+        if tostring(expected) == tostring(actual) then
+            print("Result: " .. tostring(actual))
+        else
+            print("Result: ".. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+            failures = failures + 1
+        end
+    end
+    tests = tests + 1
+end
+
+function endtest()
+    print()
+    print("Finished test without errors.")
+    print()
+    totaltests = totaltests + tests
+    totalfailures = totalfailures + failures
+    if failures == 0 then
+        print("Performed " .. tests .. " tests, all of which passed!")
+    else
+        print("Performed tests, " .. failures .. "/" .. tests .. " failed.")
+    end
+    print("=====================================================================================================================")
+end
+
+function endall()
+    if totalfailures == 0 then
+        print("Performed " .. totaltests .. " tests in total, all of which passed!")
+    else
+        print("Performed tests, " .. totalfailures .. "/" .. totaltests .. " failed.")
+    end
+end
+
+-- Comment out these lines to only run certain test code.
+require("test.calculus.derrivatives")
+
+require("test.expressions.autosimplify")
+require("test.expressions.expand")
+require("test.expressions.functions")
+require("test.expressions.rationalexponent")
+require("test.expressions.substitute")
+
+-- TODO: Finish rewriting test code.
+
+endall()

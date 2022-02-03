@@ -37,8 +37,17 @@ function AbsExpression:evaluate()
     return self
 end
 
-function AbsExpression:substitute(variables)
-    return AbsExpression(self.expression:substitute(variables))
+function AbsExpression:freeof(symbol)
+    return self.expression:freeof(symbol)
+end
+
+function AbsExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
+    return AbsExpression(self.expression:substitute(map))
 end
 
 function AbsExpression:autosimplify()

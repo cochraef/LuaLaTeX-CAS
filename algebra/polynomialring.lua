@@ -377,22 +377,19 @@ function PolynomialRing:isevaluatable()
     return false
 end
 
--- Given a table mapping variables to expressions, replaces each variable with a new expressions
-function PolynomialRing:substitute(variables)
-    if type(variables) ~= "table" then
-        error("Sent parameter of wrong type: variables must be a table")
-    end
+-- This expression is free of a symbol if and only if the symbol is not the symbol used to create the ring.
+function PolynomialRing:freeof(symbol)
+    return ~(symbol.symbol==self.symbol)
+end
 
-    for index, expression in pairs(variables) do
-        if type(index) ~= "string" then
-            error("Sent parameter of wrong type: variables must have strings as indicies")
-        end
-        if index == self.symbol then
-            return self:tocompoundexpression():substitute(variables)
-        end
-    end
+-- Replaces each expression in the map with its value.
+function PolynomialRing:substitute(map)
+    return self:tocompoundexpression():substitute(map)
+end
 
-    return self
+-- Expands a polynomial expression. Polynomials are already in expanded form, so we just need to autosimplify.
+function PolynomialRing:expand()
+    return self:tocompoundexpression():autosimplify()
 end
 
 function PolynomialRing:autosimplify()

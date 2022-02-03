@@ -13,13 +13,18 @@ function AtomicExpression:evaluate()
     return self
 end
 
--- Default substitution behavior, obviously can be overwritten for atomic expressions with symbols
-function AtomicExpression:substitute(variables)
+-- Default substitution behavior, can be overwritten for more complicated atomic expressions
+function AtomicExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
     return self
 end
 
 -- Performs automatic simplification of an expression
-function Expression:autosimplify()
+function AtomicExpression:autosimplify()
     return self
 end
 

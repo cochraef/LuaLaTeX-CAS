@@ -1,3 +1,16 @@
+-- Checks if two tables are equal, starting at index i
+function ArrayEqual(a1, a2, i)
+    i = i or 1
+    while i <= math.max(#a1, #a2) do
+        if a1[i] ~= a2[i] then
+            return false
+        end
+        i = i + 1
+    end
+    return true
+end
+
+
 -- Creates a copy of a table
 function Copy(orig)
     local orig_type = type(orig)

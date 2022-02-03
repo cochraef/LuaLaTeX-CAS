@@ -26,7 +26,7 @@ function Logarithm:new(base, expression)
         return 'log(' .. tostring(base) .. ', ' .. tostring(expression) .. ')'
     end
     __o.__eq = function(a, b)
-        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
+        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
         if not b:type() == Logarithm then
             return false
         end
@@ -37,9 +37,18 @@ function Logarithm:new(base, expression)
     return o
 end
 
+function Logarithm:freeof(symbol)
+    return self.base:freeof(symbol) and self.expression:freeof(symbol)
+end
+
 -- Substitutes each variable for a new one
-function Logarithm:substitute(variables)
-    return Logarithm(self.base:substitute(variables), self.expression:substitute(variables))
+function Logarithm:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
+    return Logarithm(self.base:substitute(map), self.expression:substitute(map))
 end
 
 -- Performs automatic simplification of a logarithm

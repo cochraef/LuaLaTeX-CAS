@@ -32,22 +32,9 @@ function SymbolExpression:new(symbol)
     return o
 end
 
--- Substitutes the variable for a new one
-function SymbolExpression:substitute(variables)
-    if type(variables) ~= "table" then
-        error("Sent parameter of wrong type: variables must be a table")
-    end
-
-    for index, expression in pairs(variables) do
-        if type(index) ~= "string" then
-            error("Sent parameter of wrong type: variables must have strings as indicies")
-        end
-        if index == self.symbol then
-            return expression
-        end
-    end
-
-    return self
+-- This expression is free of a symbol if and only if the symbol is not the expression.
+function SymbolExpression:freeof(symbol)
+    return symbol~=self
 end
 
 -- Symbols can not be evaluated to a concrete value

@@ -59,7 +59,7 @@ function BinaryOperation:simplifysumrec()
                 term2 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term2})
                 revertterm2 = true
             end
-            if term1.expressions[2] == term2.expressions[2] and term1.expressions[1].isevaluatable() and term2.expressions[1].isevaluatable() then
+            if ArrayEqual(term1.expressions, term2.expressions, 2) then
                 local result = BinaryOperation(BinaryOperation.MUL,
                                     {BinaryOperation(BinaryOperation.ADD,
                                         {term1.expressions[1],

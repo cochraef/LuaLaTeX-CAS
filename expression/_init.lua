@@ -10,6 +10,7 @@ require("expression.trigexpression")
 require("expression.logarithm")
 require("expression.absexpression")
 require("expression.derrivativeexpression")
+require("expression.integralexpression")
 require("expression.rootexpression")
 require("expression.constant")
 

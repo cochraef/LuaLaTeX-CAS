@@ -10,9 +10,19 @@ function Expression:evaluate()
     error("Called unimplemented method : evaluate()")
 end
 
--- Given a table mapping variables to expressions, replaces each variable with a new expressions
-function Expression:substitute(variables)
+-- Given a symbol, returns false if the variable appears somewhere in the expression, or false otherwise.
+function Expression:freeof(symbol)
+    return true
+end
+
+-- Given a table mapping expressions to expressions, replaces each expression with a new expression.
+function Expression:substitute(map)
     error("Called unimplemented method : substitute()")
+end
+
+-- Expands an expression - i.e., turns all products of sums into sums of products
+function Expression:expand()
+    return self:autosimplify()
 end
 
 -- Performs automatic simplification of an expression

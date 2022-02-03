@@ -48,10 +48,15 @@ function FunctionExpression:evaluate()
     return self
 end
 
-function FunctionExpression:substitute(variables)
+function FunctionExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
     local results = {}
     for index, expression in ipairs(self.expressions) do
-        results[index] = expression:substitute(variables)
+        results[index] = expression:substitute(map)
     end
     return FunctionExpression(self.name, results)
 end
