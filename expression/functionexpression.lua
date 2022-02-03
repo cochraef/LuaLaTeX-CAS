@@ -12,7 +12,7 @@ __FunctionExpression = {}
 ----------------------------
 
 -- Creates a new function expression with the given operation
-function FunctionExpression:new(name, expressions)
+function FunctionExpression:new(name, expressions, trigbypass)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
@@ -20,7 +20,7 @@ function FunctionExpression:new(name, expressions)
         name = name.symbol
     end
 
-    if TrigExpression.NAMES[name] and #expressions == 1 then
+    if TrigExpression.NAMES[name] and #expressions == 1 and (not trigbypass) then
         return TrigExpression(name, expressions[1])
     end
 
@@ -37,6 +37,23 @@ function FunctionExpression:new(name, expressions)
             end
         end
         return expressionnames .. ')'
+    end
+    __o.__eq = function(a, b)
+        if b:type() == TrigExpression then
+            return a == b:tofunction()
+        end
+        if b:type() ~= FunctionExpression then
+            return false
+        end
+        if #a.expressions ~= #b.expressions then
+            return false
+        end
+        for index, _ in ipairs(a.expressions) do
+            if a.expressions[index] ~= b.expressions[index] then
+                return false
+            end
+        end
+        return a.name == b.name
     end
 
     o = setmetatable(o, __o)
@@ -70,12 +87,30 @@ function FunctionExpression:autosimplify()
 end
 
 function FunctionExpression:order(other)
-    if other:type() == DerrivativeExpression then
-        return true
+    if other:isconstant() then
+        return false
+    end
+
+    if other:type() == SymbolExpression then
+        return SymbolExpression(self.name):order(other)
+    end
+
+    if other:type() == BinaryOperation then
+        if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then
+            return BinaryOperation(other.operation, {self}):order(other)
+        end
+
+        if other.operation == BinaryOperation.POW then
+            return (self^Integer.one()):order(other)
+        end
+    end
+
+    if other:type() == TrigExpression then
+        return self:order(other:tofunction())
     end
 
     if other:type() ~= FunctionExpression then
-        return false
+        return true
     end
 
     if self.name ~= other.name then

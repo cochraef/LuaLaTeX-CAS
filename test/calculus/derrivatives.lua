@@ -23,7 +23,7 @@ test(f:autosimplify(), "(4 + (10 * x))", f)
 test(g:autosimplify(), "(y ^ -1)", g)
 test(h:autosimplify(), "(n * (x ^ (-1 + n)))", h)
 test(i:autosimplify(), "cos(x)", i)
-test(j:autosimplify(), "(-2 * sin(x) * cos((2 * cos(x))))", j)
+test(j:autosimplify(), "(-2 * cos((2 * cos(x))) * sin(x))", j)
 test(k:autosimplify(), "(1/2 * (x ^ -1/2) * ((1 + x) ^ -1))", k)
 test(l:autosimplify(), "((|x| ^ -1) * ((1 + (-1 * (x ^ 2))) ^ -1/2))", l)
 

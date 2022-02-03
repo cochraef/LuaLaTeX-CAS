@@ -35,6 +35,17 @@ function parse(input)
     end
 end
 
+function dparse(input)
+    local parsed = string.gsub(input, "[0-9]+", parser)
+    parsed = string.gsub(parsed, "[A-z]+", parser)
+    local exe, err = load("return " .. parsed)
+    if exe then
+        return exe()
+    else
+        print(err)
+    end
+end
+
 -- Stuff required for test code.
 local tests
 local failures
@@ -90,6 +101,7 @@ end
 
 -- Comment out these lines to only run certain test code.
 require("test.calculus.derrivatives")
+require("test.calculus.integrals")
 
 require("test.expressions.autosimplify")
 require("test.expressions.expand")

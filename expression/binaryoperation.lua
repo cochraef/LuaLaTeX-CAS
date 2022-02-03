@@ -194,11 +194,11 @@ end
 
 
 function BinaryOperation:order(other)
-    if other.isevaluatable() then
+    if other:isconstant() then
         return false
     end
 
-    if other.isatomic() then
+    if other:isatomic() then
         if self.operation == BinaryOperation.POW then
             return self:order(BinaryOperation(BinaryOperation.POW, {other, Integer.one()}))
         end
@@ -249,6 +249,20 @@ function BinaryOperation:order(other)
 
     if (self.operation == BinaryOperation.ADD) and (other.operation == BinaryOperation.POW) then
         return BinaryOperation(BinaryOperation.POW, {self, Integer.one()}):order(other)
+    end
+
+    if other:type() == FunctionExpression then
+        if self.operation == BinaryOperation.ADD or self.operation == BinaryOperation.MUL then
+            return self:order(BinaryOperation(self.operation, {other}))
+        end
+
+        if self.operation == BinaryOperation.POW then
+            return self:order(other^Integer.one())
+        end
+    end
+
+    if other:type() == TrigExpression then
+        return self:order(other:tofunction())
     end
 
     return true

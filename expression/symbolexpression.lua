@@ -58,7 +58,7 @@ function SymbolExpression:order(other)
             end
         end
 
-        return true
+        return false
     end
 
     if other.operation == BinaryOperation.POW then

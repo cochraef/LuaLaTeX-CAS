@@ -28,6 +28,9 @@ function TrigExpression:new(name, expression)
         return tostring(a.name) .. '(' .. tostring(a.expression) .. ')'
     end
     __o.__eq = function(a, b)
+        if b:type() == FunctionExpression then
+            return a:tofunction() == b
+        end
         -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
         if not b:type() == TrigExpression then
             return false
@@ -62,18 +65,11 @@ function TrigExpression:autosimplify()
 end
 
 function TrigExpression:order(other)
-    if other:type() == FunctionExpression then
-        return true
-    end
+    return self:tofunction():order(other)
+end
 
-    if other:type() ~= TrigExpression then
-        return false
-    end
-
-    if TrigExpression.NAMES[self.name] ~= TrigExpression.NAMES[other.name] then
-        return TrigExpression.NAMES[self.name] < TrigExpression.NAMES[other.name]
-    end
-    return self.expression:order(other.expression)
+function TrigExpression:tofunction()
+    return FunctionExpression(self.name, {self.expression}, true)
 end
 
 function TrigExpression:tolatex()

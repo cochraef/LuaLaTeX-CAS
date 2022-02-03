@@ -67,7 +67,7 @@ function IntegralExpression.table(integrand, symbol)
 
     if integrand:type() == BinaryOperation then
 
-        if integrand.operation == BinaryOperation.POWEXP then
+        if integrand.operation == BinaryOperation.POW then
             -- int(1/x, x) = ln(x)
             if integrand.expressions[1] == symbol and integrand.expressions[2] == Integer(-1) then
                 return LN(symbol)
@@ -94,7 +94,7 @@ function IntegralExpression.table(integrand, symbol)
             end
         end
 
-        if integrand.operation == BinaryOperation.MULEXP and #integrand.expressions == 2 then
+        if integrand.operation == BinaryOperation.MUL and #integrand.expressions == 2 then
             -- int(tan(x)sec(x), x) = sec(x)
             if integrand.expressions[1] == TAN(symbol) and integrand.expressions[2] == SEC(symbol) then
                 return SEC(symbol)
@@ -200,8 +200,10 @@ function IntegralExpression.linearproperties(expression, symbol)
                 local F = IntegralExpression.integrate(term, symbol)
                 if F then
                     sum = sum + F
+                else
+                    return nil
                 end
-                return nil
+
             end
             return sum
         end
@@ -216,7 +218,7 @@ function IntegralExpression.substitutionmethod(expression, symbol)
     local F = nil
     local i = 1;
 
-    while ~F and i <= #P do
+    while not F and i <= #P do
         local g = P[i]
         if g ~= symbol and not g:freeof(symbol) then
             local subsymbol = SymbolExpression("u")
@@ -234,6 +236,8 @@ function IntegralExpression.substitutionmethod(expression, symbol)
         end
         i = i + 1
     end
+
+    return F
 end
 
 -- Generates a list of possible u-substitutions to attempt
@@ -242,7 +246,7 @@ function IntegralExpression.trialsubstitutions(expression)
 
     -- Recursive part - evaluates each term in a product.
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.MUL then
-        for index, term in ipairs(expression) do
+        for _, term in ipairs(expression.expressions) do
             substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
         end
     end
@@ -273,7 +277,7 @@ end
 ----------------------------
 
 -- Creates a new integral operation with the given symbol and expression
-function IntegralExpression:new(symbol, expression, upper, lower)
+function IntegralExpression:new(expression, symbol, lower, upper)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
@@ -293,7 +297,7 @@ function IntegralExpression:new(symbol, expression, upper, lower)
     __o.__index = IntegralExpression
     __o.__tostring = function(a)
         if a:isdefinite() then
-            return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ", ".. tostring(a.upper) .. ', ' .. tostring(a.lower) ')'
+            return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ", ".. tostring(a.lower) .. ', ' .. tostring(a.upper) .. ')'
         end
         return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ')'
     end
@@ -342,7 +346,7 @@ function IntegralExpression:autosimplify()
     local integrated = IntegralExpression.integrate(self.expression, self.symbol)
 
     -- Our expression could not be integrated.
-    if ~integrated then
+    if not integrated then
         return self
     end
 
@@ -350,7 +354,7 @@ function IntegralExpression:autosimplify()
         return (integrated:substitute({[self.symbol]=self.upper}) - integrated:substitute({[self.symbol]=self.lower})):autosimplify()
     end
 
-    return integrated
+    return integrated:autosimplify()
 end
 
 function IntegralExpression:order(other)
