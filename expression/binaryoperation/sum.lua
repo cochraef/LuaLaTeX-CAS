@@ -140,17 +140,12 @@ function BinaryOperation:mergesums(other)
         end
     end
 
-    if first.isevaluatable() and first == first.one() then
-        return BinaryOperation(self.operation, selfrest):mergesums(BinaryOperation(other.operation, otherrest))
-    end
-
     if first.operation ~= BinaryOperation.ADD or not first.expressions[2] then
         local result = BinaryOperation(self.operation, selfrest):mergesums(BinaryOperation(other.operation, otherrest))
-        if first.operation ~= BinaryOperation.ADD then
-            table.insert(result.expressions, 1, first)
-        else
-            table.insert(result.expressions, 1, first.expressions[1])
+        if not first.expressions[1] then
+            return result
         end
+        table.insert(result.expressions, 1, first.expressions[1])
         return result
     end
 
@@ -163,8 +158,5 @@ function BinaryOperation:mergesums(other)
 
     table.insert(result.expressions, 1, first.expressions[1])
 
-    if result.expressions[1] and not result.expressions[2] then
-        return result.expressions[1]
-    end
     return result
 end

@@ -79,6 +79,84 @@ function PolynomialRing.extendedgcd(a, b)
     return oldr // oldr:lc(), olds // oldr:lc(), oldt // oldr:lc()
 end
 
+-- Returns the resultant of two polynomials in the same ring, whose coefficients are all part of a field.
+function PolynomialRing.resultant(a, b)
+    local m, n = a.degree, b.degree
+    if n == Integer.zero() then
+        return b.coefficients[0]^m
+    end
+
+    local r = a % b
+    if r == Integer.zero() then
+        return r.coefficients[0]
+    end
+
+    local s = r.degree
+    local l = b:lc()
+
+    return Integer(-1)^(m*n) * l^(m-s) * PolynomialRing.resultant(b, r)
+end
+
+-- Returns the partial fraction decomposition of the rational function g/f
+-- given g, f, and some (not nessecarily irreducible) factorization of f.
+-- If the factorization is omitted, the irreducible factorization is used.
+-- The degree of g must be less than the degree of f.
+function PolynomialRing.partialfractions(g, f, ffactors)
+
+    if g.degree >= f.degree then
+        error("Argument Error: The degree of g must be less than the degree of f.")
+    end
+
+    ffactors = ffactors or f:factor()
+
+    local expansionterms = {}
+    local lead
+
+    for _, factor in ipairs(ffactors.expressions) do
+        local k
+        local m
+        -- Seperates the leading coefficient if it isn't one, so f is functionally monic.
+        if factor:isconstant() then
+            if factor ~= Integer.one() then
+                lead = factor
+            end
+        elseif factor.getring and factor:getring() == PolynomialRing:getring() then
+            m = factor
+            k = Integer.one()
+        else
+            m = factor.expressions[1]
+            k = factor.expressions[2]
+        end
+
+        if not factor:isconstant() then
+            -- Uses Chinese Remainder Theorem for each factor to determine the numerator of the term in the decomposition
+            local mk = m^k
+            local v = g % mk
+            local _, minv, _ = PolynomialRing.extendedgcd(f // mk, mk)
+            local c = v*minv % mk
+
+
+            if k == Integer.one() then
+                expansionterms[#expansionterms+1] = BinaryOperation.DIVEXP({c, m})
+            else
+                -- Uses the p-adic expansion of c to split terms with repeated roots.
+                local q = c
+                local r
+                for i = k:asnumber(), 1, -1 do
+                    q, r = q:divremainder(m)
+                    expansionterms[#expansionterms+1] = BinaryOperation.DIVEXP({r, BinaryOperation.POWEXP({m, Integer(i)})})
+                end
+            end
+        end
+    end
+
+    if lead then
+        return BinaryOperation.MULEXP({lead, BinaryOperation.ADDEXP(expansionterms)})
+    end
+    return BinaryOperation.ADDEXP(expansionterms)
+
+end
+
 
 ----------------------------
 -- Instance functionality --
@@ -334,7 +412,7 @@ function PolynomialRing:divremainder(b)
         q[i - m] = o[i]
     end
 
-    return PolynomialRing(q, self.symbol, self.degree), PolynomialRing(r, self.symbol, b.degree-Integer.one())
+    return PolynomialRing(q, self.symbol, self.degree), PolynomialRing(r, self.symbol, Integer.max(Integer.zero(), b.degree-Integer.one()))
 end
 
 -- Polynomial rings are never fields, but when dividing by a polynomial by a constant we may want to use / instead of //

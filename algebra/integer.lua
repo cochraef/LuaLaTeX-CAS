@@ -631,7 +631,7 @@ function Integer:asnumber()
     for i, digit in ipairs(self) do
         n = n + digit * Integer.DIGITSIZE ^ (i - 1)
     end
-    return math.floor(n)
+    return self.sign*math.floor(n)
 end
 
 -- Returns all positive divisors of the integer. Not guarenteed to be in any order.
@@ -694,8 +694,6 @@ function Integer:primefactorizationrec()
         return {[result]=Integer.one()}
     end
     local remaining = self / result
-    -- print("Result: " .. tostring(result))
-    -- print("Remaning: " .. tostring(remaining))
     return Integer.mergefactors(result:primefactorizationrec(), remaining:primefactorizationrec())
 end
 

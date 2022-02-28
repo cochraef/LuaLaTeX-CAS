@@ -121,16 +121,7 @@ end
 
 -- Returns the multiplicative inverse of this number if it exists
 function IntegerModN:inv()
-    local t = Integer.zero()
-    local r = self.modulus
-    local newt = Integer.one()
-    local newr = self.element
-
-    while newr ~= Integer.zero() do
-        local q = r // newr
-        t, newt = newt, t - q * newt
-        r, newr = newr, r - q * newr
-    end
+    local r, t, _ = Integer.extendedgcd(self.element, self.modulus)
 
     if r > Integer.one() then
         error("Element does not have an inverse in this ring")

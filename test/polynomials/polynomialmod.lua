@@ -1,22 +1,3 @@
-require("algebra._init")
-require("_lib.pepperfish")
-
-local function test(actual, expected, initial)
-    if initial then
-        if tostring(expected) == tostring(actual) then
-            print(tostring(initial) .. " -> " .. tostring(actual))
-        else
-            print(tostring(initial) .. " -> " .. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
-        end
-    else
-        if tostring(expected) == tostring(actual) then
-            print("Result: " .. tostring(actual))
-        else
-            print("Result: ".. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
-        end
-    end
-end
-
 local a = PolynomialRing({IntegerModN(Integer(1), Integer(11)),
                         IntegerModN(Integer(6), Integer(11)),
                         IntegerModN(Integer(1), Integer(11)),
@@ -53,23 +34,6 @@ local s = PolynomialRing({IntegerModN(Integer(1), Integer(5)),
                     IntegerModN(Integer(1), Integer(5)),
                     IntegerModN(Integer(1), Integer(5))}, "x")
 
-print("Testing polynomial operations...")
-test(q*q, "3z^4+9z^3+0z^2+11z^1+4z^0")
-test(PolynomialRing.gcd(a, b), "1y^0")
-local Q, R, S = PolynomialRing.extendedgcd(a, b)
-test(Q, "1y^0")
-test(R, "4y^3+5y^2+1y^1+3y^0")
-test(S, "7y^3+0y^2+7y^1+6y^0")
-print()
-
-print("Testing polynomial square free factoring...")
-test(p:squarefreefactorization(), "(1 * (1x^2+6x^1+2x^0 ^ 2))")
-test(r:squarefreefactorization(), "(1 * (1x^3+0x^2+0x^1+1x^0 ^ 2))")
-test(q:squarefreefactorization(), "(4 * (1z^2+8z^1+7z^0 ^ 1))")
-test(s:squarefreefactorization(), "(1 * (1x^1+4x^0 ^ 4))")
-print()
-
-
 local t = PolynomialRing({IntegerModN(Integer(1), Integer(7))}, "x"):multiplyDegree(7) - PolynomialRing({IntegerModN(Integer(1), Integer(7))}, "x"):multiplyDegree(1)
 
 local u = PolynomialRing({IntegerModN(Integer(1), Integer(13)),
@@ -86,18 +50,27 @@ local v = PolynomialRing({IntegerModN(Integer(24), Integer(7)),
                             IntegerModN(Integer(10), Integer(7)),
                             IntegerModN(Integer(1), Integer(7))}, "z")
 
--- profiler = newProfiler()
--- profiler:start()
+starttest("modular polynomial operations")
+test(q*q, "3z^4+9z^3+0z^2+11z^1+4z^0")
+test(PolynomialRing.gcd(a, b), "1y^0")
+local Q, R, S = PolynomialRing.extendedgcd(a, b)
+test(Q, "1y^0")
+test(R, "4y^3+5y^2+1y^1+3y^0")
+test(S, "7y^3+0y^2+7y^1+6y^0")
+endtest()
 
-print("Testing polynomial factoring...")
+starttest("modular square free factoring")
+test(p:squarefreefactorization(), "(1 * (1x^2+6x^1+2x^0 ^ 2))")
+test(r:squarefreefactorization(), "(1 * (1x^3+0x^2+0x^1+1x^0 ^ 2))")
+test(q:squarefreefactorization(), "(4 * (1z^2+8z^1+7z^0 ^ 1))")
+test(s:squarefreefactorization(), "(1 * (1x^1+4x^0 ^ 4))")
+endtest()
+
+starttest("modular polynomial factoring")
 test(q:factor(), "(4 * (1z^1+7z^0 ^ 1) * (1z^1+1z^0 ^ 1))", q)
 test(p:factor(), "(1 * (1x^2+6x^1+2x^0 ^ 2))", p)
 test(r:factor(), "(1 * (1x^3+0x^2+0x^1+1x^0 ^ 2))", r)
 test(t:factor(), "(1 * (1x^1+0x^0 ^ 1) * (1x^1+6x^0 ^ 1) * (1x^1+5x^0 ^ 1) * (1x^1+4x^0 ^ 1) * (1x^1+3x^0 ^ 1) * (1x^1+2x^0 ^ 1) * (1x^1+1x^0 ^ 1))", t)
 test(u:factor(), "(1 * (1x^1+11x^0 ^ 1) * (1x^1+10x^0 ^ 1) * (1x^1+6x^0 ^ 1) * (1x^1+4x^0 ^ 1))", u)
 test(v:factor(), "(1 * (1z^1+1z^0 ^ 1) * (1z^1+2z^0 ^ 1) * (1z^2+0z^1+1z^0 ^ 1) * (1z^1+4z^0 ^ 1) * (1z^1+3z^0 ^ 1))", v)
-
--- profiler:stop()
--- local outfile = io.open( "profile.txt", "w+" )
--- profiler:report( outfile )
--- outfile:close()
+endtest()

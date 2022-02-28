@@ -1,7 +1,7 @@
 -- Methods related to the Zassenhaus factorization algorithm.
 
 
--- Square-free factorization in the rational field
+-- Square-free factorization in the rational field.
 function PolynomialRing:rationalsquarefreefactorization(keeplc)
     local monic = self / self:lc()
     local terms = {}
@@ -17,7 +17,6 @@ function PolynomialRing:rationalsquarefreefactorization(keeplc)
         d = c - b:derrivative()
     end
     if keeplc and terms[1] then
-        terms[0] = Integer.one()
         terms[1] = terms[1] * self:lc()
     end
     return terms
