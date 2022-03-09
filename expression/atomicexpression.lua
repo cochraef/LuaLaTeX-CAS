@@ -28,6 +28,12 @@ function AtomicExpression:autosimplify()
     return self
 end
 
+-- If an atomic expression has an alternate representation as a compound expression, this converts it into that alternate representation.
+-- Normally, though, atomic expressions are properly atomic and this will just return itself.
+function AtomicExpression:tocompoundexpression()
+    return self
+end
+
 -- Atomic expressions are atomic, suprisingly
 function AtomicExpression:isatomic()
     return true

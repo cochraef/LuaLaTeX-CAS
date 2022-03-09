@@ -16,6 +16,13 @@ function Ring.resultantring(ring1, ring2)
     end
 
     if ring1 == PolynomialRing.getring() or ring2 == PolynomialRing.getring() then
+        -- TODO: Fix this so it works with arbitrarily-nested rings
+        if ring1 == ring2.child then
+            return ring2
+        end
+        if ring2 == ring1.child then
+            return ring1
+        end
         local symbols = {}
         while ring1 == PolynomialRing.getring() do
             symbols[#symbols+1] = ring1.symbol

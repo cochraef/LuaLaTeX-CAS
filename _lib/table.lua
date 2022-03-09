@@ -1,4 +1,4 @@
--- Checks if two tables are equal, starting at index i
+-- Checks if two arrays are equal, starting at index i
 function ArrayEqual(a1, a2, i)
     i = i or 1
     while i <= math.max(#a1, #a2) do

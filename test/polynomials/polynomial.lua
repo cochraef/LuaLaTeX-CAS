@@ -41,11 +41,21 @@ local s = PolynomialRing({Integer(1), Integer(0), Integer(-4), Integer(0), Integ
 local x = Integer(3)
 local y = Integer(-1) / Integer(6)
 
+local multia = PolynomialRing({Integer(4),
+                    Integer(0),
+                    PolynomialRing({Integer(0), Integer(0), Integer(-6)}, "y"),
+                    PolynomialRing({Integer(1), Integer(3)}, "y")}, "x")
+local multib = PolynomialRing({PolynomialRing({Integer(0), Integer(6)}, "y"),
+                            Integer(0),
+                            PolynomialRing({Integer(-4), Integer(12)}, "y")}, "x")
+
 starttest("polynomial construction")
 test(a, "5x^4+4x^3+3x^2+2x^1+1x^0")
 test(a.degree, 4)
 test(b, "2x^2+1/12x^1+1/3x^0")
 test(b.degree, 2)
+test(multia, "(3y^1+1y^0)x^3+(-6y^2+0y^1+0y^0)x^2+(0)x^1+(4)x^0")
+test(multia.degree, 3)
 endtest()
 
 starttest("polynomial-expression conversion")
@@ -72,6 +82,16 @@ test(rr, "319x^0")
 qq, rr = a:divremainder(b)
 test(qq, "5/2x^2+91/48x^1+1157/1152x^0")
 test(rr, "17755/13824x^1+2299/3456x^0")
+endtest()
+
+starttest("polynomial pseudodivision")
+local pq, pr = a:pseudodivide(c)
+test(pq, "320x^3+-704x^2+2304x^1+-6784x^0")
+test(pr, "81664x^0")
+
+pq, pr = multia:pseudodivide(multib)
+test(pq, "(36y^2+0y^1+-4y^0)x^1+(-72y^3+24y^2+0y^1+0y^0)x^0")
+test(pr, "(-216y^3+0y^2+24y^1+0y^0)x^1+(432y^4+-144y^3+576y^2+-384y^1+64y^0)x^0")
 endtest()
 
 

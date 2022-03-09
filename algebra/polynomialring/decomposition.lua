@@ -89,5 +89,5 @@ function PolynomialRing:expand(v, x)
         return Integer.zero()
     end
     local q,r = u:divremainder(v)
-    return PolynomialRing({PolynomialRing({Integer.zero(), Integer.one()}, "t")}, x) * q:expand(v, x) + r
+    return PolynomialRing({PolynomialRing({Integer.zero(), Integer.one()}, "_")}, x) * q:expand(v, x) + r
 end

@@ -313,7 +313,7 @@ function BinaryOperation:topolynomial()
                     and expression.expressions[1]:isevaluatable() and expression.expressions[2].operation and
                     expression.expressions[2].operation == BinaryOperation.POW and #expression.expressions[2].expressions == 2
                     and expression.expressions[2].expressions[1]:type() == SymbolExpression and expression.expressions[2].expressions[2].getring
-                    and expression.expressions[2].expressions[2]:getring() == Integer.getring() then
+                    and expression.expressions[2].expressions[2]:getring() == Integer.getring() and expression.expressions[2].expressions[2] > Integer.zero() then
 
             coefficient = expression.expressions[1]
             sym = expression.expressions[2].expressions[1].symbol
@@ -321,7 +321,7 @@ function BinaryOperation:topolynomial()
         -- Expressions of the form x^n
         elseif expression.operation and expression.operation == BinaryOperation.POW and #expression.expressions == 2
                     and expression.expressions[1]:type() == SymbolExpression and expression.expressions[2].getring
-                    and expression.expressions[2]:getring() == Integer.getring() then
+                    and expression.expressions[2]:getring() == Integer.getring() and expression.expressions[2] > Integer.zero() then
 
             coefficient = Integer.one()
             sym = expression.expressions[1].symbol

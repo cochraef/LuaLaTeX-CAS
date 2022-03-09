@@ -1,4 +1,4 @@
--- An expression for anintegral of an expression
+-- An expression for an integral of an expression.
 -- IntegralExpressions have the following instance variables:
 --      symbol - the SymbolExpression that the integral is taken with respect to
 --      expression - an Expression to take the integral of
@@ -21,26 +21,21 @@ function IntegralExpression.integrate(expression, symbol)
     local simplified = expression:autosimplify()
 
     local F = IntegralExpression.table(simplified, symbol)
-    if F then
-        return F
-    end
+    if F then return F end
 
     F = IntegralExpression.linearproperties(simplified, symbol)
-    if F then
-        return F
-    end
+    if F then return F end
 
     F = IntegralExpression.substitutionmethod(simplified, symbol)
-    if F then
-        return F
-    end
+    if F then return F end
+
+    F = IntegralExpression.rationalfunction(simplified, symbol)
+    if F then return F end
 
     local expanded = simplified:expand()
     if expression ~= expanded then
         F = IntegralExpression.integrate(expanded, symbol)
-        if F then
-            return F
-        end
+        if F then return F end
     end
 
     return nil
@@ -270,6 +265,109 @@ function IntegralExpression.trialsubstitutions(expression)
     end
 
     return substitutions
+end
+
+-- Uses Lazard, Rioboo, Rothstein, and Trager's method to integrate rational functions.
+-- This is mostly to try to avoid factoring and finding the roots of the full denominator whenever possible.
+function IntegralExpression.rationalfunction(expression, symbol)
+
+    -- Type checking and conversion to polynomial type.
+    local f, g, fstat, gstat
+    if expression:type() == BinaryOperation and expression.operation == BinaryOperation.POW and expression.expressions[2] == Integer(-1) then
+        g, gstat = expression.expressions[1]:topolynomial()
+        if not gstat then
+            return false
+        end
+        f = PolynomialRing({Integer.one()}, g.symbol)
+    else
+        if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL
+        or expression.expressions[3] then
+    return nil
+    end
+        if expression.expressions[2]:type() == BinaryOperation and expression.expressions[2].operation == BinaryOperation.POW and
+            expression.expressions[2].expressions[2] == Integer(-1) then
+        f, fstat = expression.expressions[1]:topolynomial()
+        g, gstat = expression.expressions[2].expressions[1]:topolynomial()
+        elseif expression.expressions[1]:type() == BinaryOperation and expression.expressions[1].operation == BinaryOperation.POW and
+        expression.expressions[1].expressions[2] == Integer(-1) then
+        f, fstat = expression.expressions[2]:topolynomial()
+        g, gstat = expression.expressions[1].expressions[1]:topolynomial()
+        else
+        return nil
+        end
+
+        if not fstat or not gstat or f.symbol ~= symbol.symbol or g.symbol ~= symbol.symbol then
+        return nil
+        end
+    end
+
+    -- If the polynomials are not relatively prime, divides out the common factors.
+    local gcd = PolynomialRing.gcd(f, g)
+    if gcd ~= Integer(1) then
+        f, g = f // gcd, g // gcd
+    end
+
+    -- Seperates out the polynomial part and rational part and integrates the polynomial part.
+    local q, h = f:divremainder(g)
+    U = IntegralExpression.integrate(q, symbol)
+
+    if h == Integer.zero() then
+        return U
+    end
+
+    -- Performs partial fraction decomposition into square-free denominators on the rational part.
+    local gg = g:squarefreefactorization()
+    local pfd = PolynomialRing.partialfractions(h, g, gg)
+
+    -- Hermite reduction.
+    local V = Integer.zero()
+    for _, term in ipairs(pfd.expressions) do
+        local i = #term.expressions
+        if i > 1 then
+            for j = 1, i-1 do
+                local n = term.expressions[j].expressions[1]
+                local d = term.expressions[j].expressions[2].expressions[1]
+                local p = term.expressions[j].expressions[2].expressions[2]
+
+                local _, s, t = PolynomialRing.extendedgcd(d, d:derrivative())
+                s = s * n
+                t = t * n
+                V = V - t/((p-Integer.one())*BinaryOperation.POWEXP({d, p-Integer.one()}))
+                term.expressions[j+1].expressions[1] = term.expressions[j+1].expressions[1] + s + t:derrivative() / (p-Integer.one())
+            end
+        end
+    end
+
+    --Lazard-Rioboo-Trager method.
+    local W = Integer.zero()
+    for _, term in ipairs(pfd.expressions) do
+        local a = term.expressions[#term.expressions].expressions[1]
+        local b = term.expressions[1].expressions[2].expressions[1]
+        local y = a - b:derrivative() * PolynomialRing({Integer.zero(), Integer.one()}, "_")
+        local r = PolynomialRing.resultant(b, y)
+
+
+        local rr = r:squarefreefactorization()
+        local remainders = PolynomialRing.monicgcdremainders(b, y)
+        for e, factor in ipairs(rr.expressions) do
+            if e > 1 then
+                local re = factor.expressions[1]
+                local w
+                for _, remainder in ipairs(remainders) do
+                    if remainder.degree:asnumber() == e - 1 then
+                        w = remainder
+                        break
+                    end
+                end
+                local roots = re:roots()
+                for _, root in ipairs(roots) do
+                    W = W + root*LN(w:substitute({[SymbolExpression("_")] = root}))
+                end
+            end
+        end
+    end
+
+    return U + V + W
 end
 
 ----------------------------
