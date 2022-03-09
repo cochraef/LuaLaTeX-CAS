@@ -348,20 +348,28 @@ function IntegralExpression.rationalfunction(expression, symbol)
 
 
         local rr = r:squarefreefactorization()
-        local remainders = PolynomialRing.monicgcdremainders(b, y)
         for e, factor in ipairs(rr.expressions) do
             if e > 1 then
                 local re = factor.expressions[1]
-                local w
-                for _, remainder in ipairs(remainders) do
-                    if remainder.degree:asnumber() == e - 1 then
-                        w = remainder
-                        break
-                    end
-                end
                 local roots = re:roots()
                 for _, root in ipairs(roots) do
-                    W = W + root*LN(w:substitute({[SymbolExpression("_")] = root}))
+
+                    local ys = y:substitute({[SymbolExpression("_")] = root}):autosimplify()
+                    if ys:freeof(symbol) then
+                        ys = PolynomialRing({ys}, symbol.symbol)
+                    else
+                        ys = ys:topolynomial()
+                    end
+                    local remainders = PolynomialRing.monicgcdremainders(b, ys)
+
+                    local w
+                    for _, remainder in ipairs(remainders) do
+                        if remainder.degree:asnumber() == e - 1 then
+                            w = remainder
+                            break
+                        end
+                    end
+                    W = W + root*LN(w)
                 end
             end
         end
