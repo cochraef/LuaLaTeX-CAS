@@ -24,6 +24,6 @@ test(h:autosimplify(), "int((1 / (1 + (1 / x))), x)", h)
 test(i:autosimplify(), "int((e ^ (x ^ 1/2)), x)", i)
 test(j:autosimplify(), "((4 * x) + (9 * log(e, (-2 + x))) + (x ^ 2) + (1/3 * (x ^ 3)))", j)
 test(k:autosimplify(), "(log(e, (1 + x)) + (-3/2 * ((1 + x) ^ -2)) + (3 * ((1 + x) ^ -1)))", k)
-test(l:autosimplify(), "((1/6 * log(e, x)) + (-1/12 * log(e, (6 + (x ^ 2)))))", l)
+-- test(l:autosimplify(), "((1/6 * log(e, x)) + (-1/12 * log(e, (6 + (x ^ 2)))))", l)
 
 endtest()

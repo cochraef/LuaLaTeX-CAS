@@ -1,7 +1,7 @@
 -- Loads algebra files in the correct order.
 require("_lib.table")
 
-require("expression._init")
+require("core._init")
 
 require("algebra.ring")
 require("algebra.euclideandomain")
@@ -10,6 +10,11 @@ require("algebra.polynomialring")
 require("algebra.integer")
 require("algebra.rational")
 require("algebra.integerquotientring")
+
+require("algebra.absexpression")
+require("algebra.logarithm")
+require("algebra.rootexpression")
+require("algebra.trigexpression")
 
 require("algebra.polynomialring.berlekampfactoring")
 require("algebra.polynomialring.zassenhausfactoring")
