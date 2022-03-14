@@ -1,0 +1,20 @@
+\ProvidesPackage{luacas}
+
+\RequirePackage{luacode}
+\RequirePackage{pgfkeys}
+
+\directlua{require('test.main')}
+
+\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
+
+\pgfkeys{
+    luac@s/diff/.is family, /luac@s/diff,
+    default/.style = 
+        {var = x},
+    var/.estore in = \diffvar,
+}
+
+\newcommand\diff[2][]{%
+    \pgfqkeys{/luac@s/diff}{default, #1}%
+    \eval{DD(\diffvar,#2)}
+}
