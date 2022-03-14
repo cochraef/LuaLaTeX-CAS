@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage{luacas}
+
+\usepackage{xcolor}
+
+\begin{document}
+
+Consider the expression: $x^g$. The derivative with respect to $x$ is:
+\[ \diff{x^g+x} \] %this working?
+while the derivative with respect to $g$ is:
+\[ \diff[var=g]{x^g+x} \] 
+Symbolic integration:
+\[ \int \frac{x+5}{x^2+3x+2}\ \mathrm{d}x = \eval{int((x+5)/(x^2+3*x+2),x)} \]
+Let's use \verb|\def\expr{(x+5)/(x^2+3*x+2)}| to save an expression into the macro \verb|\expr|. 
+\def\expr{(x+5)/(x^2+3*x+2)}
+\[ \eval{\expr} \] 
+This might be helpful; we could write:
+\[ \int \eval{\expr}\ \mathrm{d}x = \eval{int(\expr,x)}.\] 
+Let's try some integer arithmetic:
+\[ \frac{108}{37} + \frac{76}{17} = \eval{108/37+76/17}.\]
+Let's try gcd:
+\[ \gcd(108,76) = \luaexec{
+local a = Integer(108)
+local b = Integer(76)
+tex.print(Integer.gcd(a,b))
+} \] 
+
+
+\section{Bugs}
+{\color{gray} 
+Seems \verb|tolatex| has some trouble with the following and other trig related parsing:
+\[ \int \sin(x)\ \mathrm{d}x = \eval{int(sin(x),x)}\] 
+Seems to be trouble when integrating a rational function with an irreducible quadratic in the denominator:
+\[ \int \frac{1}{x^2+x+1}\ \mathrm{d}x = \eval{int(1/(x^2+x+1),x)}\]
+}
+Does this cause an error: \luaexec{int(1/(x^2+x+1),x)} ?
+\end{document}
