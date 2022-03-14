@@ -22,20 +22,6 @@ end}
 -- Static functionality --
 --------------------------
 
--- Returns the immediate subrings of this ring.
-function PolynomialRing.subrings(construction)
-    local child = construction.child
-    local subrings = {child}
-
-    for i, subring in ipairs(child.subrings(child)) do
-        local ring = Copy(construction)
-        ring.child = subring
-        subrings[i + 1] = ring
-    end
-
-    return subrings
-end
-
 -- Creates a new ring with the given symbol and child ring.
 function PolynomialRing.makering(symbol, child)
     local t = {ring = PolynomialRing}
@@ -133,10 +119,6 @@ function PolynomialRing.monicgcdremainders(a, b)
         error("Cannot take the gcd of two polynomials with different symbols")
     end
 
-    if b == Integer(0) then
-        return {a / a:lc(), b}
-    end
-
     local remainders = {a / a:lc(), b / b:lc()}
     while true do
         local q = remainders[#remainders - 1] // remainders[#remainders]
@@ -220,7 +202,7 @@ __o.__tostring = function(a)
     local out = ""
     local loc = a.degree:asnumber()
     while loc >= 0 do
-        if a.ring == PolynomialRing.getring() then
+        if a.ring == PolynomialRing.getring() or a.ring == Rational.getring() then
             out = out .. "(" .. tostring(a.coefficients[loc]) .. ")" .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
         else
             out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
@@ -232,6 +214,12 @@ end
 __o.__div = function(a, b)
     if b.getring and Ring.resultantring(a.ring, b:getring()) ~= Ring.resultantring(a:getring(), b:getring()) then
         return a:div(b:inring(a:getring()))
+    end
+    if b.getring and a:getring() == b:getring() then
+        return Rational(a, b, true)
+    end
+    if b.getring and b.ring and b:getring() == Rational:getring() and a.symbol == b.ring.symbol then
+        return a:inring(b:getring()):div(b)
     end
     return BinaryOperation.DIVEXP({a, b})
 end
@@ -321,6 +309,10 @@ function PolynomialRing:inring(ring)
     -- Faster equality check
     if ring == self:getring() then
         return self
+    end
+
+    if ring == Rational:getring() and ring.child == self:getring() then
+        return Rational(self, Integer(1), true)
     end
 
     if ring.symbol == self.symbol then

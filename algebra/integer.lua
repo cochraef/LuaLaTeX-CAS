@@ -20,11 +20,6 @@ Integer.DIGITSIZE = 10 ^ Integer.DIGITLENGTH;
 -- Partition size for multiplying integers so we can get both the upper and lower bits of each digits
 Integer.PARTITIONSIZE = math.floor(math.sqrt(Integer.DIGITSIZE))
 
--- Returns the immediate subrings of this ring
-function Integer.subrings()
-    return {}
-end
-
 -- Method for computing the gcd of two integers using Euclid's algorithm
 function Integer.gcd(a, b)
     while b ~= Integer.zero() do

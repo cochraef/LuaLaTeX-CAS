@@ -1,4 +1,4 @@
--- Represents an element of the field of rational numbers
+-- Represents an element of the field of rational numbers or rational functions.
 -- Rationals have the following instance variables:
 --      numerator - an Integer numerator for the fractional representation of this rataionl
 --      denominator - an Integer denominator for the fractional representation of this rational
@@ -6,15 +6,6 @@
 --      Rationals implement Fields
 Rational = {}
 __Rational = {}
-
---------------------------
--- Static functionality --
---------------------------
-
--- Returns the immediate subrings of this ring
-function Rational.subrings()
-    return {Integer.getring()}
-end
 
 ----------------------------
 -- Instance functionality --
@@ -33,24 +24,32 @@ function Rational:new(n, d, keep)
     local o = {}
     o = setmetatable(o, __o)
 
-    if n:getring() ~= Integer.getring() or d:getring() ~= Integer.getring() then
-        error("Improper arguments for constructing a rational. Should be integers.")
+    if n:getring() == PolynomialRing.getring() then
+        o.symbol = n.symbol
+        o.ring = n:getring()
+    end
+
+    if d:getring() == PolynomialRing.getring() then
+        o.symbol = d.symbol
+        o.ring = d:getring()
     end
 
     n = n or Integer.zero()
     d = d or Integer.one()
     o.numerator = n
     o.denominator = d
-    o:reduce()
+    if not o.ring then
+        o:reduce()
+    end
 
-    if (not keep) and o.denominator == Integer.one() then
+    if (not keep) and o.denominator == Integer.one() or (not keep) and o.numerator == Integer.zero() then
         return o.numerator
     end
 
     return o
 end
 
--- Reduces a rational number to standard form.
+-- Reduces a rational expression to standard form.
 function Rational:reduce()
     if self.denominator < Integer.zero() then
         self.denominator = -self.denominator
@@ -62,15 +61,28 @@ function Rational:reduce()
 
 end
 
+
+-- Metatable for ring objects.
+local __obj = {__index = Rational, __eq = function(a, b)
+    return a["ring"] == b["ring"] and
+            (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
+            (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
+end, __tostring = function(a)
+        if a.child and a.symbol then
+            return tostring(a.child.child) .. "(" .. a.symbol .. ")"
+        end
+        return "QQ"
+    end}
+
 -- Returns the ring this object is an element of
-local t = {ring=Rational}
-t = setmetatable(t, {__index = Rational, __eq = function(a, b)
-    return a["ring"] == b["ring"]
-end,  __tostring = function(a)
-    return "QQ"
-end})
 function Rational:getring()
-    return t;
+    local t = {ring=Rational}
+    if self then
+        t.child = self.ring
+        t.symbol = self.symbol
+    end
+    t = setmetatable(t, __obj)
+    return t
 end
 
 -- Explicitly converts this element to an element of another ring
@@ -84,6 +96,10 @@ function Rational:inring(ring)
     end
 
     error("Unable to convert element to proper ring.")
+end
+
+function Rational:tocompoundexpression()
+    return BinaryOperation(BinaryOperation.DIV, {self.numerator:tocompoundexpression(), self.denominator:tocompoundexpression()})
 end
 
 function Rational:add(b)

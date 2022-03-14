@@ -61,6 +61,9 @@ function Ring.resultantring(ring1, ring2)
         end
 
         if ring2 == Rational.getring() then
+            if ring1.child then
+                return ring1
+            end
             return ring2
         end
 

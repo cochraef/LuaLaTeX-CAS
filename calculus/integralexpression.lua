@@ -332,7 +332,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
                 local _, s, t = PolynomialRing.extendedgcd(d, d:derrivative())
                 s = s * n
                 t = t * n
-                V = V - t/((p-Integer.one())*BinaryOperation.POWEXP({d, p-Integer.one()}))
+                V = V - t / ((p-Integer.one()) * BinaryOperation.POWEXP({d, p-Integer.one()}))
                 term.expressions[j+1].expressions[1] = term.expressions[j+1].expressions[1] + s + t:derrivative() / (p-Integer.one())
             end
         end
@@ -348,20 +348,12 @@ function IntegralExpression.rationalfunction(expression, symbol)
 
 
         local rr = r:squarefreefactorization()
+        local remainders = PolynomialRing.monicgcdremainders(b, y)
         for e, factor in ipairs(rr.expressions) do
             if e > 1 then
                 local re = factor.expressions[1]
                 local roots = re:roots()
                 for _, root in ipairs(roots) do
-
-                    local ys = y:substitute({[SymbolExpression("_")] = root}):autosimplify()
-                    if ys:freeof(symbol) then
-                        ys = PolynomialRing({ys}, symbol.symbol)
-                    else
-                        ys = ys:topolynomial()
-                    end
-                    local remainders = PolynomialRing.monicgcdremainders(b, ys)
-
                     local w
                     for _, remainder in ipairs(remainders) do
                         if remainder.degree:asnumber() == e - 1 then
@@ -369,7 +361,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
                             break
                         end
                     end
-                    W = W + root*LN(w)
+                    W = W + root*LN(w:substitute({[SymbolExpression("_")] = root}))
                 end
             end
         end

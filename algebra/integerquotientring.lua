@@ -20,12 +20,6 @@ end}
 -- Static functionality --
 --------------------------
 
--- Returns the immediate subrings of this ring
--- Integers are considered subrings of their quotient rings for conversion purposes
-function IntegerModN.subrings()
-    return {Integer:getring()}
-end
-
 -- Creates a new ring with the given modulus.
 function IntegerModN.makering(modulus)
     local t = {ring = IntegerModN}
