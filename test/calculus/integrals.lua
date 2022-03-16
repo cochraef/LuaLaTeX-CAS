@@ -10,7 +10,7 @@ local i = dparse("int(e^(x^(1/2)), x)")
 local j = dparse("int((x^3+1)/(x-2), x)")
 local k = dparse("int((x^2-x+1)/(x^3+3*x^2+3*x+1), x)")
 local l = dparse("int(1 / (x^3+6*x), x)")
-local m = dparse("int(1/(x^2+2), x)")
+local m = dparse("int(1/(x^2+x+1), x)")
 local n = dparse("int(1/(x^3+2*x+2), x, 0, 1)")
 
 starttest("integration")

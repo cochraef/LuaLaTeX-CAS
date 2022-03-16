@@ -221,9 +221,9 @@ __RingOperations.__pow = function(a, n)
         return BinaryOperation.POWEXP({a, n})
     end
 
-    if a == a:zero() and n == Integer.zero() then
-        error("Cannot raise 0 to the power of 0")
-    end
+    -- if a == a:zero() and n == Integer.zero() then
+    --     error("Cannot raise 0 to the power of 0")
+    -- end
 
     return a:pow(n)
 end

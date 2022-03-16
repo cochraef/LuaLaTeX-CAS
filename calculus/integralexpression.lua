@@ -301,6 +301,11 @@ function IntegralExpression.rationalfunction(expression, symbol)
         end
     end
 
+    -- Explicit handling of degree 1 over a binomial.
+    if f == Integer.one() and g.degree <= Integer(2) then
+        return Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1]) ^ (Integer(1)/Integer(2))) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1]) ^ (Integer(1)/Integer(2))
+    end
+
     -- If the polynomials are not relatively prime, divides out the common factors.
     local gcd = PolynomialRing.gcd(f, g)
     if gcd ~= Integer(1) then
