@@ -24,14 +24,52 @@ local a = Integer(108)
 local b = Integer(76)
 tex.print(Integer.gcd(a,b))
 } \] 
+\[ f'(x) = \luaexec{A=parse('DD(x,x^2)')
+    tex.print(A:tolatex())} \quad \Rightarrow \quad 
+    f(x) = \luaexec{
+        B=parse('int(2*x,x)')
+        tex.print(B:tolatex())} \] 
+\luaexec{tex.print("\\def\\A{",A:tolatex(),"}")}
+What is A? It is $\A$.
 
-
-\section{Bugs}
+Let's try:
+\[ \luaexec{
+    y=SymbolExpression("x")
+    Q=DD(y,y)
+    A=DD(SymbolExpression("x"),SymbolExpression("x^3/2"))
+    B='DD(x,x^3/2)'
+    C=parse(B)
+    print("This is the value of A:", tostring(A)) 
+    print("This is the value of B:", tostring(B)) 
+    print("This is the value of C:", tostring(C)) 
+    tex.print(tostring(A),"\\qquad")
+    tex.print(tostring(B),"\\qquad")
+    tex.print(tostring(C),"\\qquad")
+    tex.print(C:tolatex(),"\\qquad")
+    tex.print(tostring(parse('DD(y,y^4)')))
+    } 
+\] 
+Pop back in?
+\[ \luaexec{
+    tex.print(C:tolatex())
+} \] 
+Use \verb|C| in eval?
+\[ \eval{int(C,x)} \] 
+What if we save \verb|C| into a \LaTeX\ macro: \luaexec{tex.print("\\def\\C{",tostring(C),"}")}
+Now \verb|\C| should contain the contents of \verb|C| as a string. Let's try to use it:
+\[ \eval{int(\C,x)} \] 
+Woot!
+\section{(Pseudo) Bugs}
 {\color{gray} 
-Seems \verb|tolatex| has some trouble with the following and other trig related parsing:
-\[ \int \sin(x)\ \mathrm{d}x = \eval{int(sin(x),x)}\] 
-Seems to be trouble when integrating a rational function with an irreducible quadratic in the denominator:
-\[ \int \frac{1}{x^2+x+1}\ \mathrm{d}x = \eval{int(1/(x^2+x+1),x)}\]
+\[ \int \frac{1}{x^2+1}\ \mathrm{d}x = \eval{int(1/(x^2+1),x)}\]
+Maybe get irreducible quadratics into the integration table.
 }
-Does this cause an error: \luaexec{int(1/(x^2+x+1),x)} ?
 \end{document}
+
+ideally:
+\luacas{
+    A=x*sin(x)
+    B=DD(x,A)
+    C=int(B,x)
+    display(C) %shortcut to tex.print(C:tolatex())
+}

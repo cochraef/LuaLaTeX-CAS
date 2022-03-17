@@ -73,7 +73,7 @@ function TrigExpression:tofunction()
 end
 
 function TrigExpression:tolatex()
-    return "\\" + self.name + "(" + self.expression:tolatex() + ")"
+    return "\\" .. self.name .. "(" .. self.expression:tolatex() .. ")"
 end
 
 -----------------
