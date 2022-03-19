@@ -220,7 +220,7 @@ function IntegralExpression.substitutionmethod(expression, symbol)
             if symbol == SymbolExpression("u") then
                 subsymbol = SymbolExpression("v")
             end
-            local u = (expression / (DerrivativeExpression(symbol, g))):autosimplify()
+            local u = (expression / (DerrivativeExpression(g, symbol))):autosimplify()
             u = u:substitute({[g]=subsymbol}):autosimplify()
             if u:freeof(symbol) then
                 local FF = IntegralExpression.integrate(u, subsymbol)

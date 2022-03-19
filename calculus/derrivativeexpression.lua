@@ -13,13 +13,11 @@ __DerrivativeExpression = {}
 ----------------------------
 
 -- Creates a new derrivative operation with the given symbol and expression
-function DerrivativeExpression:new(symbol, expression)
+function DerrivativeExpression:new(expression, symbol)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
-    if not symbol or not expression then
-        error("Send wrong number of parameters: derrivatives must have a variable to differentiate with respect to and an expression to differentiate.")
-    end
+    symbol = symbol or SymbolExpression("x")
 
     o.symbol = symbol
     o.expression = Copy(expression)
@@ -53,7 +51,7 @@ function DerrivativeExpression:substitute(map)
     end
     -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
     -- substituting and then evaluating the derrivative may not return the same thing as evaluating the derrivative and then substituting.
-    return DerrivativeExpression(self.symbol, self.expression:substitute(map))
+    return DerrivativeExpression(self.expression:substitute(map), self.symbol)
 end
 
 -- Performs automatic simplification of a derrivative
@@ -78,12 +76,12 @@ function DerrivativeExpression:autosimplify()
         if simplified.expressions[2] then
             return self
         end
-        return (DerrivativeExpression(self.symbol, simplified.expressions[1]) * FunctionExpression(simplified.name .. "'", simplified.expressions)):autosimplify()
+        return (DerrivativeExpression(simplified.expressions[1], self.symbol) * FunctionExpression(simplified.name .. "'", simplified.expressions)):autosimplify()
     end
 
     -- Chain rule for trig functions
     if simplified:type() == TrigExpression then
-        local internal = DerrivativeExpression(self.symbol, simplified.expression)
+        local internal = DerrivativeExpression(simplified.expression, self.symbol)
 
         if simplified.name == "sin" then
             return (internal * COS(simplified.expression)):autosimplify()
@@ -125,14 +123,14 @@ function DerrivativeExpression:autosimplify()
 
     -- TODO: Piecewise functions
     if self:type() == AbsExpression then
-        return DerrivativeExpression(self.symbol, self.expression):autosimplify()
+        return DerrivativeExpression(self.expression, self.symbol):autosimplify()
     end
 
     -- Uses linearity of derrivatives to evaluate sum expressions
     if simplified.operation == BinaryOperation.ADD then
         local parts = {}
         for i, expression in pairs(simplified.expressions) do
-            parts[i] = DerrivativeExpression(self.symbol, expression)
+            parts[i] = DerrivativeExpression(expression, self.symbol)
         end
         return BinaryOperation(BinaryOperation.ADD, parts):autosimplify()
     end
@@ -146,7 +144,7 @@ function DerrivativeExpression:autosimplify()
                 if i ~= j then
                     products[j] = innerexpression
                 else
-                    products[j] = DerrivativeExpression(self.symbol, innerexpression)
+                    products[j] = DerrivativeExpression(innerexpression, self.symbol)
                 end
             end
             sums[i] = BinaryOperation(BinaryOperation.MUL, products)
@@ -163,10 +161,10 @@ function DerrivativeExpression:autosimplify()
                     BinaryOperation.POWEXP({base, exponent}),
                     BinaryOperation.ADDEXP({
                         BinaryOperation.MULEXP({
-                            DD(self.symbol, base),
+                            DD(base, self.symbol),
                             BinaryOperation.DIVEXP({exponent, base})}),
                         BinaryOperation.MULEXP({
-                            DD(self.symbol, exponent),
+                            DD(exponent, self.symbol),
                             LN(base)})})
                     }):autosimplify()
     end
@@ -176,11 +174,11 @@ function DerrivativeExpression:autosimplify()
         local expression = simplified.expression
 
         return BinaryOperation.SUBEXP({
-                    BinaryOperation.DIVEXP({DD(self.symbol, expression),
+                    BinaryOperation.DIVEXP({DD(expression, self.symbol),
                         BinaryOperation.MULEXP({expression, LN(base)})}),
 
                     BinaryOperation.DIVEXP({
-                        BinaryOperation.MULEXP({LN(expression), DD(self.symbol, base)}),
+                        BinaryOperation.MULEXP({LN(expression), DD(base, self.symbol)}),
                         BinaryOperation.MULEXP({BinaryOperation.POWEXP({LN(base), Integer(2)}), base})
                     })
 
@@ -221,6 +219,6 @@ DerrivativeExpression = setmetatable(DerrivativeExpression, __DerrivativeExpress
 ----------------------
 -- Static constants --
 ----------------------
-DD = function(symbol, expression)
-    return DerrivativeExpression(symbol, expression)
+DD = function(expression, symbol)
+    return DerrivativeExpression(expression, symbol)
 end

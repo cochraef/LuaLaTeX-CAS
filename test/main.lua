@@ -102,7 +102,7 @@ end
 
 -- TODO: Add profiling and error catching options.
 -- Comment out these lines to only run certain test code.
--- require("test.calculus.derrivatives")
+require("test.calculus.derrivatives")
 require("test.calculus.integrals")
 
 -- require("test.expressions.autosimplify")

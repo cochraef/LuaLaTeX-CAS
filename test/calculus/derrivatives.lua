@@ -1,15 +1,15 @@
-local a = DD(SymbolExpression("x"), SymbolExpression("x") * SymbolExpression("y"))
-local b = DD(SymbolExpression("x"), Integer(3) * SymbolExpression("x") ^ Integer(2) + Integer(2) * SymbolExpression("x") + Integer(6))
-local c = DD(SymbolExpression("x"), E ^ SymbolExpression("x"))
-local d = DD(SymbolExpression("x"), FunctionExpression("f", {SymbolExpression("x") ^ Integer(2)}))
-local e = DD(SymbolExpression("x"), SymbolExpression("x") ^ SymbolExpression("x"))
-local f = DD(SymbolExpression("x"), PolynomialRing({Integer(3), Integer(4), Integer(5)}, "x"))
-local g = DD(SymbolExpression("y"), LN(SymbolExpression("y")))
-local h = DD(SymbolExpression("x"), SymbolExpression("x") ^ SymbolExpression("n"))
-local i = DD(SymbolExpression("x"), SIN((SymbolExpression("x"))));
-local j = DD(SymbolExpression("x"), SIN(Integer(2) * COS(SymbolExpression("x"))));
-local k = DD(SymbolExpression("x"), ARCTAN(SymbolExpression("x") ^ (Integer(1) / Integer(2))))
-local l = DD(SymbolExpression("x"), ARCSEC(SymbolExpression("x")))
+local a = DD(SymbolExpression("x") * SymbolExpression("y"), SymbolExpression("x"))
+local b = DD(Integer(3) * SymbolExpression("x") ^ Integer(2) + Integer(2) * SymbolExpression("x") + Integer(6), SymbolExpression("x"))
+local c = DD(E ^ SymbolExpression("x"), SymbolExpression("x"))
+local d = DD(FunctionExpression("f", {SymbolExpression("x") ^ Integer(2)}))
+local e = DD(SymbolExpression("x") ^ SymbolExpression("x"))
+local f = DD(PolynomialRing({Integer(3), Integer(4), Integer(5)}, "x"))
+local g = DD(LN(SymbolExpression("y")), SymbolExpression("y"))
+local h = DD(SymbolExpression("x") ^ SymbolExpression("n"))
+local i = DD(SIN((SymbolExpression("x"))));
+local j = DD(SIN(Integer(2) * COS(SymbolExpression("x"))));
+local k = DD(ARCTAN(SymbolExpression("x") ^ (Integer(1) / Integer(2))))
+local l = DD(ARCSEC(SymbolExpression("x")))
 
 starttest("derrivatives")
 
