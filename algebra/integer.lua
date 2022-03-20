@@ -124,6 +124,9 @@ __o.__div = function(a, b)   -- Constructor for a rational number disguised as d
     end
     return __FieldOperations.__div(a, b)
 end
+__o.__concat = function(a, b) -- Like a decimal, but fancier. Used mainly for the parser with decimal numbers.
+    return a + b / (Integer(10) ^ Integer.ceillog(b))
+end
 
 -- Creates a new integer given a string or number representation of the integer
 function Integer:new(n)
