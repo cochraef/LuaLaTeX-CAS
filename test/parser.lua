@@ -26,7 +26,7 @@ function disp(expression)
 end
 
 -- Parses raw input into Lua code and executes it.
-function parse(input)
+function CASparse(input)
 
     -- First, we replace any occurance of a number with an integer or rational version of itself.
     local str = string.gsub(input, ".?[0-9]+", function (s)
