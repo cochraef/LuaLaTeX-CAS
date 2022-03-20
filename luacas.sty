@@ -3,8 +3,9 @@
 \RequirePackage{luacode}
 \RequirePackage{pgfkeys}
 
-\directlua{require('test.main')}
+\directlua{require('test.main') require('parser.main')}
 
+\newcommand{\CAS}[1]{\luaexec{parse('#1')}}
 \newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 \pgfkeys{
@@ -16,5 +17,5 @@
 
 \newcommand\diff[2][]{%
     \pgfqkeys{/luac@s/diff}{default, #1}%
-    \eval{DD(\diffvar,#2)}
+    \eval{DD(#2,\diffvar)}
 }
