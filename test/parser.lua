@@ -1,10 +1,10 @@
--- Rudimentary parser for making the CAS easier to use. Essentially just wraps SymbolExpression() arround symbols and Integer() arround integers.
+-- Rudimentary parser for making the CAS easier to use. Essentially just wraps SymbolExpression() around symbols and Integer() arround integers.
 
 
 require("calculus._init")
 
 -- A list of symbols and functions that have special meaning and aren't converted to symbol expressions.
-local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", DD = "DD", int = "INT"}
+local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", DD = "DD", int = "INT", exp = "E^"}
 
 -- Lua keywords that also aren't converted into syntax.
 local keywords = {"and","break","do","else","elseif","end","false","for","function","goto","if","in","local","nil","not","or","repeat","return","then","true","until","while"}
@@ -22,14 +22,27 @@ end
 
 -- Displays an expression. For use in the parser.
 function disp(expression)
-    tex.print(expression:autosimplify():tolatex())
+    if expression.autosimplify then
+        print(expression:autosimplify():tolatex())
+    else
+        print(tostring(expression))
+    end
 end
 
--- Parses raw input into Lua code and executes it.
+--- Parses raw input into Lua code and executes it.
+--- @param input string
 function CASparse(input)
 
+    -- Removes new lines from multiline comments and strings, so we can split on lines without worry.
+    local str = string.gsub(input, "%[%[.*%]%]", function (s)
+        return string.gsub(s, "\n", "")
+    end)
+
+    print(str)
+
+
     -- First, we replace any occurance of a number with an integer or rational version of itself.
-    local str = string.gsub(input, ".?[0-9]+", function (s)
+    str = string.gsub(str, ".?[0-9]+", function (s)
         -- Here, we are part of an identifier, so we don't replace anything
         if string.match(string.sub(s, 1, 1), "[A-Z]") or string.match(string.sub(s, 1, 1), "[a-z]") or string.match(string.sub(s, 1, 1), "_") then
             return;
@@ -41,6 +54,27 @@ function CASparse(input)
 
         return string.sub(s, 1, 1) .. "Integer('" .. string.sub(s, 2, #s) .. "')"
     end)
+
+    print(str)
+
+    -- Now, we convert back to boring Lua numbers if we are using numeric for loops.
+    str = str.gsub(str, "%sfor%s+%a%w*%s*=.+,.+do", function (s)
+        local out = " for "
+        s = string.sub(s, 5, #s)
+        local parts = split(str, "[%s|,|=]")
+
+        out = out .. parts[1] .. "=(" .. parts[2] .. "):asnumber(),(" .. parts[3] .. "):asnumber()"
+
+        if parts[4] then
+            out = out .. ",(" .. parts[4] .. "):asnumber() do"
+        else
+            out = out .. " do"
+        end
+
+        return out
+    end)
+
+    print(str)
 
     --------------------------
     -- HERE COMES THE JANK. --
@@ -58,7 +92,9 @@ function CASparse(input)
         return string.sub(s, 1, 1) .. "Integer('0')." .. string.sub(s, 2, #s)
     end)
 
-    -- Next, we break the input into seperate lines. This means we can't put multiple assignments on one line without a semicolon, but I AM NOT DOING CFGS TO DETERMINE WHEN EXPRESSIONS END YOU CAN'T MAKE ME YOU"LL NEVER TAKE ME ALIVE CHOMSKY.
+    print(str)
+
+    -- Next, we break the input into seperate lines. This means we can't put multiple assignments on one line without a semicolon, but I AM NOT DOING CFGS TO DETERMINE WHEN EXPRESSIONS END YOU CAN'T MAKE ME YOU'LL NEVER TAKE ME ALIVE CHOMSKY.
     local lines = split(str, "\n;")
     for _, line in ipairs(lines) do
         -- On each line, we replace variables, but only if they aren't assigned or a keyword, or being assigned
@@ -78,14 +114,15 @@ function CASparse(input)
                 first = string.sub(s, 1, 1)
                 s = string.sub(s, 2, #s)
             end
-            -- LUA keyword check
+
+            -- Lua keyword check.
             for _, keyword in ipairs(keywords) do
                 if s == keyword then
                     return
                 end
             end
 
-            -- assigned variable check
+            -- Assigned variable check.
             local exe, err = load("return " .. s .." == nil")
             if exe() == nil then
                 print(err)
@@ -95,7 +132,7 @@ function CASparse(input)
                 return;
             end
 
-            -- CAS symbol check
+            -- CAS symbol check.
             for word, replace in pairs(constants) do
                 if s == word then
                     return first .. replace
@@ -107,6 +144,8 @@ function CASparse(input)
         end)
 
         print(run)
+
+        -- print(run)
         local exe, err = load(run .. "\n return true")
         if exe then
             exe()
@@ -117,4 +156,4 @@ function CASparse(input)
 end
 
 
-parse("x = 2; y = x + z; disp(y)")
+

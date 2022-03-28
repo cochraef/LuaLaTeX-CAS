@@ -351,13 +351,23 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
-        if self.expressions[2]:isevaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
-            if self.expressions[2].denominator == Integer(2) then
-                return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
+        if self.expressions[1]:isatomic() then
+            if self.expressions[2]:isevaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
+                if self.expressions[2].denominator == Integer(2) then
+                    return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
+                end
+                return "\\sqrt[" .. self.expressions[2].denominator:tolatex() .. ']{' .. self.expressions[1]:tolatex() .. '}'
             end
-            return "\\sqrt[" .. self.expressions[2].denominator:tolatex() .. ']{' .. self.expressions[1]:tolatex() .. '}'
+            return self.expressions[1]:tolatex() .. '^{' .. self.expressions[2]:tolatex() .. '}'
+        else
+            if self.expressions[2]:isevaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
+                if self.expressions[2].denominator == Integer(2) then
+                    return "\\sqrt{\\left(" .. self.expressions[1]:tolatex() .. '\\right)}'
+                end
+                return "\\sqrt[" .. self.expressions[2].denominator:tolatex() .. ']{\\left(' .. self.expressions[1]:tolatex() .. '\\right)}'
+            end
+            return "\\left(" .. self.expressions[1]:tolatex() .. "\\right)" .. '^{' .. self.expressions[2]:tolatex() .. '}'
         end
-        return self.expressions[1]:tolatex() .. '^{' .. self.expressions[2]:tolatex() .. '}'
     end
     if self.operation == BinaryOperation.MUL then
         local out = ''
@@ -368,7 +378,7 @@ function BinaryOperation:tolatex()
                     local reversed = (Integer.one() / expression):autosimplify()
                     denom = denom .. reversed:tolatex()
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
-                    out = out .. '(' .. expression:tolatex() .. ')'
+                    out = out .. '\\left(' .. expression:tolatex() .. '\\right)'
                 else
                     out = out .. expression:tolatex()
                 end
@@ -392,7 +402,7 @@ function BinaryOperation:tolatex()
         local out = ''
         for index, expression in ipairs(self.expressions) do
             out = out .. expression:tolatex()
-            if self.expressions[index + 1] then
+            if self.expressions[index + 1] and string.sub(self.expressions[index + 1]:tolatex(), 1, 1) ~= "-" then
                 out = out .. '+'
             end
         end
