@@ -40,6 +40,9 @@ function CASparse(input)
     end)
 
     print(str)
+
+    -- First, we replace any occurance of a number with an integer or rational version of itself.
+    str = string.gsub(input, ".?[0-9]+", function (s)
         -- Here, we are part of an identifier, so we don't replace anything
         if string.match(string.sub(s, 1, 1), "[A-Z]") or string.match(string.sub(s, 1, 1), "[a-z]") or string.match(string.sub(s, 1, 1), "_") then
             return;
