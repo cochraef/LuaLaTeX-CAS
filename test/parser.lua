@@ -1,4 +1,4 @@
--- Rudimentary parser for making the CAS easier to use. Essentially just wraps SymbolExpression() arround symbols and Integer() arround integers.
+-- Rudimentary parser for making the CAS easier to use. Essentially just wraps SymbolExpression() around symbols and Integer() around integers.
 
 
 require("calculus._init")
@@ -28,7 +28,7 @@ end
 -- Parses raw input into Lua code and executes it.
 function CASparse(input)
 
-    -- First, we replace any occurance of a number with an integer or rational version of itself.
+    -- First, we replace any occurrence of a number with an integer or rational version of itself.
     local str = string.gsub(input, ".?[0-9]+", function (s)
         -- Here, we are part of an identifier, so we don't replace anything
         if string.match(string.sub(s, 1, 1), "[A-Z]") or string.match(string.sub(s, 1, 1), "[a-z]") or string.match(string.sub(s, 1, 1), "_") then
@@ -58,7 +58,7 @@ function CASparse(input)
         return string.sub(s, 1, 1) .. "Integer('0')." .. string.sub(s, 2, #s)
     end)
 
-    -- Next, we break the input into seperate lines. This means we can't put multiple assignments on one line without a semicolon, but I AM NOT DOING CFGS TO DETERMINE WHEN EXPRESSIONS END YOU CAN'T MAKE ME YOU"LL NEVER TAKE ME ALIVE CHOMSKY.
+    -- Next, we break the input into separate lines. This means we can't put multiple assignments on one line without a semicolon, but I AM NOT DOING CFGS TO DETERMINE WHEN EXPRESSIONS END YOU CAN'T MAKE ME YOU"LL NEVER TAKE ME ALIVE CHOMSKY.
     local lines = split(str, "\n;")
     for _, line in ipairs(lines) do
         -- On each line, we replace variables, but only if they aren't assigned or a keyword, or being assigned

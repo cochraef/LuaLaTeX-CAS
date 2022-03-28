@@ -1,75 +1,138 @@
 \documentclass{article}
 \usepackage{luacas}
+\usepackage{amsmath}
 
 \usepackage{xcolor}
+\usepackage{parskip}
 
 \begin{document}
 
-Consider the expression: $x^g$. The derivative with respect to $x$ is:
-\[ \diff{x^g+x} \] %this working?
-while the derivative with respect to $g$ is:
-\[ \diff[var=g]{x^g+x} \] 
-Symbolic integration:
-\[ \int \frac{x+5}{x^2+3x+2}\ \mathrm{d}x = \eval{int((x+5)/(x^2+3*x+2),x)} \]
-Let's use \verb|\def\expr{(x+5)/(x^2+3*x+2)}| to save an expression into the macro \verb|\expr|. 
-\def\expr{(x+5)/(x^2+3*x+2)}
-\[ \eval{\expr} \] 
-This might be helpful; we could write:
-\[ \int \eval{\expr}\ \mathrm{d}x = \eval{int(\expr,x)}.\] 
-Let's try some integer arithmetic:
-\[ \frac{108}{37} + \frac{76}{17} = \eval{108/37+76/17}.\]
-Let's try gcd:
-\[ \gcd(108,76) = \luaexec{
-local a = Integer(108)
-local b = Integer(76)
-tex.print(Integer.gcd(a,b))
-} \] 
-\[ f'(x) = \luaexec{A=parse('DD(x,x^2)')
-    tex.print(A:tolatex())} \quad \Rightarrow \quad 
-    f(x) = \luaexec{
-        B=parse('int(2*x,x)')
-        tex.print(B:tolatex())} \] 
-\luaexec{tex.print("\\def\\A{",A:tolatex(),"}")}
-What is A? It is $\A$.
 
-Let's try:
-\[ \luaexec{
-    y=SymbolExpression("x")
-    Q=DD(y,y)
-    A=DD(SymbolExpression("x"),SymbolExpression("x^3/2"))
-    B='DD(x,x^3/2)'
-    C=parse(B)
-    print("This is the value of A:", tostring(A)) 
-    print("This is the value of B:", tostring(B)) 
-    print("This is the value of C:", tostring(C)) 
-    tex.print(tostring(A),"\\qquad")
-    tex.print(tostring(B),"\\qquad")
-    tex.print(tostring(C),"\\qquad")
-    tex.print(C:tolatex(),"\\qquad")
-    tex.print(tostring(parse('DD(y,y^4)')))
-    } 
-\] 
-Pop back in?
-\[ \luaexec{
-    tex.print(C:tolatex())
-} \] 
-Use \verb|C| in eval?
-\[ \eval{int(C,x)} \] 
-What if we save \verb|C| into a \LaTeX\ macro: \luaexec{tex.print("\\def\\C{",tostring(C),"}")}
-Now \verb|\C| should contain the contents of \verb|C| as a string. Let's try to use it:
-\[ \eval{int(\C,x)} \] 
-Woot!
-\section{(Pseudo) Bugs}
-{\color{gray} 
-\[ \int \frac{1}{x^2++x+1}\ \mathrm{d}x = \eval{int(1/(x^2+x+1),x)}\]
-Maybe get irreducible quadratics into the integration table.
+\section{Core}
+Testing \verb|core| commands. 
+
+\subsection{Expressions}
+
+\subsubsection{substitute}
+
+$\luaexec{
+    local sym1 = parse("x^2+x")
+    local subs ={[SymbolExpression("x")]=SymbolExpression("y")}
+    local sym2 = sym1:substitute(subs)
+    tex.print(sym2:tolatex())
+}$
+
+    
+\subsubsection{isatomic} 
+Symbol expressions are by default \verb|AtomicExpressions|. For example: 
+\begin{quote} 
+If we store \verb|asym = SymbolExpression("x^2+x")| then the sentence ``the expression \verb|asym| is an atomic expression'' is 
+\luaexec{
+    local asym = SymbolExpression("x^2+x")
+    if asym:isatomic() then
+        tex.print("True")
+    else
+        tex.print("False")
+    end
+}.
+\end{quote}
+But expressions that are constructed using \verb|BinaryOperations| are non-atomic. For example:
+\begin{quote}
+    If we store \verb|x = SymbolExpression("x")| and \verb|csym = x*x+x| then the sentence ``the expression \verb|csym| is an atomic expression'' is
+    \luaexec{
+    local x = SymbolExpression("x")
+    local csym = x*x+x
+    if csym:isatomic() then
+        tex.print("True")
+    else
+        tex.print("False")
+    end
+    }.
+\end{quote}
+We also have:
+\begin{quote}
+    If we store \verb|csym = parse("x^2+x")| then the sentence ``the expression \verb|csym| is an atomic expression'' is
+    \luaexec{
+    local csym = parse("x^2+x")
+    if csym:isatomic() then
+        tex.print("True")
+    else
+        tex.print("False")
+    end
+    }.
+\end{quote}
+
+
+
+\subsection{symbolexpression.lua} 
+Testing commands in \verb|symbolexpression.lua|. 
+
+\subsubsection{evaluate}
+
+\subsubsection{freeof} 
+The statement ``$x^2+x+3$ is free of $x$'' is: %
+\luaexec{
+    local x = SymbolExpression("x")
+    local sym = x*x+x+Integer(3)
+    local y = SymbolExpression("x")
+    if sym:freeof(y) then
+        tex.print("True")
+    else 
+        tex.print("False")
+    end
 }
+
+The statement ``$x^2+x+3$ is free of $y$'' is: %
+\luaexec{
+    local x = SymbolExpression("x")
+    local sym = x*x+x+Integer(3)
+    local y = SymbolExpression("y")
+    if sym:freeof(y) then
+        tex.print("True")
+    else 
+        tex.print("False")
+    end
+}
+
+\subsubsection{expand}
+
+Using the distributive property, we have:
+$\luaexec{
+    x = SymbolExpression("x")
+    y = SymbolExpression("y")
+    sym = (x-Integer(1))*(y+Integer(2))
+    sym2 = parse("(x-1)*(y+2)")
+    esym= sym2:expand()
+    tex.print(sym2:tolatex(),"=",esym:tolatex())
+}$. {\color{red} It would be good for $2x+-y$ to be written as $2x-y$.}
+
+
+\newpage
+
+
+\section{Bugs \& Feature Requests}
+{\color{gray} 
+\begin{enumerate}
+\item There's an issue with parentheses in the \verb|tolatex| command:
+\[ \CAS{
+    disp(1/((h-1)^2))
+} \] 
+\item We also might want to add the ability for \verb|\CAS| to identify \verb|local| variables. Let's add \verb|exp| as a known function:
+\[ \CAS{ disp(int(z*e^(z^2),z)) } \qquad \text{vs} \qquad \CAS{ disp(int(z*exp(z^2),z)) } \] 
+\item It might be nice to be able to use Lua logical operators in \verb|\CAS|;  and also to declare local variables to limit scope.
+\item Glorified \verb|simplify| command might be good (for getting rational expressions in a common denominator, or combining logs and such).
+\end{enumerate}
+}
+\[ \CAS{
+    local g = 2;
+    disp(g);
+    } \] 
+\CAS{disp(g)}
+\luaexec{
+CASparse("g=3; h=x^2+x")
+disp(g)
+if h==SymbolExpression("x^2+x") then tex.print("Symbols!") end
+}
+
 \end{document}
 
-ideally:
-\luacas{
-    A=x*sin(x)
-    B=DD(x,A)
-    C=int(B,x)
-    display(C) %shortcut to tex.print(C:tolatex())
-}

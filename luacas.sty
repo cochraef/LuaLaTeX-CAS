@@ -3,10 +3,12 @@
 \RequirePackage{luacode}
 \RequirePackage{pgfkeys}
 
-\directlua{require('test.main') require('parser.main')}
+\directlua{require('test.main') require('test.parser')}
 
-\newcommand{\CAS}[1]{\luaexec{parse('#1')}}
+\newcommand{\CAS}[1]{\luaexec{CASparse('#1')}}
 \newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
+
+%expression.lua
 
 \pgfkeys{
     luac@s/diff/.is family, /luac@s/diff,
@@ -14,7 +16,6 @@
         {var = x},
     var/.estore in = \diffvar,
 }
-
 \newcommand\diff[2][]{%
     \pgfqkeys{/luac@s/diff}{default, #1}%
     \eval{DD(#2,\diffvar)}
