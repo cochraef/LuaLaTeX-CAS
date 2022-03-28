@@ -24,6 +24,15 @@ end
 -- Displays an expression. For use in the parser.
 function disp(expression)
     if expression.autosimplify then
+        tex.print(expression:autosimplify():tolatex())
+    else
+        tex.print(tostring(expression))
+    end
+end
+
+-- Displays an expression. For use in the parser.
+function displua(expression)
+    if expression.autosimplify then
         print(expression:autosimplify():tolatex())
     else
         print(tostring(expression))
@@ -155,3 +164,4 @@ end
 
 
 
+CASparse("displua(2*x-y)")
