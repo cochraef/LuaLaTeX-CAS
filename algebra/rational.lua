@@ -102,6 +102,11 @@ function Rational:tocompoundexpression()
     return BinaryOperation(BinaryOperation.DIV, {self.numerator:tocompoundexpression(), self.denominator:tocompoundexpression()})
 end
 
+-- Returns this rational as a floating point number. Can only approximate the value of large integers.
+function Rational:asnumber()
+    return self.numerator:asnumber() / self.denominator:asnumber()
+end
+
 function Rational:add(b)
     return Rational(self.numerator * b.denominator + self.denominator * b.numerator, self.denominator * b.denominator)
 end
