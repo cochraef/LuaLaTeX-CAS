@@ -1,9 +1,7 @@
--- Represents a trigonometric function from one expression to another.
--- TrigExpressions have the following instance variables:
---      name - the string name of the function
---      expression - an expression that is passed in to the function
--- TrigExpressions have the following relations to other classes:
---      TrigExpressions extend CompoundExpressions
+--- @class TrigExpression
+--- Represents a trigonometric function from one expression to another.
+--- @field name SymbolExpression
+--- @field expression Expression
 TrigExpression = {}
 __TrigExpression = {}
 
@@ -11,7 +9,10 @@ __TrigExpression = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new trig expression with the given name and expression
+--- Creates a new trig expression with the given name and expression.
+--- @param name string|SymbolExpression
+--- @param expression Expression
+--- @return TrigExpression
 function TrigExpression:new(name, expression)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -28,9 +29,9 @@ function TrigExpression:new(name, expression)
         return tostring(a.name) .. '(' .. tostring(a.expression) .. ')'
     end
     __o.__eq = function(a, b)
-        if b:type() == FunctionExpression then
-            return a:tofunction() == b
-        end
+        -- if b:type() == FunctionExpression then
+        --     return a:tofunction() == b
+        -- end
         -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
         if not b:type() == TrigExpression then
             return false
@@ -42,45 +43,54 @@ function TrigExpression:new(name, expression)
     return o
 end
 
+--- @return TrigExpression
 function TrigExpression:evaluate()
     return self
 end
 
-function TrigExpression:freeof(symbol)
-    return self.expression:freeof(symbol)
-end
-
-function TrigExpression:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    return TrigExpression(self.name, self.expression:substitute(map))
-end
-
 -- TODO : Trigonometric autosimplification
+--- @return TrigExpression
 function TrigExpression:autosimplify()
     return TrigExpression(self.name, self.expression:autosimplify())
 end
 
-function TrigExpression:order(other)
-    return self:tofunction():order(other)
+--- @return table<number, Expression>
+function TrigExpression:subexpressions()
+    return {self.expression}
 end
 
-function TrigExpression:tofunction()
-    return FunctionExpression(self.name, {self.expression}, true)
+--- @param subexpressions table<number, Expression>
+--- @return TrigExpression
+function TrigExpression:setsubexpressions(subexpressions)
+    return TrigExpression(self.name, subexpressions[1])
 end
 
-function TrigExpression:tolatex()
-    return "\\" .. self.name .. "(" .. self.expression:tolatex() .. ")"
-end
+-- function TrigExpression:freeof(symbol)
+--     return self.expression:freeof(symbol)
+-- end
+
+-- function TrigExpression:substitute(map)
+--     for expression, replacement in pairs(map) do
+--         if self == expression then
+--             return replacement
+--         end
+--     end
+--     return TrigExpression(self.name, self.expression:substitute(map))
+-- end
+
+-- function TrigExpression:order(other)
+--     return self:tofunction():order(other)
+-- end
+
+-- function TrigExpression:tofunction()
+--     return FunctionExpression(self.name, {self.expression}, true)
+-- end
 
 -----------------
 -- Inheritance --
 -----------------
 
-__TrigExpression.__index = CompoundExpression
+__TrigExpression.__index = FunctionExpression
 __TrigExpression.__call = TrigExpression.new
 TrigExpression = setmetatable(TrigExpression, __TrigExpression)
 

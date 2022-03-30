@@ -2,12 +2,12 @@
 
 require("core.expression")
 require("core.atomicexpression")
-require("core.symbolexpression")
 require("core.compoundexpression")
+require("core.constantexpression")
+require("core.symbolexpression")
 require("core.binaryoperation")
 require("core.functionexpression")
 
-require("core.constant")
 
 require("core.binaryoperation.power")
 require("core.binaryoperation.product")

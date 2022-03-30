@@ -1,6 +1,5 @@
--- Interface for an element of a ring with unity
--- Rings have the following relation to other classes:
---      Rings extend AtomicExpresssions
+--- @class Ring
+--- Interface for an element of a ring with unity.
 Ring = {}
 __Ring = {}
 
@@ -8,8 +7,11 @@ __Ring = {}
 -- Static functionality --
 --------------------------
 
--- Determines which ring the output of a binary operation with inputs in ring1 and ring2 should be, if such a ring exists.
--- If one of the rings is a subring of another ring, the result should be one of the two rings.
+--- Determines which ring the output of a binary operation with inputs in ring1 and ring2 should be, if such a ring exists.
+--- If one of the rings is a subring of another ring, the result should be one of the two rings.
+--- @param ring1 RingIdentifier
+--- @param ring2 RingIdentifier
+--- @return RingIdentifier
 function Ring.resultantring(ring1, ring2)
     if ring1 == ring2 then
         return ring1
@@ -89,43 +91,58 @@ function Ring.resultantring(ring1, ring2)
     return nil
 end
 
--- Returns a particular instantiation of a ring.
--- Does the same thing as getring() if there is only one possible ring for a class, i.e., the integers and rationals\.
+--- Returns a particular instantiation of a ring.
+--- Does the same thing as getring() if there is only one possible ring for a class, i.e., the integers and rationals.
+--- @return RingIdentifier
 function Ring.makering()
     error("Called unimplemented method : makering()")
 end
 
-----------------------------
--- Instance functionality --
-----------------------------
+----------------------
+-- Required methods --
+----------------------
 
--- Returns the ring this element is part of.
+--- Returns the ring this element is part of.
+--- @return RingIdentifier
 function Ring:getring()
     error("Called unimplemented method : getring()")
 end
 
--- Returns whether the ring is commutative.
-function Ring:iscommutative()
-    error("Called unimplemented method : isCommutative()")
+--- Explicitly converts this element to an element of another ring.
+--- @param ring RingIdentifier
+--- @return Ring
+function Ring:inring(ring)
+    error("Called unimplemented method : in()")
 end
 
+--- Returns whether the ring is commutative.
+--- @return boolean
+function Ring:iscommutative()
+    error("Called unimplemented method : iscommutative()")
+end
+
+--- @return Ring
 function Ring:add(b)
     error("Called unimplemented method : add()")
 end
 
+--- @return Ring
 function Ring:sub(b)
     return(self:add(b:neg()))
 end
 
+--- @return Ring
 function Ring:neg()
     error("Called unimplemented method : neg()")
 end
 
+--- @return Ring
 function Ring:mul(b)
     error("Called unimplemented method : mul()")
 end
 
--- Ring exponentiation based on the definition. Specific rings may implement more efficient methods.
+--- Ring exponentiation by definition. Specific rings may implement more efficient methods.
+--- @return Ring
 function Ring:pow(n)
     if(n < Integer.zero()) then
         error("Execution error: Negative exponentiation is undefined over general rings")
@@ -139,23 +156,29 @@ function Ring:pow(n)
     return b
 end
 
+--- @return boolean
 function Ring:eq(b)
     error("Execution error: Ring does not have a total order")
 end
 
+--- @return boolean
 function Ring:lt(b)
     error("Execution error: Ring does not have a total order")
 end
 
+--- @return boolean
 function Ring:le(b)
     error("Execution error: Ring does not have a total order")
 end
 
--- The additive and multiplicative identities of the ring
+--- The additive identitity of the ring.
+--- @return Ring
 function Ring:zero()
     error("Called unimplemented method : zero()")
 end
 
+--- The multiplicative identitity of the ring.
+--- @return Ring
 function Ring:one()
     error("Called unimplemented method : one()")
 end
@@ -173,7 +196,7 @@ __RingOperations.__unm = function(a)
 end
 
 __RingOperations.__add = function(a, b)
-    if not b.getring and b.isevaluatable then
+    if not b.getring then
         return BinaryOperation.ADDEXP({a, b})
     end
 
@@ -186,7 +209,7 @@ __RingOperations.__add = function(a, b)
 end
 
 __RingOperations.__sub = function(a, b)
-    if not b.getring and b.isevaluatable then
+    if not b.getring then
         return BinaryOperation.SUBEXP({a, b})
     end
 
@@ -204,7 +227,7 @@ __RingOperations.__call = function (a, b)
 end
 
 __RingOperations.__mul = function(a, b)
-    if not b.getring and b.isevaluatable then
+    if not b.getring then
         return BinaryOperation.MULEXP({a, b})
     end
 
@@ -217,7 +240,7 @@ __RingOperations.__mul = function(a, b)
 end
 
 __RingOperations.__pow = function(a, n)
-    if (not n.getring and n.isevaluatable) or (n.getring and n:getring().ring ~= Integer) then
+    if (not n.getring) or (n.getring and n:getring().ring ~= Integer) then
         return BinaryOperation.POWEXP({a, n})
     end
 
@@ -274,5 +297,8 @@ end
 -- Inheritance --
 -----------------
 
-__Ring.__index = AtomicExpression
+__Ring.__index = ConstantExpression
 Ring = setmetatable(Ring, __Ring)
+
+--- Used for comparing and converting between rings.
+--- @class RingIdentifier

@@ -1,9 +1,8 @@
--- Represents an unspecified function from a tuple of expressions to an expression.
--- FunctionExpressions have the following instance variables:
---      name - the string name of the function
---      expressions - a list of expressions that are passed in to the function
--- FunctionExpressions have the following relations to other classes:
---      FunctionExpressions extend CompoundExpressions
+--- @class FunctionExpression
+--- @alias Function FunctionExpression
+--- Represents a generic function that takes zero or more expressions as inputs.
+--- @field name SymbolExpression
+--- @field expressions table<number, Expression>
 FunctionExpression = {}
 __FunctionExpression = {}
 
@@ -11,8 +10,11 @@ __FunctionExpression = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new function expression with the given operation
-function FunctionExpression:new(name, expressions, trigbypass)
+--- Creates a new function expression with the given operation.
+--- @param name string|SymbolExpression
+--- @param expressions table<number, Expression>
+--- @return FunctionExpression
+function FunctionExpression:new(name, expressions)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
@@ -20,7 +22,7 @@ function FunctionExpression:new(name, expressions, trigbypass)
         name = name.symbol
     end
 
-    if TrigExpression.NAMES[name] and #expressions == 1 and (not trigbypass) then
+    if TrigExpression.NAMES[name] and #expressions == 1 then
         return TrigExpression(name, expressions[1])
     end
 
@@ -61,31 +63,38 @@ function FunctionExpression:new(name, expressions, trigbypass)
     return o
 end
 
+--- @return FunctionExpression
 function FunctionExpression:evaluate()
-    return self
-end
-
-function FunctionExpression:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
     local results = {}
-    for index, expression in ipairs(self.expressions) do
-        results[index] = expression:substitute(map)
+    for index, expression in ipairs(self:subexpressions()) do
+        results[index] = expression:evaluate()
     end
     return FunctionExpression(self.name, results)
 end
 
+--- @return FunctionExpression
 function FunctionExpression:autosimplify()
+    -- Since the function is completely generic, we can't really do anything execpt autosimplify subexpressions.
     local results = {}
-    for index, expression in ipairs(self.expressions) do
+    for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:autosimplify()
     end
     return FunctionExpression(self.name, results)
 end
 
+--- @return table<number, Expression>
+function FunctionExpression:subexpressions()
+    return self.expressions
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return FunctionExpression
+function FunctionExpression:setsubexpressions(subexpressions)
+    return FunctionExpression(self.name, subexpressions)
+end
+
+--- @param other Expression
+--- @return boolean
 function FunctionExpression:order(other)
     if other:isconstant() then
         return false
@@ -105,11 +114,7 @@ function FunctionExpression:order(other)
         end
     end
 
-    if other:type() == TrigExpression then
-        return self:order(other:tofunction())
-    end
-
-    if other:type() ~= FunctionExpression then
+    if other:type() ~= FunctionExpression and other:type() ~= TrigExpression then
         return true
     end
 
@@ -118,18 +123,19 @@ function FunctionExpression:order(other)
     end
 
     local k = 1
-    while self.expressions[k] and other.expressions[k] do
-        if self.expressions[k] ~= other.expressions[k] then
-            return self.expressions[k]:order(other.expressions[k])
+    while self:subexpressions()[k] and other:subexpressions()[k] do
+        if self:subexpressions()[k] ~= other:subexpressions()[k] then
+            return self:subexpressions()[k]:order(other:subexpressions()[k])
         end
         k = k + 1
     end
     return #self.expressions < #other.expressions
 end
 
+--- @return string
 function FunctionExpression:tolatex()
-    local out = self.name .. '(';
-    for index, expression in ipairs(self.expressions) do
+    local out = self.name:tolatex() .. '(';
+    for index, expression in ipairs(self:subexpressions()) do
         out = out .. expression:tolatex()
         if self.expressions[index + 1] then
             out = out .. ', '

@@ -1,11 +1,9 @@
--- An expression for an integral of an expression.
--- IntegralExpressions have the following instance variables:
---      symbol - the SymbolExpression that the integral is taken with respect to
---      expression - an Expression to take the integral of
---      upper - optional, an Expression representing the upper bound of the integral
---      lower - optional, an Expression representing the lower bound of the intergral
--- IntegralExpressions have the following relations with other classes:
---      IntegralExpressions extend CompoundExpressions
+--- @class IntegralExpression
+--- An expression for the integral of an expression.
+--- @field symbol SymbolExpression
+--- @field expression Expression
+--- @field upper Expression
+--- @field lower Expression
 
 IntegralExpression = {}
 __IntegralExpression = {}
@@ -15,8 +13,11 @@ __IntegralExpression = {}
 -- Static functionality --
 --------------------------
 
--- Recursive part of the indefinite integral operator. Returns nil if the expression could not be integrated.
--- We switch to funcional programming here because it is more natural.
+--- Recursive part of the indefinite integral operator. Returns nil if the expression could not be integrated.
+--- We switch to funcional programming here because it is more natural.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
 function IntegralExpression.integrate(expression, symbol)
     local simplified = expression:autosimplify()
 
@@ -41,7 +42,10 @@ function IntegralExpression.integrate(expression, symbol)
     return nil
 end
 
--- A table of basic integrals, returns nil if the integrand isn't in the table.
+--- A table of basic integrals, returns nil if the integrand isn't in the table.
+--- @param integrand Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
 function IntegralExpression.table(integrand, symbol)
 
     -- Constant integrand rule - int(c, x) = c*x
@@ -166,7 +170,10 @@ function IntegralExpression.table(integrand, symbol)
     return nil
 end
 
--- Uses linearity to break up the integral and integrate each piece.
+--- Uses linearity to break up the integral and integrate each piece.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
 function IntegralExpression.linearproperties(expression, symbol)
     if expression:type() == BinaryOperation then
         if expression.operation == BinaryOperation.MUL then
@@ -207,7 +214,10 @@ function IntegralExpression.linearproperties(expression, symbol)
     return nil
 end
 
--- Attempts u-substitutions to evaluate the integral.
+--- Attempts u-substitutions to evaluate the integral.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
 function IntegralExpression.substitutionmethod(expression, symbol)
     local P = IntegralExpression.trialsubstitutions(expression)
     local F = nil
@@ -235,7 +245,9 @@ function IntegralExpression.substitutionmethod(expression, symbol)
     return F
 end
 
--- Generates a list of possible u-substitutions to attempt
+--- Generates a list of possible u-substitutions to attempt
+--- @param expression Expression
+--- @return table<number, Expression>
 function IntegralExpression.trialsubstitutions(expression)
     local substitutions = {}
 
@@ -267,8 +279,11 @@ function IntegralExpression.trialsubstitutions(expression)
     return substitutions
 end
 
--- Uses Lazard, Rioboo, Rothstein, and Trager's method to integrate rational functions.
--- This is mostly to try to avoid factoring and finding the roots of the full denominator whenever possible.
+--- Uses Lazard, Rioboo, Rothstein, and Trager's method to integrate rational functions.
+--- This is mostly to try to avoid factoring and finding the roots of the full denominator whenever possible.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
 function IntegralExpression.rationalfunction(expression, symbol)
 
     -- Type checking and conversion to polynomial type.
@@ -379,7 +394,11 @@ end
 -- Instance functionality --
 ----------------------------
 
--- Creates a new integral operation with the given symbol and expression
+--- Creates a new integral operation with the given symbol and expression.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @param lower Expression
+--- @param upper Expression
 function IntegralExpression:new(expression, symbol, lower, upper)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -388,7 +407,7 @@ function IntegralExpression:new(expression, symbol, lower, upper)
         error("Send wrong number of parameters: integrals must have a variable to integrate with respect to and an expression to integrate.")
     end
 
-    if upper and not lower then
+    if lower and not upper then
         error("Send wrong number of parameters: definite integrals must have an upper and a lower bound.")
     end
 
@@ -416,36 +435,14 @@ function IntegralExpression:new(expression, symbol, lower, upper)
     return o
 end
 
--- Returns true if the integral is definite, i.e., has an upper and lower bound.
+--- Returns true if the integral is definite, i.e., has an upper and lower bound.
+--- @return boolean
 function IntegralExpression:isdefinite()
     return self.upper ~= nil
 end
 
-function IntegralExpression:freeof(symbol)
-    if self:isdefinite() then
-        return self.expression:freeof(symbol) and self.upper:freeof(symbol) and self.lower:freeof(symbol)
-    end
-    return self.expression:freeof(symbol)
-end
-
--- Substitutes each expression for a new one.
-function IntegralExpression:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
-    -- substituting and then evaluating the integral may not return the same thing as evaluating the integral and then substituting.
-    if self:isdefinite() then
-        return IntegralExpression(self.symbol, self.expression:substitute(map), self.upper:substitute(map), self.lower:substitute(map))
-    end
-    return IntegralExpression(self.symbol, self.expression:substitute(map))
-end
-
--- Performs automatic simplification of an integral.
+--- @return Expression
 function IntegralExpression:autosimplify()
-
     local integrated = IntegralExpression.integrate(self.expression, self.symbol)
 
     -- Our expression could not be integrated.
@@ -460,6 +457,46 @@ function IntegralExpression:autosimplify()
     return integrated:autosimplify()
 end
 
+
+--- @return table<number, Expression>
+function IntegralExpression:subexpressions()
+    if self:isdefinite() then
+        return {self.expression, self.lower, self.upper}
+    end
+
+    return {self.expression}
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return IntegralExpression
+function IntegralExpression:setsubexpressions(subexpressions)
+    return IntegralExpression(subexpressions[1], self.symbol, subexpressions[2], subexpressions[3])
+end
+
+-- function IntegralExpression:freeof(symbol)
+--     if self:isdefinite() then
+--         return self.expression:freeof(symbol) and self.upper:freeof(symbol) and self.lower:freeof(symbol)
+--     end
+--     return self.expression:freeof(symbol)
+-- end
+
+-- -- Substitutes each expression for a new one.
+-- function IntegralExpression:substitute(map)
+--     for expression, replacement in pairs(map) do
+--         if self == expression then
+--             return replacement
+--         end
+--     end
+--     -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
+--     -- substituting and then evaluating the integral may not return the same thing as evaluating the integral and then substituting.
+--     if self:isdefinite() then
+--         return IntegralExpression(self.symbol, self.expression:substitute(map), self.upper:substitute(map), self.lower:substitute(map))
+--     end
+--     return IntegralExpression(self.symbol, self.expression:substitute(map))
+-- end
+
+--- @param other Expression
+--- @return boolean
 function IntegralExpression:order(other)
     if other:type() ~= IntegralExpression then
         return false
@@ -472,6 +509,7 @@ function IntegralExpression:order(other)
     return self.expression:order(other.expression)
 end
 
+--- @return string
 function IntegralExpression:tolatex()
     if self:isdefinite() then
         return '\\int_{' .. self.lower:tolatex() .. '}{' .. self.upper:tolatex() .. '}{' .. self.expression:tolatex() .. '\\hspace{1pt}d' .. self.symbol:tolatex() .. '}'
@@ -490,6 +528,6 @@ IntegralExpression = setmetatable(IntegralExpression, __IntegralExpression)
 ----------------------
 -- Static constants --
 ----------------------
-INT = function(symbol, expression, upper, lower)
-    return IntegralExpression(symbol, expression, upper, lower)
+INT = function(symbol, expression, lower, upper)
+    return IntegralExpression(symbol, expression, lower, upper)
 end

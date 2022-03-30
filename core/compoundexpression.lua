@@ -1,11 +1,5 @@
--- Interface for an expression consisting of multiple other expressions and some function to apply to all of them
--- CompoundExpressions have the following instance variables:
---      name - the string name of the function
---      operation - the operation to apply to the list of operands
---      expressions - a list of subexpressions associated with this expression
--- CompoundExpressions have the following relations with other classes:
---      CompoundExpressions extend Expressions
-
+--- @class CompoundExpression
+--- Interface for an expression consisting of one or more subexpressions.
 CompoundExpression = {}
 __CompoundExpression = {}
 
@@ -13,16 +7,39 @@ __CompoundExpression = {}
 -- Instance methods --
 ----------------------
 
--- Returns whether the expression is atomic or not
+--- @param symbol SymbolExpression
+--- @return boolean
+function CompoundExpression:freeof(symbol)
+    for _, expression in ipairs(self:subexpressions()) do
+        if not expression:freeof(symbol) then
+            return false
+        end
+    end
+    return true
+ end
+
+--- @param map table<Expression, Expression>
+--- @return Expression
+function CompoundExpression:substitute(map)
+    for expression, replacement in pairs(map) do
+        if self == expression then
+            return replacement
+        end
+    end
+
+    local results = {}
+    for index, expression in ipairs(self:subexpressions()) do
+        results[index] = expression:substitute(map)
+    end
+    return self:setsubexpressions(results)
+end
+
+--- @return boolean
 function CompoundExpression:isatomic()
     return false
 end
 
--- Returns whether the expression can be evaluated by compound expressions or not
-function CompoundExpression:isevaluatable()
-    return false
-end
-
+--- @return boolean
 function CompoundExpression:isconstant()
     return false
 end

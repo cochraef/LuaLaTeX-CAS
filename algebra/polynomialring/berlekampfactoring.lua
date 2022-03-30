@@ -1,6 +1,6 @@
 -- Methods related to the Berlekamp factoring algorithm.
 
--- Square-free factorization in the modular field Zp
+-- Square-free factorization in the modular field Zp.
 function PolynomialRing:modularsquarefreefactorization()
     local monic = self / self:lc()
     local terms = {}

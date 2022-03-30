@@ -1,9 +1,8 @@
--- Represents an element of the field of rational numbers or rational functions.
--- Rationals have the following instance variables:
---      numerator - an Integer numerator for the fractional representation of this rataionl
---      denominator - an Integer denominator for the fractional representation of this rational
--- Integers have the following relationship to other classes:
---      Rationals implement Fields
+--- @class Rational
+--- Represents an element of the field of rational numbers or rational functions.
+--- @field numerator Ring
+--- @field denominator Ring
+--- @field ring RingIdentifier
 Rational = {}
 __Rational = {}
 
@@ -11,15 +10,18 @@ __Rational = {}
 -- Instance functionality --
 ----------------------------
 
--- So we don't have to copy the field operations each time
+-- So we don't have to copy the field operations each time.
 local __o = Copy(__FieldOperations)
 __o.__index = Rational
 __o.__tostring = function(a)
     return tostring(a.numerator).."/"..tostring(a.denominator)
 end
 
--- Creates a new rational given an integer numerator and denominator.
--- Rational numbers are represented uniquely.
+--- Creates a new rational given an integer numerator and denominator.
+--- Rational numbers are represented uniquely.
+--- @param n Ring
+--- @param d Ring
+--- @param keep boolean
 function Rational:new(n, d, keep)
     local o = {}
     o = setmetatable(o, __o)
@@ -49,7 +51,8 @@ function Rational:new(n, d, keep)
     return o
 end
 
--- Reduces a rational expression to standard form.
+--- Reduces a rational expression to standard form.
+--- @return Rational
 function Rational:reduce()
     if self.denominator < Integer.zero() then
         self.denominator = -self.denominator
@@ -74,7 +77,8 @@ end, __tostring = function(a)
         return "QQ"
     end}
 
--- Returns the ring this object is an element of
+
+--- @return RingIdentifier
 function Rational:getring()
     local t = {ring=Rational}
     if self then
@@ -85,7 +89,8 @@ function Rational:getring()
     return t
 end
 
--- Explicitly converts this element to an element of another ring
+--- @param ring RingIdentifier
+--- @return Ring
 function Rational:inring(ring)
     if ring == self:getring() then
         return self
@@ -98,11 +103,21 @@ function Rational:inring(ring)
     error("Unable to convert element to proper ring.")
 end
 
+--- @return boolean
+function Rational:isconstant()
+    if self.ring then
+        return false
+    end
+    return true
+end
+
+--- @return Expression
 function Rational:tocompoundexpression()
     return BinaryOperation(BinaryOperation.DIV, {self.numerator:tocompoundexpression(), self.denominator:tocompoundexpression()})
 end
 
--- Returns this rational as a floating point number. Can only approximate the value of large integers.
+--- Returns this rational as a floating point number. Can only approximate the value of most rationals.
+--- @return number
 function Rational:asnumber()
     return self.numerator:asnumber() / self.denominator:asnumber()
 end
@@ -127,7 +142,6 @@ function Rational:pow(b)
     return (self.numerator ^ b) / (self.denominator ^ b)
 end
 
--- Divides a rational number by another
 function Rational:div(b)
     return Rational(self.numerator * b.denominator, self.denominator * b.numerator)
 end

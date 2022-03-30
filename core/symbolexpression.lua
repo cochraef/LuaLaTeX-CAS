@@ -1,8 +1,7 @@
--- A symbolic expression that can be substituted for another expression
--- SymbolExpressions have the following instance variables:
---      symbol - the string representation of the symbol
--- SymbolExpressions have the following relations to other classes:
---      SymbolExpressions extend AtomicExpressions
+--- @class SymbolExpression
+--- @alias Symbol SymbolExpression
+--- An atomic expression corresponding to a symbol representing an arbitary value.
+--- @field symbol string
 SymbolExpression = {}
 __SymbolExpression = {}
 
@@ -10,7 +9,9 @@ __SymbolExpression = {}
 -- Instance methods --
 ----------------------
 
--- Given the name of the symbol as a string, creates a new symbol
+--- Given the name of the symbol as a string, creates a new symbol.
+--- @param symbol string
+--- @return SymbolExpression
 function SymbolExpression:new(symbol)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -32,22 +33,26 @@ function SymbolExpression:new(symbol)
     return o
 end
 
--- This expression is free of a symbol if and only if the symbol is not the expression.
+--- @return boolean
 function SymbolExpression:freeof(symbol)
     return symbol~=self
 end
 
--- Symbols can not be evaluated to a concrete value
-function SymbolExpression:isevaluatable()
+--- @return boolean
+function SymbolExpression:isconstant()
     return false
 end
 
+--- @param other Expression
+--- @return boolean
 function SymbolExpression:order(other)
-    -- Symbol Expressions come after concrete expressions
-    if other.isevaluatable() then
+
+    -- Symbol Expressions come after constant expressions.
+    if other:isconstant() then
         return false
     end
 
+    -- Lexographic order on symbols.
     if other:type() == SymbolExpression then
         if #other.symbol < #self.symbol then
             return false
@@ -73,15 +78,13 @@ function SymbolExpression:order(other)
         return BinaryOperation(BinaryOperation.ADD, {self}):order(other)
     end
 
+    return false
 end
 
+--- Converts this symbol to an element of a polynomial ring.
+--- @return PolynomialRing, boolean
 function SymbolExpression:topolynomial()
     return PolynomialRing({Integer.zero(), Integer.one()}, self.symbol), true
-end
-
--- Variable names in LaTeX can be created with just that variable
-function SymbolExpression:tolatex()
-    return tostring(self)
 end
 
 -----------------
@@ -91,3 +94,32 @@ end
 __SymbolExpression.__index = AtomicExpression
 __SymbolExpression.__call = SymbolExpression.new
 SymbolExpression = setmetatable(SymbolExpression, __SymbolExpression)
+
+
+----------------------
+-- Static Constants --
+----------------------
+
+-- The constant pi.
+PI = SymbolExpression("pi")
+
+-- Approximates pi as a rational number. Uses continued fraction expansion.
+function PI:approximate()
+    return Integer(313383936) / Integer(99753205)
+end
+
+function PI:tolatex()
+    return "\\pi"
+end
+
+-- The constant e.
+E = SymbolExpression("e")
+
+-- Approximates pi as a rational number. Uses continued fraction expansion.
+function E:approximate()
+    return Integer(517656) / Integer(190435)
+end
+
+
+-- The imaginary constant i.
+I = SymbolExpression("i")

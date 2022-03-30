@@ -1,6 +1,7 @@
 -- Seperates the various binary operations into their own files for readability
 
--- Automatic simplification of addition expressions
+-- Automatic simplification of addition expressions.
+--- @return BinaryOperation
 function BinaryOperation:simplifysum()
     if not self.expressions[1] then
         error("Execution error: Attempted to simplify empty sum")
@@ -30,19 +31,19 @@ function BinaryOperation:simplifysumrec()
     local term2 = self.expressions[2]
 
     if self.expressions[1] and self.expressions[2] and not self.expressions[3] then
-        if (term1:isevaluatable() or not (term1.operation == BinaryOperation.ADD)) and
-            (term2:isevaluatable() or not (term2.operation == BinaryOperation.ADD)) then
+        if (term1:isconstant() or not (term1.operation == BinaryOperation.ADD)) and
+            (term2:isconstant() or not (term2.operation == BinaryOperation.ADD)) then
 
-            if term1:isevaluatable() and term2:isevaluatable() then
+            if term1:isconstant() and term2:isconstant() then
                 return BinaryOperation(BinaryOperation.ADD, {self:evaluate()})
             end
 
             -- Uses the property that x + 0 = x
-            if term1:isevaluatable() and term1 == term1:zero() then
+            if term1:isconstant() and term1 == term1:zero() then
                 return BinaryOperation(BinaryOperation.ADD, {term2})
             end
 
-            if term2:isevaluatable() and term2 == term2:zero() then
+            if term2:isconstant() and term2 == term2:zero() then
                 return BinaryOperation(BinaryOperation.ADD, {term1})
             end
 
@@ -51,11 +52,11 @@ function BinaryOperation:simplifysumrec()
             -- Uses the property that a*x+b*x= (a+b)*x
             -- This is only done if a and b are constant, since otherwise this could be counterproductive
             -- We SHOULD be okay to only check left distributivity, since constants always come first when ordered
-            if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1].isevaluatable() then
+            if term1.operation ~= BinaryOperation.MUL or not term1.expressions[1]:isconstant() then
                 term1 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term1})
                 revertterm1 = true
             end
-            if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1].isevaluatable() then
+            if term2.operation ~= BinaryOperation.MUL or not term2.expressions[1]:isconstant() then
                 term2 = BinaryOperation(BinaryOperation.MUL, {Integer.one(), term2})
                 revertterm2 = true
             end
@@ -65,7 +66,7 @@ function BinaryOperation:simplifysumrec()
                                         {term1.expressions[1],
                                         term2.expressions[1]}):autosimplify(),
                                     term1.expressions[2]}):autosimplify()
-                if result.isevaluatable() and result == result:zero() then
+                if result:isconstant() and result == result:zero() then
                     return BinaryOperation(BinaryOperation.ADD, {})
                 end
                 return BinaryOperation(BinaryOperation.ADD, {result})

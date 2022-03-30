@@ -1,11 +1,9 @@
--- Represents a binary operation with two inputs and one output
--- BinaryOperations have the following instance variables:
---      name - the string name of the function
---      operation - the operation to apply to the list of operands
---      expressions - a list of subexpressions associated with this expression
--- However, the expressions instance variable can store any number of operations greater than zero
--- BinaryOperations have the following relations to other classes:
---      BinaryOperations extend CompoundExpressions
+--- @class BinaryOperation
+--- Represents a binary operation with two inputs and one output.
+--- Represents a generic function that takes zero or more expressions as inputs.
+--- @field name string
+--- @field operation function
+--- @field expressions table<number, Expression>
 BinaryOperation = {}
 __BinaryOperation = {}
 
@@ -13,14 +11,13 @@ __BinaryOperation = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new binary operation with the given operation
-function BinaryOperation:new(operation, expressions, name)
+--- Creates a new binary operation with the given operation.
+--- @param operation function
+--- @param expressions table<number, Expression>
+--- @return BinaryOperation
+function BinaryOperation:new(operation, expressions)
     local o = {}
     local __o = Copy(__ExpressionOperations)
-
-    if type(name) ~= "string" and type(name) ~= "nil" then
-        error("Sent parameter of wrong type: name must be a string")
-    end
 
     if type(operation) ~= "function" then
         error("Sent parameter of wrong type: operation must be a function")
@@ -34,17 +31,17 @@ function BinaryOperation:new(operation, expressions, name)
     o.operation = operation
     o.expressions = Copy(expressions)
 
-    if o.operation == BinaryOperation.ADD or o.operation == BinaryOperation.MUL then
-        function o:isCommutative()
+    if BinaryOperation.COMMUTATIVITY[operation] then
+        function o:iscommutative()
             return true
         end
     else
-        function o:isCommutative()
+        function o:iscommutative()
             return false
         end
     end
 
-    if not o:isCommutative() and o.operation ~= BinaryOperation.SUB and (not o.expressions[1] or not o.expressions[2] or o.expressions[3]) then
+    if not o:iscommutative() and o.operation ~= BinaryOperation.SUB and #o.expressions ~= 2 then
         error("Sent parameter of wrong type: noncommutative operations cannot have an arbitrary number of paramaters")
     end
 
@@ -66,7 +63,7 @@ function BinaryOperation:new(operation, expressions, name)
         return '(' .. expressionnames .. ')'
     end
     __o.__eq = function(a, b)
-        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
+        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
         if not a.operation or not b.operation then
             return false
         end
@@ -85,21 +82,13 @@ function BinaryOperation:new(operation, expressions, name)
     return o
 end
 
-function BinaryOperation:freeof(symbol)
-    local result = true
-    for _, expression in ipairs(self.expressions) do
-        result = result and expression:freeof(symbol)
-    end
-    return result
-end
-
--- Evaluates each sub-expression and returns the evaluation of this expression
+--- @return Expression
 function BinaryOperation:evaluate()
     local results = {}
     local reducible = true
-    for index, expression in ipairs(self.expressions) do
+    for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:evaluate()
-        if not results[index]:isevaluatable() then
+        if not results[index]:isconstant() then
             reducible = false
         end
     end
@@ -120,57 +109,10 @@ function BinaryOperation:evaluate()
     return result
 end
 
--- Substitutes each expression for a new one.
-function BinaryOperation:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    local results = {}
-    for index, expression in ipairs(self.expressions) do
-        results[index] = expression:substitute(map)
-    end
-    return BinaryOperation(self.operation, results)
-end
-
-
--- Expands a binary operation.
-function BinaryOperation:expand()
-    local results = {}
-    for index, expression in ipairs(self.expressions) do
-        results[index] = expression:expand()
-    end
-    local expanded = BinaryOperation(self.operation, results)
-    if expanded.operation == BinaryOperation.MUL then
-        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()});
-        for _, expression in ipairs(expanded.expressions) do
-            allsums = allsums:expand2(expression)
-        end
-        return allsums:autosimplify()
-    end
-    return expanded:autosimplify()
-end
-
--- Helper for expand - multiplies two addition expressions.
-function BinaryOperation:expand2(other)
-    local result = {}
-    for _, expression in ipairs(self.expressions) do
-        if other:type() == BinaryOperation and other.operation == BinaryOperation.ADD then
-            for _, expression2 in ipairs(other.expressions) do
-                result[#result+1] = expression * expression2
-            end
-        else
-            result[#result+1] = expression * other
-        end
-    end
-    return BinaryOperation(BinaryOperation.ADD, result)
-end
-
--- Performs automatic simplification of an binary operation
+--- @return Expression
 function BinaryOperation:autosimplify()
     local results = {}
-    for index, expression in ipairs(self.expressions) do
+    for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:autosimplify()
     end
     local simplified = BinaryOperation(self.operation, results)
@@ -192,7 +134,58 @@ function BinaryOperation:autosimplify()
     return simplified
 end
 
+--- @return table<number, Expression>
+function BinaryOperation:subexpressions()
+    return self.expressions
+end
 
+--- @param subexpressions table<number, Expression>
+--- @return BinaryOperation
+function BinaryOperation:setsubexpressions(subexpressions)
+    return BinaryOperation(self.operation, subexpressions)
+end
+
+--- @return Expression
+function BinaryOperation:expand()
+    local results = {}
+    for index, expression in ipairs(self.expressions) do
+        results[index] = expression:expand()
+    end
+    local expanded = BinaryOperation(self.operation, results)
+    if expanded.operation == BinaryOperation.MUL then
+        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()});
+        for _, expression in ipairs(expanded.expressions) do
+            allsums = allsums:expand2(expression)
+        end
+        return allsums:autosimplify()
+    end
+    return expanded:autosimplify()
+end
+
+--- Helper for expand - multiplies two addition expressions.
+--- @return Expression
+function BinaryOperation:expand2(other)
+    local result = {}
+    for _, expression in ipairs(self.expressions) do
+        if other:type() == BinaryOperation and other.operation == BinaryOperation.ADD then
+            for _, expression2 in ipairs(other.expressions) do
+                result[#result+1] = expression * expression2
+            end
+        else
+            result[#result+1] = expression * other
+        end
+    end
+    return BinaryOperation(BinaryOperation.ADD, result)
+end
+
+--- TODO: General expression factoring.
+--- @return Expression
+function BinaryOperation:factor()
+    return self
+end
+
+--- @param other Expression
+--- @return boolean
 function BinaryOperation:order(other)
     if other:isconstant() then
         return false
@@ -251,7 +244,7 @@ function BinaryOperation:order(other)
         return BinaryOperation(BinaryOperation.POW, {self, Integer.one()}):order(other)
     end
 
-    if other:type() == FunctionExpression then
+    if other:type() == FunctionExpression or other:type() == TrigExpression then
         if self.operation == BinaryOperation.ADD or self.operation == BinaryOperation.MUL then
             return self:order(BinaryOperation(self.operation, {other}))
         end
@@ -261,24 +254,17 @@ function BinaryOperation:order(other)
         end
     end
 
-    if other:type() == TrigExpression then
-        return self:order(other:tofunction())
-    end
-
     return true
 end
 
--- Returns whether the binary operation is associative.
-function BinaryOperation:isAssociative()
-    error("Called unimplemented method: isAssociative()")
+--- Returns whether the binary operation is commutative.
+--- @return boolean
+function BinaryOperation:iscommutative()
+    error("Called unimplemented method: iscommutative()")
 end
 
--- Returns whether the binary operation is commutative.
-function BinaryOperation:isCommutative()
-    error("Called unimplemented method: isCommutative()")
-end
-
--- Returns an autosimplified expression as a single-variable polynomial in a ring, if it can be converted. Returns itself otherwise.
+--- Returns an autosimplified expression as a single-variable polynomial in a ring, if it can be converted. Returns itself otherwise.
+--- @return PolynomialRing, boolean
 function BinaryOperation:topolynomial()
     local addexp = self
     if not self.operation or self.operation ~= BinaryOperation.ADD then
@@ -293,7 +279,7 @@ function BinaryOperation:topolynomial()
         local sym
         local power
         -- Expressions of the form c
-        if expression:isevaluatable() then
+        if expression:isconstant() then
             coefficient = expression
             power = 0
         -- Expressions of the form x
@@ -303,14 +289,14 @@ function BinaryOperation:topolynomial()
             power = 1
         -- Expressions of the form c*x
         elseif expression.operation and expression.operation == BinaryOperation.MUL and #expression.expressions == 2
-                    and expression.expressions[1]:isevaluatable() and expression.expressions[2]:type() == SymbolExpression then
+                    and expression.expressions[1]:isconstant() and expression.expressions[2]:type() == SymbolExpression then
 
             coefficient = expression.expressions[1]
             sym = expression.expressions[2].symbol
             power = 1
         -- Expressions of the form c*x^n (totally not confusing)
         elseif expression.operation and expression.operation == BinaryOperation.MUL and #expression.expressions == 2
-                    and expression.expressions[1]:isevaluatable() and expression.expressions[2].operation and
+                    and expression.expressions[1]:isconstant() and expression.expressions[2].operation and
                     expression.expressions[2].operation == BinaryOperation.POW and #expression.expressions[2].expressions == 2
                     and expression.expressions[2].expressions[1]:type() == SymbolExpression and expression.expressions[2].expressions[2].getring
                     and expression.expressions[2].expressions[2]:getring() == Integer.getring() and expression.expressions[2].expressions[2] > Integer.zero() then
@@ -352,7 +338,7 @@ end
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
         if self.expressions[1]:isatomic() then
-            if self.expressions[2]:isevaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
+            if self.expressions[2]:isconstant() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
                 if self.expressions[2].denominator == Integer(2) then
                     return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
                 end
@@ -360,7 +346,7 @@ function BinaryOperation:tolatex()
             end
             return self.expressions[1]:tolatex() .. '^{' .. self.expressions[2]:tolatex() .. '}'
         else
-            if self.expressions[2]:isevaluatable() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
+            if self.expressions[2]:isconstant() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
                 if self.expressions[2].denominator == Integer(2) then
                     return "\\sqrt{\\left(" .. self.expressions[1]:tolatex() .. '\\right)}'
                 end
@@ -374,7 +360,7 @@ function BinaryOperation:tolatex()
         local denom = ''
         for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
-                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isevaluatable() and expression.expressions[2] < Integer.zero() then
+                if expression.operation == BinaryOperation.POW and expression.expressions[2]:isconstant() and expression.expressions[2] < Integer.zero() then
                     local reversed = (Integer.one() / expression):autosimplify()
                     denom = denom .. reversed:tolatex()
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
@@ -471,7 +457,17 @@ BinaryOperation.DEFAULT_NAMES = {
     [BinaryOperation.DIV] = "/",
     [BinaryOperation.IDIV] = "//",
     [BinaryOperation.MOD] = "%",
-    [BinaryOperation.POW] = "^",
+    [BinaryOperation.POW] = "^"
+}
+
+BinaryOperation.COMMUTATIVITY = {
+    [BinaryOperation.ADD] = true,
+    [BinaryOperation.SUB] = false,
+    [BinaryOperation.MUL] = true,
+    [BinaryOperation.DIV] = false,
+    [BinaryOperation.IDIV] = false,
+    [BinaryOperation.MOD] = false,
+    [BinaryOperation.POW] = false
 }
 
 BinaryOperation.ADDEXP = function(expressions, name)

@@ -1,9 +1,7 @@
--- Represents an element of the ring of integers.
--- Integers have the following instance variables:
---      1, 2, 3, etc. - the unsigned digits that represent the number in 'little endian' - least significant digit first
---      sign - 1 for positive integers, -1 for negative, 0 for 0
--- Integers have the following relationship to other classes:
---      Integers implement Euclidean Domains
+--- @class Integer
+--- Represents an element of the ring of integers.
+--- @field self table<number, number>
+--- @field sign number
 Integer = {}
 __Integer = {}
 
@@ -20,7 +18,10 @@ Integer.DIGITSIZE = 10 ^ Integer.DIGITLENGTH;
 -- Partition size for multiplying integers so we can get both the upper and lower bits of each digits
 Integer.PARTITIONSIZE = math.floor(math.sqrt(Integer.DIGITSIZE))
 
--- Method for computing the gcd of two integers using Euclid's algorithm
+--- Method for computing the gcd of two integers using Euclid's algorithm.
+--- @param a Integer
+--- @param b Integer
+--- @return Integer
 function Integer.gcd(a, b)
     while b ~= Integer.zero() do
         a, b = b, a%b
@@ -28,8 +29,11 @@ function Integer.gcd(a, b)
     return a
 end
 
--- Method for computing the gcd of two integers using Euclid's algorithm
--- Also returns Bezout's coefficients via extended gcd
+--- Method for computing the gcd of two integers using Euclid's algorithm.
+--- Also returns Bezout's coefficients via extended gcd.
+--- @param a Integer
+--- @param b Integer
+--- @return Integer, Integer, Integer
 function Integer.extendedgcd(a, b)
     local oldr, r  = a, b
     local olds, s  = Integer.one(), Integer.zero()
@@ -43,8 +47,11 @@ function Integer.extendedgcd(a, b)
     return oldr, olds, oldt
 end
 
--- Method for computing the larger of two integers.
--- Also returns the other integer for sorting purposes.
+--- Method for computing the larger of two integers.
+--- Also returns the other integer for sorting purposes.
+--- @param a Integer
+--- @param b Integer
+--- @return Integer, Integer
 function Integer.max(a, b)
     if a > b then
         return a, b
@@ -52,8 +59,11 @@ function Integer.max(a, b)
     return b, a
 end
 
--- Methods for computing the larger magnitude of two integers.
--- Also returns the other integer for sorting purposes, and the number -1 if the two values were swapped, 1 if not.
+--- Methods for computing the larger magnitude of two integers.
+--- Also returns the other integer for sorting purposes, and the number -1 if the two values were swapped, 1 if not.
+--- @param a Integer
+--- @param b Integer
+--- @return Integer, Integer, number
 function Integer.absmax(a, b)
     if b:ltabs(a) then
         return a, b, 1
@@ -61,8 +71,11 @@ function Integer.absmax(a, b)
     return b, a, -1
 end
 
--- Returns the ceiling of the log base (defaults to 10) of a
--- In other words, returns the least n such that base^n > a
+-- Returns the ceiling of the log base (defaults to 10) of a.
+-- In other words, returns the least n such that base^n > a.
+--- @param a Integer
+--- @param base Integer
+--- @return Integer
 function Integer.ceillog(a, base)
     base = base or Integer(10)
     local k = Integer.zero()
@@ -74,7 +87,11 @@ function Integer.ceillog(a, base)
     return k
 end
 
--- Returns a ^ b (mod n). This should be used when a ^ b is potentially large.
+--- Returns a ^ b (mod n). This should be used when a ^ b is potentially large.
+--- @param a Integer
+--- @param b Integer
+--- @param n Integer
+--- @return Integer
 function Integer.powmod(a, b, n)
     if n == Integer.one() then
         return Integer.zero()
@@ -128,7 +145,9 @@ __o.__concat = function(a, b) -- Like a decimal, but fancier. Used mainly for th
     return a + b / (Integer(10) ^ Integer.ceillog(b))
 end
 
--- Creates a new integer given a string or number representation of the integer
+--- Creates a new integer given a string or number representation of the integer.
+--- @param n number|string|Integer
+--- @return Integer
 function Integer:new(n)
     local o = {}
     o = setmetatable(o, __o)
@@ -202,7 +221,8 @@ function Integer:new(n)
     return o
 end
 
--- Returns the ring this object is an element of
+--- Returns the ring this object is an element of.
+--- @return RingIdentifier
 local t = {ring=Integer}
 t = setmetatable(t, {__index = Integer, __eq = function(a, b)
     return a["ring"] == b["ring"]
@@ -213,7 +233,8 @@ function Integer:getring()
     return t;
 end
 
--- Explicitly converts this element to an element of another ring.
+--- @param ring RingIdentifier
+--- @return Ring
 function Integer:inring(ring)
     if ring == self:getring() then
         return self
@@ -234,6 +255,8 @@ function Integer:inring(ring)
     error("Unable to convert element to proper ring.")
 end
 
+--- @param b Integer
+--- @return Integer
 function Integer:add(b)
     if self.sign == 1 and b.sign == -1 then
         return self:usub(b, 1)
@@ -249,7 +272,10 @@ function Integer:add(b)
     return self:uadd(b, sign)
 end
 
--- Addition without sign so we don't have to create an entire new integer when switching signs.
+--- Addition without sign so we don't have to create an entire new integer when switching signs.
+--- @param b Integer
+--- @param sign number
+--- @return Integer
 function Integer:uadd(b, sign)
     local o = Integer()
     o.sign = sign
@@ -272,6 +298,8 @@ function Integer:uadd(b, sign)
     return o
 end
 
+--- @param b Integer
+--- @return Integer
 function Integer:sub(b)
     if self.sign == 1 and b.sign == -1 then
         return self:uadd(b, 1)
@@ -279,7 +307,7 @@ function Integer:sub(b)
     if self.sign == -1 and b.sign == 1 then
         return self:uadd(b, -1)
     end
-    
+
     local sign = self.sign
     if sign == 0 then
         sign = b.sign
@@ -289,6 +317,9 @@ end
 
 -- Subtraction without sign so we don't have to create an entire new integer when switching signs.
 -- Uses subtraction by compliments.
+--- @param b Integer
+--- @param sign number
+--- @return Integer
 function Integer:usub(b, sign)
     local a, b, swap = Integer.absmax(self, b)
     local o = Integer()
@@ -324,6 +355,7 @@ function Integer:usub(b, sign)
     return o
 end
 
+--- @return Integer
 function Integer:neg()
     local o = Integer()
     o.sign = -self.sign
@@ -333,6 +365,8 @@ function Integer:neg()
     return o
 end
 
+--- @param b Integer
+--- @return Integer
 function Integer:mul(b)
     local o = Integer()
     o.sign = self.sign * b.sign
@@ -386,7 +420,10 @@ function Integer:mul(b)
     return o
 end
 
--- Multiplies two single-digit numbers and returns two digits
+--- Multiplies two single-digit numbers and returns two digits.
+--- @param a number
+--- @param b number
+--- @return number, number
 function Integer:mulone(a, b)
     local P = Integer.PARTITIONSIZE
 
@@ -413,7 +450,9 @@ function Integer:mulone(a, b)
     return u, l
 end
 
--- Naive exponentiation is slow even for small exponents, so this uses binary exponentiation.
+--- Naive exponentiation is slow even for small exponents, so this uses binary exponentiation.
+--- @param b Integer
+--- @return Integer
 function Integer:pow(b)
     if b < Integer.zero() then
         return Integer.one() / (self ^ -b)
@@ -448,6 +487,7 @@ function Integer:pow(b)
 end
 
 -- Fast integer division by two for binary exponentiation.
+--- @return Integer
 function Integer:divbytwo()
     local o = Integer()
     o.sign = self.sign
@@ -464,7 +504,9 @@ function Integer:divbytwo()
     return o
 end
 
--- Division with remainder over the integers. Uses the standard base 10 long division algorithm.
+--- Division with remainder over the integers. Uses the standard base 10 long division algorithm.
+--- @param b Integer
+--- @return Integer, Integer
 function Integer:divremainder(b)
     if self >= Integer.zero() and b > self or self <= Integer.zero() and b < self then
         return Integer.zero(), Integer(self)
@@ -519,7 +561,8 @@ function Integer:divremainder(b)
     return Q, R
 end
 
--- Fast in-place multiplication by ten for the division algorithm. This means the number IS MODIFIED by this method unlike the rest of the library.
+--- Fast in-place multiplication by ten for the division algorithm. This means the number IS MODIFIED by this method unlike the rest of the library.
+--- @return Integer
 function Integer:mulbyten()
     local DIGITSIZE = Integer.DIGITSIZE
     for i, _ in ipairs(self) do
@@ -539,6 +582,8 @@ function Integer:mulbyten()
     return self
 end
 
+--- @param b Integer
+--- @return boolean
 function Integer:eq(b)
     for i, digit in ipairs(self) do
         if not b[i] or not (b[i] == digit) then
@@ -548,6 +593,8 @@ function Integer:eq(b)
     return #self == #b and self.sign == b.sign
 end
 
+--- @param b Integer
+--- @return boolean
 function Integer:lt(b)
     local selfsize = #self
     local bsize = #b
@@ -570,7 +617,9 @@ function Integer:lt(b)
     return false
 end
 
--- Same as less than, but ignores signs.
+--- Same as less than, but ignores signs.
+--- @param b Integer
+--- @return boolean
 function Integer:ltabs(b)
     if #self < #b then
         return true
@@ -591,6 +640,8 @@ function Integer:ltabs(b)
     return false
 end
 
+--- @param b Integer
+--- @return boolean
 function Integer:le(b)
     local selfsize = #self
     local bsize = #b
@@ -614,16 +665,19 @@ function Integer:le(b)
 end
 
 local zero = Integer:new(0)
+--- @return Integer
 function Integer:zero()
     return zero
 end
 
 local one = Integer:new(1)
+--- @return Integer
 function Integer:one()
     return one
 end
 
--- Returns this integer as a floating point number. Can only approximate the value of large integers.
+--- Returns this integer as a floating point number. Can only approximate the value of large integers.
+--- @return number
 function Integer:asnumber()
     local n = 0
     for i, digit in ipairs(self) do
@@ -632,7 +686,8 @@ function Integer:asnumber()
     return self.sign*math.floor(n)
 end
 
--- Returns all positive divisors of the integer. Not guarenteed to be in any order.
+--- Returns all positive divisors of the integer. Not guarenteed to be in any order.
+--- @return table<number, Integer>
 function Integer:divisors()
     local primefactors = self:primefactorizationrec()
     local divisors = {}
@@ -667,7 +722,8 @@ function Integer:divisors()
     return divisors
 end
 
--- Returns the prime factorization of this integer as a expression.
+--- Returns the prime factorization of this integer as a expression.
+--- @return Expression
 function Integer:primefactorization()
     local result = self:primefactorizationrec()
     local mul = {}
@@ -679,7 +735,7 @@ function Integer:primefactorization()
     return BinaryOperation.MULEXP(mul)
 end
 
--- Recursive part of prime factorization using Pollard Rho.
+--- Recursive part of prime factorization using Pollard Rho.
 function Integer:primefactorizationrec()
     if self < Integer.zero() then
         return Integer.mergefactors({[Integer(-1)]=Integer.one()}, (-self):primefactorizationrec())
@@ -712,7 +768,7 @@ function Integer.mergefactors(a, b)
     return result
 end
 
--- return a non-trivial factor of n via Pollard Rho, or returns n if n is prime
+-- Return a non-trivial factor of n via Pollard Rho, or returns n if n is prime.
 function Integer:findafactor()
     if self:isprime() then
         return self
@@ -754,7 +810,7 @@ function Integer:findafactor()
     end
 end
 
--- uses Miller-Rabin to determine whether a number is prime up to a very large number.
+--- Uses Miller-Rabin to determine whether a number is prime up to a very large number.
 local smallprimes = {Integer:new(2), Integer:new(3), Integer:new(5), Integer:new(7), Integer:new(11), Integer:new(13), Integer:new(17),
 Integer:new(19), Integer:new(23), Integer:new(29), Integer:new(31), Integer:new(37), Integer:new(41), Integer:new(43), Integer:new(47)}
 
@@ -802,7 +858,8 @@ function Integer:isprime()
     return true
 end
 
--- returns the absolute value of an integer
+--- Returns the absolute value of an integer.
+--- @return Integer
 function Integer:abs()
     if self.sign >= 0 then
         return Integer(self)

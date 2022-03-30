@@ -1,10 +1,7 @@
--- An expression for a single-variable derrivative of an expression
--- DerrivativeExpressions have the following instance variables:
---      symbol - the SymbolExpression that the derrivative is taken with respect to
---      expression - an Expression to take the derrivative of
--- DerrivativeExpressions have the following relations with other classes:
---      DerrivativeExpressions extend CompoundExpressions
-
+--- @class DerrivativeExpression
+--- An expression for a single-variable derrivative of an expression.
+--- @field symbol SymbolExpression
+--- @field expression Expression
 DerrivativeExpression = {}
 __DerrivativeExpression = {}
 
@@ -12,7 +9,10 @@ __DerrivativeExpression = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new derrivative operation with the given symbol and expression
+-- Creates a new derrivative operation with the given symbol and expression.
+--- @param expression Expression
+--- @param symbol Symbol
+--- @return DerrivativeExpression
 function DerrivativeExpression:new(expression, symbol)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -38,23 +38,7 @@ function DerrivativeExpression:new(expression, symbol)
     return o
 end
 
-function DerrivativeExpression:freeof(symbol)
-    return self.symbol.freeof(symbol) and self.expression:freeof(symbol)
-end
-
--- Substitutes each expression for a new one.
-function DerrivativeExpression:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
-    -- substituting and then evaluating the derrivative may not return the same thing as evaluating the derrivative and then substituting.
-    return DerrivativeExpression(self.expression:substitute(map), self.symbol)
-end
-
--- Performs automatic simplification of a derrivative
+--- @return Expression
 function DerrivativeExpression:autosimplify()
     local simplified = self.expression:autosimplify()
 
@@ -188,6 +172,36 @@ function DerrivativeExpression:autosimplify()
     return self
 end
 
+
+--- @return table<number, Expression>
+function DerrivativeExpression:subexpressions()
+    return {self.expression}
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return DerrivativeExpression
+function DerrivativeExpression:setsubexpressions(subexpressions)
+    return DerrivativeExpression(subexpressions[1], self.symbol)
+end
+
+-- function DerrivativeExpression:freeof(symbol)
+--     return self.symbol.freeof(symbol) and self.expression:freeof(symbol)
+-- end
+
+-- Substitutes each expression for a new one.
+-- function DerrivativeExpression:substitute(map)
+--     for expression, replacement in pairs(map) do
+--         if self == expression then
+--             return replacement
+--         end
+--     end
+--     -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
+--     -- substituting and then evaluating the derrivative may not return the same thing as evaluating the derrivative and then substituting.
+--     return DerrivativeExpression(self.expression:substitute(map), self.symbol)
+-- end
+
+--- @param other Expression
+--- @return boolean
 function DerrivativeExpression:order(other)
     if other:type() == IntegralExpression then
         return true
@@ -204,6 +218,7 @@ function DerrivativeExpression:order(other)
     return self.expression:order(other.expression)
 end
 
+--- @return string
 function DerrivativeExpression:tolatex()
     return '\\frac{d}{d' .. self.symbol:tolatex() .. '}(' .. self.expression:tolatex() .. ')'
 end

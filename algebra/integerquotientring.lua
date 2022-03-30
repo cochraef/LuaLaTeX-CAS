@@ -1,10 +1,7 @@
--- Represents an element of the ring of integers mod n (this is also a field iff n is prime)
--- Integers Mod n have the following instance variables:
---      int - the integer itself
---      n - the value in Z/nZ
--- Integers Mod n have the following relationship to other classes:
---      Integers implement rings
---      Integers mod p implement fields
+--- @class IntegerModN
+--- Represents an element of the ring of integers mod n (this is also a field iff n is prime).
+--- @field element Integer
+--- @field modulus Integer
 
 IntegerModN = {}
 __IntegerModN = {}
@@ -20,7 +17,9 @@ end}
 -- Static functionality --
 --------------------------
 
--- Creates a new ring with the given modulus.
+--- Creates a new ring with the given modulus.
+--- @param modulus Integer
+--- @return RingIdentifier
 function IntegerModN.makering(modulus)
     local t = {ring = IntegerModN}
     t.modulus = modulus
@@ -28,7 +27,7 @@ function IntegerModN.makering(modulus)
     return t;
 end
 
--- Shorthand constructor for a ring with a particular modulus
+-- Shorthand constructor for a ring with a particular modulus.
 function IntegerModN.R(modulus)
     return IntegerModN.makering(modulus)
 end
@@ -46,7 +45,10 @@ __o.__tostring = function(a)
     return tostring(a.element)
 end
 
--- Creates a new integer i in Z/nZ
+--- Creates a new integer i in Z/nZ.
+--- @param i Integer
+--- @param n Integer
+--- @return IntegerModN
 function IntegerModN:new(i, n)
     local o = {}
 
@@ -66,7 +68,7 @@ function IntegerModN:new(i, n)
     return o
 end
 
--- Returns the ring this object is an element of
+--- @return RingIdentifier
 function IntegerModN:getring()
     local t = {ring = IntegerModN}
     if self then
@@ -76,7 +78,8 @@ function IntegerModN:getring()
     return t;
 end
 
--- Explicitly converts this element to an element of another ring
+--- @param ring RingIdentifier
+--- @return Ring
 function IntegerModN:inring(ring)
     if ring == IntegerModN:getring() then
         if ring.modulus then
@@ -96,24 +99,32 @@ function IntegerModN:inring(ring)
     error("Unable to convert element to proper ring.")
 end
 
+--- @param b IntegerModN
+--- @return IntegerModN
 function IntegerModN:add(b)
     return IntegerModN(self.element + b.element, self.modulus)
 end
 
+--- @return IntegerModN
 function IntegerModN:neg()
     return IntegerModN(-self.element, self.modulus)
 end
 
+--- @param b IntegerModN
+--- @return IntegerModN
 function IntegerModN:mul(b)
     return IntegerModN(self.element * b.element, self.modulus)
 end
 
--- Overrides the generic power method with powmod
+-- Overrides the generic power method with powmod.
+--- @param b IntegerModN
+--- @return IntegerModN
 function IntegerModN:pow(b)
     return IntegerModN(Integer.powmod(self.element, b, self.modulus), self.modulus)
 end
 
--- Returns the multiplicative inverse of this number if it exists
+-- Returns the multiplicative inverse of this number if it exists.
+--- @return IntegerModN
 function IntegerModN:inv()
     local r, t, _ = Integer.extendedgcd(self.element, self.modulus)
 
@@ -124,22 +135,31 @@ function IntegerModN:inv()
     return IntegerModN(t, self.modulus)
 end
 
+--- @param b IntegerModN
+--- @return IntegerModN
 function IntegerModN:div(b)
     return self:mul(b:inv())
 end
 
+--- @param b IntegerModN
+--- @return boolean
 function IntegerModN:eq(b)
     return self.element == b.element
 end
 
+--- @param b IntegerModN
+--- @return boolean
 function IntegerModN:lt(b)
     return self.element < b.element
 end
 
+--- @param b IntegerModN
+--- @return boolean
 function IntegerModN:le(b)
     return self.element <= b.element
 end
 
+--- @return IntegerModN
 function IntegerModN:zero()
     if not self or not self.modulus then
         return Integer.zero()
@@ -147,6 +167,7 @@ function IntegerModN:zero()
     return IntegerModN(Integer.zero(), self.modulus)
 end
 
+--- @return IntegerModN
 function IntegerModN:one()
     if not self or not self.modulus then
         return Integer.one()

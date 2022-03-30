@@ -1,11 +1,8 @@
--- An expression for the logarithm of an expression with respect to another.
--- Currently, logarithms are not being evaluated since we are just doing symbolic computation.
--- Logarithms have the following instance variables:
---      base - an Expression
---      expression - another Expression
--- DerrivativeExpressions have the following relations with other classes:
---      DerrivativeExpressions extend CompoundExpressions
-
+--- @class Logarithm
+--- An expression for the logarithm of an expression with respect to another.
+--- Currently, logarithms are not being evaluated since we are just doing symbolic computation.
+--- @field base Expression
+--- @field expression Expression
 Logarithm = {}
 __Logarithm = {}
 
@@ -13,7 +10,10 @@ __Logarithm = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new logarithm expression with the given symbol and expression
+--- Creates a new logarithm expression with the given symbol and expression.
+--- @param base Expression
+--- @param expression Expression
+--- @
 function Logarithm:new(base, expression)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -37,21 +37,9 @@ function Logarithm:new(base, expression)
     return o
 end
 
-function Logarithm:freeof(symbol)
-    return self.base:freeof(symbol) and self.expression:freeof(symbol)
-end
+--- TODO: evaluate logs that evaluate to exact integers.
 
--- Substitutes each variable for a new one
-function Logarithm:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    return Logarithm(self.base:substitute(map), self.expression:substitute(map))
-end
-
--- Performs automatic simplification of a logarithm
+--- @return Expression
 function Logarithm:autosimplify()
 
     local base = self.base:autosimplify()
@@ -76,6 +64,19 @@ function Logarithm:autosimplify()
     return Logarithm(base, expression)
 end
 
+--- @return table<number, Expression>
+function Logarithm:subexpressions()
+    return {self.base, self.expression}
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return Logarithm
+function Logarithm:setsubexpressions(subexpressions)
+    return Logarithm(subexpressions[1], subexpressions[2])
+end
+
+--- @param other Expression
+--- @return boolean
 function Logarithm:order(other)
     if other:isatomic() then
         return false
@@ -92,6 +93,7 @@ function Logarithm:order(other)
     return true
 end
 
+--- @return string
 function Logarithm:tolatex()
     if self.base == E then
         return '\\ln(' .. self.expression:tolatex() .. ')'

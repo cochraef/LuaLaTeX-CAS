@@ -1,5 +1,6 @@
 {
     "Lua.diagnostics.disable": [
-        "newfield-call"
+        "newfield-call",
+        "undefined-field"
     ]
 }

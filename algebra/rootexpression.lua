@@ -1,9 +1,6 @@
--- An expression that represents the solutions to expression = 0.
--- RootExpressions have the following instance variables:
---      expression - an Expression to find the roots of
--- RootExpressions have the following relations with other classes:
---      RootExpressions extend CompoundExpressions
-
+--- @class RootExpression
+--- An expression that represents the solutions to expression = 0.
+--- @field expression Expression
 RootExpression = {}
 __RootExpression = {}
 
@@ -11,7 +8,9 @@ __RootExpression = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new root expression with the given symbol and expression.
+--- Creates a new root expression with the given expression.
+--- @param expression Expression
+--- @return RootExpression
 function RootExpression:new(expression)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -34,23 +33,13 @@ function RootExpression:new(expression)
     return o
 end
 
--- Substitutes each expression for a new one.
-function RootExpression:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    return RootExpression(self.expression:substitute(map))
-end
-
--- Performs automatic simplification of a root expression, i.e., solves simple equations.
+--- @return Expression
 function RootExpression:autosimplify(subpart)
 
     local simplified = self.expression:autosimplify()
     local simplified, ispoly = simplified:topolynomial()
 
-    if simplified:isevaluatable() then
+    if simplified:isconstant() then
         -- 0 = 0 is always true (obviously).
         return simplified == simplified:zero()
     end
@@ -103,6 +92,27 @@ function RootExpression:autosimplify(subpart)
     return {RootExpression(simplified)}
 end
 
+--- @return table<number, Expression>
+function RootExpression:subexpressions()
+    return {self.expression}
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return RootExpression
+function RootExpression:setsubexpressions(subexpressions)
+    return RootExpression(subexpressions[1])
+end
+
+--- @param other Expression
+--- @return boolean
+function RootExpression:order(other)
+    --- TODO: Fix ordering on new expression types
+    if other:type() ~= RootExpression then
+        return false
+    end
+
+    return self.expression:order(other.expression)
+end
 
 
 -----------------

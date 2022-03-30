@@ -1,36 +1,48 @@
 -- Seperates the various binary operations into their own files for readability
 
--- Automatic simplification of power expressions
+--- Automatic simplification of power expressions.
+--- @return BinaryOperation
 function BinaryOperation:simplifypower()
     local base = self.expressions[1]
     local exponent = self.expressions[2]
 
-    if base:isevaluatable() and exponent:isevaluatable() and exponent:getring() ~= Rational:getring() then
+    if base:isconstant() and exponent:isconstant() and exponent:getring() ~= Rational:getring() then
         return self:evaluate()
     end
 
-    -- Uses the definition of the imaginary unit
-    if base == I and exponent == Integer(2) then
-        return Integer(-1)
+    -- Simplifies i^x for x integer.
+    if base == I and exponent:isconstant() and exponent:getring() == Integer:getring() then
+        if exponent % Integer(4) == Integer(0) then
+            return Integer(1)
+        end
+        if exponent % Integer(4) == Integer(1) then
+            return I
+        end
+        if exponent % Integer(4) == Integer(2) then
+            return Integer(-1)
+        end
+        if exponent % Integer(4) == Integer(3) then
+            return -I
+        end
     end
 
     -- Uses the property that 0^x = 0 if x does not equal 0
-    if base:isevaluatable() and base == base:zero() then
+    if base:isconstant() and base == base:zero() then
         return Integer.zero()
     end
 
     -- Uses the property that 1^x = 1
-    if base:isevaluatable() and base == base:one() then
+    if base:isconstant() and base == base:one() then
         return base:one()
     end
 
     -- Uses the property that x^0 = 1
-    if exponent:isevaluatable() and exponent == exponent:zero() then
+    if exponent:isconstant() and exponent == exponent:zero() then
         return exponent:one()
     end
 
     -- Uses the property that x^1 = x
-    if exponent:isevaluatable() and exponent == exponent:one() then
+    if exponent:isconstant() and exponent == exponent:one() then
         return base
     end
 
@@ -54,7 +66,7 @@ function BinaryOperation:simplifypower()
         return BinaryOperation(BinaryOperation.MUL, results):autosimplify()
     end
 
-    if base:isevaluatable() and exponent:isevaluatable() and exponent:getring() == Rational.getring() then
+    if base:isconstant() and exponent:isconstant() and exponent:getring() == Rational.getring() then
         return self:simplifyrationalpower()
     end
 

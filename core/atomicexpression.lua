@@ -1,19 +1,46 @@
--- Interface for an 'atomic' mathematical expression, i.e., an element of a set
--- AtomicExpressions have the following relation to other classes:
---      AtomicExpresssions extend Expressions
+--- @class AtomicExpression
+--- Interface for an atomic mathematical expression that has no sub-expressions.
 AtomicExpression = {}
 __AtomicExpression = {}
+
+
+----------------------
+-- Required methods --
+----------------------
+
+--- Converts an atomic expression to its equivalent compound expression, if it has one.
+--- @return Expression
+function AtomicExpression:tocompoundexpression()
+    return self
+end
 
 ----------------------
 -- Instance methods --
 ----------------------
 
--- Evaluates the current expression to itself
+--- @return AtomicExpression
 function AtomicExpression:evaluate()
     return self
 end
 
--- Default substitution behavior, can be overwritten for more complicated atomic expressions
+--- @return AtomicExpression
+function AtomicExpression:autosimplify()
+    return self
+end
+
+--- @return table<number, Expression>
+function AtomicExpression:subexpressions()
+    return {}
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return AtomicExpression
+function AtomicExpression:setsubexpressions(subexpressions)
+    return self
+end
+
+--- @param map table<Expression, Expression>
+--- @return Expression
 function AtomicExpression:substitute(map)
     for expression, replacement in pairs(map) do
         if self == expression then
@@ -23,44 +50,17 @@ function AtomicExpression:substitute(map)
     return self
 end
 
--- Performs automatic simplification of an expression
-function AtomicExpression:autosimplify()
-    return self
-end
-
--- If an atomic expression has an alternate representation as a compound expression, this converts it into that alternate representation.
--- Normally, though, atomic expressions are properly atomic and this will just return itself.
-function AtomicExpression:tocompoundexpression()
-    return self
-end
-
--- Atomic expressions are atomic, suprisingly
+--- @return boolean
 function AtomicExpression:isatomic()
     return true
 end
 
--- Most atomic expressions can be evaluated
-function AtomicExpression:isevaluatable()
-    return true
-end
-
--- Atomic expressions should come before all other expressions except themselves
-function AtomicExpression:order(other)
-    if self:isevaluatable() and other:isevaluatable() then
-        return self < other
-    end
-
-    if self == E or self == PI or self == I then
-        return false
-    end
-
-    return true
-end
-
--- Most atomic expressions should have the same __tostring as LaTeX's output
+--- @return string
 function AtomicExpression:tolatex()
+    -- Most atomic expressions should have the same __tostring as LaTeX's output
     return tostring(self)
 end
+
 
 -----------------
 -- Inheritance --

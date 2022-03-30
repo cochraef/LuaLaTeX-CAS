@@ -164,4 +164,4 @@ end
 
 
 
-CASparse("displua(2*x-y)")
+CASparse("displua(\"test\")")

@@ -1,8 +1,6 @@
--- Represents the absolute value of an expression.
--- AbsExpressions have the following instance variables:
---      expression - the expression inside the absolute value
--- AbsExpressions have the following relations to other classes:
---      AbsExpression extend CompoundExpressions
+--- @class AbsExpression
+--- The absolute value of an expression.
+--- @field expression Expression
 AbsExpression = {}
 __AbsExpression = {}
 
@@ -10,7 +8,9 @@ __AbsExpression = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new absolute value expression with the given expression.
+--- Creates a new absolute value expression with the given expression.
+--- @param expression Expression
+--- @return AbsExpression
 function AbsExpression:new(expression)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -22,13 +22,13 @@ function AbsExpression:new(expression)
         return '|' .. tostring(a.expression) .. '|'
     end
 
-
     o = setmetatable(o, __o)
     return o
 end
 
+--- @return Expression
 function AbsExpression:evaluate()
-    if self.expression:isevaluatable() then
+    if self.expression:isconstant() then
         if self.expression >= Integer(0) then
             return self.expression
         end
@@ -37,23 +37,24 @@ function AbsExpression:evaluate()
     return self
 end
 
-function AbsExpression:freeof(symbol)
-    return self.expression:freeof(symbol)
-end
-
-function AbsExpression:substitute(map)
-    for expression, replacement in pairs(map) do
-        if self == expression then
-            return replacement
-        end
-    end
-    return AbsExpression(self.expression:substitute(map))
-end
-
+--- @return Expression
 function AbsExpression:autosimplify()
     return self:evaluate()
 end
 
+--- @return table<number, Expression>
+function AbsExpression:subexpressions()
+    return {self.expression}
+end
+
+--- @param subexpressions table<number, Expression>
+--- @return AbsExpression
+function AbsExpression:setsubexpressions(subexpressions)
+    return AbsExpression(subexpressions[1])
+end
+
+--- @param other Expression
+--- @return boolean
 function AbsExpression:order(other)
     if other:isatomic() then
         return false
@@ -66,6 +67,7 @@ function AbsExpression:order(other)
     return self.expression:order(other.expression)
 end
 
+--- @return string
 function AbsExpression:tolatex()
     return "|" + self.expression:tolatex() + "|"
 end

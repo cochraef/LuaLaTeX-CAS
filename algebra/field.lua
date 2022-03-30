@@ -1,22 +1,28 @@
--- Interface for an element of a field
--- Fields have the following relation to other classes:
---      Fields extend Euclidean Domains
+--- @class Field
+--- Interface for an element of a field.
 Field = {}
 __Field = {}
+
+----------------------
+-- Required methods --
+----------------------
+
+--- @return Field
+function Field:div(b)
+    return self:mul(b:inv())
+end
+
+--- @return Field
+function Field:inv()
+    error("Called unimplemented method: inv()")
+end
 
 ----------------------------
 -- Instance functionality --
 ----------------------------
 
-function Field:div(b)
-    return self:mul(b:inv())
-end
-
-function Field:inv()
-    error("Called unimplemented method: inv()")
-end
-
--- Field exponentiation based on the definition. Specific rings may implement more efficient methods.
+--- Field exponentiation based on the definition. Specific rings may implement more efficient methods.
+--- @return Field
 function Field:pow(n)
     local base = self
     if(n < Integer.zero()) then
@@ -39,7 +45,7 @@ end
 __FieldOperations = Copy(__EuclideanOperations)
 
 __FieldOperations.__div = function(a, b)
-    if not b.getring and b.isevaluatable then
+    if not b.getring and b:isconstant() then
         return BinaryOperation.DIVEXP({a, b})
     end
 

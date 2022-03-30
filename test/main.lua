@@ -103,7 +103,7 @@ end
 -- TODO: Add profiling and error catching options.
 -- Comment out these lines to only run certain test code.
 -- require("test.calculus.derrivatives")
-require("test.calculus.integrals")
+-- require("test.calculus.integrals")
 
 -- require("test.expressions.autosimplify")
 -- require("test.expressions.expand")
@@ -111,10 +111,10 @@ require("test.calculus.integrals")
 -- require("test.expressions.rationalexponent")
 -- require("test.expressions.substitute")
 
--- require("test.polynomials.polynomial")
--- require("test.polynomials.partialfractions")
--- require("test.polynomials.polynomialmod")
--- require("test.polynomials.roots")
+require("test.polynomials.polynomial")
+require("test.polynomials.partialfractions")
+require("test.polynomials.polynomialmod")
+require("test.polynomials.roots")
 
 -- require("test.rings.modulararithmetic")
 -- require("test.rings.number")

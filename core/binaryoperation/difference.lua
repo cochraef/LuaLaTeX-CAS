@@ -1,6 +1,7 @@
 -- Seperates the various binary operations into their own files for readability
 
--- Automatic simplification of difference expressions
+--- Automatic simplification of difference expressions.
+--- @return BinaryOperation
 function BinaryOperation:simplifydifference()
     local term1 = self.expressions[1]
     local term2 = self.expressions[2]

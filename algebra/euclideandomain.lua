@@ -1,20 +1,25 @@
--- Interface for an element of a euclidean domain
--- EuclideanDomains have the following relation to other classes:
---      EuclideanDomains extend Rings
+--- @class EuclideanDomain
+--- Interface for an element of a euclidean domain.
 EuclideanDomain = {}
 __EuclideanDomain = {}
+
+----------------------
+-- Required methods --
+----------------------
+
+--- @param b EuclideanDomain
+--- @return EuclideanDomain, EuclideanDomain
+function EuclideanDomain:divremainder(b)
+    error("Called unimplemented method : divremainder()")
+end
 
 ----------------------------
 -- Instance functionality --
 ----------------------------
 
--- Euclidean domains are always commutative
+--- @return boolean
 function EuclideanDomain:iscommutative()
     return true
-end
-
-function EuclideanDomain:divremainder(b)
-    error("Called unimplemented method : divremainder()")
 end
 
 --------------------------
