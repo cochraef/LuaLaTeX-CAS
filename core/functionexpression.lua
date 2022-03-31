@@ -134,10 +134,10 @@ end
 
 --- @return string
 function FunctionExpression:tolatex()
-    local out = self.name:tolatex() .. '(';
+    local out = tostring(self.name) .. '(';
     for index, expression in ipairs(self:subexpressions()) do
         out = out .. expression:tolatex()
-        if self.expressions[index + 1] then
+        if self:subexpressions()[index + 1] then
             out = out .. ', '
         end
     end
