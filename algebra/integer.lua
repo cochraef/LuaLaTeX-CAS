@@ -816,6 +816,9 @@ Integer:new(19), Integer:new(23), Integer:new(29), Integer:new(31), Integer:new(
 
 function Integer:isprime()
     if self % Integer(2) == Integer.zero() then
+        if self == Integer(2) then
+            return true
+        end
         return false
     end
 

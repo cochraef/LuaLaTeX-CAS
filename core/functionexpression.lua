@@ -135,6 +135,9 @@ end
 --- @return string
 function FunctionExpression:tolatex()
     local out = tostring(self.name) .. '(';
+    if self:type() == TrigExpression then
+        out = "\\" .. out
+    end
     for index, expression in ipairs(self:subexpressions()) do
         out = out .. expression:tolatex()
         if self:subexpressions()[index + 1] then

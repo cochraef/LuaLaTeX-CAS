@@ -662,7 +662,7 @@ function PolynomialRing:factor()
             -- Factoring over the integers first uses the rational roots test to factor out monomials (for efficiency purposes)
             local remaining, factors = expression:rationalroots()
             terms = factors
-            -- Then applies the Zassenhaus algorithm if there entire polynomial has not been factored into monomial
+            -- Then applies the Zassenhaus algorithm if there entire polynomial has not been factored into monomials
             if remaining ~= Integer.one() then
                 remaining = remaining:zassenhausfactor()
                 for _, exp in ipairs(remaining) do

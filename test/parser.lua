@@ -154,7 +154,5 @@ end
 
 CASparse([[
     vars("x", "y", "z")
-    for i in range(-5, 5) do
-        displua(i / x)
-    end
+    displua(((1-x)^5):expand())
 ]])

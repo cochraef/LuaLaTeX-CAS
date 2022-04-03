@@ -159,6 +159,14 @@ function BinaryOperation:expand()
         end
         return allsums:autosimplify()
     end
+    if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
+        local exp = BinaryOperation.MULEXP({Integer(1)});
+        local pow = expanded.expressions[2]:asnumber()
+        for _ = 1, pow do
+            exp = exp * expanded.expressions[1]
+        end
+        return exp:expand()
+    end
     return expanded:autosimplify()
 end
 
