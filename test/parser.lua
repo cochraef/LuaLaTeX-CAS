@@ -15,6 +15,9 @@ end
 
 -- Displays an expression. For use in the parser.
 function disp(expression)
+    if type(expression) ~= "table" then
+        print(tostring(expression))
+    end
     if expression.autosimplify then
         tex.print(expression:autosimplify():tolatex())
     else
@@ -24,6 +27,9 @@ end
 
 -- Displays an expression. For use in the parser.
 function displua(expression)
+    if type(expression) ~= "table" then
+        print(tostring(expression))
+    end
     if expression.autosimplify then
         print(expression:autosimplify():tolatex())
     else
@@ -85,11 +91,71 @@ arccsc = ARCCSC
 arcsec = ARCSEC
 arccot = ARCCOT
 
+function ZTable(t)
+    return setmetatable(t, JoinTables(getmetatable(t),
+            {__index = function (t, k)
+                    if type(k) == "table" and k.type and k:type() == Integer then
+                        return rawget(t, k:asnumber())
+                    else
+                        return rawget(t, k)
+                    end
+                end,
+             __newindex = function (t, k, v)
+                    if type(k) == "table" and k.type and k:type() == Integer then
+                        rawset(t, k:asnumber(), v)
+                    else
+                        rawset(t, k, v)
+                    end
+                end}))
+end
+
+function R(n)
+    if type(n) == "number" then
+        return n
+    end
+
+    if type(n) == "string" then
+        return tonumber(n)
+    end
+
+    if type(n) == "table" and n.asnumber then
+        return n:asnumber()
+    end
+
+    error("Could not convert to a real number.")
+end
+
+function Z(n)
+    if type(n) == "table" and n.type and n:type() == Rational then
+        return n.numerator // n.denominator
+    end
+    return Integer(n)
+end
+
+function Q(n)
+    if type(n) == "table" then
+        return n
+    end
+
+    if type(n) == "number" then
+        n = tostring(n)
+    end
+
+    if type(n) == "string" then
+        local parts = split(n, "%.")
+        if #parts == 1 then
+            return Integer(parts[1])
+        else
+            return Integer(parts[1])..Integer(parts[2])
+        end
+    end
+
+    error("Could not convert to a rational number.")
+end
+
 --- Parses raw input into Lua code and executes it.
 --- @param input string
 function CASparse(input)
-
-    print(input)
 
     -- First, we replace any occurance of a number with an integer or rational version of itself.
     local str = string.gsub(input, ".?[0-9]+", function (s)
@@ -104,27 +170,6 @@ function CASparse(input)
 
         return string.sub(s, 1, 1) .. "Integer('" .. string.sub(s, 2, #s) .. "')"
     end)
-
-    print(str)
-
-    -- Now, we convert back to boring Lua numbers if we are using numeric for loops.
-    -- str = str.gsub(str, "%sfor%s+%a%w*%s*=.+,.+do", function (s)
-    --     local out = " for "
-    --     s = string.sub(s, 5, #s)
-    --     local parts = split(str, "[%s|,|=]")
-
-    --     out = out .. parts[1] .. "=(" .. parts[2] .. "):asnumber(),(" .. parts[3] .. "):asnumber()"
-
-    --     if parts[4] then
-    --         out = out .. ",(" .. parts[4] .. "):asnumber() do"
-    --     else
-    --         out = out .. " do"
-    --     end
-
-    --     return out
-    -- end)
-
-    print(str)
 
     --------------------------
     -- HERE COMES THE JANK. --
@@ -142,8 +187,6 @@ function CASparse(input)
         return string.sub(s, 1, 1) .. "Integer('0')." .. string.sub(s, 2, #s)
     end)
 
-    print(str)
-
     local exe, err = load(str .. "\n return true")
     if exe then
         exe()
@@ -153,6 +196,7 @@ function CASparse(input)
 end
 
 CASparse([[
-    vars("x", "y", "z")
-    displua(((1-x)^5):expand())
+    vars("x","y")
+    sym = {1, 4, 3}
+    displua(sym[R(2)])
 ]])

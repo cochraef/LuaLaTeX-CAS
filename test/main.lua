@@ -104,8 +104,8 @@ end
 -- TODO: Add profiling and error catching options.
 -- Comment out these lines to only run certain test code.
 
-profiler = newProfiler()
-profiler:start()
+-- profiler = newProfiler()
+-- profiler:start()
 
 require("test.calculus.derrivatives")
 require("test.calculus.integrals")
@@ -126,8 +126,8 @@ require("test.rings.number")
 
 endall()
 
-profiler:stop()
+-- profiler:stop()
 
-local outfile = io.open( "profile.txt", "w+" )
-profiler:report( outfile )
-outfile:close()
+-- local outfile = io.open( "profile.txt", "w+" )
+-- profiler:report( outfile )
+-- outfile:close()

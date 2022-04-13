@@ -48,7 +48,7 @@ end
 
 -- Join two tables, using the second entry if a key appears in both tables
 function JoinTables(t1, t2)
-    local t = Copy(t1)
+    local t = Copy(t1) or {}
     for key, value in pairs(t2) do
         t[key] = value
     end
