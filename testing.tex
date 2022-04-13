@@ -4,6 +4,7 @@
 
 \usepackage{xcolor}
 \usepackage{parskip}
+\usepackage{comment}
 
 \begin{document}
 
@@ -61,7 +62,21 @@ We also have:
     end
     }.
 \end{quote}
-
+\luaexec{
+    x = SymbolExpression("x")
+    y = SymbolExpression("y")
+    f = x*y+x^(Integer(2))
+    disp(DD(f,x))
+}
+{\color{red} 
+    Is it possible to implement within {\ttfamily BinaryOperation} smart casting of Lua ints to CAS ints? This way the parser does much less work (in other words, we just let the Lua language do most of the parsing)? For example, if {\ttfamily var} is a symbol expression then \verb|var^2| is like \verb|var^(Lua(2))| where {\ttfamily Lua(2)} is just the normal Lua number; can we define \verb|var^(Lua(2))| to mean \verb|var^(Integer(2))| perhaps within {\ttfamily BinaryOperations.lua}?}
+\begin{comment}
+    \begin{CAS}[var='x','y']
+        x=Integer('12341234098134509898234324')
+        f = x^2+x -- the 2 here is interpreted as Integer(2)
+        disp(DD(f,x))
+    \end{CAS}
+\end{comment}
 
 
 \subsection{symbolexpression.lua} 
@@ -104,34 +119,59 @@ $\luaexec{
     sym2 = parse("(x-1)*(y+2)")
     esym= sym2:expand()
     tex.print(sym2:tolatex(),"=",esym:tolatex())
-}$. {\color{red} It would be good for $2x+-y$ to be written as $2x-y$.}
+}$. 
+$\luaexec{ 
+    a={Integer(1),Integer(2),Integer(3)}
+    for i,j in pairs(a) do
+        disp(Integer(1)/j)
+    end
+    }$
+    
+\newpage
 
+I still can't send newlines or spaces to tex.print, which is odd since it works fine on the Lua end.
 
+\[ \CAS{
+    sym = {}
+    for i in range(0,5) do
+        table.insert(sym,x^i)
+    end
+}
+\luaexec{
+    g = sym[3]
+    disp(g)
+}
+\] 
+
+\CAS{ 
+    disp("hi") % works fine
+    tex.print("\\\\LaTeX", "hello back") % breaks everything
+}
+We probably need to fix the quadruple escaping:
+\[ \CAS{
+    vars("x","y")
+    f = arctan(x*y)
+    fy = DD(f,y)
+    fx = DD(f,x):autosimplify()
+    subs ={[x]=1,[y]=pi/2}
+    disp(f:substitute(subs))
+}  \qquad \CAS{disp(fx:substitute(subs))} \qquad \luaexec{disp(fy)} \] 
+Seems there's an expansion issue here. NVM -- figured it out, but there might be something amiss with {\ttfamily substitute}. Actually, I think \verb|tolatex()| is busted on trig expressions:
+\[ \CAS{
+    disp(cos(x))
+    } \] 
+What trig expressions does \LaTeX\ know for operators:
+\[ \sin \qquad \cos \qquad \tan \qquad \arctan \qquad \arcsin \qquad \arccos \]
 \newpage
 
 \section{Bugs \& Feature Requests}
 {\color{gray} 
 \begin{enumerate}
-\item There's an issue with parentheses in the \verb|tolatex| command:
-\[ \CAS{
-    disp(1/((h-1)^2))
-} \] 
-\item We also might want to add the ability for \verb|\CAS| to identify \verb|local| variables. Let's add \verb|exp| as a known function:
-\[ \CAS{ disp(int(z*e^(z^2),z)) } \qquad \text{vs} \qquad \CAS{ disp(int(z*exp(z^2),z)) } \] 
-\item It might be nice to be able to use Lua logical operators in \verb|\CAS|;  and also to declare local variables to limit scope.
-\item Glorified \verb|simplify| command might be good (for getting rational expressions in a common denominator, or combining logs and such).
+\item 
 \end{enumerate}
 }
-\[ \CAS{
-    local g = 2;
-    disp(g);
-    } \] 
-\CAS{disp(g)}
-\luaexec{
-CASparse("g=3; h=x^2+x")
-disp(g)
-if h==SymbolExpression("x^2+x") then tex.print("Symbols!") end
-}
+
+
 
 \end{document}
 
