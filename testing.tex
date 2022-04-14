@@ -17,6 +17,14 @@
     tex.print(c:tolatex())
 } \]
 
+\luaexec{
+    p = Integer(89)
+    if p:isprime() then
+        tex.print("prime!")
+    else
+        tex.print("not prime!")
+    end
+}
 
 \section{Core}
 Testing \verb|core| commands. 
