@@ -406,7 +406,7 @@ function BinaryOperation:tolatex()
         return out
     end
     if self.operation == BinaryOperation.DIV then
-        return '\\frac{' .. self.expressions[1] .. '}{' .. self.expressions[2] .. '}'
+        return '\\frac{' .. self.expressions[1]:tolatex() .. '}{' .. self.expressions[2]:tolatex() .. '}'
     end
     if self.operation == BinaryOperation.SUB then
         local out = ''
