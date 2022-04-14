@@ -8,6 +8,15 @@
 
 \begin{document}
 
+\section{Test}
+
+\[ \luaexec{
+    x = SymbolExpression("x")
+    c = Integer(1)/((x-Integer(2))*(x+Integer(3)))
+    c = c:autosimplify()
+    tex.print(c:tolatex())
+} \]
+
 
 \section{Core}
 Testing \verb|core| commands. 
