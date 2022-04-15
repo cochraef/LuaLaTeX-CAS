@@ -41,9 +41,9 @@ function FunctionExpression:new(name, expressions)
         return expressionnames .. ')'
     end
     __o.__eq = function(a, b)
-        if b:type() == TrigExpression then
-            return a == b:tofunction()
-        end
+        -- if b:type() == TrigExpression then
+        --     return a == b:tofunction()
+        -- end
         if b:type() ~= FunctionExpression then
             return false
         end
