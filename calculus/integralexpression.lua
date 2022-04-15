@@ -319,8 +319,8 @@ function IntegralExpression.rationalfunction(expression, symbol)
     -- Explicit handling of degree 1 over a binomial.
     do 
         local disc =  g.coefficients[1]*g.coefficients[1]-Integer(4)*g.coefficients[2]*g.coefficients[0] 
-        if f == Integer.one() and g.degree <= Integer(2) and disc < Integer.zero() then
-            return Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1]) ^ (Integer(1)/Integer(2))) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1]) ^ (Integer(1)/Integer(2))
+        if f == Integer.one() and g.degree == Integer(2) and disc < Integer.zero() then
+            return Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)) ^ (Integer(1)/Integer(2))) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)) ^ (Integer(1)/Integer(2))
         end
     end
 
