@@ -8,6 +8,23 @@
 
 \begin{document}
 
+\section{Test}
+
+\[ \luaexec{
+    x = SymbolExpression("x")
+    c = Integer(1)/((x-Integer(2))*(x+Integer(3)))
+    c = c:autosimplify()
+    tex.print(c:tolatex())
+} \]
+
+\luaexec{
+    p = Integer(89)
+    if p:isprime() then
+        tex.print("prime!")
+    else
+        tex.print("not prime!")
+    end
+}
 
 \section{Core}
 Testing \verb|core| commands. 
@@ -62,12 +79,15 @@ We also have:
     end
     }.
 \end{quote}
-\luaexec{
+\[ \luaexec{
     x = SymbolExpression("x")
     y = SymbolExpression("y")
-    f = x*y+x^(Integer(2))
-    disp(DD(f,x))
-}
+    f = {}
+    for i=1,5 do
+        f[i] = x*y+x^(Integer(i))
+    end
+    tex.print(DD(f[2],x):autosimplify():tolatex())
+} \] 
 {\color{red} 
     Is it possible to implement within {\ttfamily BinaryOperation} smart casting of Lua ints to CAS ints? This way the parser does much less work (in other words, we just let the Lua language do most of the parsing)? For example, if {\ttfamily var} is a symbol expression then \verb|var^2| is like \verb|var^(Lua(2))| where {\ttfamily Lua(2)} is just the normal Lua number; can we define \verb|var^(Lua(2))| to mean \verb|var^(Integer(2))| perhaps within {\ttfamily BinaryOperations.lua}?}
 \begin{comment}
@@ -126,27 +146,27 @@ $\luaexec{
         disp(Integer(1)/j)
     end
     }$
-    
-\newpage
 
-I still can't send newlines or spaces to tex.print, which is odd since it works fine on the Lua end.
+I still can't send newlines or spaces to tex.print, which is odd since it works fine on the Lua end. 
 
-\[ \CAS{
-    sym = {}
-    for i in range(0,5) do
-        table.insert(sym,x^i)
-    end
-}
+\[ 
 \luaexec{
-    g = sym[3]
-    disp(g)
+   x = SymbolExpression("x")
+   y = SymbolExpression("y")
+   sym = {}
+   for i=1,10 do
+    local c1 = Integer(math.random(10))
+    local c2 = Integer(math.random(10))
+    local e1 = Integer(math.random(10))
+    local e2 = Integer(math.random(10))
+    sym[i] = c1*x^e1 + c2*y^e2
+   end
+   fx = DD(sym[2],x):autosimplify()
+   subs = {[x]=Integer(1)/Integer(2),[y]=Integer(2)/Integer(3)}
+   fxs = fx:substitute(subs):autosimplify()
+   tex.print(fxs:tolatex())
 }
 \] 
-
-\CAS{ 
-    disp("hi") % works fine
-    tex.print("\\\\LaTeX", "hello back") % breaks everything
-}
 We probably need to fix the quadruple escaping:
 \[ \CAS{
     vars("x","y")
@@ -163,6 +183,17 @@ Seems there's an expansion issue here. NVM -- figured it out, but there might be
 What trig expressions does \LaTeX\ know for operators:
 \[ \sin \qquad \cos \qquad \tan \qquad \arctan \qquad \arcsin \qquad \arccos \]
 \newpage
+
+\[ \luaexec{
+    vars("x","y")
+    f = x^(Integer(2))+cos(y*x)
+    fx = DD(f,x)
+    disp(fx)
+} \] 
+
+\newpage
+
+
 
 \section{Bugs \& Feature Requests}
 {\color{gray} 

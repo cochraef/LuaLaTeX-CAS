@@ -386,7 +386,7 @@ function BinaryOperation:tolatex()
             if expression:type() == BinaryOperation then
                 if expression.operation == BinaryOperation.POW and expression.expressions[2]:isconstant() and expression.expressions[2] < Integer.zero() then
                     local reversed = (Integer.one() / expression):autosimplify()
-                    denom = denom .. reversed:tolatex()
+                    denom = denom .. '\\left('.. reversed:tolatex() .. '\\right)'
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
                     out = out .. '\\left(' .. expression:tolatex() .. '\\right)'
                 else
@@ -402,6 +402,9 @@ function BinaryOperation:tolatex()
         end
         if out == '-' then
             out = '-1'
+        end
+        if denom ~= '' and out == '' then 
+            return '\\frac{' .. '1' .. '}{' .. denom .. '}'
         end
         if denom ~= '' then
             return '\\frac{' .. out .. '}{' .. denom .. '}'
@@ -419,7 +422,7 @@ function BinaryOperation:tolatex()
         return out
     end
     if self.operation == BinaryOperation.DIV then
-        return '\\frac{' .. self.expressions[1] .. '}{' .. self.expressions[2] .. '}'
+        return '\\frac{' .. self.expressions[1]:tolatex() .. '}{' .. self.expressions[2]:tolatex() .. '}'
     end
     if self.operation == BinaryOperation.SUB then
         local out = ''

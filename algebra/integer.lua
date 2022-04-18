@@ -840,17 +840,18 @@ function Integer:isprime()
     end
 
     for _, a in ipairs(smallprimes) do
+        local s = r
         local x = Integer.powmod(a, d, self)
         if x == Integer.one() or x == self - Integer.one() then
             goto continue
         end
 
-        while r > Integer.zero() do
+        while s > Integer.zero() do
             x = Integer.powmod(x, Integer(2), self)
             if x == self - Integer.one() then
                 goto continue
             end
-            r = r - Integer.one()
+            s = s - Integer.one()
         end
         do
             return false
