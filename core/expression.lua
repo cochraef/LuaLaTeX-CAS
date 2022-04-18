@@ -57,6 +57,21 @@ function Expression:factor()
     return self
 end
 
+--- Returns all non-constant subexpressions of this expression - helper method for factor.
+--- @return table<number, Expression>
+function Expression:getsubexpressionsrec()
+    local result = {}
+
+    for _, expression in ipairs(self:subexpressions()) do
+        if not expression:isconstant() then
+            result[#result+1] = expression
+        end
+        result = JoinArrays(result, expression:getsubexpressionsrec())
+    end
+
+    return result
+end
+
 --- Determines whether an expression is atomic.
 --- Atomic expressions are not necessarily constant, since polynomial rings, for instance, are atomic parts that contain symbols.
 --- @return boolean

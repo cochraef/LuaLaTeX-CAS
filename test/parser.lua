@@ -17,8 +17,7 @@ end
 function disp(expression)
     if type(expression) ~= "table" then
         print(tostring(expression))
-    end
-    if expression.autosimplify then
+    elseif expression.autosimplify then
         tex.print(expression:autosimplify():tolatex())
     else
         tex.print(tostring(expression))
@@ -29,8 +28,7 @@ end
 function displua(expression)
     if type(expression) ~= "table" then
         print(tostring(expression))
-    end
-    if expression.autosimplify then
+    elseif expression.autosimplify then
         print(expression:autosimplify():tolatex())
     else
         print(tostring(expression))
@@ -39,7 +37,9 @@ end
 
 function vars(...)
     for _, string in ipairs(table.pack(...)) do
-        _G[string] = SymbolExpression(string)
+        if string ~= "_" then
+            _G[string] = SymbolExpression(string)
+        end
     end
 end
 
@@ -196,7 +196,7 @@ function CASparse(input)
 end
 
 CASparse([[
-    vars("x","y")
-    sym = {1, 4, 3}
-    displua(sym[R(2)])
+    vars("x")
+    displua(x-1/2)
+    displua(R(-1/3))
 ]])

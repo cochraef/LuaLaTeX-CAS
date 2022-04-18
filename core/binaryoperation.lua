@@ -148,7 +148,7 @@ end
 --- @return Expression
 function BinaryOperation:expand()
     local results = {}
-    for index, expression in ipairs(self.expressions) do
+    for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:expand()
     end
     local expanded = BinaryOperation(self.operation, results)
@@ -174,7 +174,7 @@ end
 --- @return Expression
 function BinaryOperation:expand2(other)
     local result = {}
-    for _, expression in ipairs(self.expressions) do
+    for _, expression in ipairs(self:subexpressions()) do
         if other:type() == BinaryOperation and other.operation == BinaryOperation.ADD then
             for _, expression2 in ipairs(other.expressions) do
                 result[#result+1] = expression * expression2
@@ -186,9 +186,25 @@ function BinaryOperation:expand2(other)
     return BinaryOperation(BinaryOperation.ADD, result)
 end
 
---- TODO: General expression factoring.
 --- @return Expression
 function BinaryOperation:factor()
+    local results = {}
+    for index, expression in ipairs(self:subexpressions()) do
+        results[index] = expression:factor()
+    end
+    local factoredsubs = BinaryOperation(self.operation, results)
+    local subs = factoredsubs:getsubexpressionsrec()
+    for index, sub in ipairs(subs) do
+        local substituted = factoredsubs:substitute({[sub]=SymbolExpression("_")}):autosimplify()
+        local polynomial, result = substituted:topolynomial()
+        if result then
+            local factored = polynomial:factor():autosimplify()
+            if factored ~= substituted then
+                return factored:substitute({[SymbolExpression("_")]=sub})
+            end
+        end
+    end
+
     return self
 end
 
