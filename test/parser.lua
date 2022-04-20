@@ -109,7 +109,7 @@ function ZTable(t)
                 end}))
 end
 
-function R(n)
+function RR(n)
     if type(n) == "number" then
         return n
     end
@@ -125,14 +125,14 @@ function R(n)
     error("Could not convert to a real number.")
 end
 
-function Z(n)
+function ZZ(n)
     if type(n) == "table" and n.type and n:type() == Rational then
         return n.numerator // n.denominator
     end
     return Integer(n)
 end
 
-function Q(n)
+function QQ(n)
     if type(n) == "table" then
         return n
     end
@@ -195,8 +195,6 @@ function CASparse(input)
     end
 end
 
-CASparse([[
-    vars("x")
-    displua(x-1/2)
-    displua(R(-1/3))
-]])
+vars("x")
+y = (Integer(2)*x+Integer(2)) * Integer(1)/Integer(2)
+print(y:autosimplify())

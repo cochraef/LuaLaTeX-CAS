@@ -57,6 +57,23 @@ function BinaryOperation:simplifyproductrec()
                 return BinaryOperation(BinaryOperation.MUL, {term1})
             end
 
+            -- Distributes constants if the other term is a sum expression.
+            if term1:isconstant() and term2.operation == BinaryOperation.ADD then
+                local distributed = BinaryOperation(BinaryOperation.ADD, {})
+                for i, exp in ipairs(term2:subexpressions()) do
+                    distributed.expressions[i] = term1 * exp
+                end
+                return BinaryOperation(BinaryOperation.MUL, {distributed:autosimplify()})
+            end
+
+            if term2:isconstant() and term1.operation == BinaryOperation.ADD then
+                local distributed = BinaryOperation(BinaryOperation.ADD, {})
+                for i, exp in ipairs(term1:subexpressions()) do
+                    distributed.expressions[i] = term2 * exp
+                end
+                return BinaryOperation(BinaryOperation.MUL, {distributed:autosimplify()})
+            end
+
             -- Uses the property that x^a*x^b=x^(a+b)
             local revertterm1 = false
             local revertterm2 = false
