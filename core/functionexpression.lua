@@ -1,8 +1,8 @@
 --- @class FunctionExpression
---- @alias Function FunctionExpression
 --- Represents a generic function that takes zero or more expressions as inputs.
 --- @field name SymbolExpression
 --- @field expressions table<number, Expression>
+--- @alias Function FunctionExpression
 FunctionExpression = {}
 __FunctionExpression = {}
 

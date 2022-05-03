@@ -1,7 +1,7 @@
 --- @class SymbolExpression
---- @alias Symbol SymbolExpression
 --- An atomic expression corresponding to a symbol representing an arbitary value.
 --- @field symbol string
+--- @alias Symbol SymbolExpression
 SymbolExpression = {}
 __SymbolExpression = {}
 

@@ -221,7 +221,7 @@ __o.__tostring = function(a)
     local out = ""
     local loc = a.degree:asnumber()
     while loc >= 0 do
-        if a.ring == PolynomialRing.getring() or a.ring == Rational.getring() then
+        if a.ring == PolynomialRing.getring() or (a.ring == Rational.getring() and a.ring.child) then
             out = out .. "(" .. tostring(a.coefficients[loc]) .. ")" .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"
         else
             out = out .. tostring(a.coefficients[loc]) .. a.symbol .. "^" .. tostring(math.floor(loc)) .. "+"

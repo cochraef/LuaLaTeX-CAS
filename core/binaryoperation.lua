@@ -162,10 +162,13 @@ function BinaryOperation:expand()
     if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
         local exp = BinaryOperation.MULEXP({Integer(1)});
         local pow = expanded.expressions[2]:asnumber()
-        for _ = 1, pow do
-            exp = exp * expanded.expressions[1]
+        for _ = 1, math.abs(pow) do
+            exp = exp:expand2(expanded.expressions[1])
         end
-        return exp:expand()
+        if pow < 0 then
+            exp = exp^Integer(-1)
+        end
+        return exp
     end
     return expanded:autosimplify()
 end
