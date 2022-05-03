@@ -195,6 +195,7 @@ function CASparse(input)
     end
 end
 
-vars("x")
-y = (Integer(2)*x+Integer(2)) * Integer(1)/Integer(2)
-print(y:autosimplify())
+
+local x = SymbolExpression("x")
+
+print((x^Integer(2)+Integer(2)*x+Integer(1)):factor())
