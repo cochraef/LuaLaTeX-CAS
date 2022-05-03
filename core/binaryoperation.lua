@@ -189,9 +189,13 @@ end
 --- @return Expression
 function BinaryOperation:factor()
     local results = {}
+
+    -- Recursively factors sub-expressions
     for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:factor()
     end
+
+    -- Attempts to factor expressions as monovariate polynomials
     local factoredsubs = BinaryOperation(self.operation, results)
     local subs = factoredsubs:getsubexpressionsrec()
     for index, sub in ipairs(subs) do
@@ -203,6 +207,10 @@ function BinaryOperation:factor()
                 return factored:substitute({[SymbolExpression("_")]=sub})
             end
         end
+    end
+
+    -- Pulls common sub-expressions out of sum expressions
+    if self.operation == BinaryOperation.ADD then
     end
 
     return self
