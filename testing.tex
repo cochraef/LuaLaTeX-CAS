@@ -1,208 +1,53 @@
 \documentclass{article}
 \usepackage{luacas}
-\usepackage{amsmath}
 
-\usepackage{xcolor}
+
 \usepackage{parskip}
 \usepackage{comment}
 
+
 \begin{document}
 
-\section{Test}
+\luaexec{
+    vars('x','y')
+    g = x*x+x
+}
+\printtree{x*x+x}
 
-\[ \luaexec{
-    x = SymbolExpression("x")
-    c = Integer(1)/((x-Integer(2))*(x+Integer(3)))
-    c = c:autosimplify()
-    tex.print(c:tolatex())
+\luaexec{
+    g = g:autosimplify()
+    g = g:topolynomial()
+    if g:type() == PolynomialRing then 
+        tex.print("I'm a polynomial.")
+    end
+}
+
+\luaexec{
+    f = FunctionExpression("f",{x})
+    g = FunctionExpression("g",{x})
+    h = DD(f*sin(x)+g,x)
+}
+
+
+\printtree[level 1/.style={sibling distance = 3cm}]{h}
+\printtree[level 1/.style={sibling distance = 2cm}]{h:autosimplify()}
+
+%\[ \print*{h} = \print{h} \] 
+
+\[ \CAS{
+    vars("x")
+    local a = ZTable({1, 2, 3})
+    local b = ZTable({})
+    for k, v in ipairs(a) do
+        b[v] = v^2
+    end
+    disp(b[1])
+    disp(b[2])
+    disp(b[3])
+    disp(R(1/2))
+    disp(Q(R(1/2)))
 } \]
 
-\luaexec{
-    p = Integer(89)
-    if p:isprime() then
-        tex.print("prime!")
-    else
-        tex.print("not prime!")
-    end
-}
 
-\section{Core}
-Testing \verb|core| commands. 
-
-\subsection{Expressions}
-
-\subsubsection{substitute}
-
-$\luaexec{
-    local sym1 = parse("x^2+x")
-    local subs ={[SymbolExpression("x")]=SymbolExpression("y")}
-    local sym2 = sym1:substitute(subs)
-    tex.print(sym2:tolatex())
-}$
-
-    
-\subsubsection{isatomic} 
-Symbol expressions are by default \verb|AtomicExpressions|. For example: 
-\begin{quote} 
-If we store \verb|asym = SymbolExpression("x^2+x")| then the sentence ``the expression \verb|asym| is an atomic expression'' is 
-\luaexec{
-    local asym = SymbolExpression("x^2+x")
-    if asym:isatomic() then
-        tex.print("True")
-    else
-        tex.print("False")
-    end
-}.
-\end{quote}
-But expressions that are constructed using \verb|BinaryOperations| are non-atomic. For example:
-\begin{quote}
-    If we store \verb|x = SymbolExpression("x")| and \verb|csym = x*x+x| then the sentence ``the expression \verb|csym| is an atomic expression'' is
-    \luaexec{
-    local x = SymbolExpression("x")
-    local csym = x*x+x
-    if csym:isatomic() then
-        tex.print("True")
-    else
-        tex.print("False")
-    end
-    }.
-\end{quote}
-We also have:
-\begin{quote}
-    If we store \verb|csym = parse("x^2+x")| then the sentence ``the expression \verb|csym| is an atomic expression'' is
-    \luaexec{
-    local csym = parse("x^2+x")
-    if csym:isatomic() then
-        tex.print("True")
-    else
-        tex.print("False")
-    end
-    }.
-\end{quote}
-\[ \luaexec{
-    x = SymbolExpression("x")
-    y = SymbolExpression("y")
-    f = {}
-    for i=1,5 do
-        f[i] = x*y+x^(Integer(i))
-    end
-    tex.print(DD(f[2],x):autosimplify():tolatex())
-} \] 
-{\color{red} 
-    Is it possible to implement within {\ttfamily BinaryOperation} smart casting of Lua ints to CAS ints? This way the parser does much less work (in other words, we just let the Lua language do most of the parsing)? For example, if {\ttfamily var} is a symbol expression then \verb|var^2| is like \verb|var^(Lua(2))| where {\ttfamily Lua(2)} is just the normal Lua number; can we define \verb|var^(Lua(2))| to mean \verb|var^(Integer(2))| perhaps within {\ttfamily BinaryOperations.lua}?}
-\begin{comment}
-    \begin{CAS}[var='x','y']
-        x=Integer('12341234098134509898234324')
-        f = x^2+x -- the 2 here is interpreted as Integer(2)
-        disp(DD(f,x))
-    \end{CAS}
-\end{comment}
-
-
-\subsection{symbolexpression.lua} 
-Testing commands in \verb|symbolexpression.lua|. 
-
-\subsubsection{evaluate}
-
-\subsubsection{freeof} 
-The statement ``$x^2+x+3$ is free of $x$'' is: %
-\luaexec{
-    local x = SymbolExpression("x")
-    local sym = x*x+x+Integer(3)
-    local y = SymbolExpression("x")
-    if sym:freeof(y) then
-        tex.print("True")
-    else 
-        tex.print("False")
-    end
-}
-
-The statement ``$x^2+x+3$ is free of $y$'' is: %
-\luaexec{
-    local x = SymbolExpression("x")
-    local sym = x*x+x+Integer(3)
-    local y = SymbolExpression("y")
-    if sym:freeof(y) then
-        tex.print("True")
-    else 
-        tex.print("False")
-    end
-}
-
-\subsubsection{expand}
-
-Using the distributive property, we have:
-$\luaexec{
-    x = SymbolExpression("x")
-    y = SymbolExpression("y")
-    sym = (x-Integer(1))*(y+Integer(2))
-    sym2 = parse("(x-1)*(y+2)")
-    esym= sym2:expand()
-    tex.print(sym2:tolatex(),"=",esym:tolatex())
-}$. 
-$\luaexec{ 
-    a={Integer(1),Integer(2),Integer(3)}
-    for i,j in pairs(a) do
-        disp(Integer(1)/j)
-    end
-    }$
-
-I still can't send newlines or spaces to tex.print, which is odd since it works fine on the Lua end. 
-
-\[ 
-\luaexec{
-   x = SymbolExpression("x")
-   y = SymbolExpression("y")
-   sym = {}
-   for i=1,10 do
-    local c1 = Integer(math.random(10))
-    local c2 = Integer(math.random(10))
-    local e1 = Integer(math.random(10))
-    local e2 = Integer(math.random(10))
-    sym[i] = c1*x^e1 + c2*y^e2
-   end
-   fx = DD(sym[2],x):autosimplify()
-   subs = {[x]=Integer(1)/Integer(2),[y]=Integer(2)/Integer(3)}
-   fxs = fx:substitute(subs):autosimplify()
-   tex.print(fxs:tolatex())
-}
-\] 
-We probably need to fix the quadruple escaping:
-\[ \CAS{
-    vars("x","y")
-    f = arctan(x*y)
-    fy = DD(f,y)
-    fx = DD(f,x):autosimplify()
-    subs ={[x]=1,[y]=pi/2}
-    disp(f:substitute(subs))
-}  \qquad \CAS{disp(fx:substitute(subs))} \qquad \luaexec{disp(fy)} \] 
-Seems there's an expansion issue here. NVM -- figured it out, but there might be something amiss with {\ttfamily substitute}. Actually, I think \verb|tolatex()| is busted on trig expressions:
-\[ \CAS{
-    disp(cos(x))
-    } \] 
-What trig expressions does \LaTeX\ know for operators:
-\[ \sin \qquad \cos \qquad \tan \qquad \arctan \qquad \arcsin \qquad \arccos \]
-\newpage
-
-\[ \luaexec{
-    vars("x","y")
-    f = x^(Integer(2))+cos(y*x)
-    fx = DD(f,x)
-    disp(fx)
-} \] 
-
-\newpage
-
-
-
-\section{Bugs \& Feature Requests}
-{\color{gray} 
-\begin{enumerate}
-\item 
-\end{enumerate}
-}
-
-
-
+\printtree{g}
 \end{document}
-
