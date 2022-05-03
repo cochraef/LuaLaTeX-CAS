@@ -400,7 +400,11 @@ function BinaryOperation:tolatex()
             if expression:type() == BinaryOperation then
                 if expression.operation == BinaryOperation.POW and expression.expressions[2]:isconstant() and expression.expressions[2] < Integer.zero() then
                     local reversed = (Integer.one() / expression):autosimplify()
-                    denom = denom .. '\\left('.. reversed:tolatex() .. '\\right)'
+                    if reversed.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
+                        denom = denom .. '\\left('.. reversed:tolatex() .. '\\right)'
+                    else
+                        denom = denom .. reversed:tolatex()
+                    end
                 elseif expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB then
                     out = out .. '\\left(' .. expression:tolatex() .. '\\right)'
                 else
