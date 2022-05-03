@@ -1,55 +1,70 @@
 \documentclass{article}
 \usepackage{luacas}
 
-
+\usepackage{verbatim}
 \usepackage{parskip}
 \usepackage{comment}
+\usepackage{forest}
+%\usepackage{tikz-qtree}
+\usepackage{pgfplots}
 
 
 \begin{document}
 
-\luaexec{
-    vars('x','y')
-    g = x*x+x
+Hi!
+\CAS{
+    vars("x","y")
+    g = DD(x*cos(x),x)
 }
-\printtree{x*x+x}
+Consider the expression $\print*{g}$.
+
+\parseforest{g}
+\bracketset{action character = @}
+\begin{forest}
+    for tree={draw,font=\ttfamily}
+    @\forestresult
+\end{forest}
+
+Here is the evaluated tree for $\print{g}$:
+
+\parseforest*{g}
+\begin{forest}
+    @\forestresult
+\end{forest}
 
 \luaexec{
-    g = g:autosimplify()
-    g = g:topolynomial()
-    if g:type() == PolynomialRing then 
-        tex.print("I'm a polynomial.")
-    end
+    h = g:autosimplify()
 }
 
 \luaexec{
-    f = FunctionExpression("f",{x})
-    g = FunctionExpression("g",{x})
-    h = DD(f*sin(x)+g,x)
+    tex.print("\\def\\a{",tostring(h),"}")
 }
+\begin{tikzpicture}
+    \begin{axis}
+        \addplot [domain = 0:2] {\a};
+    \end{axis}
+\end{tikzpicture}
 
+\luaexec{
+    vars("x","f")
+    a = f(x*x)
+}
+$\print{DD(a,x)}$
 
-\printtree[level 1/.style={sibling distance = 3cm}]{h}
-\printtree[level 1/.style={sibling distance = 2cm}]{h:autosimplify()}
+\CAS{
+    a = x^4 -1
+    a = a:autosimplify()
+    a = a:topolynomial()
+    b = x^2+1
+    b = b:topolynomial()
+    c = a \% b
+}
+$\print{c}$
 
-%\[ \print*{h} = \print{h} \] 
-
-\[ \CAS{
-    vars("x")
-    local a = ZTable({1, 2, 3})
-    local b = ZTable({})
-    for k, v in ipairs(a) do
-        b[v] = v^2
-    end
-    disp(b[1])
-    disp(b[2])
-    disp(b[3])
-    disp(RR(1/2))
-    disp(QQ(R(1/2)))
-} \]
-
-
-\printtree{g}
+\CAS{
+    vars("x","y")
+}
 
 
 \end{document}
+
