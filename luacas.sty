@@ -7,10 +7,10 @@
 \RequirePackage{xcolor}
 \RequirePackage{amsmath}
 
-\directlua{require('test.main') require('test.parser')}
+\directlua{require('test.main') require('test.parser') require('test.helper')}
 
 \newcommand{\CAS}[1]{\luaexec{CASparse('#1')}}
-\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
+%\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 %%%%%%%%%%
 %% Core %%
@@ -30,107 +30,81 @@
     }%
 }
 
-\luaexec{
-    function whatis(a)
-        if a == nil then 
-            return nil
-        end
-        if a:type() == SymbolExpression then 
-            return "SymbExp"
-        end 
-        if a:type() == BinaryOperation then 
-            return "BinOp"
-        end 
-        if a:type() == FunctionExpression then 
-            return "FnExp"
-        end 
-        if a:type() == TrigExpression then 
-            return "TrigExp"
-        end 
-        if a:type() == Integer then 
-            return "Int"
-        end 
-        if a:type() == Rational then 
-            return "Ratl"
-        end
-        if a:type() == DerrivativeExpression then 
-            return "DervExp"
-        end
-        return "No Clue"
-    end 
+\NewDocumentCommand{\eprint}{s m}{%
+    \IfBooleanTF{#1}{%
+        \directlua{
+            local sym = #2
+            tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym)..[[\end{verbatim}}]])
+        }%
+    }{%
+        \directlua{
+            local sym = #2
+            tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym:autosimplify())..[[\end{verbatim}}]])
+        }%
+    }%
 }
 
-\NewDocumentCommand{\printtree}{O{} m}{%
-    \begin{tikzpicture}[%
-            every node/.style = {%
-                draw,%
-                rectangle,%
-                rounded corners=1pt,%,
-                minimum width=1cm,%
-                minimum height=0.6cm,
-                node font=\ttfamily},
-                #1]
+\NewDocumentCommand{\printshrub}{s m}{%
+    \IfBooleanTF{#1}{%
         \luaexec{
             local sym = #2
-            if sym:type() == BinaryOperation then 
-                local binops = {BinaryOperation.ADD,
-                    BinaryOperation.MUL,
-                    BinaryOperation.SUB,
-                    BinaryOperation.DIV,
-                    BinaryOperation.POW,
-                    BinaryOperation.IDIV,
-                    BinaryOperation.MOD}
-                local obslab = {"ADD",
-                    "MUL",
-                    "SUB",
-                    "DIV",
-                    "POW",
-                    "IDIV",
-                    "MOD"}
-                for i,j in ipairs(binops) do 
-                    if sym.operation == j then 
-                        tex.print("\\node[label=90:{\\scriptsize\\color{gray} BinOp}] {",obslab[i],"}")
-                    end 
-                end 
-                for i,j in ipairs(sym.expressions) do 
-                    local l = whatis(sym.expressions[i])
-                    tex.sprint("child {node[label={-90:\\scriptsize\\color{gray}",l,"}] {$\\mathtt{",j:tolatex(),"}$}}")
-                end 
-                tex.print(";")
-            end
-            if sym:type() == FunctionExpression then 
-                tex.print("\\node[label=90:{\\scriptsize\\color{gray} FnExp}] {",sym.name,"}")
-                for i,j in ipairs(sym.expressions) do 
-                    local l = whatis(sym.expressions[i])
-                    tex.sprint("child {node[label={-90:\\scriptsize\\color{gray}",l,"}] {$\\mathtt{",tostring(j),"}$}}")
-                end 
-                tex.print(";")
-            end
-            if sym:type() == TrigExpression then 
-                tex.print("\\node[label=90:{\\scriptsize\\color{gray} TrigExp}] {",sym.name,"}")
-                local l = whatis(sym.expression)
-                tex.sprint("child {node[label={-90:{\\scriptsize\\color{gray}",l,"}}] {$\\mathtt{",tostring(sym.expression),"}$}}")
-                tex.print(";")
-            end
-            if sym:type() == SymbolExpression then
-                tex.sprint("\\node[label=90:{\\scriptsize\\color{gray}SymbExp}] {$\\mathtt{",tostring(sym),"}$};")
-            end
-            if sym:type() == Integer then 
-                tex.sprint("\\node[label=90:{\\scriptsize\\color{gray}Int}] {$\\mathtt{",tostring(sym),"}$};")
-            end
-            if sym:type() == Rational then
-                tex.sprint("\\node[label=90:{\\scriptsize\\color{gray}Ratl}] {$\\mathtt{",sym.numerator:tolatex(),"/",sym.denominator:tolatex(),"}$};")
-            end
-            if sym:type() == DerrivativeExpression then 
-                tex.sprint("\\node[label=90:{\\scriptsize\\color{gray}DervExp}] {$\\mathtt{D}$}")
-                local l = whatis(sym.expression)
-                tex.sprint("child {node[label={-90:{\\scriptsize\\color{gray}",l,"}}] {$\\mathtt{",tostring(sym.expression),"}$}}")
-                local l = whatis(sym.symbol)
-                tex.sprint("child {node[label={-90:{\\scriptsize\\color{gray}",l,"}}] {$\\mathtt{",tostring(sym.symbol),"}$}}")
-                tex.print(";")
-            end
+            sym = sym:autosimplify()
+            tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
+            tex.print(sym:gettheshrub())
+            tex.print(";")
         }%
-    \end{tikzpicture}%
+    }{%
+        \luaexec{
+            local sym = #2
+            tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
+            tex.print(sym:gettheshrub())
+            tex.print(";")
+        }%
+    }
+}
+    
+\NewDocumentCommand{\printtree}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\node {",nameof(sym),"}")
+            tex.print(sym:getthetree())
+            tex.print(";")
+        }%
+    }{%
+        \luaexec{
+            local sym = #2
+            tex.print("\\node {",nameof(sym),"}")
+            tex.print(sym:getthetree())
+            tex.print(";")
+        }%
+    }
+}
+
+\NewDocumentCommand{\parseforest}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\def\\forestresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(sym:gettheforest())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }{%
+        \luaexec{
+            local sym = #2
+            tex.print("\\def\\forestresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(sym:gettheforest())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }
 }
 
 \NewDocumentCommand{\freeof}{s m m}{%
