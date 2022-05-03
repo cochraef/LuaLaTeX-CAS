@@ -131,6 +131,3 @@ endall()
 -- local outfile = io.open( "profile.txt", "w+" )
 -- profiler:report( outfile )
 -- outfile:close()
-
-
-print(parse("x^3+1"):factor())

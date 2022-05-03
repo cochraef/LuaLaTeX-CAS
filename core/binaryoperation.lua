@@ -148,7 +148,7 @@ end
 --- @return Expression
 function BinaryOperation:expand()
     local results = {}
-    for index, expression in ipairs(self:autosimplify():subexpressions()) do
+    for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:expand()
     end
     local expanded = BinaryOperation(self.operation, results)
@@ -191,7 +191,7 @@ function BinaryOperation:factor()
     local results = {}
 
     -- Recursively factors sub-expressions
-    for index, expression in ipairs(self:autosimplify():subexpressions()) do
+    for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:factor()
     end
 
@@ -211,6 +211,12 @@ function BinaryOperation:factor()
 
     -- Pulls common sub-expressions out of sum expressions
     if self.operation == BinaryOperation.ADD then
+    end
+
+    -- Attempts to expand the expession and factor
+    local expanded = factoredsubs:expand();
+    if expanded ~= factoredsubs then
+        return expanded:factor();
     end
 
     return self

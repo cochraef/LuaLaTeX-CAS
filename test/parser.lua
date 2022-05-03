@@ -196,6 +196,7 @@ function CASparse(input)
 end
 
 
-local x = SymbolExpression("x")
-
-print((x^Integer(2)+Integer(2)*x+Integer(1)):factor())
+CASparse([[
+    vars("x", "y")
+    displua((1+2*x+x^2):factor())
+]])
