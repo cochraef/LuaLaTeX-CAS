@@ -217,10 +217,10 @@ function BinaryOperation:factor()
     end
 
     -- Attempts to expand the expession and factor
-    local expanded = factoredsubs:expand();
-    if expanded ~= factoredsubs then
-        return expanded:factor();
-    end
+    -- local expanded = factoredsubs:expand();
+    -- if expanded ~= factoredsubs then
+    --     return expanded:factor();
+    -- end
 
     return self
 end

@@ -72,6 +72,14 @@ function range(a, b, step)
     return f, nil, a - step
   end
 
+function factor(exp)
+    return exp:autosimplify():factor()
+end
+
+function expand(exp)
+    return exp:autosimplify():expand()
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
@@ -194,3 +202,9 @@ function CASparse(input)
         print(err)
     end
 end
+
+
+CASparse([[
+    vars('x')
+    displua(factor(x^2+2*x+1))
+]])
