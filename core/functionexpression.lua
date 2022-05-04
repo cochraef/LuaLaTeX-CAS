@@ -134,7 +134,7 @@ end
 
 --- @return string
 function FunctionExpression:tolatex()
-    local out = tostring(self.name) .. '(';
+    local out = tostring(self.name) .. '\\left(';
     if self:type() == TrigExpression then
         out = "\\" .. out
     end
@@ -144,7 +144,7 @@ function FunctionExpression:tolatex()
             out = out .. ', '
         end
     end
-    return out .. ')'
+    return out .. '\\right)'
 end
 
 -----------------
