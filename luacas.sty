@@ -14,6 +14,8 @@
 
 \NewEnviron{CAS}{\luaexec{CASparse([[\BODY]])}}
 
+\newcommand{\get}[2][true]{\luaexec{disp(#2, #1)}}
+
 %\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 %%%%%%%%%%
