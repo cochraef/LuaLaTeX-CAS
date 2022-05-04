@@ -194,9 +194,3 @@ function CASparse(input)
         print(err)
     end
 end
-
-
-CASparse([[
-    vars("x", "y")
-    displua((1+2*x+x^2):factor())
-]])
