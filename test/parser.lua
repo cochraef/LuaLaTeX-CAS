@@ -16,7 +16,7 @@ end
 -- Displays an expression. For use in the parser.
 function disp(expression)
     if type(expression) ~= "table" then
-        print(tostring(expression))
+        tex.print(tostring(expression))
     elseif expression.autosimplify then
         tex.print(expression:autosimplify():tolatex())
     else
@@ -205,6 +205,5 @@ end
 
 
 -- CASparse([[
---     vars('x')
---     displua(factor(x^2+2*x+1))
+--     displua('a')
 -- ]])
