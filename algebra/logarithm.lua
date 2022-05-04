@@ -96,9 +96,9 @@ end
 --- @return string
 function Logarithm:tolatex()
     if self.base == E then
-        return '\\ln(' .. self.expression:tolatex() .. ')'
+        return '\\ln\\left(' .. self.expression:tolatex() .. '\\right)'
     end
-    return '\\log_' .. self.base:tolatex() .. '(' .. self.expression:tolatex() .. ')'
+    return '\\log_' .. self.base:tolatex() .. '\\left(' .. self.expression:tolatex() .. '\\right)'
 end
 
 -----------------
