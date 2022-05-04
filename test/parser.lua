@@ -77,6 +77,9 @@ function range(a, b, step)
   end
 
 function factor(exp)
+    if exp:type() == Integer then
+        return exp:primefactorization()
+    end
     return exp:autosimplify():factor()
 end
 
