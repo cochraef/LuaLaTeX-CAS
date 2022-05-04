@@ -13,10 +13,10 @@
 \begin{document}
 
 Hi!
-\CAS{
+\begin{CAS}
     vars("x","y")
     g = DD(x*cos(x),x)
-}
+\end{CAS}
 Consider the expression $\print*{g}$.
 
 \parseforest{g}
@@ -52,19 +52,19 @@ Here is the evaluated tree for $\print{g}$:
 }
 $\print{DD(a,x)}$
 
-\CAS{
+\begin{CAS}
     a = x^4 -1
     a = a:autosimplify()
     a = a:topolynomial()
     b = x^2+1
     b = b:topolynomial()
     c = a \% b
-}
+\end{CAS}
 $\print{c}$
 
-\CAS{
+\begin{CAS}
     vars("x","y")
-}
+\end{CAS}
 
 
 \end{document}

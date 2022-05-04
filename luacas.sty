@@ -6,10 +6,14 @@
 \RequirePackage{tikz}
 \RequirePackage{xcolor}
 \RequirePackage{amsmath}
+\RequirePackage{environ}
 
-\directlua{require('test.parser')} 
+\directlua{require('test.parser')
+           require('test.helper')
+} 
 
-% \newcommand{\CAS}[1]{\luaexec{CASparse('#1')}}
+\NewEnviron{CAS}{\[\luaexec{CASparse([[\BODY]])}\]}
+
 %\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 %%%%%%%%%%
