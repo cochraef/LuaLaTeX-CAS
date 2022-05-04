@@ -7,9 +7,9 @@
 \RequirePackage{xcolor}
 \RequirePackage{amsmath}
 
-\directlua{require('test.main') require('test.parser') require('test.helper')}
+\directlua{require('test.parser')} 
 
-\newcommand{\CAS}[1]{\luaexec{CASparse('#1')}}
+% \newcommand{\CAS}[1]{\luaexec{CASparse('#1')}}
 %\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 %%%%%%%%%%
