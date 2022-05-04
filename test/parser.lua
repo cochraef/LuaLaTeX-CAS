@@ -204,7 +204,7 @@ function CASparse(input)
 end
 
 
-CASparse([[
-    vars('x')
-    displua(factor(x^2+2*x+1))
-]])
+-- CASparse([[
+--     vars('x')
+--     displua(factor(x^2+2*x+1))
+-- ]])
