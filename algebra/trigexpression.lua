@@ -147,25 +147,3 @@ end
 ARCCOT = function (a)
     return TrigExpression("arccot", a)
 end
-
---- @return string
-function TrigExpression:tolatex()
-    if self.name == "cos" then
-        return '\\cos(' .. self.expression:tolatex() .. ')'
-    end
-    if self.name == "sin" then
-        return '\\sin(' .. self.expression:tolatex() .. ')'
-    end
-    if self.name == "tan" then
-        return '\\tan(' .. self.expression:tolatex() .. ')'
-    end
-    if self.name == "arctan" then
-        return '\\arctan(' .. self.expression:tolatex() .. ')'
-    end
-    if self.name == "arccos" then 
-        return '\\arccos(' .. self.expression:tolatex() .. ')'
-    end
-    if self.name == "arcsin" then 
-        return '\\arcsin(' .. self.expression:tolatex() .. ')'
-    end
-end
