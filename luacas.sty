@@ -1,26 +1,67 @@
-\ProvidesPackage{luacas}
+%Copyright (c) ???
+%
+% Permission is granted to copy, distribute and/or modify this
+% software under the terms of the LaTeX Project Public License
+% (LPPL), version 1.3c or any later version.
+%
+% This software is provided 'as is', without warranty of any kind,
+% either expressed or implied, including, but not limited to, the
+% implied warranties of merchantability and fitness for a
+% particular purpose.
 
-\RequirePackage{luacode}
-\RequirePackage{pgfkeys}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luacas}
+    [2022/05/07 v1.0 CAS written in Lua for LaTeX]
+
+\RequirePackage{iftex}
+\ifluatex
+    \RequirePackage{luacode}
+\else
+    {\PackageError{luacas}
+    {Not running under LuaLaTeX}
+    {This package requires LuaLaTeX. Try compiling this document with\MessageBreak 'lualatex' instead of 'latex'. This is a fatal error; I'm aborting now.}%
+    }\stop
+\fi
+
+%For Macro Making:
 \RequirePackage{xparse}
+\RequirePackage{pgfkeys}
+\RequirePackage{verbatim}
+
+%For Graphics:
 \RequirePackage{tikz}
 \RequirePackage{xcolor}
 \RequirePackage{amsmath}
-\RequirePackage{environ}
 
+%These files contain Lua code for parsing luacas output; they also initialize the CAS itself
 \directlua{require('test.parser')
            require('test.helper')
 } 
 
-\NewEnviron{CAS}{\luaexec{CASparse([[\BODY]])}}
+\NewDocumentEnvironment{CAS}%
+    {+b}%
+    {\luaexec{CASparse([[#1]])}}%
+    {}
 
-\newcommand{\get}[2][true]{\luaexec{disp(#2, #1)}}
+\newcommand{\get}%
+    [2][true]%
+    {\luaexec{disp(#2, #1)}}      
+    
+\newcommand{\yoink}[2]{%
+\expandafter\def\csname #2\endcsname{%
+    \directlua{
+        tex.print(tostring(#1))
+        }%
+    }%
+}
 
 %\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 %%%%%%%%%%
 %% Core %%
 %%%%%%%%%%
+
+%pretty print
 
 \NewDocumentCommand{\print}{s m}{%
     \IfBooleanTF{#1}{%
@@ -36,7 +77,9 @@
     }%
 }
 
-\NewDocumentCommand{\eprint}{s m}{%
+%verbatim print
+
+\NewDocumentCommand{\vprint}{s m}{%
     \IfBooleanTF{#1}{%
         \directlua{
             local sym = #2
@@ -49,6 +92,8 @@
         }%
     }%
 }
+
+%prints the first level of an expression tree; for use within a tikzpicture environment
 
 \NewDocumentCommand{\printshrub}{s m}{%
     \IfBooleanTF{#1}{%
@@ -68,6 +113,8 @@
         }%
     }
 }
+
+%prints the full expression tree; for use within a tikzpicture environment
     
 \NewDocumentCommand{\printtree}{s m}{%
     \IfBooleanTF{#1}{%
@@ -87,6 +134,8 @@
         }%
     }
 }
+
+%parses an expression tree for use within the forest environment; result is stored in \forestresult
 
 \NewDocumentCommand{\parseforest}{s m}{%
     \IfBooleanTF{#1}{%

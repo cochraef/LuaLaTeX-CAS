@@ -61,11 +61,17 @@ function BinaryOperation:simplifysumrec()
                 revertterm2 = true
             end
             if ArrayEqual(term1.expressions, term2.expressions, 2) then
-                local result = BinaryOperation(BinaryOperation.MUL,
-                                    {BinaryOperation(BinaryOperation.ADD,
-                                        {term1.expressions[1],
-                                        term2.expressions[1]}):autosimplify(),
-                                    term1.expressions[2]}):autosimplify()
+                local result = (term1.expressions[1]+term2.expressions[1])
+                result = result:autosimplify()
+                for i=2,#term1.expressions do 
+                    result = result*term1.expressions[i]
+                end
+                result = result:autosimplify()
+                --local result = BinaryOperation(BinaryOperation.MUL,
+                --                    {BinaryOperation(BinaryOperation.ADD,
+                --                        {term1.expressions[1],
+                --                        term2.expressions[1]}):autosimplify(),
+                --                    term1.expressions[2]}):autosimplify()
                 if result:isconstant() and result == result:zero() then
                     return BinaryOperation(BinaryOperation.ADD, {})
                 end
