@@ -5,10 +5,10 @@
 \usepackage{parskip}
 \usepackage{comment}
 \usepackage{forest}
-%\usepackage{tikz-qtree}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
+\usepackage{asypictureB}
 
 \begin{document}
 
@@ -40,11 +40,28 @@ Here is the evaluated tree for $\print{g}$:
 \luaexec{
     tex.print("\\def\\a{",tostring(h),"}")
 }
+$\a$
 \begin{tikzpicture}
     \begin{axis}
         \addplot [domain = 0:2] {\a};
     \end{axis}
 \end{tikzpicture}
+
+%this is bad ass
+
+\begin{asypicture}{width=5cm}
+    import graph;
+    size(7cm,0);
+    
+    real f(real x){
+        return @a;
+        }
+    path q = graph(f,0,2,operator..);
+    draw(q,blue);
+    
+    xaxis("$x$",0,3,Arrow);
+    yaxis("$y$",0,3,Arrow);
+\end{asypicture}
 
 \luaexec{
     vars("x","f")
@@ -62,11 +79,21 @@ $\print{DD(a,x)}$
 \end{CAS}
 $\print{c}$
 
-\begin{CAS}
-    vars("x","y")
-\end{CAS}
+\hrulefill
 
-$\int$
+\begin{CAS}
+    a = x*y
+    b = x*y
+    c = a-b
+\end{CAS}
+$\print*{c:autosimplify()}$
+
+$\print*{c:simplifysum()}$
+
+$\print*{c:simplifydifference()}$
+
+$\print*{c:simplifyproduct()}$
+
 
 \end{document}
 
