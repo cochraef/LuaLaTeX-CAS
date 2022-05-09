@@ -1,23 +1,29 @@
 \documentclass{article}
 \usepackage{luacas}
-
-\usepackage{verbatim}
 \usepackage{parskip}
 \usepackage{comment}
 \usepackage{forest}
+%\usepackage{tikz-qtree}
 \usepackage{pgfplots}
+\usepackage{asypictureB}
 \pgfplotsset{compat=1.18}
 
-\usepackage{asypictureB}
+\usepackage{lipsum}
+\usepackage{microtype}
 
 \begin{document}
 
 Hi!
 \begin{CAS}
     vars("x","y")
-    g = DD(x*cos(x),x)
-\end{CAS}
-Consider the expression $\print*{g}$.
+    g = DD(cos(1/(x^2+1)),x)
+\end{CAS}%
+Consider the expression $\print*{g}$. This autosimplifies to 
+\[ \print{g}.\] 
+
+
+
+\vprint{g}
 
 \parseforest{g}
 \bracketset{action character = @}
@@ -40,27 +46,22 @@ Here is the evaluated tree for $\print{g}$:
 \luaexec{
     tex.print("\\def\\a{",tostring(h),"}")
 }
-$\a$
-\begin{tikzpicture}
-    \begin{axis}
-        \addplot [domain = 0:2] {\a};
-    \end{axis}
-\end{tikzpicture}
-
-%this is bad ass
-
-\begin{asypicture}{width=5cm}
+\begin{asypicture}{width=6cm}
+    import settings;
+    settings.tex = "xelatex";
     import graph;
-    size(7cm,0);
-    
+    import contour;
+    size(6cm,5cm,IgnoreAspect);
+
     real f(real x){
         return @a;
         }
     path q = graph(f,0,2,operator..);
+
     draw(q,blue);
-    
-    xaxis("$x$",0,3,Arrow);
-    yaxis("$y$",0,3,Arrow);
+
+    xaxis("$x$",LeftRight,LeftTicks);
+    yaxis("$y$",BottomTop,RightTicks);
 \end{asypicture}
 
 \luaexec{
@@ -79,15 +80,143 @@ $\print{DD(a,x)}$
 \end{CAS}
 $\print{c}$
 
-\hrulefill
+\begin{CAS}
+    vars('x','y')
+\end{CAS}
+
+\begin{CAS}
+    a = x+y
+\end{CAS}
+
+
+\def\a{x^2+x*y+y^2}
+\begin{CAS}
+    a = \a
+\end{CAS}
+$\print{a}$ vs $\a$
+
+\begin{CAS}
+    vars('x','y')
+    f = x^3-y+2*x^2*y
+    g = x^2+x*y+y^2
+    fx = DD(f,x):autosimplify()
+    fy = DD(f,y):autosimplify()
+    gx = DD(g,x):autosimplify()
+    gy = DD(g,y):autosimplify()
+    lagrange = fx*gy-fy*gx
+\end{CAS}
+
+\luaexec{
+    tex.print("\\def\\g{",tostring(g),"}")
+    tex.print("\\def\\l{",tostring(lagrange),"}")
+}
+
+
+\yoink{lagrange}{lag}
+
+\[ \begin{aligned}
+    f   &= \print{f} \\ 
+    f_x &= \print{fx} \\
+    f_y &= \print{fy}
+\end{aligned} \] 
+
+\[ \print{lagrange:expand()} \] 
+\[ \print{g} \] 
+
+
+\begin{asypicture}{width=7cm}
+    import settings;
+    settings.tex = "xelatex";
+    import graph;
+    import contour;
+    size(7cm,6cm,IgnoreAspect);
+
+    real G(pair uv){
+        real x=uv.x; real y=uv.y;
+        return @g;
+    }
+    real L(pair uv){
+        real x=uv.x; real y=uv.y;
+        return @lag;
+    }
+
+    real[] gvals={1};
+    real[] lvals={0};
+    
+    guide[][] con = contour(G,(-2,-2),(2,2),gvals);
+    guide[][] lag = contour(L,(-2,-2),(2,2),lvals);
+
+    limits((-2.5,-2.5),(2.5,2.5));
+
+    draw(con,blue+1);
+    draw(lag,red+1);
+
+    xaxis(Label("$x$",align=S),LeftRight,LeftTicks(Label(align=right)));
+    yaxis(Label("$y$",align=W),BottomTop,RightTicks(Label(align=left)));
+\end{asypicture}
+
+\begin{CAS}
+    a = 2*x*y
+    b = (-1)*x*y
+    c = a+b
+\end{CAS}
+
+$\print*{c}$
+
+
+\parseforest{c}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
+
+\luaexec{
+    term1 = c.expressions[1]:autosimplify()
+    term2 = c.expressions[2]:autosimplify()
+}
+
+\parseforest{term1}
+\begin{forest}
+    @\forestresult
+\end{forest} \qquad \parseforest{term2} \qquad \begin{forest}
+    @\forestresult
+\end{forest} 
+
+\luaexec{
+    a = x
+    if a.operation ~= BinaryOperation.MUL then
+        a = Integer.one()*a
+    end
+}
+\parseforest{a}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
+$\print{a}$
 
 \begin{CAS}
     a = x*y
-    b = x*y
-    c = a-b
+    aa = BinaryOperation(BinaryOperation.MUL,{Integer.one(),a})
+    b = 2*x*y
+    c = 3*x*y
 \end{CAS}
-$\print*{c:autosimplify()}$
+$\print{a+b+c}$
 
+\parseforest{aa+b:autosimplify()}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
+\luaexec{
+    if ArrayEqual(aa.expressions,b:autosimplify().expressions,2) then 
+        tex.print("Equal")
+    else
+        tex.print("Unequal")
+    end
+}
+
+$\print{a+Integer(2)*a}$
 
 \end{document}
 

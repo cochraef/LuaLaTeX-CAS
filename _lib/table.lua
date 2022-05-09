@@ -10,6 +10,19 @@ function ArrayEqual(a1, a2, i)
     return true
 end
 
+-- Checks if two arrays are equal, the first starting at index i, the second starting at index j
+function FancyArrayEqual(a1, a2, i,j)
+    i = i or 1
+    j = j or 1
+    while i <= math.max(#a1, #a2) or j <= math.max(#a1, #a2) do
+        if a1[i] ~= a2[j] then
+            return false
+        end
+        i = i + 1
+        j = j + 1
+    end
+    return true
+end
 
 -- Creates a copy of a table
 function Copy(orig)
