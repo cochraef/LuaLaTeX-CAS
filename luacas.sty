@@ -23,12 +23,10 @@
     }\stop
 \fi
 
-%For Macro Making:
+%Required Packaged
 \RequirePackage{xparse}
 \RequirePackage{pgfkeys}
 \RequirePackage{verbatim}
-
-%For Graphics:
 \RequirePackage{tikz}
 \RequirePackage{xcolor}
 \RequirePackage{amsmath}
@@ -45,7 +43,7 @@
 
 \newcommand{\get}%
     [2][true]%
-    {\luaexec{disp(#2, #1)}}      
+    {\directlua{disp(#2, #1)}}      
     
 \newcommand{\yoink}[2]{%
 \expandafter\def\csname #2\endcsname{%
@@ -65,12 +63,12 @@
 
 \NewDocumentCommand{\print}{s m}{%
     \IfBooleanTF{#1}{%
-        \luaexec{
+        \directlua{
             local sym = #2
             tex.print(sym:tolatex())
         }%
     }{%
-        \luaexec{
+        \directlua{
             local sym = #2
             tex.print(sym:autosimplify():tolatex())
         }%
@@ -97,7 +95,7 @@
 
 \NewDocumentCommand{\printshrub}{s m}{%
     \IfBooleanTF{#1}{%
-        \luaexec{
+        \directlua{
             local sym = #2
             sym = sym:autosimplify()
             tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
@@ -105,7 +103,7 @@
             tex.print(";")
         }%
     }{%
-        \luaexec{
+        \directlua{
             local sym = #2
             tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
             tex.print(sym:gettheshrub())
