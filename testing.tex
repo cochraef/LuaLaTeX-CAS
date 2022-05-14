@@ -16,14 +16,12 @@
 Hi!
 \begin{CAS}
     vars("x","y")
-    g = DD(cos(1/(x^2+1)),x)
+    g = diff(1/(x^2+1),{x,2})
 \end{CAS}%
-Consider the expression $\print*{g}$. This autosimplifies to 
-\[ \print{g}.\] 
+We have: 
+\[ \print*{g} = \print{g}.\] 
 
-
-
-\vprint{g}
+\vprint*{g}
 
 \parseforest{g}
 \bracketset{action character = @}
