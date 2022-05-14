@@ -60,8 +60,22 @@ function DiffExpression:new(expression,symbols)
         end
         if a.degree > 1 then 
             varlist = varlist .. '^' .. tostring(a.degree) .. '/'
-            for index, var in ipairs(a.symbols) do 
-                varlist = varlist .. 'd' .. tostring(var)
+            local varnum = 1
+            for index = 1, #a.symbols do 
+                local var = a.symbols[#a.symbols-index+1] 
+                if a.symbols[#a.symbols-index] == var then 
+                    varnum = varnum + 1 
+                    goto nextvar
+                end
+                if a.symbols[#a.symbols-index] ~=var then 
+                    if varnum == 1 then 
+                        varlist = varlist .. 'd' ..  tostring(var)
+                    else
+                        varlist = varlist .. 'd' ..  tostring(var) .. '^' .. tostring(varnum)
+                    end
+                    varnum = 1
+                end
+                ::nextvar::
             end 
             varlist = varlist .. " " .. tostring(a.expression) .. ')' 
         end 
