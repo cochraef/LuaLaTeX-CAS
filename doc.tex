@@ -40,7 +40,7 @@ The package {\ttfamily luacas} allows for symbolic computation within \LaTeX{}. 
 \begin{CAS}
     vars('x','y')
     f = 3*x*y - x^2*y 
-    fx = DD(f,x)
+    fx = diff(f,x)
 \end{CAS}
 \inputminted[
 firstline=7,
@@ -60,7 +60,7 @@ breaklines]
 {latex}
 {docdemo.tex}
 \tcblower
-The partial derivative of $\print{f}$ with respect to $x$ is $\print{fx}$
+\[ \print*{fx} = \print{fx} \] 
 \end{codebox}
 
 \subsection{About}
