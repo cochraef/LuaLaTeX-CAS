@@ -74,6 +74,15 @@ function BinaryOperation:simplifyproductrec()
                 return BinaryOperation(BinaryOperation.MUL, {distributed:autosimplify()})
             end
 
+            -- Uses the property that sqrt(a,r)*sqrt(b,r) = sqrt(a*b,r) if a,b,r are integers with a,b>0
+            if term1:type() == SqrtExpression and term2:type() == SqrtExpression and term1.expression:isconstant() and term1.root:type() == Integer then 
+                if term1.root == term2.root and term1.expression > Integer.zero() then 
+                    local expression = term1.expression*term2.expression
+                    local result = SqrtExpression(expression,term1.root):autosimplify()
+                    return BinaryOperation(BinaryOperation.MUL,{result})
+                end
+            end
+
             -- Uses the property that x^a*x^b=x^(a+b)
             local revertterm1 = false
             local revertterm2 = false
@@ -85,9 +94,11 @@ function BinaryOperation:simplifyproductrec()
                 term2 = BinaryOperation(BinaryOperation.POW, {term2, Integer.one()})
                 revertterm2 = true
             end
-            if term1.expressions[1] == term2.expressions[1] and not
+            if term1.expressions[1] == term2.expressions[1] 
+                and not
                         (term1.expressions[1]:type() == Integer and
-                        (term1.expressions[2]:type() == Rational or term2.expressions[2]:type() == Rational)) then
+                        term1.expressions[2]:type() ~= term2.expressions[2]:type()) 
+            then
                 local result = BinaryOperation(BinaryOperation.POW,
                                     {term1.expressions[1],
                                     BinaryOperation(BinaryOperation.ADD,

@@ -10,6 +10,7 @@ require("algebra.polynomialring")
 require("algebra.integer")
 require("algebra.rational")
 require("algebra.integerquotientring")
+require("algebra.sqrtexpression")
 
 require("algebra.absexpression")
 require("algebra.logarithm")
