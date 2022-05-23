@@ -10,7 +10,7 @@ __SqrtExpression = {}
 
 --- Creates a new sqrt expression with the given expression.
 --- @param expression Expression
---- @param integer Integer
+--- @param root Integer
 --- @return SqrtExpression
 function SqrtExpression:new(expression, root)
     root = root or Integer(2)
