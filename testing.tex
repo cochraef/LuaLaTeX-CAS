@@ -162,7 +162,7 @@ $\print{a}$ vs $\a$
     c = a+b
 \end{CAS}
 
-$\print*{c}$
+$\print*{c} = \print{c}$
 
 
 \parseforest{c}
@@ -217,7 +217,11 @@ $\print{a+b+c}$
     end
 }
 
-$\print{a+Integer(2)*a}$
+\begin{CAS}
+    vars('x','y')
+    c = (x*y)^(1/2)
+\end{CAS}
+\[ \print*{c} = \print{c} \] 
 
 \end{document}
 
