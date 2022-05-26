@@ -52,7 +52,7 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that (x^a)^b = x^(a*b)
-    if not base:isatomic() and base.operation == BinaryOperation.POW then
+    if not base:isatomic() and base.operation == BinaryOperation.POW and exponent:type() == Integer then
         base, exponent = base.expressions[1], BinaryOperation(BinaryOperation.MUL, {exponent, base.expressions[2]}):autosimplify()
         return BinaryOperation(BinaryOperation.POW, {base, exponent}):autosimplify()
     end
@@ -67,7 +67,7 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that sqrt(x,r)^d == sqrt(x,r/d)
-    if base:type() == SqrtExpression and exponent:type() == Integer then 
+    if base:type() == SqrtExpression and exponent:type() == Integer and exponent > Integer.zero() then 
         local root = base.root
         local expr = base.expression
         local comm = Integer.gcd(root,exponent) 
