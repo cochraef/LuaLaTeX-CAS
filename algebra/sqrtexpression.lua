@@ -1,5 +1,5 @@
 --- @class SqrtExpression
---- An expression that represents the solutions to expression = 0.
+--- An expression that represents the positive real solution to x^n = a where n is a positive integer and a is constant.
 --- @field expression Expression
 SqrtExpression = {}
 __SqrtExpression = {}
@@ -10,7 +10,7 @@ __SqrtExpression = {}
 
 --- Creates a new sqrt expression with the given expression.
 --- @param expression Expression
---- @param root Integer
+--- @param integer Integer
 --- @return SqrtExpression
 function SqrtExpression:new(expression, root)
     root = root or Integer(2)
@@ -63,15 +63,47 @@ function SqrtExpression:order(other)
 end
 
 function SqrtExpression:autosimplify()
-    if not self.expression:isconstant() then 
-        return SqrtExpression(self.expression:autosimplify(),self.root)
+    if self.root == Integer.one() then 
+        return self.expression:autosimplify()
     end
 
-    
+    if self.root:type() == Rational then 
+        return SqrtExpression(self.expression ^ self.root.denominator, self.root.numerator):autosimplify()
+    end
 
-    if self.expression:type() == Integer then 
+    if not self.root:isconstant() then 
+        return BinaryOperation(BinaryOperation.POW,{self.expression,Integer.one() / self.root}):autosimplify()
+    end
+
+    if not self.expression:isconstant() then 
+        local expression = self.expression:autosimplify()
+        if expression.operation == BinaryOperation.MUL and expression.expressions[1]:isconstant() then 
+            local coeff = SqrtExpression(expression.expressions[1],self.root):autosimplify()
+            expression.expressions[1] = BinaryOperation(BinaryOperation.MUL,{Integer.one()})
+            expression = expression:autosimplify()
+            local sqrtpart = SqrtExpression(expression,self.root):autosimplify()
+            local result = coeff*sqrtpart
+            return result:autosimplify()
+        end
+        return BinaryOperation(BinaryOperation.POW,{self.expression,Integer.one() / self.root}):autosimplify()
+    end
+
+    if self.expression:type() == Rational then 
+        local result = SqrtExpression(self.expression.numerator,self.root):autosimplify() / SqrtExpression(self.expression.denominator,self.root):autosimplify()
+        return result:autosimplify()
+    end
+
+    if self.expression:type() == Integer then
+        if self.expression == Integer.zero() then 
+            return Integer.zero()
+        end
         if self.expression == Integer.one() then
             return Integer.one()
+        end
+        if self.expression < Integer.zero() and self.root == Integer(2) then 
+            local result = SqrtExpression(self.expression:neg(),self.root):autosimplify()
+            result = I*result
+            return result:autosimplify()
         end
         local root = self.root
         local primes = self.expression:primefactorization()
@@ -106,10 +138,30 @@ function SqrtExpression:autosimplify()
         if root == Integer.one() then 
             return coeff
         end
-        return BinaryOperation(BinaryOperation.MUL,{coeff,SqrtExpression(expression,root)})
+        return BinaryOperation(BinaryOperation.MUL,{coeff,SqrtExpression(expression,root)}):autosimplify()
     end
     ::stop::
-    return self
+
+    if self.expression.operation == BinaryOperation.POW and self.expression.expressions[2]:type() == Integer then
+        local exponent = self.expression.expressions[2]
+        local root = self.root
+            local power = exponent // root
+            local newexponent = exponent / root - power
+            local coeff = self.expression.expressions[1] ^ power
+            coeff = coeff:autosimplify()
+            if newexponent == Integer.zero() then
+                return coeff
+            else
+                local num = newexponent.numerator
+                local den = newexponent.denominator
+                local expression = self.expression ^ num
+                expression = expression:autosimplify()
+                local result = coeff * SqrtExpression(expression,den)
+                return result
+            end
+    end
+
+    return SqrtExpression(self.expression:autosimplify(),self.root)
 end
 
 function SqrtExpression:tolatex()
