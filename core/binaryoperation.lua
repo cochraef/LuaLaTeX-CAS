@@ -389,9 +389,9 @@ function BinaryOperation:tolatex()
         else
             if self.expressions[2]:isconstant() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
                 if self.expressions[2].denominator == Integer(2) then
-                    return "\\sqrt{\\left(" .. self.expressions[1]:tolatex() .. '\\right)}'
+                    return "\\sqrt{" .. self.expressions[1]:tolatex() .. '}'
                 end
-                return "\\sqrt[" .. self.expressions[2].denominator:tolatex() .. ']{\\left(' .. self.expressions[1]:tolatex() .. '\\right)}'
+                return "\\sqrt[" .. self.expressions[2].denominator:tolatex() .. ']{' .. self.expressions[1]:tolatex() .. '}'
             end
             return "\\left(" .. self.expressions[1]:tolatex() .. "\\right)" .. '^{' .. self.expressions[2]:tolatex() .. '}'
         end
