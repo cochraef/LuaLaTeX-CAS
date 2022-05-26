@@ -3,3 +3,4 @@ require("algebra._init")
 
 require("calculus.derrivativeexpression")
 require("calculus.integralexpression")
+require("calculus.diffexpression")
