@@ -447,10 +447,14 @@ function BinaryOperation:tolatex()
     end
     if self.operation == BinaryOperation.SUB then
         local out = ''
-        for index, expression in ipairs(self.expressions) do
-            out = out .. expression:tolatex()
-            if self.expressions[index + 1] then
-                out = out .. '-'
+        if not self.expressions[2] then 
+            out = '-' .. self.expressions[1]:tolatex()
+        else
+            for index, expression in ipairs(self.expressions) do
+                out = out .. expression:tolatex()
+                if self.expressions[index + 1] then
+                    out = out .. '-'
+                end
             end
         end
         return out
