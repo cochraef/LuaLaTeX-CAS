@@ -118,6 +118,10 @@ function FunctionExpression:order(other)
         return true
     end
 
+    if other:type() == SqrtExpression then 
+        return false
+    end
+
     if self.name ~= other.name then
         return SymbolExpression(self.name):order(SymbolExpression(other.name))
     end

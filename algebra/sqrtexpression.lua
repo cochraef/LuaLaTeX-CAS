@@ -55,11 +55,36 @@ function SqrtExpression:order(other)
         return false
     end
 
-    if not (other:isconstant() or other:type() == SqrtExpression) then 
+    if other:type() == SymbolExpression then 
+        return self.expression:order(other)
+    end
+
+    if other:type() == BinaryOperation then 
+        if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then 
+            return BinaryOperation(other.operation,{self}):order(other)
+        end
+
+        if other.operation == BinaryOperation.POW then 
+            return (self ^ Integer.one()):order(other)
+        end
+    end
+
+    if other:type() ~= SqrtExpression then 
         return true
     end
 
-    return self.expression:order(other.expression)
+    if other:type() == SqrtExpression then 
+        if self.expression == other.expression then 
+            return self.root:order(other.root)
+        end
+        return self.expression:order(other.expression)
+    end
+end
+
+function SqrtExpression:topower()
+    local exponent = BinaryOperation(BinaryOperation.DIV,{Integer.one(),self.root}):autosimplify()
+    local base     = self.expression
+    return BinaryOperation(BinaryOperation.POW,{base,exponent}):autosimplify()
 end
 
 function SqrtExpression:autosimplify()
