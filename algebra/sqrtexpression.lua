@@ -88,50 +88,51 @@ function SqrtExpression:topower()
 end
 
 function SqrtExpression:autosimplify()
-    if self.root == Integer.one() then 
-        return self.expression:autosimplify()
+    local expression = self.expression:autosimplify()
+    local root = self.root:autosimplify()
+
+    if root == Integer.one() then 
+        return expression
     end
 
-    if self.root:type() == Rational then 
-        return SqrtExpression(self.expression ^ self.root.denominator, self.root.numerator):autosimplify()
+    if root:type() == Rational then 
+        return SqrtExpression(BinaryOperation(BinaryOperation.POW,{expression,root.denominator}):autosimplify(), root.numerator):autosimplify()
     end
 
-    if not self.root:isconstant() then 
-        return BinaryOperation(BinaryOperation.POW,{self.expression,Integer.one() / self.root}):autosimplify()
+    if not root:isconstant() then 
+        return BinaryOperation(BinaryOperation.POW,{expression,Integer.one() / root}):autosimplify()
     end
 
-    if not self.expression:isconstant() then 
-        local expression = self.expression:autosimplify()
+    if not expression:isconstant() then
         if expression.operation == BinaryOperation.MUL and expression.expressions[1]:isconstant() then 
-            local coeff = SqrtExpression(expression.expressions[1],self.root):autosimplify()
+            local coeff = SqrtExpression(expression.expressions[1],root):autosimplify()
             expression.expressions[1] = BinaryOperation(BinaryOperation.MUL,{Integer.one()})
             expression = expression:autosimplify()
-            local sqrtpart = SqrtExpression(expression,self.root):autosimplify()
+            local sqrtpart = SqrtExpression(expression,root):autosimplify()
             local result = coeff*sqrtpart
             return result:autosimplify()
         end
-        return BinaryOperation(BinaryOperation.POW,{self.expression,Integer.one() / self.root}):autosimplify()
+        return BinaryOperation(BinaryOperation.POW,{expression,Integer.one() / root}):autosimplify()
     end
 
-    if self.expression:type() == Rational then 
-        local result = SqrtExpression(self.expression.numerator,self.root):autosimplify() / SqrtExpression(self.expression.denominator,self.root):autosimplify()
+    if expression:type() == Rational then 
+        local result = BinaryOperation(BinaryOperation.MUL, {SqrtExpression(expression.numerator,root):autosimplify(),BinaryOperation(BinaryOperation.POW,{SqrtExpression(expression.denominator,root):autosimplify(),Integer(-1)})})
         return result:autosimplify()
     end
 
-    if self.expression:type() == Integer then
-        if self.expression == Integer.zero() then 
+    if expression:type() == Integer then
+        if expression == Integer.zero() then 
             return Integer.zero()
         end
-        if self.expression == Integer.one() then
+        if expression == Integer.one() then
             return Integer.one()
         end
-        if self.expression < Integer.zero() and self.root == Integer(2) then 
-            local result = SqrtExpression(self.expression:neg(),self.root):autosimplify()
+        if expression < Integer.zero() and root == Integer(2) then 
+            local result = SqrtExpression(expression:neg(),root):autosimplify()
             result = I*result
             return result:autosimplify()
         end
-        local root = self.root
-        local primes = self.expression:primefactorization()
+        local primes = expression:primefactorization()
         local coeffresult = {}
         local exprresult  = {}
         local reduction = root
@@ -143,50 +144,49 @@ function SqrtExpression:autosimplify()
             end
         end
         ::skip::
-        root = root / reduction
+        local newroot = root / reduction
         for index, term in ipairs(primes.expressions) do 
             local prime      = term.expressions[1]
             local primepower = term.expressions[2] / reduction
-            local coeffpower = primepower // root   
+            local coeffpower = primepower // newroot   
             coeffresult[index] = prime ^ coeffpower
-            local exprpower  = primepower - coeffpower*root
+            local exprpower  = primepower - coeffpower*newroot
             exprresult[index]  = prime ^ exprpower
         end
-        expression = BinaryOperation(BinaryOperation.MUL,exprresult):autosimplify()
-        coeff      = BinaryOperation(BinaryOperation.MUL,coeffresult):autosimplify()
+        local newexpression = BinaryOperation(BinaryOperation.MUL,exprresult):autosimplify()
+        local coeff      = BinaryOperation(BinaryOperation.MUL,coeffresult):autosimplify()
         if coeff == Integer.one() then 
             if reduction == Integer.one() then 
                 goto stop
             end
-            return SqrtExpression(expression,root)
+            return SqrtExpression(newexpression,newroot)
         end
-        if root == Integer.one() then 
+        if newroot == Integer.one() then 
             return coeff
         end
-        return BinaryOperation(BinaryOperation.MUL,{coeff,SqrtExpression(expression,root)}):autosimplify()
+        return BinaryOperation(BinaryOperation.MUL,{coeff,SqrtExpression(newexpression,newroot)}):autosimplify()
     end
     ::stop::
 
-    if self.expression.operation == BinaryOperation.POW and self.expression.expressions[2]:type() == Integer then
-        local exponent = self.expression.expressions[2]
-        local root = self.root
+    if expression.operation == BinaryOperation.POW and expression.expressions[2]:type() == Integer then
+        local exponent = expression.expressions[2]
             local power = exponent // root
-            local newexponent = exponent / root - power
-            local coeff = self.expression.expressions[1] ^ power
-            coeff = coeff:autosimplify()
+            local newexponent = (exponent / root) - power
+            local coeff = expression.expressions[1] ^ power
+            coeff = coeff:evaluate()
             if newexponent == Integer.zero() then
                 return coeff
             else
                 local num = newexponent.numerator
                 local den = newexponent.denominator
-                local expression = self.expression ^ num
-                expression = expression:autosimplify()
-                local result = coeff * SqrtExpression(expression,den)
+                local newexpression = expression ^ num
+                newexpression = newexpression:autosimplify()
+                local result = coeff * SqrtExpression(newexpression,den)
                 return result
             end
     end
 
-    return SqrtExpression(self.expression:autosimplify(),self.root)
+    return SqrtExpression(expression,root)
 end
 
 function SqrtExpression:tolatex()

@@ -87,7 +87,23 @@ function BinaryOperation:simplifyproductrec()
                 end
             end
 
-            -- Uses the property that sqrt(a,r)*sqrt(a,s) = sqrt(a^(r+s),r*s)
+            if term1.operation == BinaryOperation.POW and term2.operation == BinaryOperation.POW and term1.expressions[1]:type() == SqrtExpression and term2.expressions[1]:type() == SqrtExpression and term1.expressions[2]:type() == Integer and term2.expressions[2]:type() == Integer and term1.expressions[2] < Integer.zero() and term2.expressions[2] < Integer.zero() and term1.expressions[1].root == term2.expressions[1].root then 
+                local expo1 = term1.expressions[2]:neg()
+                local expo2 = term2.expressions[2]:neg()
+                local root = term1.expressions[1].root
+                local expr1 = term1.expressions[1].expression
+                local expr2 = term2.expressions[1].expression 
+                local result1 = BinaryOperation(BinaryOperation.POW,{SqrtExpression(expr1,root),expo1}):simplifypower()
+                local result2 = BinaryOperation(BinaryOperation.POW,{SqrtExpression(expr2,root),expo2}):simplifypower()
+                local result = BinaryOperation(BinaryOperation.MUL,{result1,result2}):autosimplify()
+                if result == Integer.one() then 
+                    return BinaryOperation(BinaryOperation.MUL,{})
+                end
+                if result:type() == Integer then 
+                    return BinaryOperation(BinaryOperation.MUL,{Rational(Integer.one(),result)})
+                end
+                return BinaryOperation(BinaryOperation.MUL,{BinaryOperation.POW, {result,Integer(-1)}})
+            end
 
             -- Uses the property that x^a*x^b=x^(a+b)
             local revertterm1 = false
