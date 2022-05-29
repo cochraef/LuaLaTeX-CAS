@@ -102,7 +102,7 @@ function BinaryOperation:simplifyproductrec()
                 if result:type() == Integer then 
                     return BinaryOperation(BinaryOperation.MUL,{Rational(Integer.one(),result)})
                 end
-                return BinaryOperation(BinaryOperation.MUL,{BinaryOperation.POW, {result,Integer(-1)}})
+                return BinaryOperation(BinaryOperation.MUL,{BinaryOperation(BinaryOperation.POW, {result,Integer(-1)})}):autosimplify()
             end
 
             -- Uses the property that x^a*x^b=x^(a+b)
