@@ -378,6 +378,19 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
+        if self.expressions[2]:type() == Integer and self.expressions[2] < Integer.zero() then 
+            local base = self.expressions[1]
+            local exponent = self.expressions[2]
+            if exponent == Integer(-1) then 
+                return "\\frac{1}{" .. base:tolatex() .. "}" 
+            else
+                if base:isatomic() then 
+                    return "\\frac{1}{" .. base:tolatex() .. "^{" .. exponent:neg():tolatex() .. "}}" 
+                else
+                    return "\\frac{1}{\\left(" .. base:tolatex() .. "\\right)^{" .. exponent:neg():tolatex() .. "}}"
+                end
+            end
+        end
         if self.expressions[1]:isatomic() then
             if self.expressions[2]:isconstant() and self.expressions[2]:getring() == Rational:getring() and self.expressions[2].numerator == Integer.one() then
                 if self.expressions[2].denominator == Integer(2) then
