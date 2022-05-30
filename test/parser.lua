@@ -216,7 +216,7 @@ end
 
 
 CASparse([[
-    vars("x")
-    a = (2/3)/x
-    displua(a:autosimplify())
+    vars("f", "x")
+    a = x*f(x)
+    displua(a)
 ]])

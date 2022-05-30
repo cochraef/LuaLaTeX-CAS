@@ -59,19 +59,28 @@ function starttest(name)
     failures = 0
 end
 
-function test(actual, expected, initial)
+function test(actual, expected, initial, sort)
+    if sort and type(actual) == "table" and not actual.type then
+        table.sort(actual, function (a, b)
+            return a:order(b)
+        end)
+    elseif sort and type(actual) == "table" and actual.type and actual:type() == BinaryOperation and (actual.operation == BinaryOperation.MUL or actual.operation == BinaryOperation.ADD) then
+        table.sort(actual.expressions, function (a, b)
+            return a:order(b)
+        end)
+    end
     if initial then
-        if tostring(expected) == tostring(actual) then
-            print(tostring(initial) .. " -> " .. tostring(actual))
+        if ToStringArray(expected) == ToStringArray(actual) then
+            print(ToStringArray(initial) .. " -> " .. ToStringArray(actual))
         else
-            print(tostring(initial) .. " -> " .. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+            print(ToStringArray(initial) .. " -> " .. ToStringArray(actual) .. " (Expected: " .. ToStringArray(expected) .. ")")
             failures = failures + 1
         end
     else
-        if tostring(expected) == tostring(actual) then
-            print("Result: " .. tostring(actual))
+        if ToStringArray(expected) == ToStringArray(actual) then
+            print("Result: " .. ToStringArray(actual))
         else
-            print("Result: ".. tostring(actual) .. " (Expected: " .. tostring(expected) .. ")")
+            print("Result: ".. ToStringArray(actual) .. " (Expected: " .. ToStringArray(expected) .. ")")
             failures = failures + 1
         end
     end
@@ -113,7 +122,7 @@ require("test.calculus.integrals")
 require("test.expressions.autosimplify")
 require("test.expressions.expand")
 require("test.expressions.functions")
-require("test.expressions.rationalexponent")
+-- require("test.expressions.rationalexponent")
 require("test.expressions.substitute")
 
 require("test.polynomials.polynomial")

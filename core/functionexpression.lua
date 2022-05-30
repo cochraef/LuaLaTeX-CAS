@@ -96,13 +96,14 @@ end
 --- @param other Expression
 --- @return boolean
 function FunctionExpression:order(other)
-    if other:isconstant() then
+    if other:isatomic() then
         return false
     end
 
-    if other:type() == SymbolExpression then
-        return SymbolExpression(self.name):order(other)
-    end
+    -- CASC Autosimplfication has some symbols appearing before functions, but that looks bad to me, so all symbols appear before products now.
+    -- if other:type() == SymbolExpression then
+    --     return SymbolExpression(self.name):order(other)
+    -- end
 
     if other:type() == BinaryOperation then
         if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then
