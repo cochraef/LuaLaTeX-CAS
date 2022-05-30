@@ -158,7 +158,7 @@ function Rational:lt(b)
         return false
     end
 
-    if self.numerator >= Integer.zero() and b.numerator >= Integer.zero() then
+    if (self.numerator >= Integer.zero() and b.numerator >= Integer.zero()) or (self.numerator <= Integer.zero() and b.numerator <= Integer.zero()) then
         return self.numerator * b.denominator < self.denominator * b.numerator
     end
     return self.numerator * b.denominator > self.denominator * b.numerator
