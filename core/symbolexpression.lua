@@ -54,16 +54,13 @@ function SymbolExpression:order(other)
 
     -- Lexographic order on symbols.
     if other:type() == SymbolExpression then
-        if #other.symbol < #self.symbol then
-            return false
-        end
-        for i = 1, #self.symbol do
+        for i = 1, math.min(#self.symbol, #other.symbol) do
             if string.byte(self.symbol, i) ~= string.byte(other.symbol, i) then
                 return string.byte(self.symbol, i) < string.byte(other.symbol, i)
             end
         end
 
-        return false
+        return #self.symbol < #other.symbol
     end
 
     if other.operation == BinaryOperation.POW then

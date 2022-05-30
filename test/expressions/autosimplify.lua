@@ -157,6 +157,7 @@ local z = BinaryOperation.ADDEXP
         ({SymbolExpression("x"),
         SymbolExpression("y")})})
 
+local A = dparse("(-aa-x)+(x+aa)");
 
 starttest("expression autosimplification")
 test(g:autosimplify(), "0", g)
@@ -165,7 +166,7 @@ test(i:autosimplify(), "1", i)
 test(j:autosimplify(), "x", j)
 test(k:autosimplify(), "(x ^ y)", k)
 test(l:autosimplify(), "(x ^ 60)", l)
-test(m:autosimplify(), "((x ^ a) * (y ^ a))", m)
+test(m:autosimplify(), "((x * y) ^ a)", m)
 test(n:autosimplify(), 0, n)
 test(o:autosimplify(), "(x * y * z)", o)
 test(p:autosimplify(), "x", p)
@@ -179,6 +180,7 @@ test(w:autosimplify(), "1", w)
 test(x:autosimplify(), "1", x)
 test(y:autosimplify(), "(1/3 * x)", y)
 test(z:autosimplify(), "(2 * x)", z)
+test(A:autosimplify(), "0", A)
 endtest()
 
 

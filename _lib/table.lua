@@ -11,7 +11,7 @@ function ArrayEqual(a1, a2, i)
 end
 
 -- Checks if two arrays are equal, the first starting at index i, the second starting at index j
-function FancyArrayEqual(a1, a2, i,j)
+function FancyArrayEqual(a1, a2, i, j)
     i = i or 1
     j = j or 1
     while i <= math.max(#a1, #a2) or j <= math.max(#a1, #a2) do

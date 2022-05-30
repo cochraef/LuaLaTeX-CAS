@@ -215,9 +215,8 @@ function CASparse(input)
 end
 
 
-x = Integer(1)
-y = Integer(1)
-
-z = {[x] = y}
-
-print(z[x])
+CASparse([[
+    vars("x")
+    a = (2/3)/x
+    displua(a:autosimplify())
+]])

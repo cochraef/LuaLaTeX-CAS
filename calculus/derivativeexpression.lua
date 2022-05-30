@@ -42,9 +42,9 @@ function DerivativeExpression:new(expression, symbol)
 end
 
 -- Creates a new derivative operation with the given symbols and expression.
---- @param expression Expression 
---- @param symbols Symbols 
---- @return DiffExpression 
+--- @param expression Expression
+--- @param symbols table<number, Symbol>
+--- @return DiffExpression
 function DiffExpression:new(expression,symbols)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -341,8 +341,8 @@ function DiffExpression:tolatex()
     if self.degree > 1 then       
         local cvarlist = {}
         local count = 1
-        for index, var in ipairs(self.symbols) do 
-            if var == self.symbols[index+1] then 
+        for index, var in ipairs(self.symbols) do
+            if var == self.symbols[index+1] then
                 count = count + 1
             else
                 table.insert(cvarlist,{var,count})
