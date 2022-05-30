@@ -230,7 +230,7 @@ function IntegralExpression.substitutionmethod(expression, symbol)
             if symbol == SymbolExpression("u") then
                 subsymbol = SymbolExpression("v")
             end
-            local u = (expression / (DerrivativeExpression(g, symbol))):autosimplify()
+            local u = (expression / (DerivativeExpression(g, symbol))):autosimplify()
             u = u:substitute({[g]=subsymbol}):autosimplify()
             if u:freeof(symbol) then
                 local FF = IntegralExpression.integrate(u, subsymbol)
@@ -352,11 +352,11 @@ function IntegralExpression.rationalfunction(expression, symbol)
                 local d = term.expressions[j].expressions[2].expressions[1]
                 local p = term.expressions[j].expressions[2].expressions[2]
 
-                local _, s, t = PolynomialRing.extendedgcd(d, d:derrivative())
+                local _, s, t = PolynomialRing.extendedgcd(d, d:derivative())
                 s = s * n
                 t = t * n
                 V = V - t / ((p-Integer.one()) * BinaryOperation.POWEXP({d, p-Integer.one()}))
-                term.expressions[j+1].expressions[1] = term.expressions[j+1].expressions[1] + s + t:derrivative() / (p-Integer.one())
+                term.expressions[j+1].expressions[1] = term.expressions[j+1].expressions[1] + s + t:derivative() / (p-Integer.one())
             end
         end
     end
@@ -366,7 +366,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
     for _, term in ipairs(pfd.expressions) do
         local a = term.expressions[#term.expressions].expressions[1]
         local b = term.expressions[1].expressions[2].expressions[1]
-        local y = a - b:derrivative() * PolynomialRing({Integer.zero(), Integer.one()}, "_")
+        local y = a - b:derivative() * PolynomialRing({Integer.zero(), Integer.one()}, "_")
         local r = PolynomialRing.resultant(b, y)
 
 

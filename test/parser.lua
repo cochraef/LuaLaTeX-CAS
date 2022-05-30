@@ -87,6 +87,10 @@ function expand(exp)
     return exp:autosimplify():expand()
 end
 
+function exp(x)
+    return e^x
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
@@ -211,6 +215,9 @@ function CASparse(input)
 end
 
 
--- CASparse([[
---     displua('a')
--- ]])
+x = Integer(1)
+y = Integer(1)
+
+z = {[x] = y}
+
+print(z[x])

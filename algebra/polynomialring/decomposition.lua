@@ -17,8 +17,8 @@ function PolynomialRing:decompose()
         end
         S = Remove(S, w)
         if C.degree < w.degree and w.degree < self.degree and self.degree % w.degree == Integer.zero() then
-            local g = w:expand(C, self.symbol)
-            local R = self:expand(w, self.symbol)
+            local g = w:polyexpand(C, self.symbol)
+            local R = self:polyexpand(w, self.symbol)
             if g.degree == Integer.zero() and R.degree == Integer.zero() then
                 g.symbol = self.symbol
                 decomposition[#decomposition+1] = g.coefficients[0]
@@ -83,11 +83,11 @@ function PolynomialRing:divisors()
 end
 
 -- Polynomial expansion as a subroutine of decomposition.
-function PolynomialRing:expand(v, x)
+function PolynomialRing:polyexpand(v, x)
     local u = self
     if u == Integer.zero() then
         return Integer.zero()
     end
     local q,r = u:divremainder(v)
-    return PolynomialRing({PolynomialRing({Integer.zero(), Integer.one()}, "_")}, x) * q:expand(v, x) + r
+    return PolynomialRing({PolynomialRing({Integer.zero(), Integer.one()}, "_")}, x) * q:polyexpand(v, x) + r
 end

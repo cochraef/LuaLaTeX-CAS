@@ -4,19 +4,19 @@
 function PolynomialRing:modularsquarefreefactorization()
     local monic = self / self:lc()
     local terms = {}
-    terms[0] = PolynomialRing.gcd(monic, monic:derrivative())
+    terms[0] = PolynomialRing.gcd(monic, monic:derivative())
     local b = monic // terms[0]
-    local c = monic:derrivative() // terms[0]
-    local d = c - b:derrivative()
+    local c = monic:derivative() // terms[0]
+    local d = c - b:derivative()
     local i = 1
     while b ~= Integer.one() do
         terms[i] = PolynomialRing.gcd(b, d)
         b, c = b // terms[i], d // terms[i]
         i = i + 1
-        d = c - b:derrivative()
+        d = c - b:derivative()
     end
 
-    if not (terms[i-1]:derrivative().degree == Integer.zero() and terms[i-1]:derrivative().coefficients[0] == Integer.zero()) then
+    if not (terms[i-1]:derivative().degree == Integer.zero() and terms[i-1]:derivative().coefficients[0] == Integer.zero()) then
         return terms
     end
 

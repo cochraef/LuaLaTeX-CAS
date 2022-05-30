@@ -5,16 +5,16 @@
 function PolynomialRing:rationalsquarefreefactorization(keeplc)
     local monic = self / self:lc()
     local terms = {}
-    terms[0] = PolynomialRing.gcd(monic, monic:derrivative())
+    terms[0] = PolynomialRing.gcd(monic, monic:derivative())
     local b = monic // terms[0]
-    local c = monic:derrivative() // terms[0]
-    local d = c - b:derrivative()
+    local c = monic:derivative() // terms[0]
+    local d = c - b:derivative()
     local i = 1
     while b.degree ~= Integer.zero() or b.coefficients[0] ~= Integer.one() do
         terms[i] = PolynomialRing.gcd(b, d)
         b, c = b // terms[i], d // terms[i]
         i = i + 1
-        d = c - b:derrivative()
+        d = c - b:derivative()
     end
     if keeplc and terms[1] then
         terms[1] = terms[1] * self:lc()
@@ -94,7 +94,7 @@ function PolynomialRing:findprime()
     for _, p in pairs(smallprimes) do
         local P = PolynomialRing({IntegerModN(Integer.one(), p)}, self.symbol)
         local s = self:inring(P:getring())
-        if PolynomialRing.gcd(s, s:derrivative()) == P then
+        if PolynomialRing.gcd(s, s:derivative()) == P then
             return p
         end
     end

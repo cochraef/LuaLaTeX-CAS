@@ -601,8 +601,8 @@ function PolynomialRing:multiplyDegree(n)
     return PolynomialRing(new, self.symbol, self.degree + Integer(n))
 end
 
--- Returns the formal derrivative of this polynomial
-function PolynomialRing:derrivative()
+-- Returns the formal derivative of this polynomial
+function PolynomialRing:derivative()
     if self.degree == Integer.zero() then
         return PolynomialRing({self:zeroc()}, self.symbol, Integer(-1))
     end

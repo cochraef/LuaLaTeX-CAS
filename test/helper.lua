@@ -23,7 +23,7 @@
     if a:type() == Rational then 
         return "Ratl"
     end
-    if a:type() == DerrivativeExpression then 
+    if a:type() == DerivativeExpression then 
         return "DervExp"
     end
     return "No Clue"
@@ -63,7 +63,7 @@ function nameof(sym)
     if sym:type() == Rational then 
         return tostring(sym.numerator).."/"..tostring(sym.denominator)
     end
-    if sym:type() == DerrivativeExpression then 
+    if sym:type() == DerivativeExpression then 
         return "D"
     end
     return "No Clue"

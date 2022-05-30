@@ -103,10 +103,10 @@ test(a * x, "15x^4+12x^3+9x^2+6x^1+3x^0")
 test(x * a, "15x^4+12x^3+9x^2+6x^1+3x^0")
 endtest()
 
-starttest("polynomial formal derrivatives")
-test(a:derrivative(), "20x^3+12x^2+6x^1+2x^0")
-test(b:derrivative(), "4x^1+1/12x^0")
-test(c:derrivative():derrivative(), "0x^0")
+starttest("polynomial formal derivatives")
+test(a:derivative(), "20x^3+12x^2+6x^1+2x^0")
+test(b:derivative(), "4x^1+1/12x^0")
+test(c:derivative():derivative(), "0x^0")
 endtest()
 
 
