@@ -80,7 +80,7 @@ function DiffExpression:autosimplify()
     local simplified = self.expression:autosimplify()
 
     for index,var in ipairs(self.symbols) do 
-        simplified = DerrivativeExpression(simplified,var):autosimplify()
+        simplified = DerivativeExpression(simplified,var):autosimplify()
     end
     return simplified
 end
