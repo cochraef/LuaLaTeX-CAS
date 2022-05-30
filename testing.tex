@@ -162,7 +162,7 @@ $\print{a}$ vs $\a$
     c = a+b
 \end{CAS}
 
-$\print*{c}$
+$\print*{c} = \print{c}$
 
 
 \parseforest{c}
@@ -217,7 +217,16 @@ $\print{a+b+c}$
     end
 }
 
-$\print{a+Integer(2)*a}$
+\begin{CAS}
+    vars('x','y')
+    c = sqrt(4*x^2)^2
+\end{CAS}
+\[ \print*{c} = \print{c} \] 
+
+\begin{CAS}
+a = (2/3)/x
+\end{CAS}
+\[ \print*{a} = \print{a} \] 
 
 \end{document}
 

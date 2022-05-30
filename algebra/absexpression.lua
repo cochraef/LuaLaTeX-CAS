@@ -69,7 +69,7 @@ end
 
 --- @return string
 function AbsExpression:tolatex()
-    return "|" + self.expression:tolatex() + "|"
+    return "|" .. self.expression:tolatex() .. "|"
 end
 
 -----------------

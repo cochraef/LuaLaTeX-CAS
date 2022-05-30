@@ -45,7 +45,7 @@ end
 __FieldOperations = Copy(__EuclideanOperations)
 
 __FieldOperations.__div = function(a, b)
-    if not b.getring and b:isconstant() then
+    if not b.ring and not b:isconstant() then
         return BinaryOperation.DIVEXP({a, b})
     end
 

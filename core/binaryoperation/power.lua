@@ -52,13 +52,13 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that (x^a)^b = x^(a*b)
-    if not base:isatomic() and base.operation == BinaryOperation.POW then
+    if not base:isatomic() and base.operation == BinaryOperation.POW and exponent:type() == Integer then
         base, exponent = base.expressions[1], BinaryOperation(BinaryOperation.MUL, {exponent, base.expressions[2]}):autosimplify()
         return BinaryOperation(BinaryOperation.POW, {base, exponent}):autosimplify()
     end
 
-    -- Uses the property that (x_1*x_2*...*x_n)^a = x_1^a*x_2^a*..x_n^a
-    if base.operation == BinaryOperation.MUL then
+    -- Uses the property that (x_1*x_2*...*x_n)^a = x_1^a*x_2^a*..x_n^a if a is an integer
+    if base.operation == BinaryOperation.MUL and exponent:type() == Integer then
         local results = {}
         for index, expression in ipairs(base.expressions) do
             results[index] = BinaryOperation(BinaryOperation.POW, {expression, exponent}):autosimplify()
@@ -66,8 +66,19 @@ function BinaryOperation:simplifypower()
         return BinaryOperation(BinaryOperation.MUL, results):autosimplify()
     end
 
+    -- Uses the property that sqrt(x,r)^d == sqrt(x,r/d)
+    if base:type() == SqrtExpression and exponent:type() == Integer and exponent > Integer.zero() then 
+        local root = base.root
+        local expr = base.expression
+        local comm = Integer.gcd(root,exponent) 
+        root = root / comm 
+        local expo = exponent / comm 
+        expr = expr ^ expo 
+        return SqrtExpression(expr,root):autosimplify()
+    end
+
     if base:isconstant() and exponent:isconstant() and exponent:getring() == Rational.getring() then
-        return self:simplifyrationalpower()
+        return self --:simplifyrationalpower()
     end
 
     -- Our expression cannot be simplified
@@ -123,5 +134,5 @@ function BinaryOperation:simplifyrationalpower()
                     BinaryOperation(BinaryOperation.POW, {primebase, newexponent - integerpart})}):autosimplify()
     end
 
-    return BinaryOperation(BinaryOperation.POW, {primes, exponent}):simplifypower()
+    return BinaryOperation(BinaryOperation.POW, {primes:autosimplify(), exponent})
 end
