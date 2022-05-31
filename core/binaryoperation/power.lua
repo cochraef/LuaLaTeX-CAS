@@ -77,6 +77,14 @@ function BinaryOperation:simplifypower()
         return SqrtExpression(expr,root):autosimplify()
     end
 
+    -- Rationalizing SqrtExpressions
+    if base:type() == SqrtExpression and exponent:type() == Integer and base.expression:type() == Integer and exponent < Integer.zero() then 
+        local root = base.root
+        local expr = base.expression
+        local result =  (SqrtExpression(expr ^ (root - Integer.one()),root) / expr) ^ exponent:neg()
+        return result:autosimplify()
+    end
+
     if base:isconstant() and exponent:isconstant() and exponent:getring() == Rational.getring() then
         return self --:simplifyrationalpower()
     end

@@ -410,6 +410,7 @@ function BinaryOperation:tolatex()
         end
     end
     if self.operation == BinaryOperation.MUL then
+        local sign = ''
         local out = ''
         local denom = ''
         for _, expression in ipairs(self.expressions) do
@@ -429,21 +430,30 @@ function BinaryOperation:tolatex()
             else
                 if expression == Integer(-1) then
                     out = out .. '-'
+                elseif expression:type() == Rational and expression.numerator == Integer.one() then 
+                    denom = denom .. expression.denominator:tolatex()
+                elseif expression:type() == Rational and expression.numerator == Integer(-1) then 
+                    out = out .. '-'
+                    denom = denom .. expression.denominator:tolatex()
+                elseif expression:type() == Rational then 
+                    out = out .. expression.numerator:tolatex()
+                    denom = denom .. expression.denominator:tolatex()
                 else
                     out = out .. expression:tolatex()
                 end
             end
         end
-        if out == '-' then
-            out = '-1'
+        if string.sub(out,1,1) == '-' then
+            sign = '-'
+            out = string.sub(out,2,-1)
         end
         if denom ~= '' and out == '' then 
-            return '\\frac{' .. '1' .. '}{' .. denom .. '}'
+            return sign .. '\\frac{' .. '1' .. '}{' .. denom .. '}'
         end
         if denom ~= '' then
-            return '\\frac{' .. out .. '}{' .. denom .. '}'
+            return sign .. '\\frac{' .. out .. '}{' .. denom .. '}'
         end
-        return out
+        return sign..out
     end
     if self.operation == BinaryOperation.ADD then
         local out = ''
