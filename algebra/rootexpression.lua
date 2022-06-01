@@ -75,13 +75,17 @@ function RootExpression:autosimplify(subpart)
             local delta0 = (b^Integer(2) - Integer(3)*a*c):autosimplify()
             local delta1 = (Integer(2) * b^Integer(3) - Integer(9)*a*b*c+Integer(27)*a^Integer(2)*d):autosimplify()
 
-            local C = (((delta1 + (delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3)) ^ (Integer(1)/Integer(2))) / Integer(2)) ^ (Integer(1) / Integer(3))):autosimplify()
+            local C = sqrt((delta1 + sqrt(delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3))) / Integer(2), Integer(3)):autosimplify()
 
-            if C == Integer(0) then
-                return {(-b/(Integer(3)*a)):autosimplify()}
+            if C == Integer.zero() then
+                C = (((delta1 - (delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3)) ^ (Integer(1)/Integer(2))) / Integer(2)) ^ (Integer(1) / Integer(3))):autosimplify()
             end
 
-            local eta = ((Integer(-1) + Integer(-3) ^ (Integer(1)/Integer(2))) / Integer(2)):autosimplify()
+            if C == Integer.zero() then 
+                C = (-b/(Integer(3)*a)):autosimplify()
+            end
+            
+            local eta = ((Integer(-1) + sqrt(Integer(-3))) / Integer(2)):autosimplify()
 
             return {((-Integer.one() / (Integer(3) * a)) * (b + C + delta0 / C)):autosimplify(),
                     ((-Integer.one() / (Integer(3) * a)) * (b + C*eta + delta0 / (C*eta))):autosimplify(),
