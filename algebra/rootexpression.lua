@@ -59,8 +59,8 @@ function RootExpression:autosimplify(subpart)
             if subpart then
                 c = (c - subpart):autosimplify()
             end
-            return {((-b + (b^Integer(2) - Integer(4) * a * c)^(Integer(1)/Integer(2))) / (Integer(2) * a)):autosimplify(),
-                    ((-b - (b^Integer(2) - Integer(4) * a * c)^(Integer(1)/Integer(2))) / (Integer(2) * a)):autosimplify()}
+            return {((-b + sqrt(b^Integer(2) - Integer(4) * a * c)) / (Integer(2) * a)):autosimplify(),
+                    ((-b - sqrt(b^Integer(2) - Integer(4) * a * c)) / (Integer(2) * a)):autosimplify()}
         end
         if simplified.degree == Integer(3) then
             local a = simplified.coefficients[3]
