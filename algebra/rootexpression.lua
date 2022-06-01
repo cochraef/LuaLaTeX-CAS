@@ -78,7 +78,7 @@ function RootExpression:autosimplify(subpart)
             local C = sqrt((delta1 + sqrt(delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3))) / Integer(2), Integer(3)):autosimplify()
 
             if C == Integer.zero() then
-                C = (((delta1 - (delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3)) ^ (Integer(1)/Integer(2))) / Integer(2)) ^ (Integer(1) / Integer(3))):autosimplify()
+                C = sqrt((delta1 - sqrt(delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3))) / Integer(2), Integer(3)):autosimplify()
             end
 
             if C == Integer.zero() then 
