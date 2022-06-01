@@ -127,10 +127,17 @@ function SqrtExpression:autosimplify()
         if expression == Integer.one() then
             return Integer.one()
         end
-        if expression < Integer.zero() and root == Integer(2) then 
-            local result = SqrtExpression(expression:neg(),root):autosimplify()
-            result = I*result
-            return result:autosimplify()
+        if expression < Integer.zero() then
+            if root == Integer(2) then 
+                local result = SqrtExpression(expression:neg(),root):autosimplify()
+                result = I*result
+                return result:autosimplify()
+            end
+            if root % Integer(2) == Integer.one() then 
+                local result = SqrtExpression(expression:neg(),root):autosimplify()
+                result = -result
+                return result:autosimplify()
+            end
         end
         local primes = expression:primefactorization()
         local coeffresult = {}
