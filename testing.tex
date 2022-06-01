@@ -228,5 +228,12 @@ a = (2/3)/x
 \end{CAS}
 \[ \print*{a} = \print{a} \] 
 
+\begin{CAS}
+    f = x^3-2
+    f = f:autosimplify()
+    f = f:topolynomial()
+    r = f:roots()
+\end{CAS}
+\[ \print{r[1]} \] 
 \end{document}
 
