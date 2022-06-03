@@ -206,6 +206,12 @@ function BinaryOperation:mergeproducts(other)
             return result
         end
         table.insert(result.expressions, 1, first.expressions[1])
+        
+        if result.operation == BinaryOperation.MUL and not result.expressions[3] and result.expressions[1] and result.expressions[2] then 
+            if result.expressions[1]:isconstant() and result.expressions[2]:isconstant() then 
+                return result:simplifyproductrec()
+            end
+        end        
         return result
     end
 
@@ -215,8 +221,11 @@ function BinaryOperation:mergeproducts(other)
     else
         result = self:mergeproducts(BinaryOperation(other.operation, otherrest))
     end
-
     table.insert(result.expressions, 1, first.expressions[1])
-
+    if result.operation == BinaryOperation.MUL and not result.expressions[3] and result.expressions[1] and result.expressions[2] then 
+        if result.expressions[1]:isconstant() and result.expressions[2]:isconstant() then 
+            return result:simplifyproductrec()
+        end
+    end
     return result
 end
