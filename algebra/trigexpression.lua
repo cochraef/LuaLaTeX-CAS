@@ -63,105 +63,117 @@ end
 function TrigExpression:autosimplify()
     local expression = self.expression:autosimplify()
 
-    -- uses periodicity of sin and cos and friends; first we scan over sums
-    if self.name == "sin" or self.name == "cos" or self.name == "csc" or self.name == "sec" then 
-        if expression.operation == BinaryOperation.ADD then 
-            for index,component in ipairs(expression.expressions) do 
-                if component:ismulratlPI() then 
-                    local coeff = component.expressions[1]
-                    if coeff:type() == Integer then 
-                        coeff = coeff % Integer(2)
-                        coeff = coeff:autosimplify()
-                    end 
-                    if coeff:type() == Rational then 
-                        local n = coeff.numerator
-                        local d = coeff.denominator 
-                        local m = {n:divremainder(d)}
-                        coeff = (m[1] % Integer(2)) + m[2]/d
-                        coeff = coeff:autosimplify()
-                    end
-                    expression.expressions[index].expressions[1] = coeff
-                    expression = expression:autosimplify()
+     -- uses periodicity of sin and cos and friends
+     if self.name == "sin" or self.name == "cos" or self.name == "csc" or self.name == "sec" then 
+        if expression == Integer.zero() or expression == PI then 
+            goto skip
+        end
+        if expression.operation ~= BinaryOperation.ADD then 
+            expression = BinaryOperation(BinaryOperation.ADD,{expression})
+        end
+        for index,component in ipairs(expression.expressions) do 
+            if component:ismulratlPI() then 
+                local coeff = component.expressions[1]
+                if coeff:type() == Integer then 
+                    coeff = coeff % Integer(2)
+                    coeff = coeff:autosimplify()
+                end 
+                if coeff:type() == Rational then 
+                    local n = coeff.numerator
+                    local d = coeff.denominator 
+                    local m = {n:divremainder(d)}
+                    coeff = (m[1] % Integer(2)) + m[2]/d
+                    coeff = coeff:autosimplify()
                 end
+                expression.expressions[index].expressions[1] = coeff
+                expression = expression:autosimplify()
             end
         end
+        ::skip::
     end
 
-    -- now we reduce standalone expressions that are rational multiples of pi
-    if self.name == "sin" or self.name == "cos" or self.name == "csc" or self.name == "sec" then 
-        if expression:ismulratlPI() then  
-            local coeff = expression.expressions[1]
-            if coeff:type() == Integer then 
-                coeff = coeff % Integer(2)
-                coeff = coeff:autosimplify()
-            end 
-            if coeff:type() == Rational then 
-                local n = coeff.numerator
-                local d = coeff.denominator 
-                local m = {n:divremainder(d)}
-                coeff = (m[1] % Integer(2)) + m[2]/d
-                coeff = coeff:autosimplify()
-            end
-            expression.expressions[1] = coeff
-            expression = expression:autosimplify()
-        end
-    end
-
-    -- uses periodicity of tan and cot; first we scan over sums
+    -- uses periodicity of tan and cot
     if self.name == "tan" or self.name == "cot" then 
-        if expression.operation == BinaryOperation.ADD then 
-            for index,component in ipairs(expression.expressions) do 
-                if component:ismulratlPI() then 
-                    local coeff = component.expressions[1]
-                    if coeff:type() == Integer then 
-                        coeff = Integer.zero()
-                    end 
-                    if coeff:type() == Rational then 
-                        local n = coeff.numerator
-                        local d = coeff.denominator 
-                        local m = {n:divremainder(d)}
-                        coeff = m[2]/d
-                        coeff = coeff:autosimplify()
-                    end
-                    expression.expressions[index].expressions[1] = coeff
-                    expression = expression:autosimplify()
+        if expression == Integer.zero() or expression == PI then 
+            goto skip
+        end
+        if expression.operation ~= BinaryOperation.ADD then
+            expression = BinaryOperation(BinaryOperation.ADD,{expression})
+        end
+        for index,component in ipairs(expression.expressions) do 
+            if component:ismulratlPI() then 
+                local coeff = component.expressions[1]
+                if coeff:type() == Integer then 
+                    coeff = Integer.zero()
+                end 
+                if coeff:type() == Rational then 
+                    local n = coeff.numerator
+                    local d = coeff.denominator 
+                    local m = {n:divremainder(d)}
+                    coeff = m[2]/d
+                    coeff = coeff:autosimplify()
                 end
-                if component == PI then 
-                    expression.expressions[index] = Integer.zero()
-                    expression = expression:autosimplify()
-                end
+                expression.expressions[index].expressions[1] = coeff
+                expression = expression:autosimplify()
+            end
+            if component == PI then 
+                expression.expressions[index] = Integer.zero()
+                expression = expression:autosimplify()
             end
         end
+        ::skip::
     end
 
-    -- now we reduce standalone expressions that are rational multiples of pi
-    if self.name == "tan" or self.name == "cot" then 
-        if expression:ismulratlPI() then  
-            local coeff = expression.expressions[1]
-            if coeff:type() == Integer then 
-                coeff = Integer.zero()
-            end 
-            if coeff:type() == Rational then 
-                local n = coeff.numerator
-                local d = coeff.denominator 
-                local m = {n:divremainder(d)}
-                coeff = m[2]/d
-                coeff = coeff:autosimplify()
-            end
-            expression.expressions[1] = coeff
-            expression = expression:autosimplify()
-        end
-    end
-
-    if expression == Integer.zero() then
-        if self.name == "cos" or self.name == "sec" then
+    if self.name == "cos" then 
+        if expression == Integer.zero() then 
             return Integer.one()
         end
-        if self.name == "sin" or self.name == "tan" or self.name == "arctan" or self.name == "arcsin" then
+        if expression == PI then 
+            return -Integer.one()
+        end
+        if expression:ismulratlPI() then
+            local coeff = expression.expressions[1]
+            if coeff > Integer.one() then 
+                coeff = (Integer(2)-coeff):autosimplify()
+            end
+            if TrigExpression.VALUES[tostring(coeff)] ~= nil then 
+                return TrigExpression.VALUES[tostring(coeff)]:autosimplify()
+            end
+        end
+    end
+
+    if self.name == "sin" then 
+        if expression == Integer.zero() then 
             return Integer.zero()
         end
-        if self.name == "arccos" then 
-            return PI/Integer(2)
+        if expression == PI then 
+            return Integer.zero()
+        end
+        if expression:ismulratlPI() then 
+            local coeff = expression.expressions[1]
+            local sign = Integer.one()
+            if coeff > Integer.one() then 
+                coeff = (Integer(2) - coeff):autosimplify()
+                sign = -sign:autosimplify()
+            end
+            if TrigExpression.VALUES[tostring(coeff)] ~= nil then 
+                return (sign*sqrt(Integer.one()-cos(expression)^Integer(2))):autosimplify()
+            end
+        end
+    end
+
+    if self.name == "tan" then 
+        if expression == Integer.zero() then 
+            return Integer.zero()
+        end
+        if expression == PI then 
+            return Integer.zero()
+        end
+        if expression:ismulratlPI() then 
+            local coeff = expression.expressions[1]
+            if TrigExpression.VALUES[tostring(coeff)] ~= nil then 
+                return (sin(expression) / cos(expression)):autosimplify()
+            end
         end
     end
 
@@ -213,6 +225,18 @@ TrigExpression = setmetatable(TrigExpression, __TrigExpression)
 ----------------------
 TrigExpression.NAMES = {sin=1, cos=2, tan=3, csc=4, sec=5, cot=6,
                          arcsin=7, arccos=8, arctan=9, arccsc=10, arcsec=11, arccot=12}
+
+TrigExpression.VALUES = {
+    ["0"] = Integer.one(),
+    ["1/6"] = sqrt(Integer(3))/Integer(2),
+    ["1/4"] = sqrt(Integer(2))/Integer(2),
+    ["1/3"] = Integer.one()/Integer(2),
+    ["1/2"] = Integer.zero(),
+    ["2/3"] = -Integer.one()/Integer(2),
+    ["3/4"] = -sqrt(Integer(2))/Integer(2),
+    ["5/6"] = -sqrt(Integer(3))/Integer(2),
+    ["1"]   = -Integer.one()
+}
 
 SIN = function (a)
     return TrigExpression("sin", a)
