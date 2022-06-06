@@ -30,6 +30,9 @@ function IntegralExpression.integrate(expression, symbol)
     F = IntegralExpression.substitutionmethod(simplified, symbol)
     if F then return F end
 
+    F = IntegralExpression.partsmethod(simplified, symbol)
+    if F then return F end
+
     F = IntegralExpression.rationalfunction(simplified, symbol)
     if F then return F end
 
@@ -278,6 +281,18 @@ function IntegralExpression.trialsubstitutions(expression)
 
     return substitutions
 end
+
+--- Attempts 'integration by parts'.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
+function IntegralExpression.partsmethod(expression, symbol)
+    if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL then
+        return nil
+    end
+
+end
+
 
 --- Uses Lazard, Rioboo, Rothstein, and Trager's method to integrate rational functions.
 --- This is mostly to try to avoid factoring and finding the roots of the full denominator whenever possible.

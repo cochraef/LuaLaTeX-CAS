@@ -67,18 +67,18 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that sqrt(x,r)^d == sqrt(x,r/d)
-    if base:type() == SqrtExpression and exponent:type() == Integer and exponent > Integer.zero() then 
+    if base:type() == SqrtExpression and exponent:type() == Integer and exponent > Integer.zero() then
         local root = base.root
         local expr = base.expression
-        local comm = Integer.gcd(root,exponent) 
-        root = root / comm 
-        local expo = exponent / comm 
-        expr = expr ^ expo 
+        local comm = Integer.gcd(root,exponent)
+        root = root / comm
+        local expo = exponent / comm
+        expr = expr ^ expo
         return SqrtExpression(expr,root):autosimplify()
     end
 
     -- Rationalizing SqrtExpressions
-    if base:type() == SqrtExpression and exponent:type() == Integer and base.expression:type() == Integer and exponent < Integer.zero() then 
+    if base:type() == SqrtExpression and exponent:type() == Integer and base.expression:type() == Integer and exponent < Integer.zero() then
         local root = base.root
         local expr = base.expression
         local result =  (SqrtExpression(expr ^ (root - Integer.one()),root) / expr) ^ exponent:neg()

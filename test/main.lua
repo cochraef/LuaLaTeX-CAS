@@ -117,7 +117,7 @@ end
 -- profiler:start()
 
 -- require("test.calculus.derivatives")
-require("test.calculus.integrals")
+-- require("test.calculus.integrals")
 
 require("test.expressions.autosimplify")
 require("test.expressions.expand")

@@ -213,8 +213,8 @@ function BinaryOperation:factor()
     end
 
     -- Pulls common sub-expressions out of sum expressions
-    if self.operation == BinaryOperation.ADD then
-    end
+    -- if self.operation == BinaryOperation.ADD then
+    -- end
 
     -- Attempts to expand the expession and factor
     -- local expanded = factoredsubs:expand();
