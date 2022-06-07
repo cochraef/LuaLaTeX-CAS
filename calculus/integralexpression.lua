@@ -333,7 +333,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
 
     -- Explicit handling of degree 1 over a binomial.
     do
-        local disc =  g.coefficients[1]*g.coefficients[1]-Integer(4)*g.coefficients[2]*g.coefficients[0] 
+        local disc =  g.coefficients[1]*g.coefficients[1]-Integer(4)*g.coefficients[2]*g.coefficients[0]
         if f == Integer.one() and g.degree == Integer(2) and disc < Integer.zero() then
             return Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)) ^ (Integer(1)/Integer(2))) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)) ^ (Integer(1)/Integer(2))
         end
@@ -387,14 +387,15 @@ function IntegralExpression.rationalfunction(expression, symbol)
 
         local rr = r:squarefreefactorization()
         local remainders = PolynomialRing.monicgcdremainders(b, y)
-        for e, factor in ipairs(rr.expressions) do
-            if e > 1 then
+        for pos, factor in ipairs(rr.expressions) do
+            if pos > 1 then
                 local re = factor.expressions[1]
+                local e = factor.expressions[2]
                 local roots = re:roots()
                 for _, root in ipairs(roots) do
                     local w
                     for _, remainder in ipairs(remainders) do
-                        if remainder.degree:asnumber() == e - 1 then
+                        if remainder.degree == e then
                             w = remainder
                             break
                         end
