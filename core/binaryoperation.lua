@@ -213,8 +213,45 @@ function BinaryOperation:factor()
     end
 
     -- Pulls common sub-expressions out of sum expressions
-    -- if self.operation == BinaryOperation.ADD then
-    -- end
+    if self.operation == BinaryOperation.ADD then
+        local gcf
+        for _, expression in ipairs(factoredsubs:subexpressions()) do
+            if expression.operation ~= BinaryOperation.MUL then
+                expression = BinaryOperation.MULEXP({expression})
+            end
+            if not gcf then
+                gcf = expression
+            else
+                local newgcf = Integer.one()
+                for _, gcfterm in ipairs(gcf:subexpressions()) do
+                    local gcfpower = Integer.one()
+                    if gcfterm:type() == BinaryOperation and gcfterm.operation == BinaryOperation.POW and gcfterm.expressions[2]:type() == Integer then
+                        gcfpower = gcfterm.expressions[2]
+                        gcfterm = gcfterm.expressions[1]
+                    end
+                    for _, term in ipairs(expression:subexpressions()) do
+                        local power = Integer.one()
+                        if term:type() == BinaryOperation and term.operation == BinaryOperation.POW and term.expressions[2]:type() == Integer then
+                            power = term.expressions[2]
+                            term = term.expressions[1]
+                        end
+                        if term == gcfterm then
+                            newgcf = newgcf * term^Integer.min(power, gcfpower)
+                        end
+                    end
+                end
+                gcf = newgcf
+            end
+        end
+        if gcf:type() ~= Integer then
+            local out = Integer.zero()
+            for _, expression in ipairs(factoredsubs:subexpressions()) do
+                out = out + expression/gcf
+            end
+            out = gcf*(out:autosimplify():factor())
+            return out:autosimplify()
+        end
+    end
 
     -- Attempts to expand the expession and factor
     -- local expanded = factoredsubs:expand();
@@ -222,7 +259,7 @@ function BinaryOperation:factor()
     --     return expanded:factor();
     -- end
 
-    return self
+    return factoredsubs
 end
 
 --- @param other Expression

@@ -59,6 +59,18 @@ function Integer.max(a, b)
     return b, a
 end
 
+--- Method for computing the smaller of two integers.
+--- Also returns the other integer for sorting purposes.
+--- @param a Integer
+--- @param b Integer
+--- @return Integer, Integer
+function Integer.min(a, b)
+    if a < b then
+        return a, b
+    end
+    return b, a
+end
+
 --- Methods for computing the larger magnitude of two integers.
 --- Also returns the other integer for sorting purposes, and the number -1 if the two values were swapped, 1 if not.
 --- @param a Integer

@@ -216,7 +216,9 @@ end
 
 
 CASparse([[
-    vars("f", "x")
-    a = x*f(x)
-    displua(a)
+    vars("x", "y", "z")
+    a = x - 1/x
+    print(a:autosimplify())
+    b = factor(a:autosimplify())
+    displua(b:autosimplify())
 ]])
