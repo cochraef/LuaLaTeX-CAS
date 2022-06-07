@@ -18,10 +18,48 @@ function Expression:autosimplify()
     error("Called unimplemented method : autosimplify()")
 end
 
+--- Performs more rigorous simplification of an expression. Checks different equivalent forms and determines the 'smallest' expresion.
+--- @return Expression
+function Expression:simplify()
+    local me = self:autosimplify()
+    local results = {}
+    for index, expression in ipairs(me:subexpressions()) do
+        results[index] = expression:simplify()
+    end
+    me = me:setsubexpressions(results)
+
+    local out = me
+    local minsize = self:size()
+
+    local test = me:expand()
+    if test:size() < minsize then
+        out = test
+        minsize = test:size()
+    end
+
+    test = me:factor()
+    if test:size() < minsize then
+        out = test
+        minsize = test:size()
+    end
+
+    return out
+end
+
 --- Returns a list of all subexpressions of an expression.
 --- @return table<number, Expression>
 function Expression:subexpressions()
     error("Called unimplemented method : subexpressions()")
+end
+
+--- Returns the total number of atomic and compound expressions that make up an expression, or the number of nodes in the expression tree.
+--- @return Integer
+function Expression:size()
+    local out = Integer.one()
+    for _, expression in ipairs(self:subexpressions()) do
+        out = out + expression:size()
+    end
+    return out
 end
 
 --- Returns a copy of the original expression with each subexpression substituted with a new one.

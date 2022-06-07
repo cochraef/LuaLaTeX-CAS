@@ -87,6 +87,10 @@ function expand(exp)
     return exp:autosimplify():expand()
 end
 
+function simplify(exp)
+    return exp:simplify()
+end
+
 function exp(x)
     return e^x
 end
@@ -217,8 +221,7 @@ end
 
 CASparse([[
     vars("x", "y", "z")
-    a = x - 1/x
-    print(a:autosimplify())
-    b = factor(a:autosimplify())
-    displua(b:autosimplify())
+    a = ((6 + ((1 + (2 * x)) * (-1 + (3 * x)))) * ((6 * y) + (-1 * z)))
+    displua(a)
+    displua(simplify(a))
 ]])

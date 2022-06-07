@@ -81,10 +81,10 @@ function RootExpression:autosimplify(subpart)
                 C = sqrt((delta1 - sqrt(delta1 ^ Integer(2) - Integer(4) * delta0 ^ Integer(3))) / Integer(2), Integer(3)):autosimplify()
             end
 
-            if C == Integer.zero() then 
+            if C == Integer.zero() then
                 C = (-b/(Integer(3)*a)):autosimplify()
             end
-            
+
             local eta = ((Integer(-1) + sqrt(Integer(-3))) / Integer(2)):autosimplify()
 
             return {((-Integer.one() / (Integer(3) * a)) * (b + C + delta0 / C)):autosimplify(),

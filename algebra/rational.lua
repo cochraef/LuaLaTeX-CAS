@@ -177,8 +177,8 @@ function Rational:one()
 end
 
 function Rational:tolatex()
-    if string.sub(self.numerator:tolatex(),1,1) == '-' then 
-        return "- \\frac{" .. string.sub(self.numerator:tolatex(),2,-1) .. "}{" .. self.denominator:tolatex() .. "}" 
+    if string.sub(self.numerator:tolatex(),1,1) == '-' then
+        return "- \\frac{" .. string.sub(self.numerator:tolatex(),2,-1) .. "}{" .. self.denominator:tolatex() .. "}"
     end
     return "\\frac{" .. self.numerator:tolatex() .."}{".. self.denominator:tolatex().. "}"
 end

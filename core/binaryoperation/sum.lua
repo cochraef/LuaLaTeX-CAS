@@ -52,7 +52,7 @@ function BinaryOperation:simplifysumrec()
             -- Uses the property that a*x+b*x= (a+b)*x
             -- This is only done if a and b are constant, since otherwise this could be counterproductive
             -- We SHOULD be okay to only check left distributivity, since constants always come first when ordered
-            if term1.operation == BinaryOperation.MUL and term2.operation == BinaryOperation.MUL then 
+            if term1.operation == BinaryOperation.MUL and term2.operation == BinaryOperation.MUL then
                 local findex = 2
                 local sindex = 2
                 if not term1.expressions[1]:isconstant() then
@@ -63,7 +63,7 @@ function BinaryOperation:simplifysumrec()
                     revertterm2 = true
                     sindex = 1
                 end
-                if FancyArrayEqual(term1.expressions,term2.expressions,findex,sindex) then 
+                if FancyArrayEqual(term1.expressions,term2.expressions,findex,sindex) then
                     local result
                     if not revertterm1 and not revertterm2 then
                         result = BinaryOperation(
@@ -71,23 +71,23 @@ function BinaryOperation:simplifysumrec()
                             {term1.expressions[1],term2.expressions[1]}
                         )
                     end
-                    if revertterm1 and not revertterm2 then 
+                    if revertterm1 and not revertterm2 then
                         result = BinaryOperation(
                             BinaryOperation.ADD,
                             {Integer.one(),term2.expressions[1]}
                         )
                     end
-                    if not revertterm1 and revertterm2 then 
+                    if not revertterm1 and revertterm2 then
                         result = BinaryOperation(
                             BinaryOperation.ADD,
                             {term1.expressions[1],Integer.one()}
                         )
                     end
-                    if revertterm1 and revertterm2 then 
+                    if revertterm1 and revertterm2 then
                         result = Integer(2)
                     end
                     result = result:autosimplify()
-                    for i=findex,#term1.expressions do 
+                    for i=findex,#term1.expressions do
                         result = BinaryOperation(
                             BinaryOperation.MUL,
                             {result,term1.expressions[i]}
