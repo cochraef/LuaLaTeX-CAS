@@ -63,24 +63,24 @@ end
 function TrigExpression:autosimplify()
     local expression = self.expression:autosimplify()
 
-     -- uses periodicity of sin and cos and friends
-     if self.name == "sin" or self.name == "cos" or self.name == "csc" or self.name == "sec" then
-        if expression == Integer.zero() or expression == PI then
+    -- uses periodicity of sin and cos and friends
+    if self.name == "sin" or self.name == "cos" or self.name == "csc" or self.name == "sec" then 
+        if expression == Integer.zero() or expression == PI then 
             goto skip
         end
-        if expression.operation ~= BinaryOperation.ADD then
+        if expression.operation ~= BinaryOperation.ADD then 
             expression = BinaryOperation(BinaryOperation.ADD,{expression})
         end
-        for index,component in ipairs(expression.expressions) do
-            if component:ismulratlPI() then
+        for index,component in ipairs(expression.expressions) do 
+            if component:ismulratlPI() then 
                 local coeff = component.expressions[1]
-                if coeff:type() == Integer then
+                if coeff:type() == Integer then 
                     coeff = coeff % Integer(2)
                     coeff = coeff:autosimplify()
-                end
-                if coeff:type() == Rational then
+                end 
+                if coeff:type() == Rational then 
                     local n = coeff.numerator
-                    local d = coeff.denominator
+                    local d = coeff.denominator 
                     local m = {n:divremainder(d)}
                     coeff = (m[1] % Integer(2)) + m[2]/d
                     coeff = coeff:autosimplify()
@@ -89,27 +89,26 @@ function TrigExpression:autosimplify()
                 expression = expression:autosimplify()
             end
         end
-        expression = expression:autosimplify()
         ::skip::
     end
 
     -- uses periodicity of tan and cot
-    if self.name == "tan" or self.name == "cot" then
-        if expression == Integer.zero() or expression == PI then
+    if self.name == "tan" or self.name == "cot" then 
+        if expression == Integer.zero() or expression == PI then 
             goto skip
         end
         if expression.operation ~= BinaryOperation.ADD then
             expression = BinaryOperation(BinaryOperation.ADD,{expression})
         end
-        for index,component in ipairs(expression.expressions) do
-            if component:ismulratlPI() then
+        for index,component in ipairs(expression.expressions) do 
+            if component:ismulratlPI() then 
                 local coeff = component.expressions[1]
-                if coeff:type() == Integer then
+                if coeff:type() == Integer then 
                     coeff = Integer.zero()
-                end
-                if coeff:type() == Rational then
+                end 
+                if coeff:type() == Rational then 
                     local n = coeff.numerator
-                    local d = coeff.denominator
+                    local d = coeff.denominator 
                     local m = {n:divremainder(d)}
                     coeff = m[2]/d
                     coeff = coeff:autosimplify()
@@ -117,7 +116,7 @@ function TrigExpression:autosimplify()
                 expression.expressions[index].expressions[1] = coeff
                 expression = expression:autosimplify()
             end
-            if component == PI then
+            if component == PI then 
                 expression.expressions[index] = Integer.zero()
                 expression = expression:autosimplify()
             end
@@ -125,57 +124,77 @@ function TrigExpression:autosimplify()
         ::skip::
     end
 
-    if self.name == "cos" then
-        if expression == Integer.zero() then
+    if expression == Integer.zero() then 
+        if self.name == "cos" or self.name == "sec" then 
             return Integer.one()
         end
-        if expression == PI then
-            return -Integer.one()
+        if self.name == "sin" or self.name == "tan" then 
+            return Integer.zero()
         end
-        if expression:ismulratlPI() then
-            local coeff = expression.expressions[1]
-            if coeff > Integer.one() then
-                coeff = (Integer(2)-coeff):autosimplify()
-            end
-            if TrigExpression.VALUES[tostring(coeff)] ~= nil then
-                return TrigExpression.VALUES[tostring(coeff)]:autosimplify()
-            end
+        if self.name == "arctan" or self.name == "arcsin" then
+            return Integer.zero()
+        end
+        if self.name == "arccos" or self.name == "arccot" then 
+            return PI / Integer(2)
         end
     end
 
-    if self.name == "sin" then
-        if expression == Integer.zero() then
+    if expression == PI then 
+        if self.name == "cos" or self.name == "sec" then 
+            return Integer(-1)
+        end
+        if self.name == "sin" or self.name == "tan" then 
             return Integer.zero()
         end
-        if expression == PI then
-            return Integer.zero()
-        end
-        if expression:ismulratlPI() then
-            local coeff = expression.expressions[1]
-            local sign = Integer.one()
-            if coeff > Integer.one() then
-                coeff = (Integer(2) - coeff):autosimplify()
-                sign = -sign:autosimplify()
+    end
+
+    if expression:ismulratlPI() then 
+        local coeff = expression.expressions[1]
+        if TrigExpression.COSVALUES[tostring(coeff)] ~= nil then
+            if self.name == "cos" then 
+                return TrigExpression.COSVALUES[tostring(coeff)]:autosimplify()
             end
-            if TrigExpression.VALUES[tostring(coeff)] ~= nil then
+            if self.name == "sin" then 
+                local sign = Integer.one()
+                if coeff > Integer.one() then 
+                    sign = Integer(-1)
+                end 
                 return (sign*sqrt(Integer.one()-cos(expression)^Integer(2))):autosimplify()
             end
+            if self.name == "tan" then  
+                return (sin(expression) / cos(expression)):autosimplify()
+            end
+            if self.name == "sec" then 
+                return (Integer.one() / cos(expression)):autosimplify()
+            end
+            if self.name == "csc" then 
+                return (Integer.one() / sin(expression)):autosimplify()
+            end
+            if self.name == "cot" then 
+                return (cos(expression) / sin(expression)):autosimplify()
+            end
         end
     end
 
-    if self.name == "tan" then
-        if expression == Integer.zero() then
-            return Integer.zero()
+    if TrigExpression.ACOSVALUES[tostring(expression)] ~= nil then 
+        if self.name == "arccos" then 
+            return TrigExpression.ACOSVALUES[tostring(expression)]:autosimplify()
         end
-        if expression == PI then
-            return Integer.zero()
-        end
-        if expression:ismulratlPI() then
-            local coeff = expression.expressions[1]
-            if TrigExpression.VALUES[tostring(coeff)] ~= nil then
-                return (sin(expression) / cos(expression)):autosimplify()
+        if self.name == "arcsin" then 
+            if expression == Integer(-1) then 
+                return TrigExpression.ACOSVALUES["-1"]:autosimplify()
+            elseif expression.expressions and expression.expressions[1] == Integer(-1) then 
+                local expr = (Integer(-1)*sqrt(Integer.one() - expression ^ Integer(2))):autosimplify()
+                return TrigExpression.ACOSVALUES[tostring(expr)]:autosimplify()
+            else
+                local expr = (sqrt(Integer.one() - expression ^ Integer(2))):autosimplify()
+                return TrigExpression.ACOSVALUES[tostring(expr)]:autosimplify()
             end
         end
+    end
+
+    if self.name == "arctan" and TrigExpression.ATANVALUES[tostring(expression)] ~= nil then 
+        return TrigExpression.ATANVALUES[tostring(expression)]:autosimplify()
     end
 
     return TrigExpression(self.name, expression)
@@ -227,7 +246,7 @@ TrigExpression = setmetatable(TrigExpression, __TrigExpression)
 TrigExpression.NAMES = {sin=1, cos=2, tan=3, csc=4, sec=5, cot=6,
                          arcsin=7, arccos=8, arctan=9, arccsc=10, arcsec=11, arccot=12}
 
-TrigExpression.VALUES = {
+TrigExpression.COSVALUES = {
     ["0"] = Integer.one(),
     ["1/6"] = sqrt(Integer(3))/Integer(2),
     ["1/4"] = sqrt(Integer(2))/Integer(2),
@@ -236,7 +255,34 @@ TrigExpression.VALUES = {
     ["2/3"] = -Integer.one()/Integer(2),
     ["3/4"] = -sqrt(Integer(2))/Integer(2),
     ["5/6"] = -sqrt(Integer(3))/Integer(2),
-    ["1"]   = -Integer.one()
+    ["1"]   = -Integer.one(),
+    ["7/6"] = -sqrt(Integer(3))/Integer(2),
+    ["5/4"] = -sqrt(Integer(2))/Integer(2),
+    ["4/3"] = -Integer.one()/Integer(2),
+    ["3/2"] = Integer.zero(),
+    ["5/3"] = Integer.one()/Integer(2),
+    ["7/4"] = sqrt(Integer(2))/Integer(2),
+    ["11/6"] = sqrt(Integer(3))/Integer(2),
+}
+TrigExpression.ACOSVALUES = {
+    ["1"]         = Integer.zero(),
+    ["(1/2 * sqrt(3,2))"] = PI * Integer(6) ^ Integer(-1),
+    ["(1/2 * sqrt(2,2))"] = PI * Integer(4) ^ Integer(-1),
+    ["1/2"]       = PI * Integer(3) ^ Integer(-1),
+    ["0"]         = PI * Integer(2) ^ Integer(-1),
+    ["-1/2"]      = PI * Integer(2) * Integer(3) ^ Integer(-1),
+    ["(-1/2 * sqrt(2,2))"]= PI * Integer(3) * Integer(4) ^ Integer(-1),
+    ["(-1/2 * sqrt(3,2))"]= PI * Integer(5) * Integer(6) ^ Integer(-1),
+    ["-1"]        = Integer(-1)*PI,
+}
+TrigExpression.ATANVALUES = {
+    ["(-1 * sqrt(3,2))"] = Integer(-1) * PI * Integer(3) ^ Integer(-1),
+    ["-1"] = Integer(-1) * PI * Integer(4) ^ Integer(-1),
+    ["(-1/3 * sqrt(3,2))"] = Integer(-1) * Integer(6) ^ Integer(-1),
+    ["0"] = Integer.zero(),
+    ["(1/3 * sqrt(3,2))"] = PI * Integer(6) ^ Integer(-1),
+    ["1"] = PI * Integer(4) ^ Integer(-1),
+    ["sqrt(3,2)"] = PI * Integer(3) ^ Integer(-1)
 }
 
 SIN = function (a)
