@@ -75,6 +75,11 @@ function SymbolExpression:order(other)
         return BinaryOperation(BinaryOperation.ADD, {self}):order(other)
     end
 
+    -- CASC Autosimplfication has some symbols appearing before functions, but that looks bad to me, so all symbols appear before products now.
+    if other:type() == FunctionExpression then
+        return true
+    end
+
     return false
 end
 

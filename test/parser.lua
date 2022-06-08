@@ -222,6 +222,5 @@ end
 CASparse([[
     vars("x", "y", "z")
     a = ((6 + ((1 + (2 * x)) * (-1 + (3 * x)))) * ((6 * y) + (-1 * z)))
-    displua(a)
-    displua(simplify(a))
+    print(int(a, x):autosimplify())
 ]])
