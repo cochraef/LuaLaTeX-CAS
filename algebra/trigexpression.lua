@@ -86,8 +86,8 @@ function TrigExpression:autosimplify()
                     coeff = coeff:autosimplify()
                 end
                 expression.expressions[index].expressions[1] = coeff
-                expression = expression:autosimplify()
             end
+            expression = expression:autosimplify()
         end
         ::skip::
     end
@@ -114,13 +114,12 @@ function TrigExpression:autosimplify()
                     coeff = coeff:autosimplify()
                 end
                 expression.expressions[index].expressions[1] = coeff
-                expression = expression:autosimplify()
             end
             if component == PI then 
                 expression.expressions[index] = Integer.zero()
-                expression = expression:autosimplify()
             end
         end
+        expression = expression:autosimplify()
         ::skip::
     end
 
