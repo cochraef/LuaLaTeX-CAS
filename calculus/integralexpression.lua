@@ -310,20 +310,21 @@ function IntegralExpression.rationalfunction(expression, symbol)
         end
         f = PolynomialRing({Integer.one()}, g.symbol)
     else
-        if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL
-        or expression.expressions[3] then
-    return nil
-    end
-        if expression.expressions[2]:type() == BinaryOperation and expression.expressions[2].operation == BinaryOperation.POW and
-            expression.expressions[2].expressions[2] == Integer(-1) then
-        f, fstat = expression.expressions[1]:topolynomial()
-        g, gstat = expression.expressions[2].expressions[1]:topolynomial()
-        elseif expression.expressions[1]:type() == BinaryOperation and expression.expressions[1].operation == BinaryOperation.POW and
-        expression.expressions[1].expressions[2] == Integer(-1) then
-        f, fstat = expression.expressions[2]:topolynomial()
-        g, gstat = expression.expressions[1].expressions[1]:topolynomial()
+        if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL or expression.expressions[3] then
+            return nil
+        end
+        if expression.expressions[2]:type() == BinaryOperation and expression.expressions[2].operation == BinaryOperation.POW and expression.expressions[2].expressions[2] == Integer(-1) then
+            if expression.expressions[1].topolynomial ~=nil and expression.expressions[2].expressions[1].topolynomial ~=nil then 
+                f, fstat = expression.expressions[1]:topolynomial()
+                g, gstat = expression.expressions[2].expressions[1]:topolynomial()
+            end
+        elseif expression.expressions[1]:type() == BinaryOperation and expression.expressions[1].operation == BinaryOperation.POW and expression.expressions[1].expressions[2] == Integer(-1) then
+            if expression.expressions[2].topolynomial ~= nil and expression.expressions[1].expressions[1].topolynomial ~= nil then 
+                f, fstat = expression.expressions[2]:topolynomial()
+                g, gstat = expression.expressions[1].expressions[1]:topolynomial()
+            end
         else
-        return nil
+            return nil
         end
 
         if not fstat or not gstat or f.symbol ~= symbol.symbol or g.symbol ~= symbol.symbol then
