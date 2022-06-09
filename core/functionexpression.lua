@@ -139,10 +139,14 @@ end
 
 --- @return string
 function FunctionExpression:tolatex()
-    local out = tostring(self.name) .. '\\left(';
+    local out = tostring(self.name)
     if self:type() == TrigExpression then
         out = "\\" .. out
     end
+    if self:type() ~= TrigExpression and string.len(self.name)>1 then 
+        out = '\\operatorname{' .. out .. '}'
+    end
+    out = out .. '\\left('
     for index, expression in ipairs(self:subexpressions()) do
         out = out .. expression:tolatex()
         if self:subexpressions()[index + 1] then
