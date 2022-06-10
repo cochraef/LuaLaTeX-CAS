@@ -123,11 +123,17 @@ function Expression:isconstant()
     error("Called unimplemented method: isconstant()")
 end
 
--- A total order on autosimplified expressions. Returns true if self < other.
+--- A total order on autosimplified expressions. Returns true if self < other.
 --- @param other Expression
 --- @return boolean
 function Expression:order(other)
     error("Called unimplemented method: order()")
+end
+
+--- Returns an autosimplified expression as a single-variable polynomial in a ring, if it can be converted. Returns itself otherwise.
+--- @return PolynomialRing, boolean
+function Expression:topolynomial()
+    return self, false
 end
 
 --- Converts this expression to LaTeX code.

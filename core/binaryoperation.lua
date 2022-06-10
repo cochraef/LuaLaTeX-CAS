@@ -335,7 +335,6 @@ function BinaryOperation:iscommutative()
     error("Called unimplemented method: iscommutative()")
 end
 
---- Returns an autosimplified expression as a single-variable polynomial in a ring, if it can be converted. Returns itself otherwise.
 --- @return PolynomialRing, boolean
 function BinaryOperation:topolynomial()
     local addexp = self

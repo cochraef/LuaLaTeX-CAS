@@ -30,10 +30,13 @@ function IntegralExpression.integrate(expression, symbol)
     F = IntegralExpression.substitutionmethod(simplified, symbol)
     if F then return F end
 
+    F = IntegralExpression.rationalfunction(simplified, symbol)
+    if F then return F end
+
     F = IntegralExpression.partsmethod(simplified, symbol)
     if F then return F end
 
-    F = IntegralExpression.rationalfunction(simplified, symbol)
+    F = IntegralExpression.eulersformula(simplified, symbol)
     if F then return F end
 
     local expanded = simplified:expand()
@@ -282,17 +285,6 @@ function IntegralExpression.trialsubstitutions(expression)
     return substitutions
 end
 
---- Attempts 'integration by parts'.
---- @param expression Expression
---- @param symbol SymbolExpression
---- @return Expression|nil
-function IntegralExpression.partsmethod(expression, symbol)
-    if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL then
-        return nil
-    end
-
-end
-
 
 --- Uses Lazard, Rioboo, Rothstein, and Trager's method to integrate rational functions.
 --- This is mostly to try to avoid factoring and finding the roots of the full denominator whenever possible.
@@ -408,6 +400,73 @@ function IntegralExpression.rationalfunction(expression, symbol)
     end
 
     return U + V + W
+end
+
+
+--- Attempts integration by parts for expressions with a polynomial factor in them. Other product expressions use Euler's formula.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
+function IntegralExpression.partsmethod(expression, symbol)
+    if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL then
+        return
+    end
+
+    local u
+    local vp = Integer.one()
+    for _, exp in ipairs(expression:subexpressions()) do
+        local _, bool = exp:topolynomial()
+        if bool then
+            u = exp
+        else
+            vp = vp * exp
+        end
+    end
+
+    if not u or u:freeof(symbol) then
+        return
+    end
+
+    local results = {}
+    while u ~= Integer.zero() do
+        local v = IntegralExpression.integrate(vp, symbol)
+        if not v then
+            return
+        end
+        local up = DerivativeExpression(u, symbol):autosimplify()
+        results[#results+1] = u*v
+        u = up
+        vp = v
+    end
+
+    local result = results[#results]
+    for i=#results-1,1,-1 do
+        result = results[i] - result
+    end
+
+    return result:autosimplify()
+end
+
+--- Attempts integration using Euler's formula and kind. Alternative for integration by parts for many expressions.
+--- @param expression Expression
+--- @param symbol SymbolExpression
+--- @return Expression|nil
+function IntegralExpression.eulersformula(expression, symbol)
+    local new = expression:substitute({[COS(symbol)] = (E^(I*symbol) + E^(-I*symbol))/Integer(2),
+                                       [SIN(symbol)] = (E^(I*symbol) - E^(-I*symbol))/(Integer(2)*I)})
+
+    if new == expression then
+        return
+    end
+
+    return IntegralExpression.integrate(new:expand(), symbol)
+
+    -- local complexresult = IntegralExpression.integrate(new:expand(), symbol)
+
+    -- if not complexresult then
+    --     return
+    -- end
+
 end
 
 ----------------------------
