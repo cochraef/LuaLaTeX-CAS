@@ -117,10 +117,33 @@ function Expression:isatomic()
     error("Called unimplemented method: isatomic()")
 end
 
---- Determines whether an expression is a constant, i.e., is free of every variable.
+--- Determines whether an expression is a constant, i.e., an atomic expression that is not a varaible and cannot be converted into an equivalent compound expression.
 --- @return boolean
 function Expression:isconstant()
     error("Called unimplemented method: isconstant()")
+end
+
+--- Determines whether an expression is a 'proper' real constant, i.e., is free of every varaible.
+function Expression:isrealconstant()
+    if self:isconstant() then
+        return true
+    end
+
+    for _, expression in ipairs(self:subexpressions()) do
+        if not expression:isrealconstant() then
+            return false
+        end
+    end
+
+    return self:type() ~= SymbolExpression
+end
+
+--- Determines whether an expression is a 'proper' complex constant, i.e., is free of every varaible and is of the form a + bI for nonzero a and b.
+--- @return boolean
+function Expression:iscomplexconstant()
+    return self.operation == BinaryOperation.ADD and #self.expressions == 2 and self.expressions[1]:isrealconstant()
+            and ((self.expressions[2].operation == BinaryOperation.MUL and #self.expressions[2].expressions == 2 and self.expressions[2].expressions[1]:isrealconstant() and self.expressions[2].expressions[2] == I)
+            or self.expressions[2] == I)
 end
 
 --- A total order on autosimplified expressions. Returns true if self < other.

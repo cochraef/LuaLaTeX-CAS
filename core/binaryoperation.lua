@@ -160,7 +160,7 @@ function BinaryOperation:expand()
         return allsums:autosimplify()
     end
     if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
-        local exp = BinaryOperation.MULEXP({Integer(1)});
+        local exp = BinaryOperation.MULEXP({Integer.one()});
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
             exp = exp:expand2(expanded.expressions[1])
@@ -169,6 +169,13 @@ function BinaryOperation:expand()
             exp = exp^Integer(-1)
         end
         return exp
+    end
+    if expanded.operation == BinaryOperation.POW and expanded.expressions[2].operation == BinaryOperation.ADD then
+        local exp = {}
+        for i = 1, #expanded.expressions[2].expressions do
+            exp[#exp+1] = (expanded.expressions[1]^expanded.expressions[2].expressions[i]):autosimplify()
+        end
+        return BinaryOperation.MULEXP(exp)
     end
     return expanded:autosimplify()
 end

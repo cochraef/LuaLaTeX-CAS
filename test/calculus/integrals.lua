@@ -15,6 +15,8 @@ local n = dparse("int(1/(x^3+2*x+2), x, 0, 1)")
 
 local o = dparse("int(x^2*e^x, x)")
 local p = dparse("int((x^2+6*x+3)*sin(x), x)")
+local q = dparse("int(x*e^x*sin(x),x)")
+local r = dparse("int(cos(x)^3, x)")
 
 starttest("integration")
 test(a, "int((x ^ 2), x)")
@@ -41,4 +43,6 @@ test(m:autosimplify(), "(2 * (3 ^ -1/2) * arctan(((3 ^ -1/2) * (1 + (2 * x)))))"
 
 test(o:autosimplify(), "((2 * (e ^ x)) + (-2 * (e ^ x) * x) + ((e ^ x) * (x ^ 2)))", o)
 test(p:autosimplify(), "((2 * cos(x)) + ((-3 + (-6 * x) + (-1 * (x ^ 2))) * cos(x)) + ((6 + (2 * x)) * sin(x)))", p)
+test(q:autosimplify(), "((1/2 * (e ^ x) * cos(x)) + (x * ((-1/2 * (e ^ x) * cos(x)) + (1/2 * (e ^ x) * sin(x)))))", q)
+test(r:autosimplify(), "((3/4 * sin(x)) + (1/12 * sin((3 * x))))", r)
 endtest()

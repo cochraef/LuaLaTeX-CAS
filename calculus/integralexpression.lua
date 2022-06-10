@@ -459,13 +459,40 @@ function IntegralExpression.eulersformula(expression, symbol)
         return
     end
 
-    return IntegralExpression.integrate(new:expand(), symbol)
+    local complexresult = IntegralExpression.integrate(new:expand(), symbol)
 
-    -- local complexresult = IntegralExpression.integrate(new:expand(), symbol)
+    if not complexresult then
+        return
+    end
 
-    -- if not complexresult then
-    --     return
-    -- end
+    -- TODO: Proper complex number conversion methods
+    local function converttorectangular(exp)
+        exp = exp:expand()
+        local results = {}
+        for index, sub in ipairs(exp:subexpressions()) do
+            results[index] = converttorectangular(sub)
+        end
+        local converted = exp:setsubexpressions(results)
+
+        if converted.operation == BinaryOperation.POW and converted.expressions[1] == E and converted.expressions[2].operation == BinaryOperation.MUL then
+            local ipart
+            local rest = Integer.one()
+            for _, factor in ipairs(converted.expressions[2]:subexpressions()) do
+                if factor == I then
+                    ipart = true
+                else
+                    rest = rest * factor
+                end
+            end
+            if ipart then
+                return (COS(rest) + I*SIN(rest)):autosimplify()
+            end
+        end
+
+        return converted
+    end
+
+    return converttorectangular(complexresult:autosimplify()):expand():autosimplify()
 
 end
 
