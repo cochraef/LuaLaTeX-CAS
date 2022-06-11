@@ -450,6 +450,40 @@ function IntegralExpression.partsmethod(expression, symbol)
 
         return result:autosimplify()
     end
+
+    local u 
+    local vp = Integer.one()
+    --looking for LATE
+    for _, exp in ipairs(expression:subexpressions()) do
+        if exp:type() == Logarithm then 
+            u = exp
+        else
+            vp = vp * exp
+        end
+    end
+
+    if not u or u:freeof(symbol) then
+        return
+    else
+        vp = vp:autosimplify()
+    end
+
+    if vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then 
+        local v = IntegralExpression.integrate(vp, symbol)
+        if not v then
+            return
+        end
+
+        local up = DerivativeExpression(u, symbol):autosimplify()
+        local vup = IntegralExpression.integrate(v*up,symbol)
+        if not vup then
+            return nil
+        end
+
+        local result = u*v - vup
+
+        return result:autosimplify()
+    end
 end
 
 --- Attempts integration using Euler's formula and kind. Alternative for integration by parts for many expressions.
