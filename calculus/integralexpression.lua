@@ -412,6 +412,7 @@ function IntegralExpression.partsmethod(expression, symbol)
         return
     end
 
+    -- looking for ATE
     local u
     local vp = Integer.one()
     for _, exp in ipairs(expression:subexpressions()) do
@@ -425,26 +426,30 @@ function IntegralExpression.partsmethod(expression, symbol)
 
     if not u or u:freeof(symbol) then
         return
+    else
+        vp = vp:autosimplify()
     end
 
-    local results = {}
-    while u ~= Integer.zero() do
-        local v = IntegralExpression.integrate(vp, symbol)
-        if not v then
-            return
+    if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:isconstant()) then 
+        local results = {}
+        while u ~= Integer.zero() do
+            local v = IntegralExpression.integrate(vp, symbol)
+            if not v then
+                return
+            end
+            local up = DerivativeExpression(u, symbol):autosimplify()
+            results[#results+1] = u*v
+            u = up
+            vp = v
         end
-        local up = DerivativeExpression(u, symbol):autosimplify()
-        results[#results+1] = u*v
-        u = up
-        vp = v
-    end
 
-    local result = results[#results]
-    for i=#results-1,1,-1 do
-        result = results[i] - result
-    end
+        local result = results[#results]
+        for i=#results-1,1,-1 do
+            result = results[i] - result
+        end
 
-    return result:autosimplify()
+        return result:autosimplify()
+    end
 end
 
 --- Attempts integration using Euler's formula and kind. Alternative for integration by parts for many expressions.
