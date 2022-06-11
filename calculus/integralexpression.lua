@@ -430,7 +430,7 @@ function IntegralExpression.partsmethod(expression, symbol)
         vp = vp:autosimplify()
     end
 
-    if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:isconstant()) then 
+    if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then 
         local results = {}
         while u ~= Integer.zero() do
             local v = IntegralExpression.integrate(vp, symbol)
