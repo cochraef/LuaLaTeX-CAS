@@ -323,7 +323,7 @@ function BinaryOperation:order(other)
         return BinaryOperation(BinaryOperation.POW, {self, Integer.one()}):order(other)
     end
 
-    if other:type() == FunctionExpression or other:type() == TrigExpression then
+    if other:type() == FunctionExpression or other:type() == TrigExpression or other:type() == Logarithm then
         if self.operation == BinaryOperation.ADD or self.operation == BinaryOperation.MUL then
             return self:order(BinaryOperation(self.operation, {other}))
         end
