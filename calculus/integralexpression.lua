@@ -149,27 +149,27 @@ function IntegralExpression.table(integrand, symbol)
         end
 
         if integrand == ARCSIN(symbol) then
-            return symbol*ARCSIN(symbol) + (1-symbol^(Integer(2)))^(Integer(1)/Integer(2))
+            return symbol*ARCSIN(symbol) + (Integer.one()-symbol^(Integer(2)))^(Integer.one()/Integer(2))
         end
 
         if integrand == ARCCOS(symbol) then
-            return symbol*ARCCOS(symbol) - (1-symbol^(Integer(2)))^(Integer(1)/Integer(2))
+            return symbol*ARCCOS(symbol) - (Integer.one()-symbol^(Integer(2)))^(Integer.one()/Integer(2))
         end
 
         if integrand == ARCTAN(symbol) then
-            return symbol*ARCTAN(symbol) - (Integer(1)/Integer(2))*LN(1+symbol^Integer(2))
+            return symbol*ARCTAN(symbol) - (Integer.one()/Integer(2))*LN(Integer.one()+symbol^Integer(2))
         end
 
         if integrand == ARCCSC(symbol) then
-            return symbol*ARCCSC(symbol) + LN(symbol*(1+(1-symbol^(Integer(-2)))^(Integer(1)/Integer(2))))
+            return symbol*ARCCSC(symbol) + LN(symbol*(Integer.one()+(Integer.one()-symbol^(Integer(-2)))^(Integer.one()/Integer(2))))
         end
 
         if integrand == ARCSEC(symbol) then
-            return symbol*ARCSEC(symbol) - LN(symbol*(1+(1-symbol^(Integer(-2)))^(Integer(1)/Integer(2))))
+            return symbol*ARCSEC(symbol) - LN(symbol*(Integer.one()+(Integer.one()-symbol^(Integer(-2)))^(Integer.one()/Integer(2))))
         end
 
         if integrand == ARCCOT(symbol) then
-            return symbol*ARCCOT(symbol) + (Integer(1)/Integer(2))*LN(1+symbol^Integer(2))
+            return symbol*ARCCOT(symbol) + (Integer.one()/Integer(2))*LN(Integer.one()+symbol^Integer(2))
         end
     end
 
