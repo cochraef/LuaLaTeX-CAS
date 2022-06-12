@@ -238,6 +238,31 @@ function IntegralExpression.substitutionmethod(expression, symbol)
             end
             local u = (expression / (DerivativeExpression(g, symbol))):autosimplify()
             u = u:substitute({[g]=subsymbol}):autosimplify()
+
+            --look to pull out constants from subexpressions of u
+            local coeff = Integer.one()
+            for index, exp in ipairs(u:subexpressions()) do 
+                if exp.operation ~= BinaryOperation.POW then 
+                    exp = BinaryOperation(BinaryOperation.POW,{exp,Integer.one()})
+                end
+                if exp.expressions[2]:type() == Integer and  exp.expressions[1].operation == BinaryOperation.ADD then 
+                    local power = exp.expressions[2]
+                    local sumpart = exp.expressions[1]
+                    local coeffpart
+                    if sumpart.expressions[1].operation == BinaryOperation.MUL and sumpart.expressions[1].expressions[1]:isconstant() then 
+                        coeffpart = sumpart.expressions[1].expressions[1] ^ power
+                    end
+                    if sumpart.expressions[1]:isconstant() then 
+                        coeffpart = sumpart.expressions[1]
+                    end
+                    if coeffpart then 
+                        u.expressions[index].expressions[1] = u.expressions[index].expressions[1] / coeffpart
+                        coeff = coeff / (coeffpart ^ power)
+                    end
+                end
+            end
+            u = u:autosimplify()
+
             if u:freeof(symbol) then
                 local FF = IntegralExpression.integrate(u, subsymbol)
                 if FF then
