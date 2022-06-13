@@ -91,12 +91,16 @@ function Logarithm:order(other)
 
     if other:type() == BinaryOperation then 
         if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then 
-            return BinaryOperation(other.operation,{self.expression}):order(other)
+            return BinaryOperation(other.operation,{self}):order(other)
         end
 
         if other.operation == BinaryOperation.POW then 
-            return (self.expression ^ Integer.one()):order(other)
+            return (self ^ Integer.one()):order(other)
         end
+    end
+
+    if other:type() == TrigExpression then 
+        return self.expression:order(other.expression)
     end
 
     return true
