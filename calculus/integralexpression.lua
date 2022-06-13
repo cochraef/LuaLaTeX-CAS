@@ -239,7 +239,10 @@ function IntegralExpression.substitutionmethod(expression, symbol)
             local u = (expression / (DerivativeExpression(g, symbol))):autosimplify()
             u = u:substitute({[g]=subsymbol}):autosimplify()
 
-            --look to pull out constants from subexpressions of u
+            --factor u and cancel like non-constant terms
+            u = u:factor():autosimplify()
+
+            --now do the same for constants
             local coeff = Integer.one()
             for index, exp in ipairs(u:subexpressions()) do 
                 if exp.operation ~= BinaryOperation.POW then 
