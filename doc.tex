@@ -225,12 +225,11 @@ The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between th
     
 \section{Lua Documentation}
 
-This section assumes some familiarity with the programming language Lua. For a comprehensive introduction to Lua, we refer the reader to \cite{pil}.
+This section assumes some familiarity with the programming language Lua and with object-oriented programming. For a comprehensive introduction to Lua, we refer the reader to \cite{pil}.
 
+This computer algebra system is written in object-oriented Lua. Lua does not have built-in object-oriented features, but using metatables we can simulate much of the oo functionality of a language like Java. Every class in the CAS inherits from the {\ttfamily Expression} interface. Expressions are really trees, and may have any number of sub-expressions as children depending on the type of the expression.
 
-This computer algebra system is written in object-oriented Lua. Lua, of course, does not have built-in object-oriented features, but using metatables we can simulate much of the oo functionality of a language like Java. Every class in the CAS inherits from the {\ttfamily Expression} interface. Expressions are really trees, and may have any number of sub-expressions as children depending on the type of the expression.
-
-Most operations that a user would want to apply to expressions, such as derivatives and integrals, for instance, are encapsulated into their own classes that have the expressions that these operations are applied to as instance variables. The other kind of operations on expressions are \emph{core methods}, which are proper methods in the objected-oriented sense, and can be called on expressions using the {\ttfamily :} syntax as is typical in Lua. The rule of thumb is that if there is standard mathematical notation for an operation or function represented by the CAS, it gets its own class, and if not, it is a core method.
+Most operations that a user would want to apply to expressions, such as derivatives and integrals, are encapsulated into their own classes. These classes have the expressions that these operations are applied to as instance variables. The other kind of operations on expressions are \emph{core methods}, which are methods in the objected-oriented sense, and can be called on expressions using the {\ttfamily :} syntax as is typical in Lua. The rule of thumb is that if there is standard mathematical notation for an operation or function represented by the CAS, it gets its own class, and if not, it is a core method. This way, every Lua expression corresponds to something that can be cleanly displayed in \LaTeX{}.
 
 
 \subsection{Core Methods}
@@ -238,11 +237,15 @@ Most operations that a user would want to apply to expressions, such as derivati
 All of the following core methods can be applied to any expression, and are defined in the {\ttfamily expression.lua} interface.
 
 \begin{itemize}
-    \item {\ttfamily evaluate()} applies an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerrivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
+    \item {\ttfamily evaluate()} applies an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerrivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
     
     \item {\ttfamily autosimplify()} performs fast simplification techniques on an expression. All input from the \LaTeX{} end and everything output to the \LaTeX{} end is autosimplified. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method also calls the {\ttfamily evaluate()} method.
     
+    \item {\ttfamily simplify()} performs full simplification of an expression. This may involve polynomial factorization, which is slow, so this is seperate from autosimplification and not called on the \LaTeX{} end unless the user specifically directs the CAS to simplify.
+    
     \item {\ttfamily subexpressions()} returns a list of all subexpressions of an expression. This gives a unified interface to the fields of objects, which have different names across classes.
+    
+    \item {\ttfamily size()} returns the number of nodes of the tree that constitutes an expression, roughly or the total number of expression objects that make up the expression.
     
     \item {\ttfamily setsubexpressions(subexpressions)} creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
     
@@ -254,20 +257,26 @@ All of the following core methods can be applied to any expression, and are defi
     
     \item {\ttfamily factor()} factors an expression, turning products of sums into sums of products.
     
-    \item {\ttfamily isatomic()} determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields.
+    \item {\ttfamily isatomic()} determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
     
-    \item {\ttfamily isconstant()} determines whether an expression contains no variables.
+    \item {\ttfamily isconstant()} determines whether an expression is atomic and contains no variables. See Section B.2 for more details.
+    
+    \item {\ttfamily isrealconstant()} determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$.
+    
+    \item {\ttfamily iscomplexconstant()} determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$.
     
     \item {\ttfamily tolatex()} converts an expression to \LaTeX{} code.
 \end{itemize}
 
-The number of core expressions should be kept small, since every new type of expression must implement all of these methods. 
+The number of core methods should generally be kept small, since every new type of expression must implement all of these methods. The exception to this, of course, is core methods that call other core methods that provide a unified interface to expressions. For instance, {\ttfamily size()} calls {\ttfamily subexpressions()}, so it only needs to be implemented in the expression interface.
 
 \subsection{Algebra Package}
 
 \subsection{Calculus Package}
 
-\subsection{Basic Parsing}
+\subsection{Constructing Expressions \& Basic Parsing}
+
+Algebraic computations on the Lua end typically involve constructing the desired expression and applying one or more core operations to the expression. If a non-core expres
 
 
 \end{document}
