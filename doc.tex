@@ -2,7 +2,7 @@
 
 \usepackage{luacas}
 
-\usepackage[margin=1.5in]{geometry}
+\usepackage[margin=1in]{geometry}
 \usepackage[shortlabels]{enumitem}
 
 \usepackage{tikz}
@@ -15,9 +15,9 @@
 \usepackage{microtype}
 
 
-\newtcolorbox{codebox}{
+\newtcolorbox{codebox}[1][sidebyside]{
     enhanced,skin=bicolor,
-    sidebyside,
+    #1,
     arc=1pt,
     colframe=brown,
     colback=brown!15,colbacklower=white,
@@ -151,7 +151,7 @@ Now, Alice wants to use the variable $q$ to store the appropriate \emph{differen
     breaklines]
     {latex}
     {demo.tex}
-Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$. For this, she uses the \mintinline{latex}{\print*} command:
+Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$. For this, she uses the \mintinline{latex}{\print*} command. 
 \begin{CAS}
     vars('x','h')
     f = x^2
@@ -168,6 +168,141 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     \tcblower
     \[ \print*{q} \] 
 \end{codebox}
+So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{:expand()} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=q:expand()}, and prints the result to see if things worked as expected:
+\begin{codebox}
+    \inputminted[
+    firstline=73,
+    lastline=80,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        q = q:expand()
+    \end{CAS}
+    \[ \print*{q} \] 
+\end{codebox}
+Alice is pleasantly surprised that the result of the expansion has been autosimplified, i.e., the $x^2$ and $-x^2$ came to $0$ which was omitted from the expression altogether. Now, Alice wants to distribute the $h$ in the denominator; this requires another expansion. 
+\begin{codebox}
+    \inputminted[
+    firstline=82,
+    lastline=90,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        q = q:expand()
+    \end{CAS}
+    \[ \print*{q} \] 
+\end{codebox}
+Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded (twice) and simplified (automatically), this amounts to another substitution:
+\begin{codebox}
+    \inputminted[
+    firstline=92,
+    lastline=102,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        subs = {[h]=0}
+        q = q:substitute(subs)
+    \end{CAS}
+    \[ \print*{q} \] 
+\end{codebox}
+Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{:simplify()} method:
+\begin{codebox}
+    \inputminted[
+    firstline=104,
+    lastline=115,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        q = q:simplify()
+    \end{CAS}
+    \[ \print*{q} \] 
+\end{codebox}
+Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{:simplify()} method the content of the argument. 
+
+Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}. Here's the final product of Alice's efforts:
+
+\begin{codebox}[sidebyside align=top]
+    \inputminted[
+    firstline=117,
+    lastline=143,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        vars('x','h')
+        f = x^2
+    \end{CAS}
+    Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
+    \begin{CAS}
+        subs = {[x] = x+h}
+        q = (f:substitute(subs) - f)/h
+    \end{CAS}
+    \[ \begin{aligned}
+        \print*{q} &= 
+        \begin{CAS} 
+            q = q:expand() 
+        \end{CAS}
+        \print*{q}& &\text{expand/simplify numerator} \\
+        &= 
+        \begin{CAS}
+            q = q:expand() 
+        \end{CAS}
+        \print*{q}& &\text{distribute denominator} \\ 
+        \begin{CAS}
+            subs = {[h]=0}
+            q = q:substitute(subs)
+        \end{CAS}
+        &\xrightarrow{h\to 0} \print{q}& &\text{take limit.}
+    \end{aligned} \] 
+    So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
+\end{codebox}
+Alice can produce another example merely by changing the definition of $f$ on the third line:
+\begin{codebox}[sidebyside align=top]
+    \inputminted[
+    firstline=145,
+    lastline=151,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        vars('x','h')
+        f = 2*x^3-x
+    \end{CAS}
+    Let $f(x) = \print*{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
+    \begin{CAS}
+        subs = {[x] = x+h}
+        q = (f:substitute(subs) - f)/h
+    \end{CAS}
+    \[ \begin{aligned}
+        \print*{q} &= 
+        \begin{CAS} 
+            q = q:expand() 
+        \end{CAS}
+        \print*{q}& &\text{expand/simplify numerator} \\
+        &= 
+        \begin{CAS}
+            q = q:expand() 
+        \end{CAS}
+        \print*{q}& &\text{distribute denominator} \\ 
+        \begin{CAS}
+            subs = {[h]=0}
+            q = q:substitute(subs)
+        \end{CAS}
+        &\xrightarrow{h\to 0} \print{q}& &\text{take limit.}
+    \end{aligned} \] 
+    So $\print*{diff(f,x)} = \print{diff(f,x)}$.  
+\end{codebox}
+
 
 
 \subsection{Intermediate}
