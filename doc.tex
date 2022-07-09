@@ -99,7 +99,7 @@ The CAS is written using object-oriented Lua, so it is modular and would be easy
 
 \subsection{Requirements}
 
-The \texttt{luacas} package (naturally) requires you to compile with Lua\LaTeX{}. Beyond that, the following packages are required:
+The \texttt{luacas} package (naturally) requires you to compile with Lua\LaTeX{}. Beyond that, the following packages are needed:
 \begin{multicols}{2}
 {\ttfamily 
 \begin{itemize}
@@ -122,15 +122,17 @@ The package manager for your local TeX distribution ought to install the package
     breaklines]
     {latex}
     {doc.tex}
-That's it. 
+That's it, you're ready to go.
 
-\section{Tutorial}
+\section{Tutorials}
 
-\subsection{Beginner}
+Taking a cue from the phenomenal TikZ documentation, we introduce basic usage of the \texttt{luacas} package through a few informal tutorials.  
+
+\subsection{Tutorial 1: Limit Definition of the Derivative}
 
 Alice is teaching calculus, and she wants to give her students many examples of the dreaded \emph{limit definition of the derivative}. On the other hand, she'd like to avoid working out many examples by-hand. She decides to give \texttt{luacas} a try.
 
-Alice can access the \texttt{luacas} program using a custom environment: \mintinline{latex}{\begin{CAS}..\end{CAS}}. The first thing Alice does is declare variables that will be used:
+Alice can access the \texttt{luacas} program using a custom environment: \mintinline{latex}{\begin{CAS}..\end{CAS}}. The first thing Alice must do is declare variables that will be used going forward:
 \inputminted[
     firstline=55,
     lastline=57,
@@ -182,7 +184,7 @@ So far so good! Alice wants to expand the numerator of $q$; she finds the aptly 
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is pleasantly surprised that the result of the expansion has been autosimplified, i.e., the $x^2$ and $-x^2$ came to $0$ which was omitted from the expression altogether. Now, Alice wants to distribute the $h$ in the denominator; this requires another expansion. 
+Alice is pleasantly surprised that the result of the expansion has been autosimplified, i.e., the $x^2$ and $-x^2$ came to $0$ which was omitted from the numerator of the expression altogether. Now, Alice wants to distribute the $h$ in the denominator; this requires another expansion: 
 \begin{codebox}
     \inputminted[
     firstline=82,
@@ -211,24 +213,16 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{:simplify()} method:
-\begin{codebox}
-    \inputminted[
-    firstline=104,
-    lastline=115,
-    breaklines]
-    {latex}
-    {demo.tex}
-    \tcblower
-    \begin{CAS}
-        q = q:simplify()
-    \end{CAS}
-    \[ \print*{q} \] 
-\end{codebox}
+Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{:simplify()} method. This does the trick: adding the line \mintinline{lua}{q = q:simplify()} before leaving the \texttt{CAS} environment returns the expected $2x$.
+
 Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{:simplify()} method the content of the argument. 
 
-Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}. Here's the final product of Alice's efforts:
-
+Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can:
+\begin{itemize}
+    \item be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}; and 
+    \item CAS macros persist -- if Alice assigns \mintinline{lua}{f = x^2} within \mintinline{latex}{\begin{CAS}..\end{CAS}}, then the CAS remembers that \mintinline{lua}{f = x^2} the next time Alice enters the CAS environment. 
+\end{itemize}
+Here's the final version of Alice's code: 
 \begin{codebox}[sidebyside align=top]
     \inputminted[
     firstline=117,
@@ -265,11 +259,11 @@ Alice is pretty happy with how everything is working, but she wants to be able t
     \end{aligned} \] 
     So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
 \end{codebox}
-Alice can produce another example merely by changing the definition of $f$ on the third line:
+Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 \begin{codebox}[sidebyside align=top]
     \inputminted[
     firstline=145,
-    lastline=151,
+    lastline=150,
     breaklines]
     {latex}
     {demo.tex}
