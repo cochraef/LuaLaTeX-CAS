@@ -244,21 +244,21 @@ function IntegralExpression.substitutionmethod(expression, symbol)
 
             --now do the same for constants
             local coeff = Integer.one()
-            for index, exp in ipairs(u:subexpressions()) do 
-                if exp.operation ~= BinaryOperation.POW then 
+            for index, exp in ipairs(u:subexpressions()) do
+                if exp.operation ~= BinaryOperation.POW then
                     exp = BinaryOperation(BinaryOperation.POW,{exp,Integer.one()})
                 end
-                if exp.expressions[2]:type() == Integer and  exp.expressions[1].operation == BinaryOperation.ADD then 
+                if exp.expressions[2]:type() == Integer and  exp.expressions[1].operation == BinaryOperation.ADD then
                     local power = exp.expressions[2]
                     local sumpart = exp.expressions[1]
                     local coeffpart
-                    if sumpart.expressions[1].operation == BinaryOperation.MUL and sumpart.expressions[1].expressions[1]:isconstant() then 
+                    if sumpart.expressions[1].operation == BinaryOperation.MUL and sumpart.expressions[1].expressions[1]:isconstant() then
                         coeffpart = sumpart.expressions[1].expressions[1] ^ power
                     end
-                    if sumpart.expressions[1]:isconstant() then 
+                    if sumpart.expressions[1]:isconstant() then
                         coeffpart = sumpart.expressions[1]
                     end
-                    if coeffpart then 
+                    if coeffpart then
                         u.expressions[index].expressions[1] = u.expressions[index].expressions[1] / coeffpart
                         coeff = coeff / (coeffpart ^ power)
                     end
@@ -334,12 +334,12 @@ function IntegralExpression.rationalfunction(expression, symbol)
             return nil
         end
         if expression.expressions[2]:type() == BinaryOperation and expression.expressions[2].operation == BinaryOperation.POW and expression.expressions[2].expressions[2] == Integer(-1) then
-            if expression.expressions[1].topolynomial ~=nil and expression.expressions[2].expressions[1].topolynomial ~=nil then 
+            if expression.expressions[1].topolynomial ~=nil and expression.expressions[2].expressions[1].topolynomial ~=nil then
                 f, fstat = expression.expressions[1]:topolynomial()
                 g, gstat = expression.expressions[2].expressions[1]:topolynomial()
             end
         elseif expression.expressions[1]:type() == BinaryOperation and expression.expressions[1].operation == BinaryOperation.POW and expression.expressions[1].expressions[2] == Integer(-1) then
-            if expression.expressions[2].topolynomial ~= nil and expression.expressions[1].expressions[1].topolynomial ~= nil then 
+            if expression.expressions[2].topolynomial ~= nil and expression.expressions[1].expressions[1].topolynomial ~= nil then
                 f, fstat = expression.expressions[2]:topolynomial()
                 g, gstat = expression.expressions[1].expressions[1]:topolynomial()
             end
@@ -444,14 +444,14 @@ function IntegralExpression.partsmethod(expression, symbol)
     local vp = Integer.one()
     --looking for ILATE
     for _, exp in ipairs(expression:subexpressions()) do
-        if exp:type() == TrigExpression and (exp.name == "arctan" or exp.name == "arccos" or exp.name == "arcsin" or exp.name == "arccot" or exp.name == "arcsec" or exp.name == "arccsc") then 
-            u = exp 
+        if exp:type() == TrigExpression and (exp.name == "arctan" or exp.name == "arccos" or exp.name == "arcsin" or exp.name == "arccot" or exp.name == "arcsec" or exp.name == "arccsc") then
+            u = exp
         else
             vp = vp * exp
         end
     end
 
-    if not u or u:freeof(symbol) then 
+    if not u or u:freeof(symbol) then
         goto skipI
     else
         vp = vp:autosimplify()
@@ -475,11 +475,11 @@ function IntegralExpression.partsmethod(expression, symbol)
     end
     ::skipI::
 
-    local u 
+    local u
     local vp = Integer.one()
     --looking for LATE
     for _, exp in ipairs(expression:subexpressions()) do
-        if exp:type() == Logarithm then 
+        if exp:type() == Logarithm then
             u = exp
         else
             vp = vp * exp
@@ -492,7 +492,7 @@ function IntegralExpression.partsmethod(expression, symbol)
         vp = vp:autosimplify()
     end
 
-    if vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then 
+    if vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
         local v = IntegralExpression.integrate(vp, symbol)
         if not v then
             goto skipL
@@ -528,7 +528,7 @@ function IntegralExpression.partsmethod(expression, symbol)
         vp = vp:autosimplify()
     end
 
-    if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then 
+    if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
         local results = {}
         while u ~= Integer.zero() do
             local v = IntegralExpression.integrate(vp, symbol)

@@ -75,11 +75,11 @@ function BinaryOperation:simplifyproductrec()
             end
 
             -- Uses the property that sqrt(a,r)*sqrt(b,r) = sqrt(a*b,r) if a,r are positive integers
-            if term1:type() == SqrtExpression and term2:type() == SqrtExpression and term1.expression:isconstant() and term2.expression:isconstant() and term1.root:type() == Integer then 
-                if term1.root == term2.root and term1.expression > Integer.zero() then 
+            if term1:type() == SqrtExpression and term2:type() == SqrtExpression and term1.expression:isconstant() and term2.expression:isconstant() and term1.root:type() == Integer then
+                if term1.root == term2.root and term1.expression > Integer.zero() then
                     local expression = term1.expression*term2.expression
                     local result = SqrtExpression(expression,term1.root):autosimplify()
-                    if result == Integer.one() then 
+                    if result == Integer.one() then
                         return BinaryOperation(BinaryOperation.MUL,{})
                     else
                         return BinaryOperation(BinaryOperation.MUL,{result})
@@ -87,19 +87,19 @@ function BinaryOperation:simplifyproductrec()
                 end
             end
 
-            --if term1.operation == BinaryOperation.POW and term2.operation == BinaryOperation.POW and term1.expressions[1]:type() == SqrtExpression and term2.expressions[1]:type() == SqrtExpression and term1.expressions[2]:type() == Integer and term2.expressions[2]:type() == Integer and term1.expressions[2] < Integer.zero() and term2.expressions[2] < Integer.zero() and term1.expressions[1].root == term2.expressions[1].root then 
+            --if term1.operation == BinaryOperation.POW and term2.operation == BinaryOperation.POW and term1.expressions[1]:type() == SqrtExpression and term2.expressions[1]:type() == SqrtExpression and term1.expressions[2]:type() == Integer and term2.expressions[2]:type() == Integer and term1.expressions[2] < Integer.zero() and term2.expressions[2] < Integer.zero() and term1.expressions[1].root == term2.expressions[1].root then
             --    local expo1 = term1.expressions[2]:neg()
             --    local expo2 = term2.expressions[2]:neg()
             --    local root = term1.expressions[1].root
             --    local expr1 = term1.expressions[1].expression
-            --    local expr2 = term2.expressions[1].expression 
+            --    local expr2 = term2.expressions[1].expression
             --    local result1 = BinaryOperation(BinaryOperation.POW,{SqrtExpression(expr1,root),expo1}):simplifypower()
             --    local result2 = BinaryOperation(BinaryOperation.POW,{SqrtExpression(expr2,root),expo2}):simplifypower()
             --    local result = BinaryOperation(BinaryOperation.MUL,{result1,result2}):autosimplify()
-            --    if result == Integer.one() then 
+            --    if result == Integer.one() then
             --        return BinaryOperation(BinaryOperation.MUL,{})
             --    end
-            --    if result:type() == Integer then 
+            --    if result:type() == Integer then
             --        return BinaryOperation(BinaryOperation.MUL,{Rational(Integer.one(),result)})
             --    end
             --    return BinaryOperation(BinaryOperation.MUL,{BinaryOperation(BinaryOperation.POW, {result,Integer(-1)})}):autosimplify()
@@ -206,12 +206,12 @@ function BinaryOperation:mergeproducts(other)
             return result
         end
         table.insert(result.expressions, 1, first.expressions[1])
-        
-        if result.operation == BinaryOperation.MUL and not result.expressions[3] and result.expressions[1] and result.expressions[2] then 
-            if result.expressions[1]:isconstant() and result.expressions[2]:isconstant() then 
+       
+        if result.operation == BinaryOperation.MUL and not result.expressions[3] and result.expressions[1] and result.expressions[2] then
+            if result.expressions[1]:isconstant() and result.expressions[2]:isconstant() then
                 return result:simplifyproductrec()
             end
-        end        
+        end       
         return result
     end
 
@@ -222,8 +222,8 @@ function BinaryOperation:mergeproducts(other)
         result = self:mergeproducts(BinaryOperation(other.operation, otherrest))
     end
     table.insert(result.expressions, 1, first.expressions[1])
-    if result.operation == BinaryOperation.MUL and not result.expressions[3] and result.expressions[1] and result.expressions[2] then 
-        if result.expressions[1]:isconstant() and result.expressions[2]:isconstant() then 
+    if result.operation == BinaryOperation.MUL and not result.expressions[3] and result.expressions[1] and result.expressions[2] then
+        if result.expressions[1]:isconstant() and result.expressions[2]:isconstant() then
             return result:simplifyproductrec()
         end
     end

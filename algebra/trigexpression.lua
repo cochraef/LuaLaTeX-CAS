@@ -171,7 +171,7 @@ function TrigExpression:autosimplify()
                 end
                return (sign*sqrt(Integer.one()-cos(expression)^Integer(2))):autosimplify()
             end
-            if self.name == "tan" then 
+            if self.name == "tan" then
                return (sin(expression) / cos(expression)):autosimplify()
             end
             if self.name == "sec" then

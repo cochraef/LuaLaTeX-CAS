@@ -120,7 +120,7 @@ end
 --- @param b IntegerModN
 --- @return IntegerModN
 function IntegerModN:pow(b)
-    return IntegerModN(Integer.powmod(self.element, b, self.modulus), self.modulus)
+    return IntegerModN(Integer.powmod(self.element, b.element, self.modulus), self.modulus)
 end
 
 -- Returns the multiplicative inverse of this number if it exists.

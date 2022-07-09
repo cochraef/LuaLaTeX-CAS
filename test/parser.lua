@@ -98,6 +98,7 @@ end
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
+-- sqrt = SQRT
 ln = LN
 log = LOG
 int = INT
@@ -221,6 +222,6 @@ end
 
 CASparse([[
     vars("x", "y", "z")
-    a = ((6 + ((1 + (2 * x)) * (-1 + (3 * x)))) * ((6 * y) + (-1 * z)))
-    print(int(a, x):autosimplify())
+    a = x^2
+    print(int(a,x):autosimplify())
 ]])

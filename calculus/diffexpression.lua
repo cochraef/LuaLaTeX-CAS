@@ -11,9 +11,9 @@ __DiffExpression = {}
 ----------------------------
 
 -- Creates a new derivative operation with the given symbols and expression.
---- @param expression Expression 
+--- @param expression Expression
 --- @param symbols Symbol
---- @return DiffExpression 
+--- @return DiffExpression
 function DiffExpression:new(expression,symbols)
     local o = {}
     local __o = Copy(__ExpressionOperations)
@@ -22,22 +22,22 @@ function DiffExpression:new(expression,symbols)
     o.degree   = #o.symbols
     o.expression = Copy(expression)
 
-    __o.__tostring = function(a) 
+    __o.__tostring = function(a)
         local varlist = '(d'
-        if a.degree == 1 then 
+        if a.degree == 1 then
             varlist = varlist .. '/d' .. tostring(a.symbols[1]) .. " " .. tostring(a.expression) .. ')'
         end
-        if a.degree > 1 then 
+        if a.degree > 1 then
             varlist = varlist .. '^' .. tostring(a.degree) .. '/'
             local varnum = 1
-            for index = 1, #a.symbols do 
-                local var = a.symbols[#a.symbols-index+1] 
-                if a.symbols[#a.symbols-index] == var then 
-                    varnum = varnum + 1 
+            for index = 1, #a.symbols do
+                local var = a.symbols[#a.symbols-index+1]
+                if a.symbols[#a.symbols-index] == var then
+                    varnum = varnum + 1
                     goto nextvar
                 end
-                if a.symbols[#a.symbols-index] ~=var then 
-                    if varnum == 1 then 
+                if a.symbols[#a.symbols-index] ~=var then
+                    if varnum == 1 then
                         varlist = varlist .. 'd' ..  tostring(var)
                     else
                         varlist = varlist .. 'd' ..  tostring(var) .. '^' .. tostring(varnum)
@@ -45,11 +45,11 @@ function DiffExpression:new(expression,symbols)
                     varnum = 1
                 end
                 ::nextvar::
-            end 
-            varlist = varlist .. " " .. tostring(a.expression) .. ')' 
-        end 
-        return varlist 
-    end 
+            end
+            varlist = varlist .. " " .. tostring(a.expression) .. ')'
+        end
+        return varlist
+    end
 
     __o.__index = DiffExpression
     __o.__eq = function(a, b)
@@ -57,7 +57,7 @@ function DiffExpression:new(expression,symbols)
         if not b:type() == DiffExpression then
             return false
         end
-        if a.expression ~= b.expression then 
+        if a.expression ~= b.expression then
             return false
         end
         local loc = 1
@@ -68,7 +68,7 @@ function DiffExpression:new(expression,symbols)
             end
             loc = loc + 1
         end
-        return true 
+        return true
     end
     o = setmetatable(o, __o)
 
@@ -79,7 +79,7 @@ end
 function DiffExpression:autosimplify()
     local simplified = self.expression:autosimplify()
 
-    for index,var in ipairs(self.symbols) do 
+    for index,var in ipairs(self.symbols) do
         simplified = DerivativeExpression(simplified,var):autosimplify()
     end
     return simplified
@@ -127,7 +127,7 @@ function DiffExpression:order(other)
         return false
     end
 
-    if self.degree < other.degree then 
+    if self.degree < other.degree then
         return true
     end
 
@@ -140,36 +140,36 @@ function DiffExpression:tolatex()
     if self.degree == 1 then
         varlist = varlist .. '\\mathrm{d}}{\\mathrm{d}' .. self.symbols[1]:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
     end
-    if self.degree > 1 then       
+    if self.degree > 1 then      
         local cvarlist = {}
         local count = 1
-        for index, var in ipairs(self.symbols) do 
-            if var == self.symbols[index+1] then 
+        for index, var in ipairs(self.symbols) do
+            if var == self.symbols[index+1] then
                 count = count + 1
             else
                 table.insert(cvarlist,{var,count})
                 count = 1
             end
-        end   
-        if #cvarlist == 1 then 
+        end  
+        if #cvarlist == 1 then
             varlist = varlist .. '\\mathrm{d}^{' .. self.degree .. '}}{' .. '\\mathrm{d}' .. cvarlist[1][1]:tolatex() .. '^{' .. self.degree .. '}'
         end
-        if #cvarlist > 1 then 
-            varlist = varlist .. '\\partial^{' .. self.degree .. '}}{' 
-            for index, varnum in ipairs(cvarlist) do 
+        if #cvarlist > 1 then
+            varlist = varlist .. '\\partial^{' .. self.degree .. '}}{'
+            for index, varnum in ipairs(cvarlist) do
                 var = cvarlist[#cvarlist - index+1][1]
                 num = cvarlist[#cvarlist - index+1][2]
-                if num == 1 then 
+                if num == 1 then
                     varlist = varlist .. '\\partial ' .. var:tolatex()
-                else 
+                else
                     varlist = varlist .. '\\partial ' .. var:tolatex() .. '^{' .. num .. '}'
                 end
             end
-        end 
+        end
         varlist = varlist .. '} \\left(' .. self.expression:tolatex() .. '\\right)'
-    end 
-    return varlist 
-end 
+    end
+    return varlist
+end
 
 -----------------
 -- Inheritance --
@@ -185,13 +185,13 @@ DiffExpression = setmetatable(DiffExpression, __DiffExpression)
 
 diff = function(expression,...)
     local symbols = {}
-    for i = 1, select("#",...) do 
+    for i = 1, select("#",...) do
         local var = select(i,...)
-        if #var == 0 then 
-            table.insert(symbols,var) 
+        if #var == 0 then
+            table.insert(symbols,var)
         end
-        if #var > 0 then 
-            for index=1, RR(var[2]) do 
+        if #var > 0 then
+            for index=1, RR(var[2]) do
                 table.insert(symbols,var[1])
             end
         end

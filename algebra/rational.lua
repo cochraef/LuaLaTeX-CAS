@@ -52,7 +52,6 @@ function Rational:new(n, d, keep)
 end
 
 --- Reduces a rational expression to standard form.
---- @return Rational
 function Rational:reduce()
     if self.denominator < Integer.zero() then
         self.denominator = -self.denominator
