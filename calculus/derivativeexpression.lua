@@ -336,7 +336,7 @@ end
 function DiffExpression:tolatex()
     local varlist = '\\frac{'
     if self.degree == 1 then
-        varlist = varlist .. '\\mathrm{d}}{\\mathrm{d}' .. self.symbols[1]:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
+        varlist = varlist .. 'd}{d' .. self.symbols[1]:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
     end
     if self.degree > 1 then       
         local cvarlist = {}
@@ -350,7 +350,7 @@ function DiffExpression:tolatex()
             end
         end   
         if #cvarlist == 1 then 
-            varlist = varlist .. '\\mathrm{d}^{' .. self.degree .. '}}{' .. '\\mathrm{d}' .. cvarlist[1][1]:tolatex() .. '^{' .. self.degree .. '}'
+            varlist = varlist .. 'd^{' .. self.degree .. '}}{' .. 'd' .. cvarlist[1][1]:tolatex() .. '^{' .. self.degree .. '}'
         end
         if #cvarlist > 1 then 
             varlist = varlist .. '\\partial^{' .. self.degree .. '}}{' 

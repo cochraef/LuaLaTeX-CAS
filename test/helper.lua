@@ -26,6 +26,9 @@
     if a:type() == DerivativeExpression then 
         return "DervExp"
     end
+    if a:type() == DiffExpression then 
+        return "DiffExp" 
+    end
     return "No Clue"
 end 
 
@@ -65,6 +68,9 @@ function nameof(sym)
     end
     if sym:type() == DerivativeExpression then 
         return "D"
+    end
+    if sym:type() == DiffExpression then 
+        return "Diff" 
     end
     return "No Clue"
 end
