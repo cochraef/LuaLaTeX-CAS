@@ -511,7 +511,11 @@ function BinaryOperation:tolatex()
             out = '-' .. self.expressions[1]:tolatex()
         else
             for index, expression in ipairs(self.expressions) do
-                out = out .. expression:tolatex()
+                if expression.operation and (expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB) and index >1 then 
+                    out = out .. "\\left(" .. expression:tolatex() .. "\\right)"
+                else
+                    out = out .. expression:tolatex()
+                end
                 if self.expressions[index + 1] then
                     out = out .. '-'
                 end
