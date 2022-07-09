@@ -51,4 +51,25 @@ $\print{c}$
 \end{CAS}
 \[ \print*{f} = \print{f} \] 
 \vprint*{f}
+
+\begin{CAS}
+    vars('x','h')
+\end{CAS}
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+\end{CAS}
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (f:substitute(subs) - f)/h
+\end{CAS}
+
+\[ \print*{q} \]
+
+\[ \print{q} \] 
+
 \end{document}

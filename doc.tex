@@ -128,6 +128,48 @@ That's it.
 
 \subsection{Beginner}
 
+Alice is teaching calculus, and she wants to give her students many examples of the dreaded \emph{limit definition of the derivative}. On the other hand, she'd like to avoid working out many examples by-hand. She decides to give \texttt{luacas} a try.
+
+Alice can access the \texttt{luacas} program using a custom environment: \mintinline{latex}{\begin{CAS}..\end{CAS}}. The first thing Alice does is declare variables that will be used:
+\inputminted[
+    firstline=55,
+    lastline=57,
+    breaklines]
+    {latex}
+    {demo.tex}
+Alice decides that $f$, the function to be differentiated, should be $x^2$. So Alice makes this assignnment with:
+\inputminted[
+    firstline=59,
+    lastline=62,
+    breaklines]
+    {latex}
+    {demo.tex}
+Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} functionality of \texttt{luacas}:
+\inputminted[
+    firstline=64,
+    lastline=69,
+    breaklines]
+    {latex}
+    {demo.tex}
+Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$. For this, she uses the \mintinline{latex}{\print*} command:
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (f:substitute(subs) - f)/h
+\end{CAS}
+\begin{codebox}
+    \inputminted[
+    firstline=71,
+    lastline=71,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \[ \print*{q} \] 
+\end{codebox}
+
+
 \subsection{Intermediate}
 
 \subsection{Advanced}
@@ -164,6 +206,17 @@ The following pacakages are required for various macros:
 \inputminted[
     firstline=27,
     lastline=32,
+    breaklines,
+    linenos,
+    numbersep=5pt]
+    {latex}
+    {luacas.sty}
+
+The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between the Lua program and \LaTeX{}. 
+
+\inputminted[
+    firstline=35,
+    lastline=37,
     breaklines,
     linenos,
     numbersep=5pt]
