@@ -66,10 +66,14 @@ Here is the evaluated tree for $\print{g}$:
 \end{asypicture}
 
 \luaexec{
-    vars("x","f")
+    vars("x","f","foo")
     a = f(x*x)
+    b = foo(x*x)
 }
 $\print{DD(a,x)}$
+
+$\print{DD(DD(b,x),x)}$
+
 
 \begin{CAS}
     a = x^4 -1

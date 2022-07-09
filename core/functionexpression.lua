@@ -143,8 +143,15 @@ function FunctionExpression:tolatex()
     if self:type() == TrigExpression then
         out = "\\" .. out
     end
-    if self:type() ~= TrigExpression and string.len(self.name)>1 then 
-        out = '\\operatorname{' .. out .. '}'
+    if self:type() ~= TrigExpression and string.len(self.name)>1 then
+        if out:sub(2,2) ~= "'" then 
+            local fp = out:find("'")
+            if fp then 
+                out = '\\operatorname{' .. out:sub(1,fp-1) .. '}' .. out:sub(fp,-1)
+            else
+                out = '\\operatorname{' .. out .. '}'
+            end
+        end
     end
     out = out .. '\\left('
     for index, expression in ipairs(self:subexpressions()) do
