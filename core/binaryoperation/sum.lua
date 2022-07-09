@@ -59,7 +59,7 @@ function BinaryOperation:simplifysumrec()
                     revertterm1 = true
                     findex = 1
                 end
-                if not term2.expressions[1]:isconstant() then 
+                if not term2.expressions[1]:isconstant() then
                     revertterm2 = true
                     sindex = 1
                 end
@@ -67,7 +67,7 @@ function BinaryOperation:simplifysumrec()
                     local result
                     if not revertterm1 and not revertterm2 then
                         result = BinaryOperation(
-                            BinaryOperation.ADD, 
+                            BinaryOperation.ADD,
                             {term1.expressions[1],term2.expressions[1]}
                         )
                     end
@@ -111,11 +111,11 @@ function BinaryOperation:simplifysumrec()
             end
             if ArrayEqual(term1.expressions, term2.expressions, 2) then
                 local result = BinaryOperation(
-                    BinaryOperation.ADD, 
+                    BinaryOperation.ADD,
                     {term1.expressions[1],term2.expressions[1]}
                 )
                 result = result:autosimplify()
-                for i=2,#term1.expressions do 
+                for i=2,#term1.expressions do
                     result = BinaryOperation(
                         BinaryOperation.MUL,
                         {result,term1.expressions[i]}

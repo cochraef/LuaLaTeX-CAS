@@ -55,30 +55,29 @@ function SqrtExpression:order(other)
         return false
     end
 
-    if other:type() == SymbolExpression then 
+    if other:type() == SymbolExpression then
         return self.expression:order(other)
     end
 
-    if other:type() == BinaryOperation then 
-        if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then 
+    if other:type() == BinaryOperation then
+        if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then
             return BinaryOperation(other.operation,{self}):order(other)
         end
 
-        if other.operation == BinaryOperation.POW then 
+        if other.operation == BinaryOperation.POW then
             return (self ^ Integer.one()):order(other)
         end
     end
 
-    if other:type() ~= SqrtExpression then 
+    if other:type() ~= SqrtExpression then
         return true
     end
 
-    if other:type() == SqrtExpression then 
-        if self.expression == other.expression then 
-            return self.root:order(other.root)
-        end
-        return self.expression:order(other.expression)
+
+    if self.expression == other.expression then
+        return self.root:order(other.root)
     end
+    return self.expression:order(other.expression)
 end
 
 function SqrtExpression:topower()
@@ -91,20 +90,20 @@ function SqrtExpression:autosimplify()
     local expression = self.expression:autosimplify()
     local root = self.root:autosimplify()
 
-    if root == Integer.one() then 
+    if root == Integer.one() then
         return expression
     end
 
-    if root:type() == Rational then 
+    if root:type() == Rational then
         return SqrtExpression(BinaryOperation(BinaryOperation.POW,{expression,root.denominator}):autosimplify(), root.numerator):autosimplify()
     end
 
-    if not root:isconstant() then 
+    if not root:isconstant() then
         return BinaryOperation(BinaryOperation.POW,{expression,Integer.one() / root}):autosimplify()
     end
 
     if not expression:isconstant() then
-        if expression.operation == BinaryOperation.MUL and expression.expressions[1]:isconstant() then 
+        if expression.operation == BinaryOperation.MUL and expression.expressions[1]:isconstant() then
             local coeff = SqrtExpression(expression.expressions[1],root):autosimplify()
             expression.expressions[1] = BinaryOperation(BinaryOperation.MUL,{Integer.one()})
             expression = expression:autosimplify()
@@ -115,25 +114,25 @@ function SqrtExpression:autosimplify()
         return BinaryOperation(BinaryOperation.POW,{expression,Integer.one() / root}):autosimplify()
     end
 
-    if expression:type() == Rational then 
+    if expression:type() == Rational then
         local result = BinaryOperation(BinaryOperation.MUL, {SqrtExpression(expression.numerator,root):autosimplify(),BinaryOperation(BinaryOperation.POW,{SqrtExpression(expression.denominator,root):autosimplify(),Integer(-1)})})
         return result:autosimplify()
     end
 
     if expression:type() == Integer then
-        if expression == Integer.zero() then 
+        if expression == Integer.zero() then
             return Integer.zero()
         end
         if expression == Integer.one() then
             return Integer.one()
         end
         if expression < Integer.zero() then
-            if root == Integer(2) then 
+            if root == Integer(2) then
                 local result = SqrtExpression(expression:neg(),root):autosimplify()
                 result = I*result
                 return result:autosimplify()
             end
-            if root % Integer(2) == Integer.one() then 
+            if root % Integer(2) == Integer.one() then
                 local result = SqrtExpression(expression:neg(),root):autosimplify()
                 result = -result
                 return result:autosimplify()
@@ -143,32 +142,32 @@ function SqrtExpression:autosimplify()
         local coeffresult = {}
         local exprresult  = {}
         local reduction = root
-        for _, term in ipairs(primes.expressions) do 
+        for _, term in ipairs(primes.expressions) do
             local primepower = term.expressions[2]
             reduction = Integer.gcd(primepower,reduction)
-            if reduction == Integer.one() then 
-                goto skip 
+            if reduction == Integer.one() then
+                goto skip
             end
         end
         ::skip::
         local newroot = root / reduction
-        for index, term in ipairs(primes.expressions) do 
+        for index, term in ipairs(primes.expressions) do
             local prime      = term.expressions[1]
             local primepower = term.expressions[2] / reduction
-            local coeffpower = primepower // newroot   
+            local coeffpower = primepower // newroot  
             coeffresult[index] = prime ^ coeffpower
             local exprpower  = primepower - coeffpower*newroot
             exprresult[index]  = prime ^ exprpower
         end
         local newexpression = BinaryOperation(BinaryOperation.MUL,exprresult):autosimplify()
         local coeff      = BinaryOperation(BinaryOperation.MUL,coeffresult):autosimplify()
-        if coeff == Integer.one() then 
-            if reduction == Integer.one() then 
+        if coeff == Integer.one() then
+            if reduction == Integer.one() then
                 goto stop
             end
             return SqrtExpression(newexpression,newroot)
         end
-        if newroot == Integer.one() then 
+        if newroot == Integer.one() then
             return coeff
         end
         return BinaryOperation(BinaryOperation.MUL,{coeff,SqrtExpression(newexpression,newroot)}):autosimplify()
@@ -198,8 +197,8 @@ end
 
 function SqrtExpression:tolatex()
     local printout = '\\sqrt'
-    if self.root == Integer(2) then 
-        printout = printout .. '{' .. self.expression:tolatex() .. '}' 
+    if self.root == Integer(2) then
+        printout = printout .. '{' .. self.expression:tolatex() .. '}'
     else
         printout = printout .. '[' .. self.root:tolatex() .. ']' .. '{' .. self.expression:tolatex() .. '}'
     end

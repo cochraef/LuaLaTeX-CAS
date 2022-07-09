@@ -415,14 +415,14 @@ end
 
 function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.POW then
-        if self.expressions[2]:type() == Integer and self.expressions[2] < Integer.zero() then 
+        if self.expressions[2]:type() == Integer and self.expressions[2] < Integer.zero() then
             local base = self.expressions[1]
             local exponent = self.expressions[2]
-            if exponent == Integer(-1) then 
-                return "\\frac{1}{" .. base:tolatex() .. "}" 
+            if exponent == Integer(-1) then
+                return "\\frac{1}{" .. base:tolatex() .. "}"
             else
-                if base:isatomic() then 
-                    return "\\frac{1}{" .. base:tolatex() .. "^{" .. exponent:neg():tolatex() .. "}}" 
+                if base:isatomic() then
+                    return "\\frac{1}{" .. base:tolatex() .. "^{" .. exponent:neg():tolatex() .. "}}"
                 else
                     return "\\frac{1}{\\left(" .. base:tolatex() .. "\\right)^{" .. exponent:neg():tolatex() .. "}}"
                 end
@@ -467,12 +467,12 @@ function BinaryOperation:tolatex()
             else
                 if expression == Integer(-1) then
                     out = out .. '-'
-                elseif expression:type() == Rational and expression.numerator == Integer.one() then 
+                elseif expression:type() == Rational and expression.numerator == Integer.one() then
                     denom = denom .. expression.denominator:tolatex()
-                elseif expression:type() == Rational and expression.numerator == Integer(-1) then 
+                elseif expression:type() == Rational and expression.numerator == Integer(-1) then
                     out = out .. '-'
                     denom = denom .. expression.denominator:tolatex()
-                elseif expression:type() == Rational then 
+                elseif expression:type() == Rational then
                     out = out .. expression.numerator:tolatex()
                     denom = denom .. expression.denominator:tolatex()
                 else
@@ -484,7 +484,7 @@ function BinaryOperation:tolatex()
             sign = '-'
             out = string.sub(out,2,-1)
         end
-        if denom ~= '' and out == '' then 
+        if denom ~= '' and out == '' then
             return sign .. '\\frac{' .. '1' .. '}{' .. denom .. '}'
         end
         if denom ~= '' then
@@ -507,7 +507,7 @@ function BinaryOperation:tolatex()
     end
     if self.operation == BinaryOperation.SUB then
         local out = ''
-        if not self.expressions[2] then 
+        if not self.expressions[2] then
             out = '-' .. self.expressions[1]:tolatex()
         else
             for index, expression in ipairs(self.expressions) do

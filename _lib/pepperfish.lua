@@ -1,3 +1,4 @@
+---@diagnostic disable: param-type-mismatch, lowercase-global, need-check-nil, assign-type-mismatch
 --[[
 
 == Introduction ==

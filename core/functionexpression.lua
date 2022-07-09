@@ -119,7 +119,7 @@ function FunctionExpression:order(other)
         return true
     end
 
-    if other:type() == SqrtExpression then 
+    if other:type() == SqrtExpression then
         return false
     end
 
@@ -144,9 +144,9 @@ function FunctionExpression:tolatex()
         out = "\\" .. out
     end
     if self:type() ~= TrigExpression and string.len(self.name)>1 then
-        if out:sub(2,2) ~= "'" then 
+        if out:sub(2,2) ~= "'" then
             local fp = out:find("'")
-            if fp then 
+            if fp then
                 out = '\\operatorname{' .. out:sub(1,fp-1) .. '}' .. out:sub(fp,-1)
             else
                 out = '\\operatorname{' .. out .. '}'
