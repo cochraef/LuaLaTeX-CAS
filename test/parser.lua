@@ -83,15 +83,7 @@ function factor(exp)
     return exp:autosimplify():factor()
 end
 
-function expand(exp,full)
-    full = full or false
-    if full then
-        local newexp = exp:autosimplify():expand()
-        while newexp ~= exp do 
-            newexp = newexp:autosimplify():expand()
-        end
-        return newexp
-    end
+function expand(exp)
     return exp:autosimplify():expand()
 end
 
