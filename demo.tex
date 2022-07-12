@@ -65,7 +65,7 @@ $\print{c}$
     vars('x','h')
     f = x^2
     subs = {[x]=x+h}
-    q = (f:substitute(subs) - f)/h
+    q = (substitute(subs,f) - f)/h
 \end{CAS}
 
 \[ \print*{q} \]
@@ -74,8 +74,8 @@ $\print{c}$
     vars('x','h')
     f = x^2
     subs = {[x]=x+h}
-    q = (f:substitute(subs) - f)/h
-    q = q:expand()
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
 \end{CAS}
 \[ \print*{q} \]
 
@@ -83,9 +83,9 @@ $\print{c}$
     vars('x','h')
     f = x^2
     subs = {[x]=x+h}
-    q = (f:substitute(subs) - f)/h
-    q = q:expand()
-    q = q:expand()
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
+    q = expand(q)
 \end{CAS}
 \[ \print*{q} \]
 
@@ -93,11 +93,11 @@ $\print{c}$
     vars('x','h')
     f = x^2
     subs = {[x]=x+h}
-    q = (f:substitute(subs) - f)/h
-    q = q:expand()
-    q = q:expand()
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
+    q = expand(q)
     subs = {[h] = 0}
-    q = q:substitute(subs)
+    q = substitute(subs,q)
 \end{CAS}
 \[ \print*{q} \]
 
@@ -105,12 +105,12 @@ $\print{c}$
     vars('x','h')
     f = x^2
     subs = {[x]=x+h}
-    q = (f:substitute(subs) - f)/h
-    q = q:expand()
-    q = q:expand()
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
+    q = expand(q)
     subs = {[h] = 0}
-    q = q:substitute(subs)
-    q = q:simplify()
+    q = substitute(subs,q)
+    q = simplify(q)
 \end{CAS}
 \[ \print*{q} \]
 
@@ -120,23 +120,23 @@ $\print{c}$
 \end{CAS}
 Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
 \begin{CAS}
-    subs = {[x] = x+h}
-    q = (f:substitute(subs) - f)/h
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
 \end{CAS}
 \[ \begin{aligned}
     \print*{q} &= 
     \begin{CAS} 
-        q = q:expand() 
+        q = expand(q) 
     \end{CAS}
     \print*{q}& &\text{expand/simplify numerator} \\
     &= 
     \begin{CAS}
-        q = q:expand() 
+        q = expand(q) 
     \end{CAS}
     \print*{q}& &\text{distribute denominator} \\ 
     \begin{CAS}
         subs = {[h]=0}
-        q = q:substitute(subs)
+        q = substitute(subs,q)
     \end{CAS}
     &\xrightarrow{h\to 0} \print{q}& &\text{take limit.}
 \end{aligned} \] 

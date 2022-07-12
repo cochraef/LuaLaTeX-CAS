@@ -146,7 +146,7 @@ Alice decides that $f$, the function to be differentiated, should be $x^2$. So A
     breaklines]
     {latex}
     {demo.tex}
-Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} functionality of \texttt{luacas}:
+Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} command of \texttt{luacas}:
 \inputminted[
     firstline=64,
     lastline=69,
@@ -158,7 +158,7 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     vars('x','h')
     f = x^2
     subs = {[x]=x+h}
-    q = (f:substitute(subs) - f)/h
+    q = (substitute(subs,f)- f)/h
 \end{CAS}
 \begin{codebox}
     \inputminted[
@@ -170,7 +170,7 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     \tcblower
     \[ \print*{q} \] 
 \end{codebox}
-So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{:expand()} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=q:expand()}, and prints the result to see if things worked as expected:
+So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{expand} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=expand(q)}, and prints the result to see if things worked as expected:
 \begin{codebox}
     \inputminted[
     firstline=73,
@@ -180,7 +180,7 @@ So far so good! Alice wants to expand the numerator of $q$; she finds the aptly 
     {demo.tex}
     \tcblower
     \begin{CAS}
-        q = q:expand()
+        q = expand(q)
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
@@ -194,7 +194,7 @@ Alice is pleasantly surprised that the result of the expansion has been autosimp
     {demo.tex}
     \tcblower
     \begin{CAS}
-        q = q:expand()
+        q = expand(q)
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
@@ -213,7 +213,7 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{:simplify()} method. This does the trick: adding the line \mintinline{lua}{q = q:simplify()} before leaving the \texttt{CAS} environment returns the expected $2x$.
+Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{simplify} command. This does the trick: adding the line \mintinline{lua}{q = simplify(q)} before leaving the \texttt{CAS} environment returns the expected $2x$.
 
 Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{:simplify()} method the content of the argument. 
 
