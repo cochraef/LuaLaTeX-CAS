@@ -5,6 +5,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[shortlabels]{enumitem}
 
+\usepackage[textsize=scriptsize]{todonotes}
 \usepackage{tikz}
 \usepackage{minted}
 %\usemintedstyle{pastie}
@@ -144,13 +145,14 @@ Alice decides that $f$, the function to be differentiated, should be $x^2$. So A
     breaklines]
     {latex}
     {demo.tex}
-Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} functionality of \texttt{luacas}:
+Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} functionality of \todo{Do we want easier syntax for substitution? I think using syntax unique to Lua might be confusing for new users.} \texttt{luacas}:
 \inputminted[
     firstline=64,
     lastline=69,
     breaklines]
     {latex}
     {demo.tex}
+\todo{that's a good idea, maybe subs([x]=x+h,f) works?}
 Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$. For this, she uses the \mintinline{latex}{\print*} command. 
 \begin{CAS}
     vars('x','h')
@@ -168,7 +170,7 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     \tcblower
     \[ \print*{q} \] 
 \end{codebox}
-So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{:expand()} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=q:expand()}, and prints the result to see if things worked as expected:
+So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{:expand()} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=q:expand()}, and prints the result to see if things worked as expected: \todo{Same thing here - the parser has a \texttt{expand()} function, so using \texttt{expand(q)} instead of \texttt{q:expand()} might be better.}
 \begin{codebox}
     \inputminted[
     firstline=73,
@@ -182,7 +184,7 @@ So far so good! Alice wants to expand the numerator of $q$; she finds the aptly 
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is pleasantly surprised that the result of the expansion has been autosimplified, i.e., the $x^2$ and $-x^2$ came to $0$ which was omitted from the expression altogether. Now, Alice wants to distribute the $h$ in the denominator; this requires another expansion. 
+iAlice is pleasantly surprised that the result of the expansion has been autosimplified, i.e., the $x^2$ and $-x^2$ came to $0$ which was omitted from the expression altogether. Now, Alice wants to distribute the $h$ in the denominator; this requires another expansion.  \todo{Maple only needs one expand to fully expand this into $h+2x$ instead of two. If that would be better, I can fix this is the code.}
 \begin{codebox}
     \inputminted[
     firstline=82,
@@ -196,6 +198,7 @@ Alice is pleasantly surprised that the result of the expansion has been autosimp
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
+\todo{I sort of like the extra control, but maybe an option like expand(q,full)?}
 Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded (twice) and simplified (automatically), this amounts to another substitution:
 \begin{codebox}
     \inputminted[
@@ -211,7 +214,7 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{:simplify()} method:
+Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{:simplify()} method \todo{Use \texttt{simplify(q)}?}:
 \begin{codebox}
     \inputminted[
     firstline=104,
@@ -225,7 +228,7 @@ Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{:simplify()} method the content of the argument. 
+Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{:simplify()} method the content of the argument. \todo{I don't know if we want to address the nuances of autosimplification vs. simplification in a first example. Using print instead of print* from the begining may be better, since end users are generally going to want nice-looking autosimplified output.}
 
 Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}. Here's the final product of Alice's efforts:
 
@@ -360,27 +363,74 @@ The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between th
     
 \section{Lua Documentation}
 
-This section assumes some familiarity with the programming language Lua and with object-oriented programming. For a comprehensive introduction to Lua, we refer the reader to \cite{pil}. This section is geared towards for those who are interested in the inner design, as opposed to the algorithms or mathematics, of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
+This section assumes some familiarity with the programming language Lua and with object-oriented programming. This section is geared towards those who are interested in the inner design, as opposed to the algorithms or mathematics, of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
 
 This computer algebra system is written in object-oriented Lua. Lua does not have built-in object-oriented features, but using metatables we can simulate much of the oo functionality of a language like Java. Every class in the CAS inherits from the {\ttfamily Expression} interface. Expressions are really trees, and may have any number of sub-expressions as children depending on the type of the expression.
 
-Most operations that a user would want to apply to expressions, such as derivatives and integrals, are encapsulated into their own classes. These classes have the expressions that these operations are applied to as instance variables. The other kind of operations on expressions are \emph{core methods}, which are methods in the objected-oriented sense, and can be called on expressions using the {\ttfamily :} syntax as is typical in Lua. The rule of thumb is that if there is standard mathematical notation for an operation or function represented by the CAS, it gets its own class, and if not, it is a core method. This way, every Lua expression corresponds to something that can be cleanly displayed in \LaTeX{}.
+Most operations that a user would want to apply to expressions, such as derivatives and integrals, are encapsulated into their own classes. These classes have the expressions that these operations are applied to as instance variables. Other kinds of operations on expressions are \emph{core methods}, which are methods in the objected-oriented sense, and can be called on expressions using the {\ttfamily :} syntax as is typical in Lua. The rule of thumb is that if there is standard mathematical notation for an operation or function represented by the CAS, it gets its own class, and if not, it is a core method. This way, every Lua expression corresponds to something that can be cleanly displayed in \LaTeX{}. Individual classes may also have methods unique to that class.
+
+\subsection{Expression Types}
+
+There are a sizeable number of expression types currently in the CAS. They are spread across the core, algebra, and calculus packages. If an expression has no possible sub-expressions, it is called \emph{atomic}. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both subinterfaces to expressions, and all classes inherit from one of those interfaces.
+
+A list of atomic expressions and their constructors are provided below.
+
+\begin{itemize}
+    \item {\ttfamily SymbolExpression(symbol)} takes a string and converts it into a symbol that represents an arbitrary value, such as $x$.
+    
+    \item {\ttfamily Integer(n)} takes a string or number and converts it into an arbitrary-precision integer, such as $-12$.
+    
+    \item {\ttfamily Rational(n, d)} takes an {\ttfamily Integer} numerator and denominator and constructs a rational number in reduced form, such as $\frac{3}{8}$. It may also take polynomial numerators and denominators, in which case it returns an element in the field of fractions over that polynomial ring, such as $\frac{x^2+3}{x-1}$. The {\ttfamily /} operator on two integers or polynomials can also be used to create a rational.
+    
+    \item {\ttfamily IntegerModN(i, n)} takes an {\ttfamily Integer} number and an {\ttfamily Integer} modulus and creates an element in the ring $\mathbf{Z}_n$, such as $4\mod 17$.
+    
+    \item {\ttfamily PolynomialRing(coefficients, symbol)} takes a list of coefficients in some ring and a symbol and produces a polynomial with those coefficients in a ring adjoined to that symbol, such as $5x^2-\frac{3}{2}x+\frac{1}{7}$.
+\end{itemize}
+
+Integers, rationals (not rational expressions), and integers mod an integer are \emph{constant expressions}, and inherit from the {\ttfamily ConstantExpression} interface. Those three expressions as well as polynomials and rational expressions inherit from the {\ttfamily Ring} interface.
+
+A list of compound expressions and their constructors are provided below.
+
+\begin{itemize}
+    \item {\ttfamily BinaryOperation(operation, expressions)} takes a function and a list of expressions and creates an expression with that function as its operation, such as $3+2^{x-1}$. Associative binary operations may have any number of subexpressions, while non-associative binary operations must have exactly two subexpressions. The currently implemented binary operations are the ring operations $+$, $-$, $\times$, $\wedge$, $/$, $\%$, and $//$.
+    
+    \item {\ttfamily FunctionExpression(name, expressions)} takes a string name and a list of expressions and creates a generic function with its subexpressions as arguments, such as $f(3, y^2)$. 
+    
+    \item {\ttfamily AbsExpression(expression)} takes an expression and returns the absolute value of that expression, such as $|z|$.
+    
+    \item {\ttfamily SqrtExpression(expression, root)} takes two expressions and returns a root expression such as $\sqrt{3x+1}$. If {\ttfamily root} is ommited, it defaults to 2.
+    
+    \item {\ttfamily Logarithm(base, expression)} takes two expressions and returns a log expression such as $\log_2(x)$.
+    
+    \item {\ttfamily TrigExpression(name, expression)} takes a string name and expression and returns the appropriate trigonometric function applied to {\ttfamily expression}, such as $\sin(x)$. {\ttfamily TrigExpression} is a subclass of {\ttfamily FunctionExpression}. Valid trigonometric functions are sin, cos, tan, csc, sec, cot, arcsin, arccos, arctan, arccsc, arcsec, and arccot.
+    
+    \item {\ttfamily RootExpression(expression)} takes an expression and returns an expression representing the roots of the equation {\ttfamily expression} $= 0$, such as RootOf$(x^5+x-1)$.
+    
+    \item {\ttfamily DerivativeExpression(expression, symbol)} takes an expression and symbol and returns an expression for the single-variable derrivative of that expression with respect to the given symbol, such as $\frac{\mathrm{d}}{\mathrm{d}x}(x^y)$.
+    
+    \item {\ttfamily DiffExpression(expression, symbols)} takes an expression and list of symbols and returns an expression for the higher-order partial derivative of that expression with respect to each symbol, such as $\frac{\partial}{\partial x \partial y}x^y$.
+    
+    \item {\ttfamily IntExpression(expression, symbol)} takes an expression and symbol and returns an expression for the indefinite integral of the expression with respect to the given symbol, such as $\int \cos(x) \hspace{2pt} \mathrm{d}x$.
+    
+    \item {\ttfamily IntExpression(expression, symbol, lower, upper)} takes an expression and symbol and returns an expression for the definite integral of the expression with respect to the given symbol and bounds, such as $\int_{-2}^2 \cos(x) \hspace{2pt} \mathrm{d}x$.
+\end{itemize}
 
 
 \subsection{Core Methods}
 
 All of the following core methods can be applied to any expression, and are defined in the {\ttfamily expression.lua} interface.
 
+
 \begin{itemize}
-    \item {\ttfamily evaluate()} applies an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerrivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
+    \item {\ttfamily evaluate()} applies an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerrivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to $+$ returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
     
     \item {\ttfamily autosimplify()} performs fast simplification techniques on an expression. All input from the \LaTeX{} end and everything output to the \LaTeX{} end is autosimplified. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method also calls the {\ttfamily evaluate()} method.
     
-    \item {\ttfamily simplify()} performs full simplification of an expression. This may involve polynomial factorization, which is slow, so this is seperate from autosimplification and not called on the \LaTeX{} end unless the user specifically directs the CAS to simplify.
+    \item {\ttfamily simplify()} performs full simplification of an expression. This may involve polynomial factorization, which is slow, so this is seperate from autosimplification and not called on the \LaTeX{} end unless the user specifically directs the CAS to simplify. The {\ttfamily simplify()} method also calls the {\ttfamily autosimplify()} method.
     
-    \item {\ttfamily subexpressions()} returns a list of all subexpressions of an expression. This gives a unified interface to the fields of objects, which have different names across classes.
+    \item {\ttfamily subexpressions()} returns a list of all subexpressions of an expression. This gives a unified interface to the fields of subexpressions, which have different names across classes.
     
-    \item {\ttfamily size()} returns the number of nodes of the tree that constitutes an expression, roughly or the total number of expression objects that make up the expression.
+    \item {\ttfamily size()} returns the number of nodes of the tree that constitutes an expression, roughly the total number of expression objects that make up the expression.
     
     \item {\ttfamily setsubexpressions(subexpressions)} creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
     
@@ -392,15 +442,17 @@ All of the following core methods can be applied to any expression, and are defi
     
     \item {\ttfamily factor()} factors an expression, turning products of sums into sums of products.
     
-    \item {\ttfamily isatomic()} determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
+    \item {\ttfamily isatomic()} determines whether an expression is atomic.
     
-    \item {\ttfamily isconstant()} determines whether an expression is atomic and contains no variables. See Section B.2 for more details.
+    \item {\ttfamily isconstant()} determines whether an expression is atomic and contains no variables.
     
     \item {\ttfamily isrealconstant()} determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$.
     
     \item {\ttfamily iscomplexconstant()} determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$.
     
-    \item {\ttfamily tolatex()} converts an expression to \LaTeX{} code.
+    \item {\ttfamily topolynomial()} attempts to convert a compound expression to a monovariate polynomial with type {\ttfamily PolynomialRing}.
+    
+    \item {\ttfamily tolatex()} converts an expression to string \LaTeX{} code.
 \end{itemize}
 
 The number of core methods should generally be kept small, since every new type of expression must implement all of these methods. The exception to this, of course, is core methods that call other core methods that provide a unified interface to expressions. For instance, {\ttfamily size()} calls {\ttfamily subexpressions()}, so it only needs to be implemented in the expression interface.
@@ -413,17 +465,72 @@ All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamil
     \item {\ttfamily \_\_eq} determines whether an expression is structurally identical to another expression.
 \end{itemize}
 
-\subsection{Algebra Package}
+\subsection{Ring Methods}
 
-The algebra package contains functionality for arbitrary-precision arithmetic, polynomial arithmetic and factoring, symbolic root finding, and logarithm and trigonometric expression classes. It requires the core package to be loaded. There are a couple of features of note in this package.
+For those that wish to expand the algebraic structures the CAS is equipped with, the algebra packages come with interfaces for basic operations on rings and conversions between rings. This subsection assumes some familiarity with algebraic structures such as rings, Euclidean domains, and fields.
 
-\subsection{Calculus Package}
+Each ring, domain, and field operation also has a corresponding metamethod to use as a shorthand. These metamethods are generic, and handle converting input arguments. The regular methods assume all arguments are part of the same ring.
 
-The calculus package contains expression types for integration and differentiation. It requires both the algebra and core packages to be loaded. There isn't anything special going on in this package from a design perspective, so we don't have much to say for this section.
+The ring operations and corresponding metamethods are:
 
-\subsection{Constructing Expressions \& Basic Parsing}
+\begin{itemize}
+    \item {\ttfamily a:add(b)} ({\ttfamily a + b}) adds {\ttfamily a} and {\ttfamily b}.
+    \item {\ttfamily a:sub(b)} ({\ttfamily a - b}) subtracts {\ttfamily b} from {\ttfamily a}.
+    \item {\ttfamily a:neg()} ({\ttfamily -a}) returns the additive inverse of {\ttfamily a}.
+    \item {\ttfamily a:mul(b)} ({\ttfamily a * b}) multiplies {\ttfamily a} and {\ttfamily b}.
+    \item {\ttfamily a:pow(n)} ({\ttfamily a \wedge{} n}) raises {\ttfamily a} to the power of an integer {\ttfamily n}.
+    \item {\ttfamily a:eq(b)} ({\ttfamily a == b}) returns whether {\ttfamily a} and b are the same element of a ring.
+    \item {\ttfamily a:lt(b)} ({\ttfamily a < b}) returns whether {\ttfamily a} is less than {\ttfamily b} under some total order on ring elements. Implementation of this method is not necessary if no natural total order exists on the given ring. 
+    \item {\ttfamily a:le(b)} ({\ttfamily a <= b}) returns whether {\ttfamily a} is less than or equal to {\ttfamily b} under some total order on ring elements. Implementation of this method is not necessary if no natural total order exists on the given ring.
+    \item {\ttfamily a:zero()} returns the additive  identity of a ring.
+    \item {\ttfamily a:one()} returns the multiplicative identity of a ring.
+\end{itemize}
 
-Algebraic computations on the Lua end typically involve constructing the desired expression and applying one or more core operations to the expression. If a non-core operation is applied, then this core expression will be {\ttfamily autosimplify()}.
+Subtraction and exponentiation have default implementations in the ring interface, but these can be overridden. Exponentiation is implemented as repeated multiplication, so overriding this method with a more efficient approach is recommended.
+
+Euclidean domains are subinterfaces to rings, and require the following methods in addition to ring methods:
+
+\begin{itemize}
+    \item {\ttfamily a:divremainder(b)} ({\ttfamily a // b} and {\ttfamily a \% b}) performs division with remainder on {\ttfamily a} and {\ttfamily b}, and returns both the quotient and the remainder. Using {\ttfamily //} returns only the quotient, while using {\ttfamily \%} returns only the remainder.
+\end{itemize}
+
+Fields are subinterfaces to Euclidean domains, and require the following methods in addition to Euclidean domains methods:
+
+\begin{itemize}
+    \item {\ttfamily a:div(b)} ({\ttfamily a / b}) divides {\ttfamily a} by {\ttfamily b}.
+    \item {\ttfamily a:inv()} returns the multiplicative inverse of {\ttfamily a}.
+\end{itemize}
+
+Division has a default implementation in the field interface, but this can be overridden.
+
+It is worth mentioning how binary operations on different rings are implemented. The code makes use of a {\ttfamily RingIdentifier} object that acts as a sort of class without any methods. This is used because a single class can instantiate objects in multiple rings, such as polynomial rings, which can be constructed over any ring and any variable, such as $\mathbf{Z}[x]$ or $\mathbf{Q}[y]$.
+
+The {\ttfamily Ring} class also requires the following methods for dealing with {\ttfamily RingIdentifier}s:
+
+\begin{itemize}
+    \item {\ttfamily Ring.makering()} is a static method that returns the default {\ttfamily RingIdentifier} for the {\ttfamily Ring}.
+    
+    \item {\ttfamily a:getring()} returns the particular {\ttfamily RingIdentifier} the element {\ttfamily a} is part of.  For classes with only one possible ring, such as the {\ttfamily Integer} class, this does the same thing as {\ttfamily makering}.
+    
+    \item {\ttfamily a:inring(ring)} takes a {\ttfamily RingIdentifier} ring and converts {\ttfamily a} to an element of that ring, if such a conversion is feasible. 
+\end{itemize}
+
+Finally, the static method {\ttfamily Ring.resultantring(ring1, ring2)} calculates the smallest {\ttfamily RingIdentifier} that contains {\ttfamily ring1} and {\ttfamily ring2} as subrings. The full process for performing a binary operation, say, multiplication, on two elements of possible different rings looks like:
+
+\begin{minted}{lua}
+    local aring, bring = a:getring(), b:getring()
+    local oring = Ring.resultantring(aring, bring)
+    if not oring then
+        error("Attempted to perform multiplication on two elements of incompatable rings")
+    end
+    return a:inring(oring):mul(b:inring(oring))
+\end{minted}
+
+One should be careful about what kind of conversions are allowed. Converting an integer to a $1\times1$ matrix likely makes sense, but converting a polynomial to matrix does not.
+
+\subsection{Constructor Shorthands \& Basic Parsing}
+
+Algebraic computations on the Lua end typically involve constructing the desired expression and applying one or more operations to the expression. If a non-core operation represented by a class is applied, then this operation will be {\ttfamily autosimplify()}.
 
 Naively, one could nest class constructors to build an expression. For instance, the Lua code for evaluating the integral \[ \int_0^6 \sin(x) + 2x^2 + 3 \hspace{2pt}\mathrm{d}x\] and storing the result in a variable {\ttfamily r} is as follows:
 
@@ -440,7 +547,7 @@ r = IntegralExpression(BinaryOperation(BinaryOperation.ADD,
         Integer(6)):autosimplify()
 \end{minted}
 
-This is more than unwieldy, so a number of constructs are added to make using and developing the CAS easier. Metatables for many binary operations allow natural symbols to act as constructors that use Lua's build-in operator precedence:
+This is more than unwieldy, so a number of constructs are added to make using and developing the CAS easier. Metatables for binary operations allow natural symbols to act as constructors that use Lua's build-in operator precedence:
 
 \begin{minted}{lua}
 r = IntegralExpression(TrigExpression("sin", SymbolExpression("x")) +
@@ -461,7 +568,7 @@ r = INT(SIN(SymbolExpression("x")) + Integer(2) * SymbolExpression("x") ^ Intege
         Integer(6)):autosimplify()
 \end{minted}
 
-This is still fairly unwieldy, mostly because every string and number need to be wrapped in a constructor to convert them to expressions. Unfortunately, this syntax is also the most awkward to reduce in Lua, and the inner workings of the code just uses the longer constructors.
+This is still fairly unwieldy, mostly because every string and number need to be wrapped in a constructor to convert them to expressions. Unfortunately, this syntax is also the most awkward to avoid in Lua, and the inner workings of the code just uses the longer constructors.
 
 For \LaTeX{} users, or for Lua users who are looking for a simpler paradigm, a parser was implemented that takes the code input as a string and wraps numbers in the {\ttfamily Integer} constructor, then evaluates the code using Lua's {\ttfamily load()} function. The {\ttfamily vars()} command also allows variables to be declared as symbol expressions with the same name, at the cost of being able to use these symbols to reference other objects. Using the parser, the code now looks like:
 
@@ -470,17 +577,35 @@ CASparse([[
     vars("x")
     r = int(sin(x) + 2*x^2 + 3, x, 0, 6)
 ]])
+
 \end{minted}
 
-\subsection{Implementing New Expression Types}
+The CAS \LaTeX{} environment is implemented by wrapping the text inside the environment with the {\ttfamily CASparse} command.
 
-Suppose one wanted to expand the CAS to be able to handle set theoretic constructs such as taking unions and intersections of sets. First, one would need to create a new set class that could store any number of expressions as subexpressions, ensuring that all of these expressions are unique.
+%\subsection{Implementing New Expression Types}
 
-Sets contain subexpressions, so they are compound expressions, and inherit from the {\ttfamily CompoundExpression} interface. The constructor would take a list of expressions, remove any duplicate expressions, and return a new object with the unique subexpressions. There are many ways to implement sets in code, but using a hashtable like in Section 11.5 of \cite{pil} is the most efficient.
+%Suppose one wanted to expand the CAS to be able to %handle set theoretic constructs such as taking unions %and intersections of sets. Sets contain subexpressions, %so they are compound expressions, and inherit from the %{\ttfamily CompoundExpression} interface.
 
-The next order of buisness is ensuring all of the core methods and metamethods are implemented. The {\ttfamily CompoundExpression} interface gives default implementations for some methods, which work fine for our purposes. Most core methods, such as {\ttfamily expand()} don't have an idiom in set theory, so we would simply expand each of the elements of the set and move on. Interestingly, this means sets could provide functional programming support to our CAS.
+%\begin{minted}{lua}
+%Set = {}
+%__Set = {}
 
-There are many ways of adding union and intersection operators to the CAS. One way would be to assign the $+$ metamethod to unions and the $\times$ metamethod to intersections. Another would be to add one new class for set operations with multiple sub-types, similar to the {\ttfamily BinaryOperation()} class. One could also just add a new class for each set operation. Each approach has benefits and drawbacks whose determination is left as an exercise for the reader.
+%-----------------
+%-- Inheritance --
+%-----------------
 
+%__Set.__index = CompoundExpression
+%__Set.__call = Set.new
+%Set = setmetatable(Set, __Set)
+%\end{minted}
+
+
+%First, one would need to create a set class that could %store any number of expressions as subexpressions, %ensuring that all of these expressions are unique. The %constructor would take a list of expressions, remove %any duplicate expressions, and return a new object with %the unique subexpressions. There are many ways to %implement sets in code, but using a hashtable like in %Section 11.5 of \cite{pil} is the most efficient.
+
+%The next order of buisness is ensuring all of the core %methods and metamethods are implemented. The {\ttfamily %CompoundExpression} interface gives default %implementations for some methods, which work fine for %our purposes. Most core methods, such as {\ttfamily %expand()} don't have an idiom in set theory, so we %would simply expand each of the elements of the set and %move on. Interestingly, this means sets could provide %functional programming support to our CAS.
+
+%There are many ways of adding union and intersection %operators to the CAS. One way would be to create new %functions to be used with the existing {\ttfamily %BinaryOperation} class. Another would be to add one new %class for set operations with multiple sub-types %similar to the {\ttfamily BinaryOperation} class. One %could also just add a new class for each set operation. %Each approach has benefits and drawbacks whose %determination is left as an exercise for the reader.
+
+% \subsection{Implementing New Rings}
 
 \end{document}
