@@ -1,17 +1,17 @@
 \contentsline {section}{\numberline {1}Introduction}{1}{section.1}%
-\contentsline {subsection}{\numberline {1.1}About}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.1}About}{1}{subsection.1.1}%
 \contentsline {subsection}{\numberline {1.2}Features}{2}{subsection.1.2}%
-\contentsline {section}{\numberline {2}Installation}{3}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Requirements}{3}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Installing {\ttfamily luacas}}{3}{subsection.2.2}%
+\contentsline {section}{\numberline {2}Installation}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Requirements}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Installing {\ttfamily luacas}}{2}{subsection.2.2}%
 \contentsline {section}{\numberline {3}Tutorials}{3}{section.3}%
 \contentsline {subsection}{\numberline {3.1}Tutorial 1: Limit Definition of the Derivative}{3}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Intermediate}{7}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Advanced}{7}{subsection.3.3}%
-\contentsline {section}{\numberline {A}The \LaTeX {} code}{7}{appendix.A}%
-\contentsline {section}{\numberline {B}Lua Documentation}{8}{appendix.B}%
-\contentsline {subsection}{\numberline {B.1}Core Methods}{8}{subsection.B.1}%
-\contentsline {subsection}{\numberline {B.2}Algebra Package}{9}{subsection.B.2}%
-\contentsline {subsection}{\numberline {B.3}Calculus Package}{9}{subsection.B.3}%
-\contentsline {subsection}{\numberline {B.4}Constructing Expressions \& Basic Parsing}{9}{subsection.B.4}%
-\contentsline {subsection}{\numberline {B.5}Implementing New Expression Types}{10}{subsection.B.5}%
+\contentsline {subsection}{\numberline {3.2}Intermediate}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Advanced}{6}{subsection.3.3}%
+\contentsline {section}{\numberline {A}The \LaTeX {} code}{6}{appendix.A}%
+\contentsline {section}{\numberline {B}Lua Documentation}{7}{appendix.B}%
+\contentsline {subsection}{\numberline {B.1}Core Methods}{7}{subsection.B.1}%
+\contentsline {subsection}{\numberline {B.2}Algebra Package}{8}{subsection.B.2}%
+\contentsline {subsection}{\numberline {B.3}Calculus Package}{8}{subsection.B.3}%
+\contentsline {subsection}{\numberline {B.4}Constructing Expressions \& Basic Parsing}{8}{subsection.B.4}%
+\contentsline {subsection}{\numberline {B.5}Implementing New Expression Types}{9}{subsection.B.5}%
