@@ -198,6 +198,25 @@ Alice is pleasantly surprised that the result of the expansion has been autosimp
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
+Alternatively, Alice could have asked the \mintinline{lua}{expand} command to \emph{fully expand} with the optional parameter \texttt{full}:
+\begin{codebox}
+    \inputminted[
+    firstline=176,
+    lastline=183,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        vars('x','h')
+        f = x^2
+        subs = {[x]=x+h}
+        q = (substitute(subs,f)-f)/h
+        q = expand(q,full)
+    \end{CAS}
+    \[ \print*{q} \] 
+\end{codebox}
+
 Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded (twice) and simplified (automatically), this amounts to another substitution:
 \begin{codebox}
     \inputminted[
@@ -213,13 +232,26 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{simplify} command. This does the trick: adding the line \mintinline{lua}{q = simplify(q)} before leaving the \texttt{CAS} environment returns the expected $2x$.
+Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{simplify} command. This does the trick: adding the line \mintinline{lua}{q = simplify(q)} before leaving the \texttt{CAS} environment returns the expected $2x$:
+\begin{codebox}
+    \inputminted[
+    firstline=104,
+    lastline=115,
+    breaklines]
+    {latex}
+    {demo.tex}
+    \tcblower
+    \begin{CAS}
+        q=simplify(q)
+    \end{CAS}
+    \[ \print*{q} \] 
+\end{codebox}
 
-Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{:simplify()} method the content of the argument. 
+Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{simplify()} method the content of the argument. 
 
 Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can:
 \begin{itemize}
-    \item be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}; and 
+    \item Be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}; and 
     \item CAS macros persist -- if Alice assigns \mintinline{lua}{f = x^2} within \mintinline{latex}{\begin{CAS}..\end{CAS}}, then the CAS remembers that \mintinline{lua}{f = x^2} the next time Alice enters the CAS environment. 
 \end{itemize}
 Here's the final version of Alice's code: 

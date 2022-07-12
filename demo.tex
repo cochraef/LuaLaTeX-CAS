@@ -172,4 +172,14 @@ Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using
 \end{aligned} \] 
 So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
 
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q,full)
+\end{CAS}
+\[ \print*{q} \] 
+
 \end{document}
