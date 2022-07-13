@@ -450,6 +450,16 @@ function BinaryOperation:tolatex()
         local sign = ''
         local out = ''
         local denom = ''
+        if self:autosimplify():isconstant() then 
+            for index, expression in ipairs(self.expressions) do 
+                if index == 1 then 
+                    out = out .. expression:tolatex()
+                else
+                    out = out .. "\\cdot " .. expression:tolatex() 
+                end
+            end
+            return out
+        end
         for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
                 if expression.operation == BinaryOperation.POW and expression.expressions[2]:isconstant() and expression.expressions[2] < Integer.zero() then
