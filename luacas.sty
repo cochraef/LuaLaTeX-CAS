@@ -65,12 +65,12 @@
     \IfBooleanTF{#1}{%
         \directlua{
             local sym = #2
-            tex.print(sym:tolatex())
+            tex.print(sym:autosimplify():tolatex())
         }%
     }{%
         \directlua{
             local sym = #2
-            tex.print(sym:autosimplify():tolatex())
+            tex.print(sym:tolatex())
         }%
     }%
 }
