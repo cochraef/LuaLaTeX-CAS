@@ -153,7 +153,7 @@ Now, Alice wants to use the variable $q$ to store the appropriate \emph{differen
     breaklines]
     {latex}
     {demo.tex}
-Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$ within her document. For this, she uses the \mintinline{latex}{\print*} command. 
+Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$ within her document. For this, she uses the \mintinline{latex}{\print} command. 
 \begin{CAS}
     vars('x','h')
     f = x^2
@@ -168,7 +168,7 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     {latex}
     {demo.tex}
     \tcblower
-    \[ \print*{q} \] 
+    \[ \print{q} \] 
 \end{codebox}
 So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{expand} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=expand(q)}, and prints the result to see if things worked as expected:
 \begin{codebox}
@@ -184,44 +184,13 @@ So far so good! Alice wants to expand the numerator of $q$; she finds the aptly 
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is pleasantly surprised that the result of the expansion has been autosimplified, i.e., the $x^2$ and $-x^2$ came to $0$ which was omitted from the numerator of the expression altogether. Now, Alice wants to distribute the $h$ in the denominator; this requires another expansion: 
+Alice is pleasantly surprised that the result of the expansion has been \emph{autosimplified}, i.e., the factors of $x^2$ and $-x^2$ cancelled each other out, and the resulting extra factor of $h$ has been cancelled out as well.  
+
+Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded and simplified (automatically), this amounts to another substitution:
 \begin{codebox}
     \inputminted[
     firstline=82,
-    lastline=90,
-    breaklines]
-    {latex}
-    {demo.tex}
-    \tcblower
-    \begin{CAS}
-        q = expand(q)
-    \end{CAS}
-    \[ \print*{q} \] 
-\end{codebox}
-Alternatively, Alice could have asked the \mintinline{lua}{expand} command to \emph{fully expand} with the optional parameter \texttt{full}:
-\begin{codebox}
-    \inputminted[
-    firstline=176,
-    lastline=183,
-    breaklines]
-    {latex}
-    {demo.tex}
-    \tcblower
-    \begin{CAS}
-        vars('x','h')
-        f = x^2
-        subs = {[x]=x+h}
-        q = (substitute(subs,f)-f)/h
-        q = expand(q,full)
-    \end{CAS}
-    \[ \print*{q} \] 
-\end{codebox}
-
-Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded (twice) and simplified (automatically), this amounts to another substitution:
-\begin{codebox}
-    \inputminted[
-    firstline=92,
-    lastline=102,
+    lastline=91,
     breaklines]
     {latex}
     {demo.tex}
@@ -230,13 +199,13 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
         subs = {[h]=0}
         q = q:substitute(subs)
     \end{CAS}
-    \[ \print*{q} \] 
+    \[ \print{q} \] 
 \end{codebox}
 Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{simplify} command. This does the trick: adding the line \mintinline{lua}{q = simplify(q)} before leaving the \texttt{CAS} environment returns the expected $2x$:
 \begin{codebox}
     \inputminted[
-    firstline=104,
-    lastline=115,
+    firstline=93,
+    lastline=103,
     breaklines]
     {latex}
     {demo.tex}
@@ -244,10 +213,10 @@ Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes
     \begin{CAS}
         q=simplify(q)
     \end{CAS}
-    \[ \print*{q} \] 
+    \[ \print{q} \] 
 \end{codebox}
 
-Alternatively, Alice could have used the \mintinline{latex}{\print} command instead of \mintinline{latex}{\print*} -- the essential difference is that \mintinline{latex}{\print}, unlike \mintinline{latex}{\print*}, automatically applies the \mintinline{lua}{simplify()} method the content of the argument. 
+Alternatively, Alice could have used the \mintinline{latex}{\print*} command instead of \mintinline{latex}{\print} -- the essential difference is that \mintinline{latex}{\print*}, unlike \mintinline{latex}{\print}, automatically simplifies the content of the argument. 
 
 Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can:
 \begin{itemize}
@@ -257,8 +226,8 @@ Alice is pretty happy with how everything is working, but she wants to be able t
 Here's the final version of Alice's code: 
 \begin{codebox}[sidebyside align=top]
     \inputminted[
-    firstline=117,
-    lastline=143,
+    firstline=105,
+    lastline=131,
     breaklines]
     {latex}
     {demo.tex}
@@ -269,33 +238,33 @@ Here's the final version of Alice's code:
     \end{CAS}
     Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
     \begin{CAS}
-        subs = {[x] = x+h}
-        q = (f:substitute(subs) - f)/h
+        subs = {[x]=x+h}
+        q = (substitute(subs,f) - f)/h
     \end{CAS}
     \[ \begin{aligned}
-        \print*{q} &= 
+        \print{q} &= 
         \begin{CAS} 
-            q = q:expand() 
+            q = expand(q) 
         \end{CAS}
-        \print*{q}& &\text{expand/simplify numerator} \\
-        &= 
-        \begin{CAS}
-            q = q:expand() 
-        \end{CAS}
-        \print*{q}& &\text{distribute denominator} \\ 
+        \print{q}& &\text{expand/simplify} \\
         \begin{CAS}
             subs = {[h]=0}
-            q = q:substitute(subs)
+            q = substitute(subs,q)
         \end{CAS}
-        &\xrightarrow{h\to 0} \print{q}& &\text{take limit.}
+        &\xrightarrow{h\to 0} \print{q}& &\text{take limit}\\ 
+        &= 
+        \begin{CAS}
+            q = simplify(q)
+        \end{CAS}
+        \print{q} & &\text{simplify.}
     \end{aligned} \] 
-    So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
+    So $\print{diff(f,x)} = \print*{diff(f,x)}$.     
 \end{codebox}
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 \begin{codebox}[sidebyside align=top]
     \inputminted[
-    firstline=145,
-    lastline=150,
+    firstline=133,
+    lastline=138,
     breaklines]
     {latex}
     {demo.tex}
@@ -304,29 +273,29 @@ Alice can produce another example merely by changing the definition of $f$ on th
         vars('x','h')
         f = 2*x^3-x
     \end{CAS}
-    Let $f(x) = \print*{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
+    Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
     \begin{CAS}
         subs = {[x] = x+h}
         q = (f:substitute(subs) - f)/h
     \end{CAS}
     \[ \begin{aligned}
-        \print*{q} &= 
+        \print{q} &= 
         \begin{CAS} 
-            q = q:expand() 
+            q = expand(q)
         \end{CAS}
-        \print*{q}& &\text{expand/simplify numerator} \\
-        &= 
-        \begin{CAS}
-            q = q:expand() 
-        \end{CAS}
-        \print*{q}& &\text{distribute denominator} \\ 
+        \print{q}& &\text{expand/simplify} \\
         \begin{CAS}
             subs = {[h]=0}
             q = q:substitute(subs)
         \end{CAS}
-        &\xrightarrow{h\to 0} \print{q}& &\text{take limit.}
+        &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\ 
+        &= 
+        \begin{CAS}
+            q = simplify(q)
+        \end{CAS}
+        \print{q}& &\text{simplify.}
     \end{aligned} \] 
-    So $\print*{diff(f,x)} = \print{diff(f,x)}$.  
+    So $\print{diff(f,x)} = \print*{diff(f,x)}$.     
 \end{codebox}
 
 
