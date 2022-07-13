@@ -156,7 +156,7 @@ Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using
 \[ \begin{aligned}
     \print*{q} &= 
     \begin{CAS} 
-        q = q:expand() 
+        q = expand(q)
     \end{CAS}
     \print*{q}& &\text{expand/simplify numerator} \\
     &= 
@@ -178,8 +178,11 @@ So $\print*{diff(f,x)} = \print{diff(f,x)}$.
     f = x^2
     subs = {[x]=x+h}
     q = (substitute(subs,f)-f)/h
-    q = expand(q,full)
 \end{CAS}
+\luaexec{
+    q.expressions[1] = q.expressions[1]:expand()
+}
 \[ \print*{q} \] 
-
+\luaexec{q.expressions[1] = q.expressions[1]:factor()}
+\[ \print*{q} = \print{q} \] 
 \end{document}
