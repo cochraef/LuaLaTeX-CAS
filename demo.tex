@@ -161,17 +161,72 @@ Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using
 So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
 
 \begin{CAS}
-    a = 3
-    b = x^2
-    c = a*b
-    c = substitute({[x]=2},c)
-    d = 2^2
+    vars('x','h')
+    f = 2*x/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
 \end{CAS}
-\[ \print{c} \] 
+\[ \print{q} \]
+\begin{CAS}
+    q = expand(q)
+\end{CAS}
+\[ \print{q} \] 
+
 \luaexec{
-    if c.operation == BinaryOperation.MUL then 
-        tex.print("MUL")
+    den = {}
+    num = {}
+    if q.operation == BinaryOperation.ADD then 
+        for _, expr in ipairs(q.expressions) do
+            local numpart = Integer.one()
+            if expr.operation == BinaryOperation.MUL then 
+                for _,subexpr in ipairs(expr.expressions) do 
+                    if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2] == -Integer.one() then    
+                        for _,term in ipairs(den) do 
+                            if subexpr.expressions[1] == term then 
+                                goto continue
+                            end
+                        end
+                        table.insert(den,subexpr.expressions[1])
+                        ::continue::
+                    else 
+                        numpart = numpart*subexpr 
+                    end
+                end
+            end
+            if expr.operation == BinaryOperation.POW and expr.expressions[2] == -Integer.one() then 
+                for _,term in ipairs(den) do 
+                    if expr.expressions[1] == term then 
+                        goto continue
+                    end
+                end
+                table.insert(den,subexpr.expressions)
+                ::continue::
+            end
+            table.insert(num,numpart)
+        end
     end
+    denominator = Integer.one()
+    numerator   = Integer.zero()
+    for _,expr in ipairs(den) do 
+        denominator = denominator*expr
+    end
+    denominator = denominator:simplify()
+    for _,expr in ipairs(num) do 
+        numerator = numerator + expr*denominator 
+    end
+    numerator = numerator:expand():factor()
+    common = numerator/denominator
+    common = simplify(common)
 }
+\[ \print{denominator} \] 
+\[ \print{numerator} \] 
+\[ \print{common} \] 
+
+
+\parseforest{q}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
 
 \end{document}
