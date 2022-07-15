@@ -22,7 +22,7 @@ function SqrtExpression:new(expression, root)
 
     __o.__index = SqrtExpression
     __o.__tostring = function(a)
-        return 'sqrt(' .. tostring(a.expression) .. ',' .. tostring(a.root) .. ')'
+        return tostring(a.expression) .. ' ^ (1/' .. tostring(a.root) .. ')'
     end
     __o.__eq = function(a, b)
         -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
