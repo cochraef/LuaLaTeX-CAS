@@ -55,12 +55,16 @@ function BinaryOperation:new(operation, expressions)
             if index > 1 then
                 expressionnames = expressionnames .. ' '
             end
-            expressionnames = expressionnames .. tostring(expression)
+            if expression:type() == Integer then 
+                expressionnames = expressionnames .. tostring(expression)
+            else
+                expressionnames = expressionnames .. '(' .. tostring(expression) .. ')'
+            end
             if a.expressions[index + 1] then
                 expressionnames = expressionnames .. ' ' .. a.name
             end
         end
-        return '(' .. expressionnames .. ')'
+        return expressionnames
     end
     __o.__eq = function(a, b)
         -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
