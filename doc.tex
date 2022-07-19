@@ -467,15 +467,5 @@ CASparse([[
 ]])
 \end{minted}
 
-\subsection{Implementing New Expression Types}
-
-Suppose one wanted to expand the CAS to be able to handle set theoretic constructs such as taking unions and intersections of sets. First, one would need to create a new set class that could store any number of expressions as subexpressions, ensuring that all of these expressions are unique.
-
-Sets contain subexpressions, so they are compound expressions, and inherit from the {\ttfamily CompoundExpression} interface. The constructor would take a list of expressions, remove any duplicate expressions, and return a new object with the unique subexpressions. There are many ways to implement sets in code, but using a hashtable like in Section 11.5 of \cite{pil} is the most efficient.
-
-The next order of buisness is ensuring all of the core methods and metamethods are implemented. The {\ttfamily CompoundExpression} interface gives default implementations for some methods, which work fine for our purposes. Most core methods, such as {\ttfamily expand()} don't have an idiom in set theory, so we would simply expand each of the elements of the set and move on. Interestingly, this means sets could provide functional programming support to our CAS.
-
-There are many ways of adding union and intersection operators to the CAS. One way would be to assign the $+$ metamethod to unions and the $\times$ metamethod to intersections. Another would be to add one new class for set operations with multiple sub-types, similar to the {\ttfamily BinaryOperation()} class. One could also just add a new class for each set operation. Each approach has benefits and drawbacks whose determination is left as an exercise for the reader.
-
 
 \end{document}
