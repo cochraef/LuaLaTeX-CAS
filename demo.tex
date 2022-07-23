@@ -2,6 +2,7 @@
 \usepackage{luacas}
 \usepackage{forest}
 \usepackage{verbatim}
+\usepackage{pgfplots}
 
 \begin{document}
 
@@ -227,6 +228,66 @@ So $\print*{diff(f,x)} = \print{diff(f,x)}$.
 \begin{forest}
     @\forestresult
 \end{forest}
+
+\begin{CAS}
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
+    dh = expand(dh)
+    h  = int(dh,x)
+    h  = simplify(h+10)
+\end{CAS}
+\[ \print{h} \] 
+\begin{CAS}
+    dh = diff(h,x)
+    dh = simplify(dh)
+\end{CAS}
+\[ \print{dh} \] 
+\begin{CAS}
+    r = roots(dh)
+\end{CAS}
+\luaexec{
+    vals = {}
+    for i=1,4 do 
+        table.insert(vals,substitute({[x]=r[i]},h):simplify())
+    end
+}
+\[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
+\[ \print{vals[1]} \] 
+\yoink{h}
+\yoink{dh}
+\yoink{r[1]}[a]
+\yoink{r[2]}[b]
+\yoink{r[3]}[c]
+\yoink{r[4]}[d]
+
+\yoink{vals[1]}[A]
+\yoink{vals[2]}[B]
+\yoink{vals[3]}[C]
+\yoink{vals[4]}[D]
+
+\NewDocumentCommand{\newyoink}{m O{#1}}{%
+\expandafter\newcommand\csname #2\endcsname{%
+    \directlua{
+        tex.print(tostring(#1))
+        }%
+    }%
+}
+\newyoink{r[1]}[g]
+
+\begin{tikzpicture}
+    \begin{axis}[legend pos = north west]
+    \addplot [domain=-3.5:1.5,samples=100] {\h};
+    \addlegendentry{$f$};
+    \addplot[densely dashed] [domain=-3.25:1.25,samples=100] {\dh};
+    \addlegendentry{$df/dx$};
+    \addplot[gray,dashed,thick] [domain=-3.5:1.5] {0};
+    \draw[fill=red] (axis cs: \g,0) circle (1.5pt);
+    \end{axis}
+\end{tikzpicture}
+
 
 
 \end{document}

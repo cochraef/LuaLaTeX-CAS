@@ -45,7 +45,7 @@
     [2][true]%
     {\directlua{disp(#2, #1)}}      
     
-\newcommand{\yoink}[2]{%
+\NewDocumentCommand{\yoink}{m O{#1}}{%
 \expandafter\def\csname #2\endcsname{%
     \directlua{
         tex.print(tostring(#1))

@@ -99,6 +99,13 @@ function substitute(tbl,expr)
     return expr:substitute(tbl) 
 end
 
+function roots(poly)
+    if poly.topolynomial then 
+        poly = poly:topolynomial()
+    end
+    return poly:roots()
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
