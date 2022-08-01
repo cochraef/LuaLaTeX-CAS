@@ -374,7 +374,7 @@ This section also assumes some familiarity with the programming language Lua, in
  
  \subsection{Class Structure and Inheritance}
  
-Every object in the CAS is an expression, meaning it inherits from the {\ttfamily Expression} type (class). Since the {\ttfamily Expression} type itself has no constructor and cannot be instantiated, it it closer to an interface in Java OOP terms.\footnote{In reality, interfaces are unnecessary in Lua due to its weak typing - Lua doesn't check whether an object has a method at compile time. The {\ttfamily Expression} type is really an abstract class in Java terms, but we will call it an interface for simplicity.} {\ttfamily Expression}s can store any number of other expressions as sub-expressions, depending on type. This means that {\ttfamily Expression} objects are really trees. Types that inherit from {\ttfamily Expression} that can not store other expressions are called \emph{atomic expressions}, and correspond to the leaf nodes of the tree. Other expression types are \emph{compound expressions}. Thus, every {\ttfamily Expression} type inherits from one of {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression}. The {\ttfamily ConstantExpresssion} interface is a subinterface to {\ttfamily AtomicExpression}\footnote{See the Section B.2. {\ttfamily isconstant()} entry for details.} Types that inherit from {\ttfamily ConstantExpression} roughly correspond to numbers. An outline of the inheritance hierarchy is pictured below:
+Every object in the CAS is an expression, meaning it inherits from the {\ttfamily Expression} type (class). Since the {\ttfamily Expression} type itself has no constructor and cannot be instantiated, it it closer to an interface in Java OOP terms.\footnote{In reality, interfaces are unnecessary in Lua due to its weak typing - Lua doesn't check whether an object has a method at compile time. The {\ttfamily Expression} type is really an abstract class in Java terms, but we will call it an interface for simplicity.} {\ttfamily Expression}s can store any number of other expressions as sub-expressions, depending on type. This means that {\ttfamily Expression} objects are really trees. Types that inherit from {\ttfamily Expression} that can not store other expressions are called \emph{atomic expressions}, and correspond to the leaf nodes of the tree. Other expression types are \emph{compound expressions}. Thus, every {\ttfamily Expression} type inherits from one of {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression}. The {\ttfamily ConstantExpresssion} interface is a subinterface to {\ttfamily AtomicExpression}.\footnote{See the Section B.2. {\ttfamily isconstant()} entry for details.} Types that inherit from {\ttfamily ConstantExpression} roughly correspond to numbers. An outline of the inheritance hierarchy is pictured below:
 
 \begin{figure}[h]
 \centering
@@ -424,9 +424,9 @@ All of the following core methods can be applied to any expression, and are defi
     
     \item {\ttfamily simplify()} performs full simplification of an expression. This may involve polynomial factorization, which is slow, so this is seperate from autosimplification and not called on the \LaTeX{} end unless the user specifically directs the CAS to simplify.
     
-    \item {\ttfamily subexpressions()} returns a list of all subexpressions of an expression. This gives a unified interface to the fields of objects, which have different names across classes.
+    \item {\ttfamily subexpressions()} returns a list of all subexpressions of an expression. This gives a unified interface to the instance variables for subexpressions, which have different names across classes.
     
-    \item {\ttfamily size()} returns the number of nodes of the tree that constitutes an expression, roughly or the total number of expression objects that make up the expression.
+    \item {\ttfamily size()} returns the number of nodes of the tree that constitutes an expression, or roughly the total number of expression objects that make up the expression.
     
     \item {\ttfamily setsubexpressions(subexpressions)} creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
     
@@ -465,7 +465,7 @@ The algebra package contains functionality for arbitrary-precision arithmetic, p
 
 \subsubsection{Ring Interfaces}
 
-Most classes in the algebra package inherit from the {\ttfamily Ring} interface, which itself inherits from the \\ {\ttfamily ConstantExpression} interface. The {\ttfamily Ring} interface interface requires the following arithmetic operations, which have corresponding metamethods listed below. For ring objects {\ttfamily a} and {\ttfamily b},
+Most classes in the algebra package inherit from the {\ttfamily Ring} interface, which itself inherits from the \\ {\ttfamily ConstantExpression} interface. The {\ttfamily Ring} interface requires the following arithmetic operations, which have corresponding metamethods listed below. For ring objects {\ttfamily a} and {\ttfamily b},
 
 \begin{itemize}
     \item {\ttfamily a:add(b) (a + b)} adds two ring elements.
@@ -480,7 +480,7 @@ Most classes in the algebra package inherit from the {\ttfamily Ring} interface,
     \item {\ttfamily a:one()} returns the multiplicative identity of a ring.
 \end{itemize}
 
-The arithmetic methods should only be used with two objects of the same type, while the metamethods should be used on objects of potentially different types, since they handle conversion between different types of rings. \footnote{See section B.3.2 for details.}
+The arithmetic methods should only be used with two objects of the same type, while the metamethods can be used on objects of potentially different types, since they handle conversion between different types of rings. \footnote{See section B.3.2 for details.}
 
 The {\ttfamily EuclideanDomain} interface is a subinterface to the Ring interface, which also requires the following operations:
 
@@ -498,11 +498,11 @@ The {\ttfamily Field} interface is a subinterface to the {\ttfamily EuclideanDom
 
 \subsubsection{Ring Conversion}
 
-Many of the rings in the algebra package are subsets of one another. For instance, integers are subsets of rationals, which are subsets of polynomial rings over the rationals, etc. To smoothly convert objects from one ring to another, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information the exact ring of an object, including information about what symbol the object is a part of. To perform operations on two elements of different rings, the CAS performs the following: 
+Many of the rings in the algebra package are subsets of one another. For instance, integers are subsets of rationals, which are subsets of polynomial rings over the rationals, etc. To smoothly convert objects from one ring to another, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information the exact ring of an object, including the symbol the ring has if it's a polynomial ring, for instance. To perform operations on two elements of different rings, the CAS does the following: 
 
-To get the generic {\ttfamily RingIdentifier} from a class, it uses the static {\ttfamily Ring.makering()} method. To get the {\ttfamily RingIdentifier} from a specific instance (element) of a ring, it uses the {\ttfamily ring()} method. From there, the CAS computes the smallest {\ttfamily RingIdentifier} that contains the two {\ttfamily RingIdentifier}s as subsets using the static {\ttfamily Ring.resultantring()}. Finally, the CAS converts both objects into the resultant {\ttfamily RingIdentifier} if possible, and then performs the operation.
+To get the generic {\ttfamily RingIdentifier} from a class, it uses the static {\ttfamily Ring.makering()} method. To get the {\ttfamily RingIdentifier} from a specific instance (element) of a ring, it uses the {\ttfamily :getring()} method. From there, the CAS computes the smallest {\ttfamily RingIdentifier} that contains the two {\ttfamily RingIdentifier}s as subsets using the static {\ttfamily Ring.resultantring()}. Finally, the CAS converts both objects into the resultant {\ttfamily RingIdentifier} using the {\ttfamily :inring(ring)} method if possible, and then performs the operation.
 
-To add another class that implements {\ttfamily Ring} and has proper conversion abilities, the {\ttfamily resultantring} method needs to be updated to include all possible resultant rings constructed from the new ring and existing rings. The other three methods need to be implemented, as well.
+To add another class that implements {\ttfamily Ring} and has proper conversion abilities, the {\ttfamily resultantring} method needs to be updated to include all possible resultant rings constructed from the new ring and existing rings. The other three methods need to be implemented as well.
 
 \subsubsection{Types}
 
@@ -512,7 +512,7 @@ The following types do not inherit from the {\ttfamily Ring} interface, instead 
     \item {\ttfamily AbsExpression(expression)} creates a new expression corresponding to the absolute value of \\ {\ttfamily expression}.
     \item {\ttfamily Logarithm(base, expression)} creates a new expression corresponding to the logarithm base {\ttfamily base} of {\ttfamily expression}.
     \item {\ttfamily SqrtExpression(expression, root)} creates a new expression corresponding the the {\ttfamily root}th root of {\ttfamily expression}. If {\ttfamily root} is omitted, it defaults to $2$.
-    \item {\ttfamily TrigExpression(name, expression)} creates a new expression corresponding to the trigonometric function applied to {\ttfamily expression}. The valid names are $\sin$, $\cos$, $\tan$, $\csc$, $\sec$, $\cot$, $\arcsin$, $\arccos$, $\arctan$, arccsc, arcsec, and arccot.
+    \item {\ttfamily TrigExpression(name, expression)} creates a new expression corresponding to a trigonometric function applied to {\ttfamily expression}. The valid names are $\sin$, $\cos$, $\tan$, $\csc$, $\sec$, $\cot$, $\arcsin$, $\arccos$, $\arctan$, arccsc, arcsec, and arccot.
     
     \item {\ttfamily RootExpression(expression)} creates an expression that represents the solutions to {\ttfamily expression} $= 0$ when they would be unwieldy or impossible to display using standard algebraic functions.
 \end{itemize}
@@ -582,7 +582,7 @@ r = INT(SIN(SymbolExpression("x")) + Integer(2) * SymbolExpression("x") ^ Intege
         Integer(6)):autosimplify()
 \end{minted}
 
-This is still fairly unwieldy, mostly because every string and number need to be wrapped in a constructor to convert them to expressions. Unfortunately, this syntax is also the most awkward to reduce in Lua, and the inner workings of the code just uses the longer constructors.
+This is still fairly unwieldy, mostly because every string and number need to be wrapped in a constructor to convert them to expressions. Unfortunately, this syntax is also the most awkward to avoid in Lua, and the inner workings of the code just uses the longer constructors.
 
 For \LaTeX{} users, or for Lua users who are looking for a simpler paradigm, a parser was implemented that takes the code input as a string and wraps numbers in the {\ttfamily Integer} constructor, then evaluates the code using Lua's {\ttfamily load()} function. The {\ttfamily vars()} command also allows variables to be declared as symbol expressions with the same name, at the cost of being able to use these symbols to reference other objects. Using the parser, the code now looks like:
 
