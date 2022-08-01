@@ -110,8 +110,8 @@ function PI:approximate()
     return Integer(313383936) / Integer(99753205)
 end
 
-function PI:tolatex()
-    return "\\pi"
+function PI:isconstant()
+    return true
 end
 
 -- The constant e.

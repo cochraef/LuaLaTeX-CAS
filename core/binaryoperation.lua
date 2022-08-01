@@ -55,7 +55,7 @@ function BinaryOperation:new(operation, expressions)
             if index > 1 then
                 expressionnames = expressionnames .. ' '
             end
-            if expression:type() == Integer then 
+            if expression:isatomic() then
                 expressionnames = expressionnames .. tostring(expression)
             else
                 expressionnames = expressionnames .. '(' .. tostring(expression) .. ')'
