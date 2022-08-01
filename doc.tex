@@ -1,6 +1,8 @@
 \documentclass{article}
 
 \usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
 
 \usepackage[margin=1in]{geometry}
 \usepackage[shortlabels]{enumitem}
@@ -463,27 +465,81 @@ The algebra package contains functionality for arbitrary-precision arithmetic, p
 
 \subsubsection{Ring Interfaces}
 
+Most classes in the algebra package inherit from the {\ttfamily Ring} interface, which itself inherits from the \\ {\ttfamily ConstantExpression} interface. The {\ttfamily Ring} interface interface requires the following arithmetic operations, which have corresponding metamethods listed below. For ring objects {\ttfamily a} and {\ttfamily b},
+
+\begin{itemize}
+    \item {\ttfamily a:add(b) (a + b)} adds two ring elements.
+    \item {\ttfamily a:sub(b) (a - b)} subtracts one ring element from another. Subtraction has a default implementation in {\ttfamily Ring.lua} as adding the additive inverse, but this can be overwritten if a faster performance method is available.
+    \item {\ttfamily a:neg() (-a)} returns the additive inverse of a ring element.
+    \item {\ttfamily a:mul(b) (a * b)} multiplies two ring elements.
+    \item {\ttfamily a:pow(n) (a \wedge{} n)} raises one ring element to the power of an integer. Exponentiation has a default implementation as repeated multiplication, but this can (and probably should) be overwritten for faster performance.
+    \item {\ttfamily a:eq(b) (a == b)} tests if two ring elements are the same.
+    \item {\ttfamily a:lt(b) (a < b)} tests if one ring element is less than another under some total order. If the ring does not have a natural total order, this method does not need to be implemented.
+    \item {\ttfamily a:le(b) (a <= b)} tests if one ring element is less than or equal to another under some total order. If the ring does not have a natural total order, this method does not need to be implemented.
+    \item {\ttfamily a:zero()} returns the additive identity of a ring.
+    \item {\ttfamily a:one()} returns the multiplicative identity of a ring.
+\end{itemize}
+
+The arithmetic methods should only be used with two objects of the same type, while the metamethods should be used on objects of potentially different types, since they handle conversion between different types of rings. \footnote{See section B.3.2 for details.}
+
+The {\ttfamily EuclideanDomain} interface is a subinterface to the Ring interface, which also requires the following operations:
+
+\begin{itemize}
+    \item {\ttfamily a:divremainder(b) (a // b) (a \% b)} returns both the result of Eulcidean division and the remainder when a is divided by b.
+\end{itemize}
+
+The {\ttfamily Field} interface is a subinterface to the {\ttfamily EuclideanDomain} interface, which also requires the following operations:
+
+\begin{itemize}
+    \item {\ttfamily a:div(b) (a / b)} divides one ring element by another. Division has a default implementation as multiplying by the multiplicative inverse, but this can be overwritten if a faster performance method is available.
+     \item {\ttfamily a:inv()} returns the multiplicative inverse of a ring element.
+\end{itemize}
 
 
 \subsubsection{Ring Conversion}
 
+Many of the rings in the algebra package are subsets of one another. For instance, integers are subsets of rationals, which are subsets of polynomial rings over the rationals, etc. To smoothly convert objects from one ring to another, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information the exact ring of an object, including information about what symbol the object is a part of. To perform operations on two elements of different rings, the CAS performs the following: 
+
+To get the generic {\ttfamily RingIdentifier} from a class, it uses the static {\ttfamily Ring.makering()} method. To get the {\ttfamily RingIdentifier} from a specific instance (element) of a ring, it uses the {\ttfamily ring()} method. From there, the CAS computes the smallest {\ttfamily RingIdentifier} that contains the two {\ttfamily RingIdentifier}s as subsets using the static {\ttfamily Ring.resultantring()}. Finally, the CAS converts both objects into the resultant {\ttfamily RingIdentifier} if possible, and then performs the operation.
+
+To add another class that implements {\ttfamily Ring} and has proper conversion abilities, the {\ttfamily resultantring} method needs to be updated to include all possible resultant rings constructed from the new ring and existing rings. The other three methods need to be implemented, as well.
+
 \subsubsection{Types}
+
+The following types do not inherit from the {\ttfamily Ring} interface, instead inheriting from the {\ttfamily CompoundExpression} interface.
+
+\begin{itemize}
+    \item {\ttfamily AbsExpression(expression)} creates a new expression corresponding to the absolute value of \\ {\ttfamily expression}.
+    \item {\ttfamily Logarithm(base, expression)} creates a new expression corresponding to the logarithm base {\ttfamily base} of {\ttfamily expression}.
+    \item {\ttfamily SqrtExpression(expression, root)} creates a new expression corresponding the the {\ttfamily root}th root of {\ttfamily expression}. If {\ttfamily root} is omitted, it defaults to $2$.
+    \item {\ttfamily TrigExpression(name, expression)} creates a new expression corresponding to the trigonometric function applied to {\ttfamily expression}. The valid names are $\sin$, $\cos$, $\tan$, $\csc$, $\sec$, $\cot$, $\arcsin$, $\arccos$, $\arctan$, arccsc, arcsec, and arccot.
+    
+    \item {\ttfamily RootExpression(expression)} creates an expression that represents the solutions to {\ttfamily expression} $= 0$ when they would be unwieldy or impossible to display using standard algebraic functions.
+\end{itemize}
+
+
+The following types inherit from the {\ttfamily Ring} interface. However, not all of them are proper {\ttfamily ConstantExpression}s, so some of them override the {\ttfamily isconstant()} method.
+
+\begin{itemize}
+    \item {\ttfamily Integer(n)} takes a string, number, or {\ttfamily Integer} input and constructs an Integer. Since Lua can only store integers exactly up to a certain point, it is recommended to use strings to build large integers.
+    \item {\ttfamily IntegerModN(i, n)} takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an integer in the ring $\mathbb{Z_n}$. 
+    \item {\ttfamily Rational(n, d, keep)} takes a numerator {\ttfamily n} and denominator {\ttfamily d} in the same ring and constructs a rational expression in the field of fractions over that ring. For the integers, this is the ring of rational numbers. If the {\ttfamily keep} flag is omitted, the constructed object will be simplified to have smallest possible denominator, possibly returning an object in the original ring {\ttfamily n} and {\ttfamily d} where in.
+    \item {\ttfamily PolynomialRing(coefficients, symbol, degree)} takes a list of {\ttfamily coefficients} not necessarily in the same ring and a {\ttfamily SymbolExpression symbol} to create a polynomial in the polynomial ring with the given {\ttfamily symbol} and coefficients in the smallest possible ring that includes all of the coefficients. If {\ttfamily degree} is omitted, it will calculate the degree of the polynomial automatically. The list can either be one-indexed or zero-indexed, but if it is one-indexed, the internal list of coefficients will still be zero-indexed.
+\end{itemize}
 
 \subsection{Calculus Package}
 
 The calculus package contains expression types for integration and differentiation. It requires both the algebra and core packages to be loaded.
 
 \subsubsection{Types}
+All types added by the calculus package inherit from the {\ttfamily CompoundExpression} interface.
 
 \begin{itemize}
-    \item {\ttfamily DerivativeExpression(expression, symbol)} creates a new derivative expression, representing the single-variable derivative of {\ttfamily expression} with respect to {\ttfamily symbol}. 
+    \item {\ttfamily DerivativeExpression(expression, symbol)} creates a new derivative expression, representing the single-variable derivative of {\ttfamily expression} with respect to {\ttfamily symbol}. If {\ttfamily symbol} is omitted, it defaults to $x$.
     
     \item {\ttfamily DiffExpression(expression, symbols)} creates a new differential expression, representing the multi-variable derivative of {\ttfamily expression} with respect to each symbol in the list {\ttfamily symbol}.
     
     \item {\ttfamily IntegralExpression(expression, symbol, lower, upper)} creates a new indefinite integral expression, representing the integral of {\ttfamily expression} with respect to {\ttfamily symbol} from {\ttfamily lower} to {\ttfamily upper} If both {\ttfamily lower} and {\ttfamily upper} are omitted, creates a new indefinite integral expression instead.
-    \begin{itemize}
-        \item {\ttfamily IntegralExpression:isdefinite()} returns whether the integral is definite or not.
-    \end{itemize}
 \end{itemize}
 
 \subsection{Constructing Expressions \& Basic Parsing}
