@@ -5,6 +5,7 @@
 \usepackage[margin=1in]{geometry}
 \usepackage[shortlabels]{enumitem}
 
+
 \usepackage{tikz}
 \usepackage{minted}
 %\usemintedstyle{pastie}
@@ -13,6 +14,12 @@
 \usepackage{multicol}
 \usepackage[most]{tcolorbox}
 \usepackage{microtype}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
 
 
 \newtcolorbox{codebox}[1][sidebyside]{
@@ -358,7 +365,14 @@ The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between th
     
 \section{Lua Documentation}
 
-This section assumes some familiarity with the programming language Lua and with object-oriented programming. For a comprehensive introduction to Lua, we refer the reader to \cite{pil}. This section is geared towards for those who are interested in the inner design, as opposed to the algorithms or mathematics, of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
+This section is geared towards for those who are interested in the inner design of the Lua end of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
+ 
+This section also assumes some familiarity with the programming language Lua, including using prototypes for object-oriented programning in Lua. For a comprehensive introduction to Lua, we refer the reader to \cite{pil}. Chapter 16 of \cite{pil} provides a good introduction to object-oriented design and inheritance in Lua. 
+ 
+ \subsection{Class Structure and Inheritance}
+ 
+Every object in the CAS is an expression, meaning it inherits from the {\ttfamily Expression} class. Since the {\ttfamily Expression} class itself cannot be instantiated, it it closer to an interface in Java OOP terms. \footnote{In reality, interfaces are unnecessary in Lua due to its weak typing - Lua doesn't check whether an object has a method at compile time. The {\ttfamily Expression} class is really an abstract class in Java terms, but we will call it an interface for simplicity.} {\ttfamily Expression}s can store any number of other expressions as sub-expressions, depending on type. Expressions that
+\subsubsection{Metatable inheritance}
 
 This computer algebra system is written in object-oriented Lua. Lua does not have built-in object-oriented features, but using metatables we can simulate much of the oo functionality of a language like Java. Every class in the CAS inherits from the {\ttfamily Expression} interface. Expressions are really trees, and may have any number of sub-expressions as children depending on the type of the expression.
 
@@ -469,6 +483,10 @@ CASparse([[
     r = int(sin(x) + 2*x^2 + 3, x, 0, 6)
 ]])
 \end{minted}
+
+\newpage
+
+\printbibliography
 
 
 \end{document}
