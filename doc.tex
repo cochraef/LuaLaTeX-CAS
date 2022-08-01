@@ -7,6 +7,7 @@
 
 
 \usepackage{tikz}
+\usetikzlibrary{positioning}
 \usepackage{minted}
 %\usemintedstyle{pastie}
 \usepackage[hidelinks]{hyperref}
@@ -365,18 +366,49 @@ The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between th
     
 \section{Lua Documentation}
 
-This section is geared towards for those who are interested in the inner design of the Lua end of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
+This section is geared towards those who are interested in the inner workings of the Lua end of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
  
 This section also assumes some familiarity with the programming language Lua, including using prototypes for object-oriented programning in Lua. For a comprehensive introduction to Lua, we refer the reader to \cite{pil}. Chapter 16 of \cite{pil} provides a good introduction to object-oriented design and inheritance in Lua. 
  
  \subsection{Class Structure and Inheritance}
  
-Every object in the CAS is an expression, meaning it inherits from the {\ttfamily Expression} class. Since the {\ttfamily Expression} class itself cannot be instantiated, it it closer to an interface in Java OOP terms. \footnote{In reality, interfaces are unnecessary in Lua due to its weak typing - Lua doesn't check whether an object has a method at compile time. The {\ttfamily Expression} class is really an abstract class in Java terms, but we will call it an interface for simplicity.} {\ttfamily Expression}s can store any number of other expressions as sub-expressions, depending on type. Expressions that
-\subsubsection{Metatable inheritance}
+Every object in the CAS is an expression, meaning it inherits from the {\ttfamily Expression} type (class). Since the {\ttfamily Expression} type itself has no constructor and cannot be instantiated, it it closer to an interface in Java OOP terms.\footnote{In reality, interfaces are unnecessary in Lua due to its weak typing - Lua doesn't check whether an object has a method at compile time. The {\ttfamily Expression} type is really an abstract class in Java terms, but we will call it an interface for simplicity.} {\ttfamily Expression}s can store any number of other expressions as sub-expressions, depending on type. This means that {\ttfamily Expression} objects are really trees. Types that inherit from {\ttfamily Expression} that can not store other expressions are called \emph{atomic expressions}, and correspond to the leaf nodes of the tree. Other expression types are \emph{compound expressions}. Thus, every {\ttfamily Expression} type inherits from one of {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression}. The {\ttfamily ConstantExpresssion} interface is a subinterface to {\ttfamily AtomicExpression}\footnote{See the Section B.2. {\ttfamily isconstant()} entry for details.} Types that inherit from {\ttfamily ConstantExpression} roughly correspond to numbers. An outline of the inheritance hierarchy is pictured below:
 
-This computer algebra system is written in object-oriented Lua. Lua does not have built-in object-oriented features, but using metatables we can simulate much of the oo functionality of a language like Java. Every class in the CAS inherits from the {\ttfamily Expression} interface. Expressions are really trees, and may have any number of sub-expressions as children depending on the type of the expression.
+\begin{figure}[h]
+\centering
 
-Most operations that a user would want to apply to expressions, such as derivatives and integrals, are encapsulated into their own classes. These classes have the expressions that these operations are applied to as instance variables. The other kind of operations on expressions are \emph{core methods}, which are methods in the objected-oriented sense, and can be called on expressions using the {\ttfamily :} syntax as is typical in Lua. The rule of thumb is that if there is standard mathematical notation for an operation or function represented by the CAS, it gets its own class, and if not, it is a core method. This way, every Lua expression corresponds to something that can be cleanly displayed in \LaTeX{}.
+\begin{tikzpicture}[interface/.style={rectangle, draw=orange!60, fill=orange!5, very thick, minimum size=5mm},class/.style={text width=2.5cm,rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm}]
+
+\node[interface] at (0, 0) (exp) {\ttfamily Expression};
+\node[interface] at (-2, -2) (atom) {\ttfamily AtomicExpression};
+\node[interface] at (2, -2) (comp) {\ttfamily CompoundExpression};
+\node[interface] at (-6, -4) (constant) {\ttfamily ConstantExpression};
+
+\node[class] (num) [below=of constant] {Integers, Rationals};
+
+\node[class] at (-2, -4) (sym) [below=of atom] {Symbols, Polynomials};
+
+\node[class] at (2, -4) (sum) [below=of comp] {Sums, Products, \newline Integrals, Sets, Vectors, Matrices};
+
+\draw[->] (atom.north) -- (exp.south);
+\draw[->] (comp.north) -- (exp.south);
+\draw[->] (constant.north) -- (atom.south);
+
+\draw[->] (num.north) -- (constant.south);
+\draw[->] (sym.north) -- (atom.south);
+\draw[->] (sum.north) -- (comp.south);
+
+\end{tikzpicture}
+
+\caption{Interfaces in the Lua\LaTeX{} CAS and examples of types that inherit from each interface.}
+
+\end{figure}
+
+Most operations that a user would want to apply to expressions, such as derivatives and integrals, are encapsulated into their own types. These types have the {\ttfamily Expression}s that these operations are applied to as instance variables, and thus are compound expressions. The other kind of operations on expressions are \emph{core methods}, which are methods in the objected-oriented sense, and can be called on expressions using the {\ttfamily :} syntax as is typical in Lua. The rule of thumb is that if there is standard mathematical notation for an operation or function represented by the CAS, it gets its own class, and if not, it is a core method. This way, every Lua expression corresponds to something that can be cleanly displayed in \LaTeX{}. This also gives us a compact way to display expression trees in this guide, namely, using mathematical notation.
+
+
+\subsubsection{Metamethod inheritance}
+This CAS takes advantage of Lua's metamethods, particularly the mathematical operators, to reduce the notational burden of expression construction. Unlike regular methods, metamethods cannot be inherited - if two tables don't have a {\ttfamily \_\_add} metamethod, it won't trigger the table's {\ttfamily \_\_index} metamethod. This means that all such metamethods are created in their own tables with names that start with a double underscore, such as {\ttfamily \_\_RingOperations}, and assigned to the correct object in its constructor method.
 
 
 \subsection{Core Methods}
@@ -406,7 +438,7 @@ All of the following core methods can be applied to any expression, and are defi
     
     \item {\ttfamily isatomic()} determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
     
-    \item {\ttfamily isconstant()} determines whether an expression is atomic and contains no variables. See Section B.2 for more details.
+    \item {\ttfamily isconstant()} determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases, for instance, it returns {\ttfamily false} for the constant $\pi$. This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
     
     \item {\ttfamily isrealconstant()} determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$.
     
@@ -417,7 +449,7 @@ All of the following core methods can be applied to any expression, and are defi
 
 The number of core methods should generally be kept small, since every new type of expression must implement all of these methods. The exception to this, of course, is core methods that call other core methods that provide a unified interface to expressions. For instance, {\ttfamily size()} calls {\ttfamily subexpressions()}, so it only needs to be implemented in the expression interface.
 
-All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. Unlike regular methods, metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
+All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. As mentioned previously, metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
 
 \begin{itemize}
     \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua. Used for debugging purposes.
@@ -427,11 +459,32 @@ All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamil
 
 \subsection{Algebra Package}
 
-The algebra package contains functionality for arbitrary-precision arithmetic, polynomial arithmetic and factoring, symbolic root finding, and logarithm and trigonometric expression classes. It requires the core package to be loaded. There are a couple of features of note in this package.
+The algebra package contains functionality for arbitrary-precision arithmetic, polynomial arithmetic and factoring, symbolic root finding, and logarithm and trigonometric expression classes. It requires the core package to be loaded.
+
+\subsubsection{Ring Interfaces}
+
+
+
+\subsubsection{Ring Conversion}
+
+\subsubsection{Types}
 
 \subsection{Calculus Package}
 
-The calculus package contains expression types for integration and differentiation. It requires both the algebra and core packages to be loaded. There isn't anything special going on in this package from a design perspective, so we don't have much to say for this section.
+The calculus package contains expression types for integration and differentiation. It requires both the algebra and core packages to be loaded.
+
+\subsubsection{Types}
+
+\begin{itemize}
+    \item {\ttfamily DerivativeExpression(expression, symbol)} creates a new derivative expression, representing the single-variable derivative of {\ttfamily expression} with respect to {\ttfamily symbol}. 
+    
+    \item {\ttfamily DiffExpression(expression, symbols)} creates a new differential expression, representing the multi-variable derivative of {\ttfamily expression} with respect to each symbol in the list {\ttfamily symbol}.
+    
+    \item {\ttfamily IntegralExpression(expression, symbol, lower, upper)} creates a new indefinite integral expression, representing the integral of {\ttfamily expression} with respect to {\ttfamily symbol} from {\ttfamily lower} to {\ttfamily upper} If both {\ttfamily lower} and {\ttfamily upper} are omitted, creates a new indefinite integral expression instead.
+    \begin{itemize}
+        \item {\ttfamily IntegralExpression:isdefinite()} returns whether the integral is definite or not.
+    \end{itemize}
+\end{itemize}
 
 \subsection{Constructing Expressions \& Basic Parsing}
 
