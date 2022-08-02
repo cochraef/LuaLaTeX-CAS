@@ -5,11 +5,11 @@ require("calculus._init")
 require("_lib.pepperfish")
 
 -- Stuff required for the basic parser.
-local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT"}
+local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT", abs = "ABS"}
 
 local function parser(s)
     if string.find(s, "[0-9]+") then
-        return "Integer('" .. s .. "')"
+        return "Integer(\"" .. s .. "\")"
     end
 
     if s.find(s, "[%^%\\%[%]]") then
@@ -22,12 +22,12 @@ local function parser(s)
         end
     end
 
-    return "SymbolExpression('" .. s .. "')"
+    return "SymbolExpression(\"" .. s .. "\")"
 end
 
 function parse(input)
     local parsed = string.gsub(input, "[0-9]+", parser)
-    parsed = string.gsub(parsed, "[A-z]+", parser)
+    parsed = string.gsub(parsed, "[A-z']+", parser)
     local exe, err = load("return " .. parsed)
     if exe then
         return exe():autosimplify()
@@ -59,16 +59,18 @@ function starttest(name)
     failures = 0
 end
 
-function test(actual, expected, initial, sort)
+-- Tests two objects for equality, irrespective of order. If the object is a table or expression, the objects may be sorted to ensure the correct order.
+function testeq(actual, expected, initial, sort)
     if sort and type(actual) == "table" and not actual.type then
         table.sort(actual, function (a, b)
             return a:order(b)
         end)
-    elseif sort and type(actual) == "table" and actual.type and actual:type() == BinaryOperation and (actual.operation == BinaryOperation.MUL or actual.operation == BinaryOperation.ADD) then
+    elseif sort and type(actual) == "table" and actual.type and actual:type() == BinaryOperation and actual:iscommutative() then
         table.sort(actual.expressions, function (a, b)
             return a:order(b)
         end)
     end
+
     if initial then
         if ToStringArray(expected) == ToStringArray(actual) then
             print(ToStringArray(initial) .. " -> " .. ToStringArray(actual))
@@ -119,19 +121,19 @@ end
 require("test.calculus.derivatives")
 require("test.calculus.integrals")
 
-require("test.expressions.autosimplify")
-require("test.expressions.simplify")
-require("test.expressions.functions")
--- require("test.expressions.rationalexponent")
-require("test.expressions.substitute")
+-- require("test.expressions.autosimplify")
+-- require("test.expressions.simplify")
+-- require("test.expressions.functions")
+-- -- require("test.expressions.rationalexponent")
+-- require("test.expressions.substitute")
 
-require("test.polynomials.polynomial")
-require("test.polynomials.partialfractions")
-require("test.polynomials.polynomialmod")
-require("test.polynomials.roots")
+-- require("test.polynomials.polynomial")
+-- require("test.polynomials.partialfractions")
+-- require("test.polynomials.polynomialmod")
+-- require("test.polynomials.roots")
 
-require("test.rings.modulararithmetic")
-require("test.rings.number")
+-- require("test.rings.modulararithmetic")
+-- require("test.rings.number")
 
 endall()
 

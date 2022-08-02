@@ -96,22 +96,6 @@ function DiffExpression:setsubexpressions(subexpressions)
     return DiffExpression(subexpressions[1], self.symbols)
 end
 
--- function DerrivativeExpression:freeof(symbol)
---     return self.symbol.freeof(symbol) and self.expression:freeof(symbol)
--- end
-
--- Substitutes each expression for a new one.
--- function DerrivativeExpression:substitute(map)
---     for expression, replacement in pairs(map) do
---         if self == expression then
---             return replacement
---         end
---     end
---     -- Typically, we only perform substitution on autosimplified expressions, so this won't get called. May give strange results, i.e.,
---     -- substituting and then evaluating the derrivative may not return the same thing as evaluating the derrivative and then substituting.
---     return DerrivativeExpression(self.expression:substitute(map), self.symbol)
--- end
-
 --- @param other Expression
 --- @return boolean
 function DiffExpression:order(other)

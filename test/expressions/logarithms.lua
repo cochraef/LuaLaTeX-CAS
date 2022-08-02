@@ -4,8 +4,8 @@ local c = BinaryOperation.POWEXP({Integer(2), LOG(Integer(2), SymbolExpression("
 
 
 starttest("logarithms")
-test(a, "log(e, x)")
-test(a:autosimplify(), "log(e, x)", a)
-test(b:autosimplify(), "x", b)
-test(c:autosimplify(), "y", c)
+testeq(a, "log(e, x)")
+testeq(a:autosimplify(), "log(e, x)", a)
+testeq(b:autosimplify(), "x", b)
+testeq(c:autosimplify(), "y", c)
 endtest()
