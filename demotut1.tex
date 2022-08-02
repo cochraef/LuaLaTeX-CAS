@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage{luacas}
+
+\begin{document}
+
+\begin{CAS}
+    vars('x','h')
+\end{CAS}
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+\end{CAS}
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+\end{CAS}
+
+\[ \print{q} \]
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
+\end{CAS}
+\[ \print{q} \]
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
+    subs = {[h] = 0}
+    q = substitute(subs,q)
+\end{CAS}
+\[ \print{q} \]
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+    q = expand(q)
+    subs = {[h] = 0}
+    q = substitute(subs,q)
+    q = simplify(q)
+\end{CAS}
+\[ \print{q} \]
+
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+\end{CAS}
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
+\begin{CAS}
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+\end{CAS}
+\[ \begin{aligned}
+    \print{q} &= 
+    \begin{CAS} 
+        q = expand(q) 
+    \end{CAS}
+    \print{q}& &\text{expand/simplify} \\
+    \begin{CAS}
+        subs = {[h]=0}
+        q = substitute(subs,q)
+    \end{CAS}
+    &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\
+    &= 
+    \begin{CAS}
+        q = simplify(q)
+    \end{CAS}
+    \print{q}& &\text{simplify.}
+\end{aligned} \] 
+So $\print{diff(f,x)} = \print*{diff(f,x)}$. 
+
+\begin{CAS}
+    vars('x','h')
+    f = 2*x^3-x
+\end{CAS}
+... 
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
+\begin{CAS}
+    subs = {[x] = x+h}
+    q = (f:substitute(subs) - f)/h
+\end{CAS}
+\[ \begin{aligned}
+    \print{q} &= 
+    \begin{CAS} 
+        q = expand(q)
+    \end{CAS}
+    \print{q}& &\text{expand/simplify} \\
+    \begin{CAS}
+        subs = {[h]=0}
+        q = q:substitute(subs)
+    \end{CAS}
+    &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\ 
+    &= 
+    \begin{CAS}
+        q = simplify(q)
+    \end{CAS}
+    \print{q}& &\text{simplify.}
+\end{aligned} \] 
+So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
+
+\end{document}

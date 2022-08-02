@@ -1,0 +1,121 @@
+\documentclass{article}
+\usepackage{luacas}
+
+\usepackage{pgfplots}
+\usetikzlibrary{calc}
+
+\begin{document}
+
+\begin{CAS}
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
+\end{CAS}
+
+\begin{CAS}
+    h  = int(dh,x)
+\end{CAS}
+
+\[ \print{h} \] 
+
+\begin{CAS}
+    h = simplify(int(dh,x))
+\end{CAS}
+\[ \print{h} \]
+
+\begin{CAS}
+    r = roots(dh) 
+\end{CAS}
+
+\[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
+
+\begin{CAS}
+v1 = substitute({[x]=r[1]},h):simplify()
+\end{CAS}
+\[ \print{v1} \]
+
+
+\luaexec{
+    v = {}
+    for i=1,4 do 
+        table.insert(v,substitute({[x]=r[i]},h):simplify())
+    end
+}
+
+\[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad \print{v[4]} \] 
+
+%\yoink{h}
+\yoink{dh}
+\yoink{r[1]}[a]
+\yoink{r[2]}[b]
+\yoink{r[3]}[c]
+\yoink{r[4]}[d]
+
+\yoink{v[1]}[A]
+\yoink{v[2]}[B]
+\yoink{v[3]}[C]
+\yoink{v[4]}[D]
+
+\newcommand{\fetch}[1]{
+    \directlua{tex.print(tostring(#1))}
+}
+\NewDocumentCommand{\store}{m O{#1}}{
+    \expandafter\def\csname #2\endcsname{%
+        \directlua{
+            input = #1
+            if not input[1] then
+                tex.print{tostring(input)}
+            else
+                tex.print("{")
+                for _,entry in ipairs(input) do 
+                    tex.print(tostring(entry),",")
+                end
+                tex.print("}")
+            end
+        }%
+    }%
+}%
+
+\store{h}
+\store{r}
+\store{v}
+\pgfmathsetmacro\a{\r[3]}
+$\a$
+
+\begin{tikzpicture}
+    \foreach \k in {0,1,2,3}{
+        \pgfmathsetmacro\a{\r[\k]}
+        \draw (\a,0) circle (\a);
+    }
+\end{tikzpicture}
+
+\begin{tikzpicture}
+    \begin{axis}[legend pos = north west]
+        \addplot [domain=-3.5:1.5,samples=100] {\h};
+        \addlegendentry{$f$};
+        \addplot[densely dashed] 
+            [domain=-3.25:1.25,samples=100] {\dh};
+        \addlegendentry{$df/dx$};
+        \addplot[gray,dashed,thick]
+            [domain=-3.5:1.5] {0};
+            \coordinate (O) at (axis cs:0,0);
+            \coordinate (X) at (axis cs:1,0);
+            \coordinate (Y) at (axis cs:0,1);
+    \end{axis}
+    \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+        \foreach \k in {0,1,2,3}{
+        \pgfmathsetmacro\a{\r[\k]}
+        \pgfmathsetmacro\b{\v[\k]}
+        \draw[fill=purple,purple]
+            (\a,0) circle (1.5pt);
+        \draw[fill=purple,purple]
+            (\a,\b) circle (1.5pt);
+        \draw[purple,dashed]
+            (\a,0) -- (\a,\b);
+        }
+    \end{scope}
+\end{tikzpicture}
+
+\end{document}

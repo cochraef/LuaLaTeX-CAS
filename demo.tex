@@ -4,15 +4,16 @@
 \usepackage{verbatim}
 \usepackage{pgfplots}
 
+\usetikzlibrary{calc}
+
 \begin{document}
 
 
-{\small 
+
 \begin{CAS}
     vars('x')
     disp(int(1/(x^3+1), x))
 \end{CAS}
-}
 
 On the other hand:
 
@@ -53,113 +54,110 @@ $\print{c}$
 \[ \print*{f} = \print{f} \] 
 \vprint*{f}
 
+
+
 \begin{CAS}
-    vars('x','h')
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
 \end{CAS}
 
 \begin{CAS}
-    vars('x','h')
-    f = x^2
+    h  = int(dh,x)
 \end{CAS}
+\[ \print{h} \] 
 
 \begin{CAS}
-    vars('x','h')
-    f = x^2
-    subs = {[x]=x+h}
-    q = (substitute(subs,f) - f)/h
+    h = simplify(int(dh,x)+10)
 \end{CAS}
-
-\[ \print{q} \]
+\[ \print{h} \]
 
 \begin{CAS}
-    vars('x','h')
-    f = x^2
-    subs = {[x]=x+h}
-    q = (substitute(subs,f) - f)/h
-    q = expand(q)
+    r = roots(dh) 
 \end{CAS}
-\[ \print{q} \]
 
-\begin{CAS}
-    vars('x','h')
-    f = x^2
-    subs = {[x]=x+h}
-    q = (substitute(subs,f) - f)/h
-    q = expand(q)
-    subs = {[h] = 0}
-    q = substitute(subs,q)
-\end{CAS}
-\[ \print{q} \]
+\luaexec{
+    v = {}
+    for i=1,4 do 
+        table.insert(v,substitute({[x]=r[i]},h):simplify())
+    end
+}
+\[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
+\[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad \print{v[4]} \] 
 
-\begin{CAS}
-    vars('x','h')
-    f = x^2
-    subs = {[x]=x+h}
-    q = (substitute(subs,f) - f)/h
-    q = expand(q)
-    subs = {[h] = 0}
-    q = substitute(subs,q)
-    q = simplify(q)
-\end{CAS}
-\[ \print{q} \]
+%\yoink{h}
+\yoink{dh}
+\yoink{r[1]}[a]
+\yoink{r[2]}[b]
+\yoink{r[3]}[c]
+\yoink{r[4]}[d]
 
-\begin{CAS}
-    vars('x','h')
-    f = x^2
-\end{CAS}
-Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
-\begin{CAS}
-    subs = {[x]=x+h}
-    q = (substitute(subs,f) - f)/h
-\end{CAS}
-\[ \begin{aligned}
-    \print{q} &= 
-    \begin{CAS} 
-        q = expand(q) 
-    \end{CAS}
-    \print{q}& &\text{expand/simplify} \\
-    \begin{CAS}
-        subs = {[h]=0}
-        q = substitute(subs,q)
-    \end{CAS}
-    &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\
-    &= 
-    \begin{CAS}
-        q = simplify(q)
-    \end{CAS}
-    \print{q}& &\text{simplify.}
-\end{aligned} \] 
-So $\print{diff(f,x)} = \print*{diff(f,x)}$. 
+\yoink{v[1]}[A]
+\yoink{v[2]}[B]
+\yoink{v[3]}[C]
+\yoink{v[4]}[D]
 
-\begin{CAS}
-    vars('x','h')
-    f = 2*x^3-x
-\end{CAS}
-.
-.
-Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
-\begin{CAS}
-    subs = {[x] = x+h}
-    q = (f:substitute(subs) - f)/h
-\end{CAS}
-\[ \begin{aligned}
-    \print{q} &= 
-    \begin{CAS} 
-        q = expand(q)
-    \end{CAS}
-    \print{q}& &\text{expand/simplify} \\
-    \begin{CAS}
-        subs = {[h]=0}
-        q = q:substitute(subs)
-    \end{CAS}
-    &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\ 
-    &= 
-    \begin{CAS}
-        q = simplify(q)
-    \end{CAS}
-    \print{q}& &\text{simplify.}
-\end{aligned} \] 
-So $\print*{diff(f,x)} = \print{diff(f,x)}$. 
+\newcommand{\fetch}[1]{
+    \directlua{tex.print(tostring(#1))}
+}
+\NewDocumentCommand{\store}{m O{#1}}{
+    \expandafter\def\csname #2\endcsname{%
+        \directlua{
+            input = #1
+            if not input[1] then
+                tex.print{tostring(input)}
+            else
+                tex.print("{")
+                for _,entry in ipairs(input) do 
+                    tex.print(tostring(entry),",")
+                end
+                tex.print("}")
+            end
+        }%
+    }%
+}%
+
+\store{h}
+\store{r}
+\store{v}
+\pgfmathsetmacro\a{\r[3]}
+$\a$
+
+\begin{tikzpicture}
+    \foreach \k in {0,1,2,3}{
+        \pgfmathsetmacro\a{\r[\k]}
+        \draw (\a,0) circle (\a);
+    }
+\end{tikzpicture}
+
+\begin{tikzpicture}
+    \begin{axis}[legend pos = north west]
+        \addplot [domain=-3.5:1.5,samples=100] {\h};
+        \addlegendentry{$f$};
+        \addplot[densely dashed] 
+            [domain=-3.25:1.25,samples=100] {\dh};
+        \addlegendentry{$df/dx$};
+        \addplot[gray,dashed,thick]
+            [domain=-3.5:1.5] {0};
+            \coordinate (O) at (axis cs:0,0);
+            \coordinate (X) at (axis cs:1,0);
+            \coordinate (Y) at (axis cs:0,1);
+    \end{axis}
+    \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
+        \foreach \k in {0,1,2,3}{
+        \pgfmathsetmacro\a{\r[\k]}
+        \pgfmathsetmacro\b{\v[\k]}
+        \draw[fill=purple,purple]
+            (\a,0) circle (1.5pt);
+        \draw[fill=purple,purple]
+            (\a,\b) circle (1.5pt);
+        \draw[purple,dashed]
+            (\a,0) -- (\a,\b);
+        }
+    \end{scope}
+\end{tikzpicture}
 
 \begin{CAS}
     vars('x','h')
@@ -228,65 +226,6 @@ So $\print*{diff(f,x)} = \print{diff(f,x)}$.
 \begin{forest}
     @\forestresult
 \end{forest}
-
-\begin{CAS}
-    vars('x')
-    f = x^2+2*x-2
-    g = x^2-1
-    subs = {[x] = f}
-    dh = substitute(subs,g)
-    dh = expand(dh)
-    h  = int(dh,x)
-    h  = simplify(h+10)
-\end{CAS}
-\[ \print{h} \] 
-\begin{CAS}
-    dh = diff(h,x)
-    dh = simplify(dh)
-\end{CAS}
-\[ \print{dh} \] 
-\begin{CAS}
-    r = roots(dh)
-\end{CAS}
-\luaexec{
-    vals = {}
-    for i=1,4 do 
-        table.insert(vals,substitute({[x]=r[i]},h):simplify())
-    end
-}
-\[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
-\[ \print{vals[1]} \] 
-\yoink{h}
-\yoink{dh}
-\yoink{r[1]}[a]
-\yoink{r[2]}[b]
-\yoink{r[3]}[c]
-\yoink{r[4]}[d]
-
-\yoink{vals[1]}[A]
-\yoink{vals[2]}[B]
-\yoink{vals[3]}[C]
-\yoink{vals[4]}[D]
-
-\NewDocumentCommand{\newyoink}{m O{#1}}{%
-\expandafter\newcommand\csname #2\endcsname{%
-    \directlua{
-        tex.print(tostring(#1))
-        }%
-    }%
-}
-\newyoink{r[1]}[g]
-
-\begin{tikzpicture}
-    \begin{axis}[legend pos = north west]
-    \addplot [domain=-3.5:1.5,samples=100] {\h};
-    \addlegendentry{$f$};
-    \addplot[densely dashed] [domain=-3.25:1.25,samples=100] {\dh};
-    \addlegendentry{$df/dx$};
-    \addplot[gray,dashed,thick] [domain=-3.5:1.5] {0};
-    \draw[fill=red] (axis cs: \g,0) circle (1.5pt);
-    \end{axis}
-\end{tikzpicture}
 
 
 

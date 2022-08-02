@@ -100,6 +100,7 @@ function substitute(tbl,expr)
 end
 
 function roots(poly)
+    poly = expand(poly)
     if poly.topolynomial then 
         poly = poly:topolynomial()
     end

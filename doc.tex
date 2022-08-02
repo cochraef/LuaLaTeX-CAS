@@ -27,7 +27,7 @@
 
 \begin{document}
 \title{A portable Computer Algebra System capable of symbolic computation for use in Lua\LaTeX{}: \\  The {\ttfamily luacas} package }
-\author{Evan Cochrane \\ {\itshape Timothy All, Joe Eichholz}}
+\author{Evan Cochrane \\ {\itshape Timothy All}}
 \date{} 
 
 \maketitle 
@@ -47,7 +47,7 @@ firstline=7,
 lastline=11,
 breaklines]
 {latex}
-{docdemo.tex}
+{demointro.tex}
 The above code will compute the partial derivative $f_x$ of the function $f$ defined by 
 \[ f(x,y)=3xy-x^2y.\]
 There are various methods for fetching and/or printing results from the CAS within your \LaTeX{} document:
@@ -58,7 +58,7 @@ firstline=14,
 lastline=14,
 breaklines]
 {latex}
-{docdemo.tex}
+{demointro.tex}
 \tcblower
 \[ \print*{fx} = \print{fx} \] 
 \end{codebox}
@@ -94,6 +94,10 @@ Currently, {\ttfamily luacas} includes the following functionality:
 \end{itemize}
                 
 The CAS is written using object-oriented Lua, so it is modular and would be easy to extend its functionality (which we hope to do in the future).
+
+\subsection{Acknowledgements}
+
+We'd like to thank the faculty of the Department of Mathematics at Rose-Hulman Institute of Technology for offering constructive feedback as we worked on this project. In particular, a special thanks goes to Dr. Joseph Eichholz for his invaluable input and helpful suggestions. 
 
 \section{Installation}
 
@@ -134,25 +138,25 @@ Alice is teaching calculus, and she wants to give her students many examples of 
 
 Alice can access the \texttt{luacas} program using a custom environment: \mintinline{latex}{\begin{CAS}..\end{CAS}}. The first thing Alice must do is declare variables that will be used going forward:
 \inputminted[
-    firstline=55,
-    lastline=57,
+    firstline=6,
+    lastline=8,
     breaklines]
     {latex}
-    {demo.tex}
-Alice decides that $f$, the function to be differentiated, should be $x^2$. So Alice makes this assignnment with:
+    {demotut1.tex}
+Alice decides that $f$, the function to be differentiated, should be $x^2$. So Alice makes this assignment with:
 \inputminted[
-    firstline=59,
-    lastline=62,
+    firstline=10,
+    lastline=13,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
 Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} command of \texttt{luacas}:
 \inputminted[
-    firstline=64,
-    lastline=69,
+    firstline=15,
+    lastline=20,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
 Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$ within her document. For this, she uses the \mintinline{latex}{\print} command. 
 \begin{CAS}
     vars('x','h')
@@ -161,39 +165,42 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     q = (substitute(subs,f)- f)/h
 \end{CAS}
 \begin{codebox}
-    \inputminted[
-    firstline=71,
-    lastline=71,
+    {\small\inputminted[
+    firstline=22,
+    lastline=22,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
+    }
     \tcblower
     \[ \print{q} \] 
 \end{codebox}
 So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{expand} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=expand(q)}, and prints the result to see if things worked as expected:
 \begin{codebox}
-    \inputminted[
-    firstline=73,
-    lastline=80,
+    {\small\inputminted[
+    firstline=24,
+    lastline=31,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
+    }
     \tcblower
     \begin{CAS}
         q = expand(q)
     \end{CAS}
     \[ \print*{q} \] 
 \end{codebox}
-Alice is pleasantly surprised that the result of the expansion has been \emph{autosimplified}, i.e., the factors of $x^2$ and $-x^2$ cancelled each other out, and the resulting extra factor of $h$ has been cancelled out as well.  
+Alice is pleasantly surprised that the result of the expansion has been \emph{autosimplified}, i.e., the factors of $x^2$ and $-x^2$ cancelled each other out, and the resulting extra factor of $h$ has been cancelled out of the numerator and denominator.
 
 Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded and simplified (automatically), this amounts to another substitution:
 \begin{codebox}
-    \inputminted[
-    firstline=82,
-    lastline=91,
+    {\small\inputminted[
+    firstline=33,
+    lastline=42,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
+    }
     \tcblower
     \begin{CAS}
         subs = {[h]=0}
@@ -203,12 +210,13 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
 \end{codebox}
 Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{simplify} command. This does the trick: adding the line \mintinline{lua}{q = simplify(q)} before leaving the \texttt{CAS} environment returns the expected $2x$:
 \begin{codebox}
-    \inputminted[
-    firstline=93,
-    lastline=103,
+    {\small\inputminted[
+    firstline=44,
+    lastline=54,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
+    }
     \tcblower
     \begin{CAS}
         q=simplify(q)
@@ -225,12 +233,13 @@ Alice is pretty happy with how everything is working, but she wants to be able t
 \end{itemize}
 Here's the final version of Alice's code: 
 \begin{codebox}[sidebyside align=top]
-    \inputminted[
-    firstline=105,
-    lastline=131,
+    {\small\inputminted[
+    firstline=56,
+    lastline=82,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
+    }
     \tcblower
     \begin{CAS}
         vars('x','h')
@@ -262,12 +271,13 @@ Here's the final version of Alice's code:
 \end{codebox}
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 \begin{codebox}[sidebyside align=top]
-    \inputminted[
-    firstline=133,
-    lastline=138,
+    {\small\inputminted[
+    firstline=84,
+    lastline=88,
     breaklines]
     {latex}
-    {demo.tex}
+    {demotut1.tex}
+    }
     \tcblower
     \begin{CAS}
         vars('x','h')
@@ -302,7 +312,107 @@ Alice can produce another example merely by changing the definition of $f$ on th
 
 Bob is teaching calculus too, and he wants to give his students many examples of \emph{finding the local max/min of a given function}. But, like Alice, Bob doesn't want to work out a bunch of examples by-hand. Bob decides to try his hand with \texttt{luacas} after having been taught the basics by Alice. 
 
-Bob decides to stick with polynomials for these examples; if anything because those functions are in the wheel-house of \texttt{luacas}.
+Bob decides to stick with polynomials for these examples; if anything because those functions are in the wheel-house of \texttt{luacas}. In particular, Bob decides that the \emph{derivative} of the function he wants to use should be a composition of quadratics. This ought to ensure that the roots of that derivative are expressible in a nice way. 
+
+Accordingly, Bob declares variables and chooses two quadratic polynomials to compose, say $f$ and $g$, and sets $dh = g \circ f$:
+
+\inputminted[
+firstline=9,
+lastline=15,
+breaklines]
+{latex}
+{demotut2.tex}
+
+Bob wants to compute $h$, the integral of $dh$. Bob could certainly compute this quantity by-hand, but why hardcode that information into the document when \texttt{luacas} can do this for you? So Bob uses the \texttt{int} command:
+
+\inputminted[
+firstline=17,
+lastline=19,
+breaklines]
+{latex}
+{demotut2.tex}
+
+Bob is curious to know the value of $h$. So he uses the \mintinline{latex}{\print{h}} to produce:
+\begin{codebox}
+    {\small\inputminted[
+        firstline=21,
+        lastline=21,
+        breaklines]
+        {latex}
+        {demotut2.tex}}
+    \tcblower
+    \begin{CAS}
+        vars('x')
+        f = x^2+2*x-2
+        g = x^2-1
+        subs = {[x] = f}
+        dh = substitute(subs,g)
+        h  = int(dh,x)
+    \end{CAS}
+    \[\print{h} \] 
+\end{codebox}
+This isn't exactly what Bob had in mind. It occurs to Bob that he may need to simplify the expression $h$, so he tries:
+
+\begin{codebox}
+    {\small\inputminted[
+        firstline=23,
+        lastline=26,
+        breaklines]
+        {latex}
+        {demotut2.tex}
+    }
+    \tcblower
+    \begin{CAS}
+        h = simplify(h)
+    \end{CAS}
+    \[\print{h} \] 
+\end{codebox}
+
+That's more like it! Now, Bob wants to find the roots to $dh$. Bob uses the \texttt{roots} command to do this:
+
+\inputminted[
+    firstline=28,
+    lastline=30,
+    breaklines]
+    {latex}
+    {demotut2.tex}
+
+But then Bob wonders to himself, ``How do I actually retrieve the roots of $dh$ from \texttt{luacas}?'' The assignment \mintinline{lua}{r = roots(dh)} stores the roots of the polynomial $dh$ in a table named \texttt{r}. With indices beginning at $1$, Bob can retrieve the values of these roots via:
+
+\begin{codebox}
+    \inputminted[
+    firstline=32,
+    lastline=32,
+    breaklines]
+    {latex}
+    {demotut2.tex}
+    \tcblower 
+    \begin{CAS}
+        r = roots(dh)
+    \end{CAS}
+    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
+\end{codebox}
+
+Splendid! Bob would now like to evaluate the function $h$ at these roots (for these are the local max/min values of $h$). Here's Bob's first thought:
+
+\begin{codebox}
+    \inputminted[
+    firstline=34,
+    lastline=37,
+    breaklines]
+    {latex}
+    {demotut2.tex}
+    \tcblower 
+    \begin{CAS}
+        v1 = simplify(substitute({[x]=r[1]},h))
+    \end{CAS}
+    \[ \print{v1} \] 
+\end{codebox}
+
+What's going on? Bob is (understandably) confused. But here's where Bob learns a valuable lesson\dots 
+
+\subsubsection*{Lua numbers vs \texttt{luacas} Integers}
+
 
 
 \subsection{Advanced}
