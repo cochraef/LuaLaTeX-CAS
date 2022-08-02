@@ -27,7 +27,7 @@ function BinaryOperation:simplifypower()
     end
 
     -- Simplifies complex numbers raised to negative integer powers
-    if base:iscomplexconstant() and exponent:isconstant() and exponent:getring() == Integer:getring() and exponent < Integer.zero() then
+    if not base:isrealconstant() and base:iscomplexconstant() and exponent:isconstant() and exponent:getring() == Integer:getring() and exponent < Integer.zero() then
         local a = base.expressions[1]
         local b
         if base.expressions[2] == I then
