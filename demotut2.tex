@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{luacas}
+\usepackage{multicol,fullpage,luacas,parskip,asypictureB}
 
 \usepackage{pgfplots}
 \usetikzlibrary{calc}
@@ -15,13 +15,13 @@
 \end{CAS}
 
 \begin{CAS}
-    h  = int(dh,x)
+    h  = int(dh,x)+10
 \end{CAS}
 
 \[ \print{h} \] 
 
 \begin{CAS}
-    h = simplify(int(dh,x))
+    h = simplify(int(dh,x)+10)
 \end{CAS}
 \[ \print{h} \]
 
@@ -32,90 +32,129 @@
 \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
 
 \begin{CAS}
-v1 = substitute({[x]=r[1]},h):simplify()
+v = simplify(substitute({[x]=r[1]},h))
 \end{CAS}
-\[ \print{v1} \]
+\[ \print{v} \]
 
+\begin{CAS}
+    vars('y')
+    a = 1
+    b = y+a
+\end{CAS}
+\[ \print{b} \] 
 
-\luaexec{
-    v = {}
-    for i=1,4 do 
-        table.insert(v,substitute({[x]=r[i]},h):simplify())
-    end
+\directlua{
+    vars('y')
+    a = Integer(1)
+    b = y+a
 }
+\[ \print{b} \] 
 
+
+\directlua{
+v = {}
+for i=1,4 do 
+    table.insert(v,simplify(
+        substitute({[x]=r[i]},h)
+        )
+    )
+end
+}
 \[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad \print{v[4]} \] 
 
-%\yoink{h}
-\yoink{dh}
-\yoink{r[1]}[a]
-\yoink{r[2]}[b]
-\yoink{r[3]}[c]
-\yoink{r[4]}[d]
-
-\yoink{v[1]}[A]
-\yoink{v[2]}[B]
-\yoink{v[3]}[C]
-\yoink{v[4]}[D]
-
-\newcommand{\fetch}[1]{
-    \directlua{tex.print(tostring(#1))}
-}
-\NewDocumentCommand{\store}{m O{#1}}{
-    \expandafter\def\csname #2\endcsname{%
-        \directlua{
-            input = #1
-            if not input[1] then
-                tex.print{tostring(input)}
-            else
-                tex.print("{")
-                for _,entry in ipairs(input) do 
-                    tex.print(tostring(entry),",")
-                end
-                tex.print("}")
-            end
-        }%
-    }%
-}%
+\begin{tikzpicture}[scale=0.9]
+    \begin{axis}[legend pos = north west]
+    \addplot [domain=-3.5:1.5,samples=100]
+        {\fetch{h}};
+    \addlegendentry{$f$};
+    \addplot[densely dashed] 
+        [domain=-3.25:1.25,samples=100]
+        {\fetch{dh}};
+    \addlegendentry{$df/dx$};
+    \addplot[gray,dashed,thick]
+        [domain=-3.5:1.5] {0};
+    \end{axis}
+\end{tikzpicture}
 
 \store{h}
+\store{dh}
+
+\store{r[1]}[rootone]
+
 \store{r}
 \store{v}
-\pgfmathsetmacro\a{\r[3]}
-$\a$
+
+\def\ralt{{ \fetch{r[1]}, \fetch{r[2]}, \fetch{r[3]}, \fetch{r[4]} }}
 
 \begin{tikzpicture}
+\begin{axis}[legend pos = north west]
+    \addplot 
+    [domain=-3.5:1.5,samples=100] {\h};
+    \addlegendentry{$f$};
+    \addplot[densely dashed] 
+    [domain=-3.25:1.25,samples=100] {\dh};
+    \addlegendentry{$df/dx$};
+    \addplot[gray,dashed,thick]
+    [domain=-3.5:1.5] {0};
+    \coordinate (O) at (axis cs:0,0);
+    \coordinate (X) at (axis cs:1,0);
+    \coordinate (Y) at (axis cs:0,1);
+\end{axis}
+\begin{scope}[x={($(X)-(O)$)},
+     y={($(Y)-(O)$)},
+     shift={(O)}]
     \foreach \k in {0,1,2,3}{
-        \pgfmathsetmacro\a{\r[\k]}
-        \draw (\a,0) circle (\a);
+    \pgfmathsetmacro\a{\r[\k]}
+    \pgfmathsetmacro\b{\v[\k]}
+    \draw[fill=purple,purple]
+    (\a,0) circle (1.5pt)
+    (\a,\b) circle (1.5pt)
+    (\a,0) edge[dashed] (\a,\b);
     }
+\end{scope}
 \end{tikzpicture}
 
-\begin{tikzpicture}
+\newpage
+
+Consider the function $f(x)$ defined by:
+    \begin{CAS}
+        vars('x')
+        f = x^2+2*x-2
+        g = x^2-1
+        subs = {[x] = f}
+        dh = expand(substitute(subs,g))
+        h = simplify(int(dh,x)+10)
+    \end{CAS}
+    $\displaystyle f(x) = \print{h}$.
+\begin{multicols}{2}
+    Note that: 
+    \[ f'(x) = \print{dh}.\] 
+    The roots to $f'(x)=0$ equation are:
+    \begin{CAS}
+        r = roots(dh)
+    \end{CAS}
+    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]}.\] 
+    Recall: $f'(x_0)$ measures the slope of the tangent line to $y=f(x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak (local maximum) or a valley (local minimum). 
+    \columnbreak 
+    \store{h}\store{dh}
+    \begin{tikzpicture}[scale=0.95]
     \begin{axis}[legend pos = north west]
-        \addplot [domain=-3.5:1.5,samples=100] {\h};
+        \addplot 
+        [domain=-3.5:1.5,samples=100] {\h};
         \addlegendentry{$f$};
         \addplot[densely dashed] 
-            [domain=-3.25:1.25,samples=100] {\dh};
+        [domain=-3.25:1.25,samples=100] {\dh};
         \addlegendentry{$df/dx$};
         \addplot[gray,dashed,thick]
-            [domain=-3.5:1.5] {0};
-            \coordinate (O) at (axis cs:0,0);
-            \coordinate (X) at (axis cs:1,0);
-            \coordinate (Y) at (axis cs:0,1);
+        [domain=-3.5:1.5] {0};
+        \luaexec{for i=1,4 do 
+        tex.print("\\draw[fill=purple,purple]",
+            "(axis cs:{", tostring(r[i]) ,"},0) circle (1.5pt)",
+            "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) circle (1.5pt)",
+            "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) edge[dashed] (axis cs:{", tostring(r[i]) ,"},0);")
+        end}
     \end{axis}
-    \begin{scope}[x={($(X)-(O)$)}, y={($(Y)-(O)$)}, shift={(O)}]
-        \foreach \k in {0,1,2,3}{
-        \pgfmathsetmacro\a{\r[\k]}
-        \pgfmathsetmacro\b{\v[\k]}
-        \draw[fill=purple,purple]
-            (\a,0) circle (1.5pt);
-        \draw[fill=purple,purple]
-            (\a,\b) circle (1.5pt);
-        \draw[purple,dashed]
-            (\a,0) -- (\a,\b);
-        }
-    \end{scope}
-\end{tikzpicture}
+    \end{tikzpicture}
+\end{multicols}
 
 \end{document}

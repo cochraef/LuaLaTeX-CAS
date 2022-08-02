@@ -1,4 +1,4 @@
-%Copyright (c) ???
+% Copyright (c) ???
 %
 % Permission is granted to copy, distribute and/or modify this
 % software under the terms of the LaTeX Project Public License
@@ -23,7 +23,7 @@
     }\stop
 \fi
 
-%Required Packaged
+%Required Packages
 \RequirePackage{xparse}
 \RequirePackage{pgfkeys}
 \RequirePackage{verbatim}
@@ -43,7 +43,28 @@
 
 \newcommand{\get}%
     [2][true]%
-    {\directlua{disp(#2, #1)}}      
+    {\directlua{disp(#2, #1)}}  
+    
+\newcommand{\fetch}[1]{
+    \directlua{tex.print(tostring(#1))}
+}
+
+\NewDocumentCommand{\store}{m O{#1}}{
+    \expandafter\def\csname #2\endcsname{%
+        \directlua{
+            input = #1
+            if not input[1] then
+                tex.sprint{tostring(input)}
+            else
+                tex.sprint("{")
+                for _,entry in ipairs(input) do 
+                    tex.sprint(tostring(entry),",")
+                end
+                tex.sprint("}")
+            end
+        }%
+    }%
+}%
     
 \NewDocumentCommand{\yoink}{m O{#1}}{%
 \expandafter\def\csname #2\endcsname{%

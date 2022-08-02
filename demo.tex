@@ -107,13 +107,13 @@ $\print{c}$
         \directlua{
             input = #1
             if not input[1] then
-                tex.print{tostring(input)}
+                tex.sprint{tostring(input)}
             else
-                tex.print("{")
+                tex.sprint("{")
                 for _,entry in ipairs(input) do 
-                    tex.print(tostring(entry),",")
+                    tex.sprint(tostring(entry),",")
                 end
-                tex.print("}")
+                tex.sprint("}")
             end
         }%
     }%
