@@ -12,6 +12,6 @@ local b = BinaryOperation.ADDEXP
                 Integer(4)})
 
 starttest("function expressions")
-testeq(a:autosimplify(), "f(x, (2 * x))", a)
-testeq(b:autosimplify(), "(4 + f(x) + g(x))", b)
+testeq(a:autosimplify(), parse("f(x, (2 * x))"), a)
+testeq(b:autosimplify(), parse("(4 + f(x) + g(x))"), b)
 endtest()

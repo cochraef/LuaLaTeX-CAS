@@ -227,7 +227,7 @@ end
 function IntegralExpression.substitutionmethod(expression, symbol)
     local P = IntegralExpression.trialsubstitutions(expression)
     local F = nil
-    local i = 1;
+    local i = 1
 
     while not F and i <= #P do
         local g = P[i]

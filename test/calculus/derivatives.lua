@@ -6,14 +6,14 @@ local e = DD(SymbolExpression("x") ^ SymbolExpression("x"))
 local f = DD(PolynomialRing({Integer(3), Integer(4), Integer(5)}, "x"))
 local g = DD(LN(SymbolExpression("y")), SymbolExpression("y"))
 local h = DD(SymbolExpression("x") ^ SymbolExpression("n"))
-local i = DD(SIN((SymbolExpression("x"))));
-local j = DD(SIN(Integer(2) * COS(SymbolExpression("x"))));
+local i = DD(SIN((SymbolExpression("x"))))
+local j = DD(SIN(Integer(2) * COS(SymbolExpression("x"))))
 local k = DD(ARCTAN(SymbolExpression("x") ^ (Integer(1) / Integer(2))))
 local l = DD(ARCSEC(SymbolExpression("x")))
 
 starttest("derivatives")
 
-testeq(a, "(d/dx x * y)")
+testeq(a, dparse("DD(x*y, x)"))
 testeq(a:autosimplify(), parse("y"), a)
 testeq(b:autosimplify(), parse("6 * x + 2"), b)
 testeq(c:autosimplify(), parse("e^x"), c)

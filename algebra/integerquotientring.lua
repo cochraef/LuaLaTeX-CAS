@@ -24,7 +24,7 @@ function IntegerModN.makering(modulus)
     local t = {ring = IntegerModN}
     t.modulus = modulus
     t = setmetatable(t, __obj)
-    return t;
+    return t
 end
 
 -- Shorthand constructor for a ring with a particular modulus.
@@ -75,7 +75,7 @@ function IntegerModN:getring()
         t.modulus = self.modulus
     end
     t = setmetatable(t, __obj)
-    return t;
+    return t
 end
 
 --- @param ring RingIdentifier
