@@ -242,29 +242,29 @@ function IntegralExpression.substitutionmethod(expression, symbol)
             --factor u and cancel like non-constant terms
             u = u:factor():autosimplify()
 
-            --now do the same for constants
-            local coeff = Integer.one()
-            for index, exp in ipairs(u:subexpressions()) do
-                if exp.operation ~= BinaryOperation.POW then
-                    exp = BinaryOperation(BinaryOperation.POW,{exp,Integer.one()})
-                end
-                if exp.expressions[2]:type() == Integer and  exp.expressions[1].operation == BinaryOperation.ADD then
-                    local power = exp.expressions[2]
-                    local sumpart = exp.expressions[1]
-                    local coeffpart
-                    if sumpart.expressions[1].operation == BinaryOperation.MUL and sumpart.expressions[1].expressions[1]:isconstant() then
-                        coeffpart = sumpart.expressions[1].expressions[1] ^ power
-                    end
-                    if sumpart.expressions[1]:isconstant() then
-                        coeffpart = sumpart.expressions[1]
-                    end
-                    if coeffpart then
-                        u.expressions[index].expressions[1] = u.expressions[index].expressions[1] / coeffpart
-                        coeff = coeff / (coeffpart ^ power)
-                    end
-                end
-            end
-            u = u:autosimplify()
+            -- now do the same for constants
+            -- local coeff = Integer.one()
+            -- for index, exp in ipairs(u:subexpressions()) do
+            --     if exp.operation ~= BinaryOperation.POW then
+            --         exp = BinaryOperation(BinaryOperation.POW,{exp,Integer.one()})
+            --     end
+            --     if exp.expressions[2]:type() == Integer and exp.expressions[1].operation == BinaryOperation.ADD then
+            --         local power = exp.expressions[2]
+            --         local sumpart = exp.expressions[1]
+            --         local coeffpart
+            --         if sumpart.expressions[1].operation == BinaryOperation.MUL and sumpart.expressions[1].expressions[1]:isconstant() then
+            --             coeffpart = sumpart.expressions[1].expressions[1] ^ power
+            --         end
+            --         if sumpart.expressions[1]:isconstant() then
+            --             coeffpart = sumpart.expressions[1]
+            --         end
+            --         if coeffpart then
+            --             u.expressions[index].expressions[1] = u.expressions[index].expressions[1] / coeffpart
+            --             coeff = coeff / (coeffpart ^ power)
+            --         end
+            --     end
+            -- end
+            -- u = u:autosimplify()
 
             if u:freeof(symbol) then
                 local FF = IntegralExpression.integrate(u, subsymbol)
@@ -531,7 +531,7 @@ function IntegralExpression.partsmethod(expression, symbol)
     if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
         local results = {}
         while u ~= Integer.zero() do
-            local v = IntegralExpression.integrate(vp, symbol)
+            local v = IntegralExpression(vp, symbol):autosimplify()
             if not v then
                 return
             end
@@ -562,7 +562,7 @@ function IntegralExpression.eulersformula(expression, symbol)
         return
     end
 
-    local complexresult = IntegralExpression.integrate(new:expand(), symbol)
+    local complexresult = IntegralExpression.integrate(new:autosimplify():expand(), symbol)
 
     if not complexresult then
         return

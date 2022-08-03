@@ -43,6 +43,6 @@ testeq(m:autosimplify(), parse("2 * (3 ^ (-1/2)) * (arctan((3 ^ (-1/2)) * (1 + (
 
 testeq(o:autosimplify(), parse("((2 * (e ^ x)) + (-2 * (e ^ x) * x) + ((e ^ x) * (x ^ 2)))"), o)
 testeq(p:autosimplify(), parse("((2 * cos(x)) + ((-3 + (-6 * x) + (-1 * (x ^ 2))) * cos(x)) + ((6 + (2 * x)) * sin(x)))"), p)
-testeq(q:autosimplify(), parse("((1/2 * (e ^ x) * cos(x)) + (x * ((-1/2 * (e ^ x) * cos(x)) + (1/2 * (e ^ x) * sin(x)))))"), q)
+testeq(q:autosimplify(), parse("(1/2 * (e ^ x) * (cos(x))) + (-1/2 * (e ^ x) * x * (cos(x))) + (1/2 * (e ^ x) * x * (sin(x)))"), q)
 testeq(r:autosimplify(), parse("((3/4 * sin(x)) + (1/12 * sin((3 * x))))"), r)
 endtest()
