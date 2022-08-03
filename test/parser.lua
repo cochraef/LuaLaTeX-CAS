@@ -197,7 +197,7 @@ function CASparse(input)
     local str = string.gsub(input, ".?[0-9]+", function (s)
         -- Here, we are part of an identifier, so we don't replace anything
         if string.match(string.sub(s, 1, 1), "[A-Z]") or string.match(string.sub(s, 1, 1), "[a-z]") or string.match(string.sub(s, 1, 1), "_") then
-            return;
+            return
         end
 
         if string.match(string.sub(s, 1, 1), "[0-9]") then
@@ -218,7 +218,7 @@ function CASparse(input)
     end)
     str = string.gsub(str, ".?%.Integer%('[0-9]+'%)", function (s)
         if string.sub(s, 1, 2) == ".." then
-            return;
+            return
         end
         return string.sub(s, 1, 1) .. "Integer('0')." .. string.sub(s, 2, #s)
     end)

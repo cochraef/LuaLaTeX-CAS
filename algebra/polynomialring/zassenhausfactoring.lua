@@ -142,7 +142,7 @@ function PolynomialRing:henselift(S, k)
             local rnew = R[i]:inring(PolynomialRing.R("y", p ^ Integer(j)))
             Vnew[i] = vnew + (p) ^ (Integer(j) - Integer.one()) * rnew
         end
-        V = Vnew;
+        V = Vnew
     end
     return self:truefactors(V, p, k)
 end
@@ -216,5 +216,5 @@ function PolynomialRing:truefactors(l, p, k)
     if U ~= Integer.one() then
         factors[#factors+1] = U
     end
-    return factors;
+    return factors
 end

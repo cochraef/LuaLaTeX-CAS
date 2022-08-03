@@ -31,7 +31,7 @@ function FunctionExpression:new(name, expressions)
 
     __o.__index = FunctionExpression
     __o.__tostring = function(a)
-        local expressionnames = a.name .. '(';
+        local expressionnames = a.name .. '('
         for index, expression in ipairs(a.expressions) do
             expressionnames = expressionnames .. tostring(expression)
             if a.expressions[index + 1] then

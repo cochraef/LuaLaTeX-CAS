@@ -12,9 +12,9 @@ __Integer = {}
 -- The length of each digit in base 10. 10^15 < 2^53 < 10^16, so 15 is the highest value that will work with double-percision numbers.
 -- For multiplication to work properly, however, this also must be even so we can take the square root of the digit size exaxtly.
 -- 10^14 is still larger than 2^26, so it is still efficient to do multiplication this way.
-Integer.DIGITLENGTH = 14;
+Integer.DIGITLENGTH = 14
 -- The maximum size for a digit. While this doesn't need to be a power of 10, it makes implementing converting to and from strings much easier.
-Integer.DIGITSIZE = 10 ^ Integer.DIGITLENGTH;
+Integer.DIGITSIZE = 10 ^ Integer.DIGITLENGTH
 -- Partition size for multiplying integers so we can get both the upper and lower bits of each digits
 Integer.PARTITIONSIZE = math.floor(math.sqrt(Integer.DIGITSIZE))
 
@@ -146,7 +146,7 @@ __o.__tostring = function(a) -- Only works if the digit size is a power of 10
 end
 __o.__div = function(a, b)   -- Constructor for a rational number disguised as division
     if not b.getring then
-        return BinaryOperation.DIVEXP({a, b});
+        return BinaryOperation.DIVEXP({a, b})
     end
     if(a:getring() == Integer:getring() and b:getring() == Integer:getring()) then
         return Rational(a, b)
@@ -242,7 +242,7 @@ end, __tostring = function(a)
     return "ZZ"
 end})
 function Integer:getring()
-    return t;
+    return t
 end
 
 --- @param ring RingIdentifier
