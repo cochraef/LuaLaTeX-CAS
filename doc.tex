@@ -10,7 +10,7 @@
 \usepackage{pgfplots}
 \usetikzlibrary{positioning,calc}
 \usepackage{minted}
-%\usemintedstyle{pastie}
+\usemintedstyle{pastie}
 \usepackage[hidelinks]{hyperref}
 \usepackage{parskip}
 \usepackage{multicol}
@@ -23,8 +23,6 @@ backend=biber,
 style=numeric,
 ]{biblatex}
 \addbibresource{sources.bib}
-
-
 
 \newtcolorbox{codebox}[1][sidebyside]{
     enhanced,skin=bicolor,
@@ -715,7 +713,7 @@ Every object in the CAS is an expression, meaning it inherits from the {\ttfamil
 \begin{figure}[h]
 \centering
 
-\begin{tikzpicture}[interface/.style={rectangle, draw=orange!60, fill=orange!5, very thick, minimum size=5mm},class/.style={text width=2.5cm,rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm}]
+\begin{tikzpicture}[interface/.style={rectangle, draw=orange!60, fill=orange!5, very thick, minimum size=5mm,outer sep=3pt},class/.style={text width=2.5cm,rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm}]
 
 \node[interface] at (0, 0) (exp) {\ttfamily Expression};
 \node[interface] at (-2, -2) (atom) {\ttfamily AtomicExpression};
@@ -728,13 +726,12 @@ Every object in the CAS is an expression, meaning it inherits from the {\ttfamil
 
 \node[class] at (2, -4) (sum) [below=of comp] {Sums, Products, \newline Integrals, Sets, Vectors, Matrices};
 
-\draw[->] (atom.north) -- (exp.south);
-\draw[->] (comp.north) -- (exp.south);
-\draw[->] (constant.north) -- (atom.south);
-
-\draw[->] (num.north) -- (constant.south);
-\draw[->] (sym.north) -- (atom.south);
-\draw[->] (sum.north) -- (comp.south);
+\draw[->,thick] (atom) edge (exp)
+    (comp) edge (exp)
+    (constant) edge (atom)
+    (num) edge (constant)
+    (sym) edge (atom)
+    (sum) edge (comp);
 
 \end{tikzpicture}
 

@@ -1,5 +1,5 @@
 --- @class DiffExpression
---- An expression for a single-variable higher-order derivatives of an expression.
+--- An expression for a multi-variable higher-order derivatives of an expression.
 --- @field symbols SymbolExpression
 --- @field expression Expression
 
@@ -12,7 +12,7 @@ __DiffExpression = {}
 
 -- Creates a new derivative operation with the given symbols and expression.
 --- @param expression Expression
---- @param symbols Symbol
+--- @param symbols table<number, Symbol>
 --- @return DiffExpression
 function DiffExpression:new(expression,symbols)
     local o = {}
