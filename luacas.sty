@@ -181,6 +181,12 @@
     }
 }
 
+\NewDocumentCommand{\whatis}{m}{%
+    \directlua{
+        tex.print("{\\ttfamily",whatis(#1),"}")
+    }%
+}
+
 \NewDocumentCommand{\freeof}{s m m}{%
     \IfBooleanTF{#1}{%
         \luaexec{

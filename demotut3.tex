@@ -1,0 +1,95 @@
+\documentclass{article}
+\usepackage{multicol,fullpage,luacas,parskip,asypictureB}
+
+\usepackage{pgfplots,forest}
+\usetikzlibrary{calc}
+
+\begin{document}
+
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q)
+\end{CAS}
+
+\parseforest{q}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {
+        font=\ttfamily,
+        rectangle,
+        rounded corners=1pt
+    },
+    where level=0{%
+        fill=orange!25
+    }{},
+    @\forestresult
+\end{forest}
+
+\directlua{
+    if q.operation == BinaryOperation.ADD then 
+        tex.print("I'm an \\texttt{ADD}")
+    end
+}
+
+\luaexec{
+    den = {}
+    num = {}
+    auxden = {}
+    if q.operation == BinaryOperation.ADD then 
+        for _, expr in ipairs(q.expressions) do
+            local numpart = Integer.one()
+            local denpart = Integer.one()
+            if expr.operation == BinaryOperation.MUL then 
+                for _,subexpr in ipairs(expr.expressions) do 
+                    if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2] == -Integer.one() then
+                        denpart = denpart*subexpr.expressions[1]    
+                        for _,term in ipairs(den) do 
+                            if subexpr.expressions[1] == term then 
+                                goto continue
+                            end
+                        end
+                        table.insert(den,subexpr.expressions[1])
+                        ::continue::
+                    else 
+                        numpart = numpart*subexpr 
+                    end
+                end
+            end
+            if expr.operation == BinaryOperation.POW and expr.expressions[2] == -Integer.one() then 
+                denpart = denpart*expr.expressions[1]
+                for _,term in ipairs(den) do 
+                    if expr.expressions[1] == term then 
+                        goto continue
+                    end
+                end
+                table.insert(den,subexpr.expressions)
+                ::continue::
+            end
+            table.insert(num,numpart)
+            table.insert(auxden,denpart)
+        end
+    end
+    denominator = Integer.one()
+    numerator   = Integer.zero()
+    for _,expr in ipairs(den) do 
+        denominator = denominator*expr
+    end
+    denominator = denominator:simplify()
+    for index,expr in ipairs(num) do
+        local numer = denominator/auxden[index]
+        numer = numer:simplify() 
+        numerator = numerator + expr*numer
+    end
+    numerator = numerator:simplify():expand():factor()
+    common = numerator/denominator
+}
+\[ \print{denominator} \] 
+\[ \print{numerator} \] 
+\[ \print{common} \] 
+
+
+
+\end{document}

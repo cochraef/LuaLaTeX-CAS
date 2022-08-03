@@ -8,7 +8,9 @@
 \usepackage[shortlabels]{enumitem}
 
 \usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \usetikzlibrary{positioning,calc}
+\usepackage{forest}
 \usepackage{minted}
 \usemintedstyle{pastie}
 \usepackage[hidelinks]{hyperref}
@@ -318,7 +320,7 @@ Alice can produce another example merely by changing the definition of $f$ on th
     So $\print{diff(f,x)} = \print*{diff(f,x)}$.     
 \end{codebox}
 
-\subsection{Tutorial 2: Finding maxima/minima}
+\subsection{Tutorial 2: Finding Maxima/Minima}
 
 Bob is teaching calculus too, and he wants to give his students many examples of \emph{finding the local max/min of a given function}. But, like Alice, Bob doesn't want to work out a bunch of examples by-hand. Bob decides to try his hand with \texttt{luacas} after having been taught the basics by Alice. 
 
@@ -649,9 +651,65 @@ Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} fun
 \end{codebox}
 
 
-\subsection{Advanced}
+\subsection{Tutorial 3: Adding Functionality}
 
+Charlie is, like Alice and Bob, also teaching calculus. Charlie likes Alice's examples and wants to try something similar. But Charlie would like to do more involved examples using rational functions. Accordingly, Charlie copy-n-pastes Alice's code:
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q)
+\end{CAS}
+\begin{minted}{latex}
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q)
+\end{CAS}
+\end{minted}
+Unfortunately, \mintinline{latex}{\[ q=\print{q} \]} produces:
+\[ q = \print{q} \]
+The \mintinline{lua}{simplify()} command doesn't seem to help either! What Charlie truly needs is to combine terms, i.e., Charlie needs to find a \emph{common denominator}. They're horrified to learn that no such functionality exists in this burgeoning package. 
 
+So what's Charlie to do? They could put in a feature request, but they're concerned that the schlubs in charge of managing the package won't get around to it until who-knows-when. So Charlie decides to take matters into their own hands, Besides, looking for that silver lining, they'll learn a little bit about how \texttt{luacas} is structured. 
+
+At the heart of any CAS are \texttt{Expressions}. Mathematically speaking, an \texttt{Expression} is a rooted tree. Luckily, this tree can be drawn using the (wonderful) \texttt{forest} package. In particular, the command \mintinline{latex}{\parseforest{q}} will scan the contents of the expression \texttt{q} and parse the results into a form compatible with the \texttt{forest} package; those results are saved in a macro named \mintinline{latex}{\forestresult}. 
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{
+    \inputminted[ 
+        firstline = 17,
+        lastline = 29,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {\parseforest{q}
+    \bracketset{action character = @}
+    \begin{forest}
+        for tree = {
+            font=\ttfamily,
+            rectangle,
+            rounded corners=1pt
+        },
+        where level=0{%
+            fill=orange!25
+        }{},
+        @\forestresult
+    \end{forest}}
+The root of the tree above is \texttt{ADD} since $q$ is, at its heart, the addition of two other expressions. Charlie wonders how they might check to see if a mystery \texttt{Expression} is an \texttt{ADD}? But this is putting the cart before the horse; Charlie should truly wonder how to check for the \emph{type} of \texttt{Expression} -- then they can worry about other attributes. 
+
+\newpage
 
 \appendix
 
