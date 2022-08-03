@@ -457,7 +457,8 @@ function IntegralExpression.partsmethod(expression, symbol)
         vp = vp:autosimplify()
     end
 
-    if vp:type() == Logarithm or vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
+    --if vp:type() == Logarithm or vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
+    if select(2,vp:topolynomial()) then 
         local v = IntegralExpression.integrate(vp, symbol)
         if not v then
             goto skipI
@@ -492,7 +493,8 @@ function IntegralExpression.partsmethod(expression, symbol)
         vp = vp:autosimplify()
     end
 
-    if vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
+    --if vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
+    if select(2,vp:topolynomial()) then 
         local v = IntegralExpression.integrate(vp, symbol)
         if not v then
             goto skipL
