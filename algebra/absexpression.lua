@@ -56,15 +56,17 @@ end
 --- @param other Expression
 --- @return boolean
 function AbsExpression:order(other)
-    if other:isatomic() then
-        return false
-    end
+    -- if other:isatomic() then
+    --     return false
+    -- end
 
-    if other:type() ~= AbsExpression then
-        return true
-    end
+    -- if other:type() ~= AbsExpression then
+    --     return true
+    -- end
 
-    return self.expression:order(other.expression)
+    -- return self.expression:order(other.expression)
+
+    return FunctionExpression("abs", self.expression):order(other)
 end
 
 --- @return string

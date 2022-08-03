@@ -6,7 +6,7 @@ local f2 = parse("x^7-3*x^6+5*x^5-7*x^4+7*x^3-5*x^2+3*x-1"):topolynomial()
 
 starttest("partial fraction decomposition")
 
-test(PolynomialRing.partialfractions(g1, f1):autosimplify(), "((2 * (x ^ -2)) + (x ^ -1) + ((-1 + x) ^ -1) + (-1 * ((1 + x) ^ -1)))")
-test(PolynomialRing.partialfractions(g2, f2):autosimplify(), "(((-1 + x) ^ -3) + ((-1 + x) ^ -1) + ((1 + (x ^ 2)) ^ -2) + ((1 + x) * ((1 + (x ^ 2)) ^ -1)))")
+testeq(PolynomialRing.partialfractions(g1, f1):autosimplify(), "((2 * (x ^ -2)) + (x ^ -1) + ((-1 + x) ^ -1) + (-1 * ((1 + x) ^ -1)))")
+testeq(PolynomialRing.partialfractions(g2, f2):autosimplify(), "(((-1 + x) ^ -3) + ((-1 + x) ^ -1) + ((1 + (x ^ 2)) ^ -2) + ((1 + x) * ((1 + (x ^ 2)) ^ -1)))")
 
 endtest()
