@@ -6,28 +6,28 @@
         return nil
     end
     if a:type() == SymbolExpression then
-        return "SymbExp"
+        return "SymbolExpression"
     end
     if a:type() == BinaryOperation then
-        return "BinOp"
+        return "BinaryOperation"
     end
     if a:type() == FunctionExpression then
-        return "FnExp"
+        return "FunctionExpression"
     end
     if a:type() == TrigExpression then
-        return "TrigExp"
+        return "TrigExpression"
     end
     if a:type() == Integer then
-        return "Int"
+        return "Integer"
     end
     if a:type() == Rational then
-        return "Ratl"
+        return "Rational"
     end
     if a:type() == DerivativeExpression then
-        return "DervExp"
+        return "DerivativeExpression"
     end
     if a:type() == DiffExpression then
-        return "DiffExp"
+        return "DiffExpression"
     end
     return "No Clue"
 end
