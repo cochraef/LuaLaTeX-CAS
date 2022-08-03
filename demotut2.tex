@@ -157,4 +157,18 @@ Consider the function $f(x)$ defined by:
     \end{tikzpicture}
 \end{multicols}
 
+\begin{tikzpicture}[scale=0.7]
+    \draw [dashed,latex-latex] 
+    (-7,0) -- (4,0);
+    \foreach \k in {0,1,2,3}{
+        \pgfmathsetmacro\a{\r[\k]}
+        \draw (\a,0) circle (\a);
+    }
+    \foreach \x in {-6,...,3}{
+        \draw[fill,orange] 
+        (\x,0) circle (2pt)
+        node[below] {\footnotesize$\x$};
+    }
+\end{tikzpicture}
+
 \end{document}

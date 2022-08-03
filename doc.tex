@@ -570,7 +570,32 @@ The command \mintinline{latex}{\store{r}} is equivalent to:
 \begin{minted}{latex}
 \def\r{{ \fetch{r[1]}, \fetch{r[2]}, \fetch{r[3]}, \fetch{r[4]} }}
 \end{minted}
-The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \mintinline{latex}{\pgfmathsetmacro}. Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This is what Bob does in his complete project below. 
+The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \mintinline{latex}{\pgfmathsetmacro}. For example:
+
+\begin{codebox}
+    {\small\inputminted[ 
+        firstline = 160,
+        lastline = 172,
+        breaklines
+    ]
+    {latex}
+    {demotut2.tex}}
+    \tcblower
+    \store{r}
+    \begin{tikzpicture}[scale=0.7]
+        \draw [dashed,latex-latex] (-7,0) -- (4,0);
+        \foreach \k in {0,1,2,3}{
+            \pgfmathsetmacro\a{\r[\k]}
+            \draw (\a,0) circle (\a);
+        }
+        \foreach \x in {-6,...,3}{
+            \draw[fill,orange] (\x,0) circle (2pt)
+            node[below] {\footnotesize$\x$};
+        }
+    \end{tikzpicture}
+\end{codebox}
+
+Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project below. 
 
 \begin{codebox}[sidebyside align=top]
     \begin{multicols}{2}{\footnotesize
