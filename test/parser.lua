@@ -233,7 +233,8 @@ end
 
 
 CASparse([[
-    vars("x", "y", "z")
-    a = x^2
-    print(int(a,x):autosimplify())
+
+    vars("x")
+    print(int(ln(x)*x, x):autosimplify())
+
 ]])

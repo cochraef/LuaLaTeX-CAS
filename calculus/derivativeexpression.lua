@@ -9,25 +9,25 @@ __DerivativeExpression = {}
 -- Instance functionality --
 ----------------------------
 
--- Creates a new derivative operation with the given symbol and expression.
+-- Creates a new single-variable derivative operation with the given symbol and expression.
 --- @param expression Expression
 --- @param symbol Symbol
+--- @param static boolean
 --- @return DerivativeExpression
-function DerivativeExpression:new(expression, symbol)
+function DerivativeExpression:new(expression, symbol, static)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
-    symbol = symbol or SymbolExpression("x")
-
-    o.symbol = symbol
     o.expression = Copy(expression)
+    o.symbol = symbol or SymbolExpression("x")
+    o.static = static
 
     __o.__index = DerivativeExpression
     __o.__tostring = function(a)
         return '(d/d' .. tostring(a.symbol) .. " " .. tostring(a.expression) .. ')'
     end
     __o.__eq = function(a, b)
-        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
+        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always runs this anyway
         if not b:type() == DerivativeExpression then
             return false
         end
@@ -41,6 +41,10 @@ end
 --- @return Expression
 function DerivativeExpression:autosimplify()
     local simplified = self.expression:autosimplify()
+
+    if self.static then
+        return DerivativeExpression(simplified, self.symbol, self.static)
+    end
 
     -- The derivative of a constant is 0
     if simplified:isconstant() then
@@ -60,7 +64,7 @@ function DerivativeExpression:autosimplify()
         if simplified.expressions[2] then
             return self
         end
-        return (DerivativeExpression(simplified.expressions[1], self.symbol) * FunctionExpression(simplified.name .. "'", simplified.expressions)):autosimplify()
+        return (DerivativeExpression(simplified.expressions[1], self.symbol) * DerivativeExpression(FunctionExpression(simplified.name, simplified.expressions), self.symbol, true)):autosimplify()
     end
 
     -- Chain rule for trig functions

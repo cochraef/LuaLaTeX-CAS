@@ -26,6 +26,11 @@ function FunctionExpression:new(name, expressions)
         return TrigExpression(name, expressions[1])
     end
 
+    -- TODO: Symbol Checking For Constructing derivatives like this
+    if string.sub(name, #name, #name) == "'" and #expressions == 1 then
+       return DerivativeExpression(FunctionExpression(string.sub(name, 1, #name - 1), expressions), SymbolExpression("x"), true)
+    end
+
     o.name = name
     o.expressions = expressions
 

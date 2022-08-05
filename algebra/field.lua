@@ -50,7 +50,7 @@ __FieldOperations.__div = function(a, b)
     end
 
     if(b == b:zero()) then
-        error("Cannot divide by zero.")
+        error("Arithmetic Error: Cannot divide by zero.")
     end
 
     local aring, bring = a:getring(), b:getring()

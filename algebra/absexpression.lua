@@ -39,7 +39,7 @@ end
 
 --- @return Expression
 function AbsExpression:autosimplify()
-    return self:evaluate()
+    return AbsExpression(self.expression:autosimplify()):evaluate()
 end
 
 --- @return table<number, Expression>

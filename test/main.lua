@@ -5,7 +5,7 @@ require("calculus._init")
 require("_lib.pepperfish")
 
 -- Stuff required for the basic parser.
-local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT", abs = "ABS"}
+local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT", abs = "ABS", fact="FACT"}
 
 local function parser(s)
     if string.find(s, "[0-9]+") then
@@ -38,7 +38,7 @@ end
 
 function dparse(input)
     local parsed = string.gsub(input, "[0-9]+", parser)
-    parsed = string.gsub(parsed, "[A-z]+", parser)
+    parsed = string.gsub(parsed, "[A-z']+", parser)
     local exe, err = load("return " .. parsed)
     if exe then
         return exe()
