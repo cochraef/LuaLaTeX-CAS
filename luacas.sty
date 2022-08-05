@@ -181,9 +181,36 @@
     }
 }
 
+\NewDocumentCommand{\parseshrub}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\def\\shrubresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(", tikz+={\\node[anchor=south] at (.north) {test};}")
+            tex.print(sym:getthefancyshrub())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }{%
+        \luaexec{
+            local sym = #2
+            tex.print("\\def\\shrubresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(", tikz+={\\node[anchor=south,font=\\ttfamily\\footnotesize,gray] at (.north) {",whatis(sym),"};}")
+            tex.print(sym:getthefancyshrub())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }
+}
+
 \NewDocumentCommand{\whatis}{m}{%
-    \directlua{
-        tex.print("{\\ttfamily",whatis(#1),"}")
+    \luaexec{
+        tex.sprint("{\\ttfamily",longwhatis(#1),"}")
     }%
 }
 

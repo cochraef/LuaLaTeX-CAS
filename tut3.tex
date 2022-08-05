@@ -1,0 +1,227 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse}
+\usepackage{microtype}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\begin{document}
+
+\subsection{Tutorial 3: Adding Functionality}
+
+Charlie is, like Alice and Bob, also teaching calculus. Charlie likes Alice's examples and wants to try something similar. But Charlie would like to do more involved examples using rational functions. Accordingly, Charlie copy-n-pastes Alice's code:
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q)
+\end{CAS}
+\begin{minted}{latex}
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q)
+\end{CAS}
+\end{minted}
+Unfortunately, \mintinline{latex}{\[ q=\print{q} \]} produces:
+\[ q = \print{q} \]
+The \mintinline{lua}{simplify()} command doesn't seem to help either! What Charlie truly needs is to combine terms, i.e., Charlie needs to find a \emph{common denominator}. They're horrified to learn that no such functionality exists in this burgeoning package. 
+
+So what's Charlie to do? They could put in a feature request, but they're concerned that the schlubs in charge of managing the package won't get around to it until who-knows-when. So Charlie decides to take matters into their own hands. Besides, looking for that silver lining, they'll learn a little bit about how \texttt{luacas} is structured. 
+
+At the heart of any CAS are \texttt{Expressions}. Mathematically speaking, an \texttt{Expression} is a rooted tree. Luckily, this tree can be drawn using the (wonderful) \texttt{forest} package. In particular, the command \mintinline{latex}{\parseforest{q}} will scan the contents of the expression \texttt{q} and parse the results into a form compatible with the \texttt{forest} package; those results are saved in a macro named \mintinline{latex}{\forestresult}. 
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{
+    \inputminted[ 
+        firstline = 17,
+        lastline = 29,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {\parseforest{q}
+    \bracketset{action character = @}
+    \begin{forest}
+        for tree = {
+            font=\ttfamily,
+            rectangle,
+            rounded corners=1pt
+        },
+        where level=0{%
+            fill=orange!25
+        }{},
+        @\forestresult
+    \end{forest}}
+The root of the tree above is \texttt{ADD} since $q$ is, at its heart, the addition of two other expressions. Charlie wonders how they might check to see if a mystery \texttt{Expression} is an \texttt{ADD}? But this is putting the cart before the horse; Charlie should truly wonder how to check for the \emph{type} of \texttt{Expression} -- then they can worry about other attributes. 
+
+Charlie can print the \texttt{Expression} type directly into his document using the \mintinline{latex}{\whatis} command:
+
+\begin{codebox}
+    \inputminted[ 
+        firstline = 31,
+        lastline = 34,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}
+    \tcblower
+    \begin{CAS}
+        r = diff(q,x,x)
+    \end{CAS}
+    \whatis{q} vs \whatis{r}
+\end{codebox}
+
+So \texttt{q} is a \texttt{BinaryOperation}? This strikes Charlie as a little strange. On the other hand, \texttt{q} is the result of a binary operation applied to two other expressions; so perhaps this makes a modicum of sense. 
+
+At any rate, Charlie now knows, according to \texttt{luacas}, that \texttt{q} is of the \texttt{Expression}-type \whatis{q}. The actual operator that's used to form \texttt{q} is stored in the attribute \mintinline{lua}{q.operation}:
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{
+    \inputminted[ 
+        firstline = 36,
+        lastline = 38,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {
+    \luaexec{
+    if q.operation == BinaryOperation.ADD then 
+        tex.sprint("I'm an \\texttt{ADD}")
+    end
+    }}
+
+Of course, different \texttt{Expression} types have different attributes. For example, being a \texttt{DiffExpression}, \texttt{r} has the attribute \texttt{r.degree}:
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{
+    \inputminted[ 
+        firstline = 40,
+        lastline = 40,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {
+    \luaexec{
+        tex.print("I'm an order", r.degree, "derivative.")
+    }}
+
+\texttt{BinaryOperation}s have several attributes, but the most important attribute for Charlie's purposes is \texttt{q.expressions}. In this case, \texttt{q.expressions} is a table with two entries; those two entries are precisely the \texttt{Expressions} whose sum forms \texttt{q}. In particular, 
+
+\mintinline{latex}{\[ \print{q.expressions[1]} \qquad \text{and} \qquad \print{q.expressions[2]} \]}
+
+produces:
+\[ \print{q.expressions[1]} \qquad\text{and} \qquad \print{q.expressions[2]} \] 
+
+The expression \texttt{q.expressions[1]} is another \texttt{BinaryOperation}. Instead of printing the entire expression tree (as we've done above), Charlie might be interested in the commands \mintinline{latex}{\parseshrub} and \mintinline{latex}{\shrubresult}:
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{\small
+    \inputminted[ 
+        firstline = 48,
+        lastline = 54,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {\parseshrub{q.expressions[1]}
+     \bracketset{action character = @}
+        \begin{forest}
+            for tree = {draw,rectangle,rounded corners=1pt,fill=lightgray!20,font=\ttfamily, s sep=1.5cm}
+            @\shrubresult
+    \end{forest}
+}
+
+The ``shrub'' is essentially the first level of the ``forest'', but with some extra information concerning attributes. For contrast, here's the result of \mintinline{latex}{\parseshrub} and \mintinline{latex}{\shrubresult} applied to \texttt{r}, the \texttt{DiffExpression} defined above. 
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{\small
+    \inputminted[ 
+        firstline = 56,
+        lastline = 62,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {\parseshrub{r}
+    \bracketset{action character = @}
+    \begin{forest}
+        for tree = {draw,rectangle,rounded corners=1pt,
+            fill=lightgray!20,font=\ttfamily, s sep=1.5cm}
+        @\shrubresult
+    \end{forest}
+}
+The attribute \mintinline{lua}{r.degree} returns the size of the table stored in \mintinline{lua}{r.symbols} which, in turn, records the variables (and order) with which to differentiate the expression stored in \mintinline{lua}{r.expression}.
+
+\end{document}

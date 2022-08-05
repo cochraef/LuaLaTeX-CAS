@@ -28,13 +28,38 @@
     @\forestresult
 \end{forest}
 
-\whatis{q}
+\begin{CAS}
+    r = diff(q,x,x)
+\end{CAS}
+\whatis{q} vs \whatis{r}
 
-\directlua{
-    if q.operation == BinaryOperation.ADD then 
-        tex.print("I'm an \\texttt{ADD}")
-    end
-}
+\luaexec{if q.operation == BinaryOperation.ADD then 
+    tex.print("I'm an \\texttt{ADD}")
+end}
+
+\luaexec{tex.print("I'm an order", r.degree, "derivative.")}
+
+\parseshrub{q}
+\begin{forest}
+    for tree = {draw,rectangle,rounded corners=1pt,fill=lightgray!20,font=\ttfamily}
+    @\shrubresult
+\end{forest}
+
+\parseshrub{q.expressions[1]}
+\begin{forest}
+    for tree = {draw,rectangle,
+    rounded corners=1pt,fill=lightgray!20,
+    font=\ttfamily, s sep=2cm}
+    @\shrubresult
+\end{forest}
+
+\parseshrub{r}
+\begin{forest}
+    for tree = {draw,rectangle,
+    rounded corners=1pt,fill=lightgray!20,
+    font=\ttfamily, s sep=1cm}
+    @\shrubresult
+\end{forest}
 
 \luaexec{
     den = {}
@@ -91,63 +116,6 @@
 \[ \print{denominator} \] 
 \[ \print{numerator} \] 
 \[ \print{common} \] 
-
-
-\begin{CAS}
-    f = ln(x^3+3*x)/(x^3+3*x)*(x^2+1)
-    a = int(f,x)
-    a = a:autosimplify()
-\end{CAS}
-\[ \print{a} \] 
-
-\end{document}
-
-\luaexec{
-    vp = Integer.one()
-    for _, exp in ipairs(f:subexpressions()) do
-        if exp:type() == Logarithm then
-            u = exp
-        else
-            vp = vp * exp
-        end
-    end   
-    vp = vp:autosimplify()
-}
-\[ \print{u} \qquad \print{vp} \] 
-\luaexec{
-    if select(2,vp:topolynomial()) then 
-        tex.print("it works")
-    else 
-        tex.print("it's busted")
-    end
-}
-
-\end{document}
-
-
-\parseforest{f}
-\begin{forest}
-    @\forestresult
-\end{forest}
-
-
-\luaexec{
-    vp = Integer.one()
-    for _, exp in ipairs(f:subexpressions()) do
-        if exp:type() == TrigExpression and (exp.name == "arctan" or exp.name == "arccos" or exp.name == "arcsin" or exp.name == "arccot" or exp.name == "arcsec" or exp.name == "arccsc") then
-            u = exp
-        else
-            vp = vp * exp
-        end
-    end   
-    vp = vp:autosimplify()
-    if vp:topolynomial()[2] then 
-        tex.print("it's busted")
-    else 
-        tex.print("it works")
-    end
-}
-\[ \print{vp} \] 
 
 
 \end{document}

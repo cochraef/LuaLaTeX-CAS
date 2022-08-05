@@ -127,34 +127,34 @@ Consider the function $f(x)$ defined by:
     \end{CAS}
     $\displaystyle f(x) = \print{h}$.
 \begin{multicols}{2}
-    Note that: 
-    \[ f'(x) = \print{dh}.\] 
-    The roots to $f'(x)=0$ equation are:
-    \begin{CAS}
-        r = roots(dh)
-    \end{CAS}
-    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]}.\] 
-    Recall: $f'(x_0)$ measures the slope of the tangent line to $y=f(x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak (local maximum) or a valley (local minimum). 
-    \columnbreak 
-    \store{h}\store{dh}
-    \begin{tikzpicture}[scale=0.95]
-    \begin{axis}[legend pos = north west]
-        \addplot 
-        [domain=-3.5:1.5,samples=100] {\h};
-        \addlegendentry{$f$};
-        \addplot[densely dashed] 
-        [domain=-3.25:1.25,samples=100] {\dh};
-        \addlegendentry{$df/dx$};
-        \addplot[gray,dashed,thick]
-        [domain=-3.5:1.5] {0};
-        \luaexec{for i=1,4 do 
-        tex.print("\\draw[fill=purple,purple]",
-            "(axis cs:{", tostring(r[i]) ,"},0) circle (1.5pt)",
-            "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) circle (1.5pt)",
-            "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) edge[dashed] (axis cs:{", tostring(r[i]) ,"},0);")
-        end}
-    \end{axis}
-    \end{tikzpicture}
+Note that: 
+\[ f'(x) = \print{dh}.\] 
+The roots to $f'(x)=0$ equation are:
+\begin{CAS}
+    r = roots(dh)
+\end{CAS}
+\[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]}.\] 
+Recall: $f'(x_0)$ measures the slope of the tangent line to $y=f(x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak (local maximum) or a valley (local minimum). 
+\columnbreak 
+\store{h}\store{dh}
+\begin{tikzpicture}[scale=0.95]
+\begin{axis}[legend pos = north west]
+    \addplot 
+    [domain=-3.5:1.5,samples=100] {\h};
+    \addlegendentry{$f$};
+    \addplot[densely dashed] 
+    [domain=-3.25:1.25,samples=100] {\dh};
+    \addlegendentry{$df/dx$};
+    \addplot[gray,dashed,thick]
+    [domain=-3.5:1.5] {0};
+    \luaexec{for i=1,4 do 
+    tex.print("\\draw[fill=purple,purple]",
+        "(axis cs:{", tostring(r[i]) ,"},0) circle (1.5pt)",
+        "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) circle (1.5pt)",
+        "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) edge[dashed] (axis cs:{", tostring(r[i]) ,"},0);")
+    end}
+\end{axis}
+\end{tikzpicture}
 \end{multicols}
 
 \begin{tikzpicture}[scale=0.7]

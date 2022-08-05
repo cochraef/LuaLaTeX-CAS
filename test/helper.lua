@@ -6,6 +6,37 @@
         return nil
     end
     if a:type() == SymbolExpression then
+        return "Sym"
+    end
+    if a:type() == BinaryOperation then
+        return "BinOp"
+    end
+    if a:type() == FunctionExpression then
+        return "FncExp"
+    end
+    if a:type() == TrigExpression then
+        return "TrigExp"
+    end
+    if a:type() == Integer then
+        return "Int"
+    end
+    if a:type() == Rational then
+        return "Ratl"
+    end
+    if a:type() == DerivativeExpression then
+        return "DervExp"
+    end
+    if a:type() == DiffExpression then
+        return "DiffExp"
+    end
+    return "No Clue"
+end
+
+function longwhatis(a)
+    if a == nil then
+        return nil
+    end
+    if a:type() == SymbolExpression then
         return "SymbolExpression"
     end
     if a:type() == BinaryOperation then
@@ -67,7 +98,7 @@ function nameof(sym)
         return tostring(sym.numerator).."/"..tostring(sym.denominator)
     end
     if sym:type() == DerivativeExpression then
-        return "D"
+        return "Derv"
     end
     if sym:type() == DiffExpression then
         return "Diff"
@@ -86,8 +117,8 @@ end
 
 function Expression:gettheshrub()
     local string = ""
-    for _, expression in ipairs(self:subexpressions()) do
-        string = string.."child {node [label=-90:{"..whatis(expression).."}] {$\\mathtt{"..expression:tolatex().."}$}}"
+    for index, expression in ipairs(self:subexpressions()) do
+        string = string.."child {node [label=-90:{expr["..tostring(index).."]}] {$\\mathtt{"..expression:tolatex().."}$}}"
     end
     return string
 end
@@ -112,6 +143,28 @@ function Expression:gettheforest()
         else
             string = string.." [ "..nameof(expression)..expression:gettheforest().." ] "
         end
+    end
+    return string
+end
+
+function Expression:getthefancyshrub()
+    local string = ""
+    if self:type() == DiffExpression then 
+        for index, expression in ipairs(self:subexpressions()) do
+            string = string.." [ $\\mathtt{"..expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
+        end
+        string = string.." [ $\\mathtt{\\{"
+        for _,symbol in ipairs(self.symbols) do 
+            if next(self.symbols,_) == nil then 
+                string = string .. symbol:tolatex().."\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.symbols};} ] "
+            else
+                string = string .. symbol:tolatex() .. "," 
+            end
+        end
+        return string
+    end
+    for index, expression in ipairs(self:subexpressions()) do
+        string = string.." [ $\\mathtt{"..expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression["..index.."]};} ] "
     end
     return string
 end

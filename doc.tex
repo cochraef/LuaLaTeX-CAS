@@ -139,6 +139,8 @@ The package manager for your local TeX distribution ought to install the package
     {doc.tex}
 That's it, you're ready to go.
 
+\newpage
+
 \section{Tutorials}
 
 Taking a cue from the phenomenal TikZ documentation, we introduce basic usage of the \texttt{luacas} package through a few informal tutorials.  
@@ -242,16 +244,18 @@ Alice is pretty happy with how everything is working, but she wants to be able t
     \item Be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}; and 
     \item CAS macros persist -- if Alice assigns \mintinline{lua}{f = x^2} within \mintinline{latex}{\begin{CAS}..\end{CAS}}, then the CAS remembers that \mintinline{lua}{f = x^2} the next time Alice enters the CAS environment. 
 \end{itemize}
-Here's the final version of Alice's code: 
+Alice's completed project is on the next page.
+
+\newpage
+
 \begin{codebox}[sidebyside align=top]
-    \begin{multicols}{2}{\footnotesize\inputminted[
+    {\footnotesize\inputminted[
     firstline=56,
     lastline=82,
     breaklines]
     {latex}
     {demotut1.tex}
     }
-    \end{multicols}
     \tcblower
     \begin{CAS}
         vars('x','h')
@@ -279,13 +283,14 @@ Here's the final version of Alice's code:
         \end{CAS}
         \print{q} & &\text{simplify.}
     \end{aligned} \] 
-    So $\print{diff(f,x)} = \print*{diff(f,x)}$.     
+    So $\print{diff(f,x)} = \print*{diff(f,x)}$. 
 \end{codebox}
+    
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 \begin{codebox}[sidebyside align=top]
-    {\small\inputminted[
+    {\footnotesize\inputminted[
     firstline=84,
-    lastline=88,
+    lastline=87,
     breaklines]
     {latex}
     {demotut1.tex}
@@ -319,6 +324,8 @@ Alice can produce another example merely by changing the definition of $f$ on th
     \end{aligned} \] 
     So $\print{diff(f,x)} = \print*{diff(f,x)}$.     
 \end{codebox}
+
+\newpage
 
 \subsection{Tutorial 2: Finding Maxima/Minima}
 
@@ -595,10 +602,12 @@ The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \
     \end{tikzpicture}
 \end{codebox}
 
-Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project below. 
+Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project on the next page.
+
+\newpage
 
 \begin{codebox}[sidebyside align=top]
-    \begin{multicols}{2}{\footnotesize
+    {\footnotesize
     \inputminted[ 
         firstline = 119,
         lastline  = 158,
@@ -606,7 +615,6 @@ Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} fun
         ]
         {latex}
         {demotut2.tex}}
-    \end{multicols}
     \tcblower
     Consider the function $f(x)$ defined by:
     \begin{CAS}
@@ -649,7 +657,9 @@ Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} fun
     \end{tikzpicture}
 \end{multicols}
 \end{codebox}
+    
 
+\newpage
 
 \subsection{Tutorial 3: Adding Functionality}
 
@@ -674,7 +684,7 @@ Unfortunately, \mintinline{latex}{\[ q=\print{q} \]} produces:
 \[ q = \print{q} \]
 The \mintinline{lua}{simplify()} command doesn't seem to help either! What Charlie truly needs is to combine terms, i.e., Charlie needs to find a \emph{common denominator}. They're horrified to learn that no such functionality exists in this burgeoning package. 
 
-So what's Charlie to do? They could put in a feature request, but they're concerned that the schlubs in charge of managing the package won't get around to it until who-knows-when. So Charlie decides to take matters into their own hands, Besides, looking for that silver lining, they'll learn a little bit about how \texttt{luacas} is structured. 
+So what's Charlie to do? They could put in a feature request, but they're concerned that the schlubs in charge of managing the package won't get around to it until who-knows-when. So Charlie decides to take matters into their own hands. Besides, looking for that silver lining, they'll learn a little bit about how \texttt{luacas} is structured. 
 
 At the heart of any CAS are \texttt{Expressions}. Mathematically speaking, an \texttt{Expression} is a rooted tree. Luckily, this tree can be drawn using the (wonderful) \texttt{forest} package. In particular, the command \mintinline{latex}{\parseforest{q}} will scan the contents of the expression \texttt{q} and parse the results into a form compatible with the \texttt{forest} package; those results are saved in a macro named \mintinline{latex}{\forestresult}. 
 
@@ -709,7 +719,49 @@ At the heart of any CAS are \texttt{Expressions}. Mathematically speaking, an \t
     \end{forest}}
 The root of the tree above is \texttt{ADD} since $q$ is, at its heart, the addition of two other expressions. Charlie wonders how they might check to see if a mystery \texttt{Expression} is an \texttt{ADD}? But this is putting the cart before the horse; Charlie should truly wonder how to check for the \emph{type} of \texttt{Expression} -- then they can worry about other attributes. 
 
-To check the type of an \texttt{Expression}, Charlie finds the \mintinline{latex}{\whatis} command to be helpful:
+Charlie can print the \texttt{Expression} type directly into his document using the \mintinline{latex}{\whatis} command:
+
+\begin{codebox}
+    \inputminted[ 
+        firstline = 31,
+        lastline = 34,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}
+    \tcblower
+    \begin{CAS}
+        r = diff(q,x)
+    \end{CAS}
+    \whatis{q} vs \whatis{r}
+\end{codebox}
+
+So \texttt{q} is a \texttt{BinaryOperation}? This strikes Charlie as a little strange. On the other hand, \texttt{q} is the result of a binary operation applied to two other expressions; so perhaps this makes a modicum of sense. 
+
+At any rate, Charlie now knows, according to \texttt{luacas}, that \texttt{q} is of the \texttt{Expression}-type \whatis{q}. The actual operator that's used to form \texttt{q} is stored in the attribute \mintinline{lua}{q.operation}. Although Charlie can't get this printed, like the \texttt{Expression} type, they can check the value with an \texttt{if-then} statement:
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]{
+    \inputminted[ 
+        firstline = 36,
+        lastline = 40,
+        breaklines
+    ]
+    {latex}
+    {demotut3.tex}}
+    {
+    \luaexec{
+    if q.operation == BinaryOperation.ADD then 
+        tex.sprint("I'm an \\texttt{ADD}")
+    end
+    }}
 
 
 \newpage
