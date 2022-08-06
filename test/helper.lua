@@ -150,7 +150,7 @@ end
 function Expression:getthefancyshrub()
     local string = ""
     if self:type() == DiffExpression then 
-        for index, expression in ipairs(self:subexpressions()) do
+        for _, expression in ipairs(self:subexpressions()) do
             string = string.." [ $\\mathtt{"..expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
         end
         string = string.." [ $\\mathtt{\\{"
