@@ -61,72 +61,15 @@ end}
     @\shrubresult
 \end{forest}
 
-\luaexec{
-    den, num, auxden = {}, {}, {}
-    if q.operation == BinaryOperation.ADD then 
-        for _, expr in ipairs(q.expressions) do
-            local numpart = Integer.one()
-            local denpart = Integer.one()
-            if expr.operation == BinaryOperation.MUL then 
-                for _,subexpr in ipairs(expr.expressions) do 
-                    if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2] == -Integer.one() then
-                        denpart = denpart*subexpr.expressions[1]    
-                        for _,term in ipairs(den) do 
-                            if subexpr.expressions[1] == term then 
-                                goto continue
-                            end
-                        end
-                        table.insert(den,subexpr.expressions[1])
-                        ::continue::
-                    else 
-                        numpart = numpart*subexpr 
-                    end
-                end
-            end
-            if expr.operation == BinaryOperation.POW and expr.expressions[2] == -Integer.one() then 
-                denpart = denpart*expr.expressions[1]
-                for _,term in ipairs(den) do 
-                    if expr.expressions[1] == term then 
-                        goto continue
-                    end
-                end
-                table.insert(den,expr.expressions[1])
-                ::continue::
-            end
-            if not (expr.operation == BinaryOperation.POW or expr.operation == BinaryOperation.MUL) then 
-                numpart = expr 
-            end
-            table.insert(num,numpart)
-            table.insert(auxden,denpart)
-        end
-    end
-    denominator = Integer.one()
-    numerator   = Integer.zero()
-    for _,expr in ipairs(den) do 
-        denominator = denominator*expr
-    end
-    denominator = denominator:simplify()
-    for index,expr in ipairs(num) do
-        local numer = denominator/auxden[index]
-        numer = numer:simplify() 
-        numerator = numerator + expr*numer
-    end
-    numerator = numerator:simplify():expand():factor()
-    common = numerator/denominator
-}
-\[ \print{denominator} \] 
-\[ \print{numerator} \] 
-\[ \print{common} \] 
-
 \newpage
 
-Now that Charlie knows the basics of how \texttt{luacas} is structured, they're ready to write their own function \texttt{combine} that will take a sum of rational expressions and form an equivalent singular rational expression under a common denominator. 
+Now that Charlie knows the basics of how \texttt{luacas} is structured, they're ready to write their own function \texttt{combine} that will take a sum of rational expressions and form an equivalent singular rational expression under a common denominator. Charlie will need to know a little Lua, but nothing too far beyond the typical \texttt{if-then} logical operators. 
 
 It's best if Charlie writes this Lua function in a separate file, say \texttt{myfunction.lua}. We walk through Charlie's design below, and like many functions in \texttt{luacas}, he defines this function as a method:
 
 \begin{minted}[breaklines,linenos]{lua}
 function Expression:combine()
-    local den, num, aux, input = {}, {}, {}, self:simplify()
+    local den, num, aux, mul, input = {}, {}, {}, {}, self:autosimplify():expand()
     if input.operation ~= BinaryOperation.ADD then 
         return input
     end
@@ -144,7 +87,7 @@ Next, Charlie starts to march through the expressions \texttt{expr} of \texttt{r
         local numpart, denpart = Integer.one(), Integer.one()
             if expr.operation == BinaryOperation.POW and expr.expressions[2] == -Integer.one() then 
 \end{minted}
-The first thing Charlie checks is if the current \texttt{expr} is a \texttt{BinaryOperation} with operation \texttt{POW}. If so, then Charlie checks to see if the second expression in \texttt{expr} is equal to $-1$ (if \texttt{expr} is a \texttt{POW}, then the exponent is stored in \texttt{expr.expressions[2]}). 
+The first thing Charlie checks is if the current \texttt{expr} is a \texttt{BinaryOperation} with operation \texttt{POW}. If so, then Charlie checks to see if the second expression in \texttt{expr} is equal to $-1$ (if \texttt{expr} is a \texttt{POW}, then the exponent is stored in \texttt{expr.expressions[2]}). If so, then this means that \texttt{expr.expressions[1]} is a denominator-term.
 
 \begin{minted}[breaklines,linenos,firstnumber=9]{lua}
                 denpart = denpart*expr.expressions[1]
@@ -158,7 +101,7 @@ The first thing Charlie checks is if the current \texttt{expr} is a \texttt{Bina
             end
 \end{minted}
 
-If all these checks pass, then Charlie knows that \texttt{expr.expressions[1]} is a denominator term. So Charlie makes this a factor of the local variable \texttt{denpart}. Then, Charlie scans the contents of the table \texttt{den} to see if \texttt{expr.expressions[1]} has already been included. If it hasn't, then Charlie includes it into the table with \texttt{table.insert}. The table \texttt{den} will eventually contain all terms that comprise the common denominator. 
+In this case, Charlie makes \texttt{expr.expressions[1]} a factor of the local variable \texttt{denpart} (for \emph{denominator part}). Charlie then scans the contents of the table \texttt{den} to see if \texttt{expr.expressions[1]} has already been included. If it hasn't, then Charlie includes it into the table with \texttt{table.insert}. The table \texttt{den} will eventually contain all terms that comprise the common denominator. Of course, \texttt{expr} may not be a \texttt{POW}...
 
 \begin{minted}[linenos,breaklines,firstnumber=18]{lua}
         if expr.operation == BinaryOperation.MUL then 
@@ -184,12 +127,13 @@ If all these checks pass, then Charlie knows that \texttt{expr.expressions[1]} i
         table.insert(aux,denpart)
     end
 \end{minted}
-Of course, it could be that \texttt{expr} is a \texttt{MUL}, or  neither a \texttt{POW} nor a \texttt{MUL}. So Charlie must reckon with these possibilities as well. But in all cases, Charlie marches through the (sub)expressions, recording denominators and numerators as they go. In the end, Charlie has:
+In particular, it could be that \texttt{expr} is a \texttt{MUL}, or  neither a \texttt{POW} nor a \texttt{MUL}. So Charlie must reckon with these possibilities as well. But in all cases, Charlie marches through the (sub)expressions, recording denominators and numerators as they go. In the end, Charlie has:
 \begin{itemize}
     \item \texttt{den}, a table whose product of terms gives us the common denominator we seek;
     \item \texttt{num}, a table whose terms are the numerators of the subexpressions of the parent \texttt{ADD} expression;
     \item \texttt{aux}, a table whose terms are the denominators of the subexpressions of the parent \texttt{ADD} expression.
 \end{itemize}
+Charlie now forms the \texttt{denominator} of the final output.
 \begin{minted}[breaklines,linenos,firstnumber=40]{lua}
     local denominator = Integer.one()
     local numerator   = Integer.zero()
@@ -198,7 +142,7 @@ Of course, it could be that \texttt{expr} is a \texttt{MUL}, or  neither a \text
     end
     denominator = denominator:autosimplify()
 \end{minted}
-Charlie now forms the \texttt{denominator} of the final output. 
+Charlie now forms the \texttt{numerator} of the final output.
 \begin{minted}[breaklines,linenos,firstnumber=46]{lua}
     for index,expr in ipairs(num) do
         local uncommon = denominator/aux[index]
@@ -207,46 +151,129 @@ Charlie now forms the \texttt{denominator} of the final output.
     end
     numerator = numerator:simplify()
 \end{minted}
-Charlie now forms the \texttt{numerator} of the final output.
+Finally, Charlie returns the final result:
 \begin{minted}[breaklines,linenos,firstnumber=52]{lua}
     return numerator/denominator
 end
 \end{minted}
-Finally, Charlie returns the final result!
-
-
-
+Charlie may now use the \texttt{:combine()} method within \mintinline{latex}{\begin{CAS}..\end{CAS}}. 
 
 \newpage
 
 \luaexec{
 function Expression:combine()
-    local den, num, aux, result = {}, {}, {}, self:simplify()
-    if result.operation ~= BinaryOperation.ADD then 
-        return result
+    local den, num, aux, mul, input = {}, {}, {}, {}, self:autosimplify():expand()
+    if input.operation ~= BinaryOperation.ADD then 
+        return input
     end
-    for _, expr in ipairs(result.expressions) do
+    for _, expr in ipairs(input.expressions) do
         local numpart, denpart = Integer.one(), Integer.one()
-        if expr.operation == BinaryOperation.POW and expr.expressions[2] == -Integer.one() then 
-            denpart = denpart*expr.expressions[1]
-            for _,term in ipairs(den) do 
-                if expr.expressions[1] == term then 
-                    goto continue
+        if expr.operation == BinaryOperation.POW and expr.expressions[2]:type() == Integer and expr.expressions[2] < Integer.zero() then 
+            denpart = denpart*expr.expressions[1] ^ expr.expressions[2]:neg()
+            for index,term in ipairs(den) do 
+                if expr.expressions[1] == den[index] then
+                    if expr.expressions[2]:neg() > mul[index] then
+                        mul[index] = expr.expressions[2]:neg()
+                    else 
+                        goto continue
+                    end
                 end
             end
             table.insert(den,expr.expressions[1])
+            table.insert(mul,expr.expressions[2]:neg())
             ::continue::
         end
         if expr.operation == BinaryOperation.MUL then 
             for _,subexpr in ipairs(expr.expressions) do 
-                if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2] == -Integer.one() then
-                    denpart = denpart*subexpr.expressions[1]    
-                    for _,term in ipairs(den) do 
-                        if subexpr.expressions[1] == term then 
-                            goto continue
+                if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2]:type() == Integer and subexpr.expressions[2] < Integer.zero() then
+                    denpart = denpart*subexpr.expressions[1] ^ subexpr.expressions[2]:neg()   
+                    for index,term in ipairs(den) do 
+                        if subexpr.expressions[1] == den[index] then
+                            if subexpr.expressions[2]:neg() > mul[index] then 
+                                mul[index] = subexpr.expressions[2]:neg()
+                            else
+                                goto continue
+                            end
                         end
                     end
                     table.insert(den,subexpr.expressions[1])
+                    table.insert(mul,subexpr.expressions[2]:neg())
+                    ::continue::
+                else 
+                    numpart = numpart*subexpr 
+                end
+            end
+        end
+        if expr.operation ~= BinaryOperation.POW and expr.operation ~= BinaryOperation.MUL then 
+            numpart = expr 
+        end
+        table.insert(num,numpart)
+        table.insert(aux,denpart)
+    end
+    local denominator = Integer.one()
+    local numerator   = Integer.zero()
+    for index,expr in ipairs(den) do 
+        denominator = denominator*den[index] ^ mul[index]
+    end
+    denominator = denominator:autosimplify()
+    for index,expr in ipairs(num) do
+        local uncommon = denominator/aux[index]
+        uncommon = uncommon:factor():simplify()
+        numerator = numerator + expr*uncommon
+    end
+    numerator = numerator:simplify():factor()
+    return numerator/denominator
+end
+}
+
+\begin{CAS}
+    a = 1/x
+    b = 1/x^2
+    c = 1/x^3
+    d = a+b+c
+    d = d:combine()
+\end{CAS}
+\[ \print{d} \] 
+
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = q:combine()
+\end{CAS}
+\[ \print{q} \] 
+
+\end{document}
+
+\luaexec{
+function Expression:oldcombine()
+    local den, num, aux, mul, input = {}, {}, {}, {}, self:expand()
+    if input.operation ~= BinaryOperation.ADD then 
+        return input
+    end
+    for _, expr in ipairs(input.expressions) do
+        local numpart, denpart = Integer.one(), Integer.one()
+        if expr.operation == BinaryOperation.POW and expr.expressions[2]:type() == Integer and expr.expressions[2] < Integer.zero() then 
+            denpart = denpart*expr.expressions[1] ^ expr.expressions[2]:neg()
+            for _,term in ipairs(den) do 
+                if expr.expressions[1] ^ expr.expressions[2]:neg() == term then 
+                    goto continue
+                end
+            end
+            table.insert(den,expr.expressions[1] ^ expr.expressions[2]:neg())
+            ::continue::
+        end
+        if expr.operation == BinaryOperation.MUL then 
+            for _,subexpr in ipairs(expr.expressions) do 
+                if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2]:type() == Integer and subexpr.expressions[2] < Integer.zero() then
+                    denpart = denpart*subexpr.expressions[1] ^ subexpr.expressions[2]:neg()   
+                    for _,term in ipairs(den) do 
+                        if subexpr.expressions[1] ^ subexpr.expressions[2]:neg() == term then 
+                            goto continue
+                        end
+                    end
+                    table.insert(den,subexpr.expressions[1] ^ subexpr.expressions[2]:neg())
                     ::continue::
                 else 
                     numpart = numpart*subexpr 
@@ -270,17 +297,7 @@ function Expression:combine()
         uncommon = uncommon:factor():simplify()
         numerator = numerator + expr*uncommon
     end
-    numerator = numerator:simplify()
+    numerator = numerator:simplify():factor()
     return numerator/denominator
 end
 }
-
-\begin{CAS}
-    a = 1/x+1/(x+1)
-    b = 2/(x^2)
-    c = a+b
-    c = c:combine()
-\end{CAS}
-\[\print{c} \] 
-
-\end{document}
