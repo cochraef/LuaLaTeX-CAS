@@ -267,6 +267,73 @@ function BinaryOperation:factor()
     return factoredsubs
 end
 
+--- @return Expression
+function BinaryOperation:combine()
+    local den, num, aux, mul, input = {}, {}, {}, {}, self:autosimplify():expand()
+    if input.operation ~= BinaryOperation.ADD then 
+        return input
+    end
+    for _, expr in ipairs(input.expressions) do
+        local numpart, denpart = Integer.one(), Integer.one()
+        if expr.operation == BinaryOperation.POW and expr.expressions[2]:type() == Integer and expr.expressions[2] < Integer.zero() then 
+            denpart = denpart*expr.expressions[1] ^ expr.expressions[2]:neg()
+            for index,term in ipairs(den) do 
+                if expr.expressions[1] == den[index] then
+                    if expr.expressions[2]:neg() > mul[index] then
+                        mul[index] = expr.expressions[2]:neg()
+                        goto continue
+                    else 
+                        goto continue
+                    end
+                end
+            end
+            table.insert(den,expr.expressions[1])
+            table.insert(mul,expr.expressions[2]:neg())
+            ::continue::
+        end
+        if expr.operation == BinaryOperation.MUL then 
+            for _,subexpr in ipairs(expr.expressions) do 
+                if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2]:type() == Integer and subexpr.expressions[2] < Integer.zero() then
+                    denpart = denpart*subexpr.expressions[1] ^ subexpr.expressions[2]:neg()   
+                    for index,term in ipairs(den) do 
+                        if subexpr.expressions[1] == den[index] then
+                            if subexpr.expressions[2]:neg() > mul[index] then 
+                                mul[index] = subexpr.expressions[2]:neg()
+                                goto continue
+                            else
+                                goto continue
+                            end
+                        end
+                    end
+                    table.insert(den,subexpr.expressions[1])
+                    table.insert(mul,subexpr.expressions[2]:neg())
+                    ::continue::
+                else 
+                    numpart = numpart*subexpr 
+                end
+            end
+        end
+        if expr.operation ~= BinaryOperation.POW and expr.operation ~= BinaryOperation.MUL then 
+            numpart = expr 
+        end
+        table.insert(num,numpart)
+        table.insert(aux,denpart)
+    end
+    local denominator = Integer.one()
+    local numerator   = Integer.zero()
+    for index,expr in ipairs(den) do 
+        denominator = denominator*den[index] ^ mul[index]
+    end
+    denominator = denominator:autosimplify()
+    for index,expr in ipairs(num) do
+        local uncommon = denominator/aux[index]
+        uncommon = uncommon:factor():simplify()
+        numerator = numerator + expr*uncommon
+    end
+    numerator = numerator:simplify():factor()
+    return numerator/denominator
+end
+
 --- @param other Expression
 --- @return boolean
 function BinaryOperation:order(other)
