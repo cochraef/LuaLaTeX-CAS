@@ -1,0 +1,131 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse}
+\usepackage{microtype}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\begin{document}
+
+\section{Introduction}
+
+The package {\ttfamily luacas} allows for symbolic computation within \LaTeX{}. For example:
+\begin{CAS}
+    vars('x','y')
+    f = 3*x*y - x^2*y 
+    fxy = diff(f,x,y)
+\end{CAS}
+\begin{minted}{latex}
+    \begin{CAS}
+        vars('x','y')
+        f = 3*x*y - x^2*y 
+        fxy = diff(f,x,y)
+    \end{CAS}
+\end{minted}
+The above code will compute the mixed partial derivative $f_{xy}$ of the function $f$ defined by 
+\[ f(x,y)=3xy-x^2y.\]
+There are various methods for fetching and/or printing results from the CAS within your \LaTeX{} document:
+
+\begin{codebox}
+\begin{minted}{latex}
+    \[ \print{fxy} = \print*{fxy} \] 
+\end{minted} 
+\tcblower
+\[ \print{fxy} = \print*{fxy} \] 
+\end{codebox}
+
+\subsection{About}
+
+The core CAS program is written purely in Lua and integrated into \LaTeX{} via Lua\LaTeX{}. Currently, most existing computer algebra systems such as Maple and Mathematica allow converting their stored expressions to \LaTeX{} code, but this still requires exporting code from \LaTeX{} to another program and importing it back, which can be tedious.
+
+The target audience for this package are mathematics students, instructors, and professionals who would like some ability to perform basic symbolic computations within \LaTeX{} without the need for laborious and technical setup. But truly, this package was born out of a desire from the authors to learn more about symbolic computation. What you're looking at here is the proverbial ``carrot at the end of the stick'' to keep our learning moving forward.
+                
+Using a scripting language (like Lua) for the core CAS reduces performance dramatically, but the following considerations make it a good option for our intentions: 
+                
+\begin{itemize}
+    \item Compiled languages that can communicate with \LaTeX{} in some way (such as C through Lua) require compiling the code on each machine before running, reducing portability.
+    \item Our target usage would generally not involve computations that take longer than a second, such as factoring large primes or polynomials.
+    \item Lua is a fast scripting language, especially when compared to Python, and is designed to be compact and portable.
+    \item If C code could be used, we could tie into one of many open-source C symbolic calculators, but the point of this project is to learn the mathematics of symbolic computation. The barebones but friendly nature of Lua makes it an ideal language from a pedagogical point of view.
+\end{itemize}
+
+\subsection{Features}
+                
+Currently, {\ttfamily luacas} includes the following functionality:
+                
+\begin{itemize}
+    \item Arbitrary-precision integer and rational arithmetic
+    \item Number-theoretic algorithms for factoring integers and determining primality
+    \item Constructors for arbitrary polynomial rings and integer mod rings, and arithmetic algorithms for both
+    \item Factoring univariate polynomials over the rationals and over finite fields
+    \item Polynomial decomposition and some multivariate functionality, such as pseudodivision
+    \item Basic symbolic root finding
+    \item Symbolic expression manipulations such as expansion, substitution, and simplification
+    \item Symbolic differentiation and integration
+\end{itemize}
+                
+The CAS is written using object-oriented Lua, so it is modular and would be easy to extend its functionality (which we hope to do in the future).
+
+\subsection{Acknowledgements}
+
+We'd like to thank the faculty of the Department of Mathematics at Rose-Hulman Institute of Technology for offering constructive feedback as we worked on this project. A special thanks goes to Dr. Joseph Eichholz for his invaluable input and helpful suggestions. 
+
+\section{Installation}
+
+\subsection{Requirements}
+
+The \texttt{luacas} package (naturally) requires you to compile with Lua\LaTeX{}. Beyond that, the following packages are needed:
+\begin{multicols}{2}
+{\ttfamily 
+\begin{itemize}
+    \item xparse
+    \item pgfkeys
+    \item verbatim
+    \item amsmath
+    \item luacode
+    \item iftex
+    \item tikz/forest
+    \item xcolor
+\end{itemize}}
+\end{multicols}
+The packages {\ttfamily tikz, forest, xcolor} aren't strictly required, but they are needed for drawing expression trees.
+
+\subsection{Installing {\ttfamily luacas}}
+The package manager for your local TeX distribution ought to install the package fine on its own. But for those who like to take matters into their own hands: unpack \texttt{luacas.zip} in the current working directory (or in a directory visible to TeX, like your local texmf directory), and in the preamble of your document, put:
+\begin{minted}{latex}
+    \usepackage{luacas}
+\end{minted}
+That's it, you're ready to go.
+
+\end{document}

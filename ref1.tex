@@ -1,0 +1,46 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse}
+\usepackage{microtype}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\begin{document}
+
+\section{Reference}
+
+
+
+\end{document}
+
