@@ -40,7 +40,7 @@ style=numeric,
 
 \subsection{Tutorial 3: Adding Functionality}
 
-Charlie, like Alice and Bob, is also teaching calculus. Charlie likes Alice's examples and wants to try something similar. But Charlie would like to do more involved examples using rational functions. Accordingly, Charlie copy-n-pastes Alice's code:
+Charlie, like Alice and Bob, is also teaching calculus. Charlie likes Alice's examples and wants to try something similar. But Charlie would like to do more involved examples using rational functions. Accordingly, Charlie copy-and-pastes Alice's code:
 \begin{CAS}
     vars('x','h')
     f = 1/(x^2+1)
@@ -61,7 +61,7 @@ Unfortunately, \mintinline{latex}{\[ q=\print{q} \]} produces:
 \[ q = \print{q} \]
 The \mintinline{lua}{simplify()} command doesn't seem to help either! What Charlie truly needs is to combine terms, i.e., Charlie needs to find a \emph{common denominator}. They're horrified to learn that no such functionality exists in this burgeoning package. 
 
-So what's Charlie to do? They could put in for a feature request, but they're concerned that the schlubs in charge of managing the package won't get around to it until who-knows-when. So Charlie decides to take matters into their own hands. Besides, looking for that silver lining, they'll learn a little bit about how \texttt{luacas} is structured. 
+So what's Charlie to do? They could put a feature request in, but they're concerned that the schlubs in charge of managing the package won't get around to it until who-knows-when. So Charlie decides to take matters into their own hands. Besides, looking for that silver lining, they'll learn a little bit about how \texttt{luacas} is structured. 
 
 At the heart of any CAS is the idea of an \texttt{Expression}. Mathematically speaking, an \texttt{Expression} is a rooted tree. Luckily, this tree can be drawn using the (wonderful) \texttt{forest} package. In particular, the command \mintinline{latex}{\parseforest{q}} will scan the contents of the expression \texttt{q} and parse the results into a form compatible with the \texttt{forest} package; those results are saved in a macro named \mintinline{latex}{\forestresult}. 
 
@@ -96,7 +96,7 @@ At the heart of any CAS is the idea of an \texttt{Expression}. Mathematically sp
     \end{forest}}
 The root of the tree above is \texttt{ADD} since $q$ is, at its heart, the addition of two other expressions. Charlie wonders how they might check to see if a mystery \texttt{Expression} is an \texttt{ADD}? But this is putting the cart before the horse; Charlie should truly wonder how to check for the \emph{type} of \texttt{Expression} -- then they can worry about other attributes. 
 
-Charlie can print the \texttt{Expression} type directly into his document using the \mintinline{latex}{\whatis} command:
+Charlie can print the \texttt{Expression} type directly into their document using the \mintinline{latex}{\whatis} command:
 
 \begin{codebox}
     \inputminted[ 
@@ -228,7 +228,7 @@ Now that Charlie knows the basics of how \texttt{luacas} is structured, they're 
 
 
 \begin{multicols}{2}
-First, Charlie decides to up the complexity of his expression {\ttfamily f} so that he has something more general to work with:
+First, Charlie decides to up the complexity of their expression {\ttfamily f} so that they have something more general to work with:
 \begin{CAS}
     vars('x','h')
     f = x/(x^2+1)
