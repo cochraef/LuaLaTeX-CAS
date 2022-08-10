@@ -96,12 +96,12 @@ function exp(x)
 end
 
 function substitute(tbl,expr)
-    return expr:substitute(tbl) 
+    return expr:substitute(tbl)
 end
 
 function roots(poly)
     poly = expand(poly)
-    if poly.topolynomial then 
+    if poly.topolynomial then
         poly = poly:topolynomial()
     end
     return poly:roots()
