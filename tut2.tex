@@ -1,0 +1,366 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse}
+\usepackage{microtype}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\begin{document}
+
+\subsection{Tutorial 2: Finding Maxima/Minima}
+
+Bob is teaching calculus too, and he wants to give his students many examples of \emph{finding the local max/min of a given function}. But, like Alice, Bob doesn't want to work out a bunch of examples by-hand. Bob decides to try his hand with \texttt{luacas} after having been taught the basics by Alice. 
+
+Bob decides to stick with polynomials for these examples; if anything because those functions are in the wheel-house of \texttt{luacas}. In particular, Bob decides that the \emph{derivative} of the function he wants to use should be a composition of quadratics. This ought to ensure that the roots of that derivative are expressible in a nice way. 
+
+Accordingly, Bob declares variables and chooses two quadratic polynomials to compose, say $f$ and $g$, and sets $dh = g \circ f$:
+
+\inputminted[
+firstline=9,
+lastline=15,
+breaklines]
+{latex}
+{demotut2.tex}
+
+Bob wants to compute $h$, the integral of $dh$. Bob could certainly compute this quantity by-hand, but why hardcode that information into the document when \texttt{luacas} can do this for you? So Bob uses the \texttt{int} command and shifts the result (with some malice aforethought):
+
+\inputminted[
+firstline=17,
+lastline=19,
+breaklines]
+{latex}
+{demotut2.tex}
+
+Bob is curious to know the value of $h$. So he uses \mintinline{latex}{\print{h}} to produce:
+\begin{codebox}
+    {\small\inputminted[
+        firstline=21,
+        lastline=21,
+        breaklines]
+        {latex}
+        {demotut2.tex}}
+    \tcblower
+    \begin{CAS}
+        vars('x')
+        f = x^2+2*x-2
+        g = x^2-1
+        subs = {[x] = f}
+        dh = substitute(subs,g)
+        h  = int(dh,x)+10
+    \end{CAS}
+    \[\print{h} \] 
+\end{codebox}
+This isn't exactly what Bob had in mind. It occurs to Bob that he may need to simplify the expression $h$, so he tries:
+
+\begin{codebox}
+    {\small\inputminted[
+        firstline=23,
+        lastline=26,
+        breaklines]
+        {latex}
+        {demotut2.tex}
+    }
+    \tcblower
+    \begin{CAS}
+        h = simplify(h)
+    \end{CAS}
+    \[\print{h} \] 
+\end{codebox}
+
+That's more like it! Now, Bob wants to find the roots to $dh$. Bob uses the \texttt{roots} command to do this:
+
+\inputminted[
+    firstline=28,
+    lastline=30,
+    breaklines]
+    {latex}
+    {demotut2.tex}
+
+But then Bob wonders to himself, ``How do I actually retrieve the roots of $dh$ from \texttt{luacas}?'' The assignment \mintinline{lua}{r = roots(dh)} stores the roots of the polynomial $dh$ in a table named \texttt{r}. With indices beginning at $1$, Bob can retrieve the entries of that table via:
+
+\begin{codebox}
+    {\small\inputminted[
+    firstline=32,
+    lastline=32,
+    breaklines]
+    {latex}
+    {demotut2.tex}}
+    \tcblower 
+    \begin{CAS}
+        r = roots(dh)
+    \end{CAS}
+    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
+\end{codebox}
+
+Splendid! Bob would now like to evaluate the function $h$ at these roots (for these are the local max/min values of $h$). Here's Bob's first thought:
+
+\begin{codebox}
+    {\small\inputminted[
+    firstline=34,
+    lastline=37,
+    breaklines]
+    {latex}
+    {demotut2.tex}}
+    \tcblower 
+    \begin{CAS}
+        v = simplify(substitute({[x]=r[1]},h))
+    \end{CAS}
+    \[ \print{v} \] 
+\end{codebox}
+
+What the heck?! Bob is (understandably) confused. But here's where Bob learns a valuable lesson\dots 
+
+\subsubsection{A brief interlude: Lua numbers vs \texttt{luacas Integers}}
+
+The \LaTeX{} environment \mintinline{latex}{\begin{CAS}..\end{CAS}} is really a glorified Lua environment. The ``glory'' comes in how the contents of the environment are parsed in a special manner to make interacting with the CAS (mostly) easy. Bob has encountered a situation where that interaction is not as easy as we'd like. 
+
+For comparison, consider the following simple use of \texttt{luacas} using the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment:
+\begin{codebox}
+    {\footnotesize\inputminted[
+    firstline=39,
+    lastline=44,
+    breaklines]
+    {latex}
+    {demotut2.tex}}
+    \tcblower 
+    \begin{CAS}
+        vars('y')
+        a = 1
+        b = y+a
+    \end{CAS}
+    \[ \print{b} \] 
+\end{codebox}
+Here's the same thing but using \mintinline{latex}{\directlua} instead:
+\begin{codebox}
+    {\footnotesize\inputminted[
+    firstline=46,
+    lastline=51,
+    breaklines]
+    {latex}
+    {demotut2.tex}}
+    \tcblower 
+    \directlua{
+    vars('y')
+    a = Integer(1)
+    b = y+a
+}
+\[ \print{b} \] 
+\end{codebox}
+The essential difference being:
+\begin{itemize}
+    \item Using \mintinline{latex}{\begin{CAS}..\end{CAS}}, the parser automatically interprets any digit strings as an \texttt{Integer}; this is a special class defined within the bowels of \texttt{luacas}. Ultimately, it allows for us to define things like the addition of an \texttt{Integer} and an \texttt{Expression} (in this case, the result is a new \texttt{Expression}). 
+    \item Using \mintinline{latex}{\directlua}, there is no parsing, so the user (aka Bob) is responsible for telling \texttt{luacas} what to interpret as an \texttt{Integer} versus what to interpret as a normal Lua number. 
+\end{itemize}
+Generally speaking, we like what the parser in \mintinline{latex}{\begin{CAS}..\end{CAS}} does: it keeps us from having to wrap all integers in \texttt{Integer(..)}. But the price we pay is that the parser indiscriminately wraps \emph{all} digit strings in \texttt{Integer(..)}. This causes a problem in the following line in Bob's code:
+\inputminted[ 
+    firstline=35,
+    lastline=35
+    ]
+    {lua}
+    {demotut2.tex}
+The parser sees \mintinline{lua}{r[1]} and interprets \texttt{1} as \texttt{Integer(1)} -- but \mintinline{lua}{r[Integer(1)]} is \texttt{nil}, so no substitution is performed. 
+
+The good news is that, excluding the annoyance between \texttt{Integer} and Lua number, interacting with the CAS via \mintinline{latex}{\directlua} is not much different than interacting with it via \mintinline{latex}{\begin{CAS}..\end{CAS}}
+
+\subsubsection*{Back to the tutorial...}
+
+After that enlightening interlude, Bob realizes that he should probably use \mintinline{latex}{\directlua} (or \mintinline{latex}{\luaexec} from the \texttt{luacode} package) to build a table of values:
+
+\begin{codebox}
+    {\footnotesize\inputminted[
+    firstline=54,
+    lastline=63,
+    breaklines]
+    {latex}
+    {demotut2.tex}}
+    \tcblower 
+    \directlua{
+    v = {}
+    for i=1,4 do 
+        table.insert(v,simplify(substitute({[x]=r[i]},h)))
+    end
+}
+\[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad \print{v[4]} \] 
+\end{codebox}
+Great! But still; Bob doesn't want to just pretty-print the roots of $dh$. Bob is determined to plot the results -- he wants to hammer home the point that the roots of $dh$ point to the local extrema of $h$. 
+
+Luckily, Bob is familiar with some of the fantastic graphics tools in the \LaTeX{} ecosystem, like \texttt{pgfplots} and \texttt{asymptote}. But then Bob begins to wonder, ``How can I yoink results out of \texttt{luacas} so that I may yeet them into something like \texttt{pgfplots}?''
+Bob is delighted to find the following commands: \mintinline{latex}{\fetch} and \mintinline{latex}{\store}.
+
+Whereas the \mintinline{latex}{\print} command relies on the \texttt{luacas} method \mintinline{lua}{tolatex()}, the commands \mintinline{latex}{\fetch} and \mintinline{latex}{\store} rely on the \texttt{luacas} function \mintinline{lua}{tostring()}. Bob can view the output of \mintinline{lua}{tostring()} using the \mintinline{latex}{\vprint} command ({\bf v}erbatim {\bf print}). For example, \mintinline{latex}{\vprint{h}} produces:
+\vprint{h} 
+This is more-or-less what Bob wants -- but he doesn't want the verbatim output printed to his document, Bob just wants the contents of \mintinline{lua}{tostring(h)}. Here's where \mintinline{latex}{\fetch} comes in. The command \mintinline{latex}{\fetch{h}} is equivalent to:
+\begin{minted}{latex}
+    \directlua{
+        tex.print(tostring(h))
+    }
+\end{minted}
+For comparison, the command \mintinline{latex}{\print{h}} is equivalent to:
+\begin{minted}{latex}
+    \directlua{
+        tex.print(h:tolatex())
+    }
+\end{minted}
+For Bob's purposes, \mintinline{latex}{\fetch{h}} is exactly what he needs:
+
+\tcbsidebyside[ 
+    sidebyside adapt=right,
+    enhanced,skin=bicolor,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+    ]
+    {\small
+    \inputminted[ 
+        firstline = 65,
+        lastline  = 77,
+        breaklines
+        ]
+        {latex}
+        {demotut2.tex}}
+    {\begin{tikzpicture}
+        \begin{axis}[legend pos = north west]
+            \addplot [domain=-3.5:1.5,samples=100] {\fetch{h}};
+            \addlegendentry{$f$};
+            \addplot[densely dashed] 
+                [domain=-3.25:1.25,samples=100] {\fetch{dh}};
+            \addlegendentry{$df/dx$};
+            \addplot[gray,dashed,thick]
+                [domain=-3.5:1.5] {0};
+        \end{axis}
+    \end{tikzpicture}}
+Alternatively, Bob could use \mintinline{latex}{\store}. The \mintinline{latex}{\store} command will \emph{fetch} the contents of its mandatory argument and store it in a macro of the same name. 
+\inputminted[ 
+    firstline=79,
+    lastline=80,
+    breaklines
+    ]
+    {latex}
+    {demotut2.tex}
+Now the macros \mintinline{latex}{\h} and \mintinline{latex}{\dh} can be used in place of \mintinline{latex}{\fetch{h}} and \mintinline{latex}{\fetch{dh}}, respectively. An optional argument can be used to store contents in a macro under a different name. This is useful for situations like the following:
+\inputminted[ 
+    firstline=82,
+    lastline=82,
+    breaklines
+    ]
+    {latex}
+    {demotut2.tex}
+Now \mintinline{latex}{\rootone} can be used in place of \mintinline{latex}{\fetch{r[1]}}. But Bob wants to fetch all the values stored in \texttt{r} (and \texttt{v}, for that matter). In this case, Bob can use:
+\inputminted[ 
+    firstline=84,
+    lastline=85,
+    breaklines
+]{latex}{demotut2.tex}
+The command \mintinline{latex}{\store{r}} is equivalent to:
+\begin{minted}{latex}
+\def\r{{ \fetch{r[1]}, \fetch{r[2]}, \fetch{r[3]}, \fetch{r[4]} }}
+\end{minted}
+The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \mintinline{latex}{\pgfmathsetmacro}. For example:
+
+\begin{codebox}
+    {\small\inputminted[ 
+        firstline = 160,
+        lastline = 172,
+        breaklines
+    ]
+    {latex}
+    {demotut2.tex}}
+    \tcblower
+    \store{r}
+    \begin{tikzpicture}[scale=0.7]
+        \draw [dashed,latex-latex] (-7,0) -- (4,0);
+        \foreach \k in {0,1,2,3}{
+            \pgfmathsetmacro\a{\r[\k]}
+            \draw (\a,0) circle (\a);
+        }
+        \foreach \x in {-6,...,3}{
+            \draw[fill,orange] (\x,0) circle (2pt)
+            node[below] {\footnotesize$\x$};
+        }
+    \end{tikzpicture}
+\end{codebox}
+
+Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project shared below:
+\begin{minted}[breaklines]{latex}
+Consider the function $f(x)$ defined by:
+\begin{CAS}
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = expand(substitute(subs,g))
+    h = simplify(int(dh,x)+10)
+\end{CAS}
+$\displaystyle f(x) = \print{h}$.
+\begin{multicols}{2}
+    Note that: 
+    \[ f'(x) = \print{dh}.\] 
+    The roots to $f'(x)=0$ equation are:
+    \begin{CAS}
+        r = roots(dh)
+    \end{CAS}
+    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]}.\] 
+    Recall: $f'(x_0)$ measures the slope of the tangent line to $y=f(x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak (local maximum) or a valley (local minimum). 
+    \directlua{
+        v = {}
+        for i=1,4 do 
+            table.insert(v,simplify(substitute({[x]=r[i]},h)))
+        end
+    }
+    \columnbreak 
+    \store{h}\store{dh}
+    \begin{tikzpicture}[scale=0.95]
+        \begin{axis}[legend pos = north west]
+            \addplot 
+            [domain=-3.5:1.5,samples=100] {\h};
+            \addlegendentry{$f$};
+            \addplot[densely dashed] 
+            [domain=-3.25:1.25,samples=100] {\dh};
+            \addlegendentry{$df/dx$};
+            \addplot[gray,dashed,thick]
+            [domain=-3.5:1.5] {0};
+            \luaexec{for i=1,4 do 
+                tex.print("\\draw[fill=purple,purple]",
+                    "(axis cs:{", tostring(r[i]) ,"},0) circle (1.5pt)",
+                    "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) circle (1.5pt)",
+                    "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) edge[dashed] (axis cs:{", tostring(r[i]) ,"},0);")
+                end}
+        \end{axis}
+    \end{tikzpicture}
+\end{multicols}
+\end{minted}
+
+\end{document}
