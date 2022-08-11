@@ -331,7 +331,11 @@ function BinaryOperation:combine()
         numerator = numerator + expr*uncommon
     end
     numerator = numerator:simplify():factor()
-    return numerator/denominator
+    if denominator == Integer.one() then 
+        return numerator 
+    else 
+        return numerator/denominator
+    end
 end
 
 --- @param other Expression
