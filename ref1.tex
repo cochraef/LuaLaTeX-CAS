@@ -17,14 +17,27 @@
 \usepackage{parskip}
 \usepackage{multicol}
 \usepackage[most]{tcolorbox}
-    \tcbuselibrary{xparse}
+    \tcbuselibrary{xparse,documentation}
 \usepackage{microtype}
+\usepackage{makeidx}
 
 \usepackage[
 backend=biber,
 style=numeric,
 ]{biblatex}
 \addbibresource{sources.bib}
+
+\definecolor{rose}{RGB}{128,0,0}
+\definecolor{roseyellow}{RGB}{222,205,99}
+\definecolor{roseblue}{RGB}{167,188,214}
+\definecolor{rosenavy}{RGB}{79,117,139}
+\definecolor{roseorange}{RGB}{232,119,34}
+\definecolor{rosegreen}{RGB}{61,68,30}
+\definecolor{rosewhite}{RGB}{223,209,167}
+\definecolor{rosebrown}{RGB}{108,87,27}
+\definecolor{rosegray}{RGB}{84,88,90}
+
+\definecolor{codegreen}{HTML}{49BE25}
 
 \newtcolorbox{codebox}[1][sidebyside]{
     enhanced,skin=bicolor,
@@ -36,10 +49,165 @@ style=numeric,
     notitle
 }
 
+\newtcolorbox{codehead}[1][]{
+    enhanced,
+    frame hidden,
+    colback=brown!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize
+}
+
+\makeindex
+
 \begin{document}
 
 \section{Reference}
 
+\index{Core Methods!\texttt{evaluate}}
+\begin{codehead}
+    \mintinline{lua}{function Expression:evaluate()}
+\end{codehead}
+Applies to an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
+
+    For example, the code:
+    \begin{minted}{latex}
+\directlua{
+    x = Integer(1)/Integer(2)
+    y = Integer(2)/Integer(3)
+    z = BinaryOperation(BinaryOperation.ADD,{x,y})
+}
+\[ \print{z} = \print{z:evaluate()}.\] 
+    \end{minted}
+    produces:
+    \directlua{
+        x = Integer(1)/Integer(2)
+        y = Integer(2)/Integer(3)
+        z = BinaryOperation(BinaryOperation.ADD,{x,y})
+    }
+    \[ \print{z} = \print{z:evaluate()}.\]
+
+\index{Core Methods!\texttt{autosimplify()}}
+\begin{codehead}
+    \mintinline{lua}{function Expression:autosimplify()}
+\end{codehead}
+
+Performs fast simplification techniques on an expression. All input from the \LaTeX{} end and everything output to the \LaTeX{} end is autosimplified. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method also calls the {\ttfamily evaluate()} method.
+
+Consider the code:
+
+\begin{minted}{latex}
+\begin{CAS}
+    vars('x','y','z')
+    w = x/y + y/z + z/x 
+\end{CAS}
+\[ \print{w} = \print{w:autosimplify()} \]
+\end{minted}
+\begin{CAS}
+    vars('x','y','z')
+    w = x/y + y/z + z/x 
+\end{CAS}
+The output is as follows:
+\[ \print{w} = \print{w:autosimplify()} \]
+It seems that \texttt{autosimplify()} did nothing; but there are significant structural differences between \texttt{w} and \texttt{w:autosimplify()}:
+
+\begin{multicols}{2}
+    \begin{center}
+        \underline{Expression tree for \texttt{w}}
+
+    \parseforest{w}
+    \bracketset{action character = @}
+    \begin{forest}
+        for tree = {font = \ttfamily}
+        @\forestresult
+    \end{forest}
+
+    \underline{Expression tree for \texttt{w:autosimplify()}}
+
+    \parseforest{w:autosimplify()}
+    \bracketset{action character = @}
+    \begin{forest}
+        for tree = {font = \ttfamily}
+        @\forestresult
+    \end{forest}
+\end{center}
+\end{multicols}
+
+Ironically, the \emph{autosimplified} expression tree on the right looks more complicated than the one on the left! But the main purpose of \texttt{autosimplify()} is to take an expression (that truly could be input in a myriad of ways) and convert that expression into something \emph{anticipatable}. 
+
+For example, suppose the user inputs:
+\begin{minted}{latex}
+\begin{CAS}
+    w = x/y + (z/x+y/z)
+\end{CAS}
+\end{minted}
+In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()} look as follows:
+
+\begin{multicols}{2}
+\begin{center}
+    \underline{Expression tree for \texttt{w}}
+
+\parseforest{w}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+
+\underline{Expression tree for \texttt{w:autosimplify}}
+
+\parseforest{w:autosimplify()}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\end{multicols}
+{\bf Note:} \texttt{w:autosimplify()} is exactly the same as it was before despite the different starting point. This is an essential function of \texttt{autosimplify()}.
+
+\end{document}
+
+
+
+    \item[autosimplify()] Performs fast simplification techniques on an expression. All input from the \LaTeX{} end and everything output to the \LaTeX{} end is autosimplified. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method also calls the {\ttfamily evaluate()} method.
+    
+    \item {\ttfamily simplify()} performs full simplification of an expression. This may involve polynomial factorization, which is slow, so this is seperate from autosimplification and not called on the \LaTeX{} end unless the user specifically directs the CAS to simplify.
+    
+    \item {\ttfamily subexpressions()} returns a list of all subexpressions of an expression. This gives a unified interface to the instance variables for subexpressions, which have different names across classes.
+    
+    \item {\ttfamily size()} returns the number of nodes of the tree that constitutes an expression, or roughly the total number of expression objects that make up the expression.
+    
+    \item {\ttfamily setsubexpressions(subexpressions)} creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
+    
+    \item {\ttfamily freeof(symbol)} determines whether or not an expression contains a particular \\ {\ttfamily SymbolExpression} somewhere in the tree.
+    
+    \item {\ttfamily substitute(map)} takes a table mapping expressions to other expressions and recursively maps each instance of an expression with its corresponding table expression.
+    
+    \item {\ttfamily expand()} expands an expression, turning sums of products into products of sums.
+    
+    \item {\ttfamily factor()} factors an expression, turning products of sums into sums of products.
+    
+    \item {\ttfamily isatomic()} determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
+    
+    \item {\ttfamily isconstant()} determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases, for instance, it returns {\ttfamily false} for the constant $\pi$. This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
+    
+    \item {\ttfamily isrealconstant()} determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$.
+    
+    \item {\ttfamily iscomplexconstant()} determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$.
+    
+    \item {\ttfamily tolatex()} converts an expression to \LaTeX{} code.
+\end{itemize}
 
 
 \end{document}
