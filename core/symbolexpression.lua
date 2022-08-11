@@ -104,6 +104,9 @@ SymbolExpression = setmetatable(SymbolExpression, __SymbolExpression)
 
 -- The constant pi.
 PI = SymbolExpression("pi")
+function PI:tolatex()
+    return "\\pi"
+end
 
 -- Approximates pi as a rational number. Uses continued fraction expansion.
 function PI:approximate()
@@ -125,3 +128,6 @@ end
 
 -- The imaginary constant i.
 I = SymbolExpression("i")
+function I:tolatex()
+    return "i" 
+end
