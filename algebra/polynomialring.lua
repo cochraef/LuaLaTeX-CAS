@@ -209,7 +209,6 @@ function PolynomialRing.partialfractions(g, f, ffactors)
 
 end
 
-
 ----------------------------
 -- Instance functionality --
 ----------------------------
@@ -241,6 +240,68 @@ __o.__div = function(a, b)
         return a:inring(b:getring()):div(b)
     end
     return BinaryOperation.DIVEXP({a, b})
+end
+
+function PolynomialRing:tolatex()
+    local out = ''
+    local loc = self.degree:asnumber()
+    if loc == 0 then 
+        return self.coefficients[loc]:tolatex()
+    end
+    if self.ring == Rational.getring() or self.ring == Integer.getring() then 
+        if self.coefficients[loc] ~= Integer.one() then 
+            out = out .. self.coefficients[loc]:tolatex() .. self.symbol
+        else
+            out = out .. self.symbol
+        end
+        if loc ~=1 then 
+            out = out .. "^{" .. loc .. "}"
+        end 
+        loc = loc -1
+        while loc >=0 do 
+            local coeff = self.coefficients[loc]
+            if coeff == Integer.one() then 
+                out = out .. "+"
+                goto continue
+            end
+            if coeff < Integer.zero() then 
+                out = out .. "-" .. coeff:neg():tolatex()
+            end 
+            if coeff == Integer.zero() then 
+                goto skip
+            end
+            if coeff > Integer.zero() then 
+                out = out .. "+" .. coeff:tolatex()
+            end
+            ::continue::
+            if loc > 1 then 
+                out = out .. self.symbol .. "^{" .. loc .. "}"
+            end 
+            if loc == 1 then 
+                out = out .. self.symbol
+            end 
+            ::skip::
+            loc = loc-1
+        end
+    else
+        while loc >=0 do 
+            if loc >=1 then
+                out = out .. self.coefficients[loc]:tolatex() .. self.symbol .. "^{" .. loc .. "} + "
+            else 
+                out = out .. self.coefficients[loc]:tolatex() .. self.symbol .. "^{" .. loc .. "}"
+            end
+        loc = loc-1
+        end
+    end
+    return out
+end
+
+function PolynomialRing:isatomic() 
+    if self.degree >= Integer.one() then 
+        return false
+    else
+        return true
+    end
 end
 
 -- Creates a new polynomial ring given an array of coefficients and a symbol
