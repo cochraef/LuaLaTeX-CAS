@@ -723,7 +723,7 @@ end
 --- @return string
 function IntegralExpression:tolatex()
     if self:isdefinite() then
-        return '\\int_{' .. self.lower:tolatex() .. '}{' .. self.upper:tolatex() .. '}{' .. self.expression:tolatex() .. '\\hspace{1pt}d' .. self.symbol:tolatex() .. '}'
+        return '\\int_{' .. self.lower:tolatex() .. '}^{' .. self.upper:tolatex() .. '}{' .. self.expression:tolatex() .. '\\hspace{1pt}d' .. self.symbol:tolatex() .. '}'
     end
     return '\\int{' .. self.expression:tolatex() .. '\\hspace{1pt}d' .. self.symbol:tolatex() .. '}'
 end
