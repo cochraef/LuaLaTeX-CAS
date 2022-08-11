@@ -29,6 +29,9 @@
     if a:type() == DiffExpression then
         return "DiffExp"
     end
+    if a:type() == IntegralExpression then 
+        return "Intgrl"
+    end
     return "No Clue"
 end
 
@@ -59,6 +62,9 @@ function longwhatis(a)
     end
     if a:type() == DiffExpression then
         return "DiffExpression"
+    end
+    if a:type() == IntegralExpression then 
+        return "IntegralExpression" 
     end
     return "No Clue"
 end
@@ -102,6 +108,9 @@ function nameof(sym)
     end
     if sym:type() == DiffExpression then
         return "Diff"
+    end
+    if sym:type() == IntegralExpression then 
+        return "$\\mathtt{\\int}$" 
     end
     return "No Clue"
 end
@@ -161,6 +170,15 @@ function Expression:getthefancyshrub()
                 string = string .. symbol:tolatex() .. "," 
             end
         end
+        return string
+    end
+    if self:type() == IntegralExpression then 
+        string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
+        if self:isdefinite() then 
+            string = string .. "[ $\\mathtt{"..self.lower:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.lower};} ] "
+            string = string .. "[ $\\mathtt{"..self.upper:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.upper};} ] "
+            return string 
+        end 
         return string
     end
     for index, expression in ipairs(self:subexpressions()) do
