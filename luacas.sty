@@ -200,7 +200,7 @@
             tex.print("\\def\\shrubresult{")
             tex.print("[")
             tex.print(nameof(sym))
-            tex.print(", tikz+={\\node[anchor=south,font=\\ttfamily\\footnotesize,gray] at (.north) {",whatis(sym),"};}")
+            tex.print(", tikz+={\\node[anchor=south,font=\\ttfamily\\footnotesize,gray] at (.north) {",longwhatis(sym),"};}")
             tex.print(sym:getthefancyshrub())
             tex.print("]")
             tex.print("}")
