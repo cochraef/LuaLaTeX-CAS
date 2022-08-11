@@ -1,2 +1,15 @@
-\indexentry{Core Methods!\texttt{evaluate}|hyperpage}{1}
-\indexentry{Core Methods!\texttt{autosimplify()}|hyperpage}{1}
+\indexentry{Core Methods!\texttt  {function Expression:evaluate()}|hyperpage}{1}
+\indexentry{Core Methods!\texttt  {function Expression:autosimplify()}|hyperpage}{1}
+\indexentry{Core Methods!\texttt  {function Expression:simplify()}|hyperpage}{2}
+\indexentry{Core Methods!\texttt  {function Expression:subexpressions()}|hyperpage}{2}
+\indexentry{Core Methods!\texttt  {function Expression:size()}|hyperpage}{3}
+\indexentry{Core Methods!\texttt  {function Expression:setsubexpressions(subexpressions)}|hyperpage}{4}
+\indexentry{Core Methods!\texttt  {function Expression:freeof(symbol)}|hyperpage}{4}
+\indexentry{Core Methods!\texttt  {function Expression:substitute(map)}|hyperpage}{4}
+\indexentry{Core Methods!\texttt  {function Expression:expand()}|hyperpage}{4}
+\indexentry{Core Methods!\texttt  {function Expression:factor()}|hyperpage}{5}
+\indexentry{Core Methods!\texttt  {function Expression:isatomic()}|hyperpage}{5}
+\indexentry{Core Methods!\texttt  {function Expression:isconstant()}|hyperpage}{5}
+\indexentry{Core Methods!\texttt  {function Expression:isrealconstant()}|hyperpage}{5}
+\indexentry{Core Methods!\texttt  {function Expression:iscomplexconstant()}|hyperpage}{5}
+\indexentry{Core Methods!\texttt  {function Expression:tolatex()}|hyperpage}{5}
