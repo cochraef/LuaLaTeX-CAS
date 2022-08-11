@@ -95,6 +95,12 @@ function Expression:factor()
     return self
 end
 
+--- Attempts to combine an expression by collapsing sums of expressions together into a single factor, e.g. common denominator
+--- @return Expression
+function Expression:combine()
+    return self
+end
+
 --- Returns all non-constant subexpressions of this expression - helper method for factor.
 --- @return table<number, Expression>
 function Expression:getsubexpressionsrec()
