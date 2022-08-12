@@ -491,6 +491,51 @@ On the other hand:
 
 Determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
 
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+x = SymbolExpression("x")
+y = x*x+x
+if x:isatomic() then 
+    tex.print("I'm atomic.")
+end 
+if not y:isatomic() then 
+    tex.print("But I'm compound.")
+end
+\end{minted}
+\tcblower
+\directlua{
+    x = SymbolExpression("x")
+    y = x*x+x
+    if x:isatomic() then 
+        tex.print("I'm atomic.")
+    end 
+    if not y:isatomic() then 
+        tex.print("But I'm compound.")
+    end
+}
+\end{codebox}
+Since \texttt{SymbolExpression} inherits from \texttt{AtomicExpression}, we have that \texttt{isatomic()} is taken literally as well. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+y = SymbolExpression("x*x+x")
+if not y:isatomic() then 
+    tex.print("But I'm compound.")
+else
+    tex.print("But I'm atomic!")
+end
+\end{minted}
+\tcblower
+\directlua{
+    y = SymbolExpression("x*x+x")
+    if not y:isatomic() then 
+        tex.print("But I'm compound.")
+    else
+        tex.print("But I'm atomic!")
+    end
+}
+\end{codebox}
+\vskip 0.2cm
+
 \coderef{function Expression:isconstant()}
 
 Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases, for instance, it returns {\ttfamily false} for the constant $\pi$. This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
