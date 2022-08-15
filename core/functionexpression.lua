@@ -2,6 +2,8 @@
 --- Represents a generic function that takes zero or more expressions as inputs.
 --- @field name SymbolExpression
 --- @field expressions table<number, Expression>
+--- @field orders table<number, Integer>
+--- @field variables table<number,SymbolExpression>
 --- @alias Function FunctionExpression
 FunctionExpression = {}
 __FunctionExpression = {}
@@ -14,8 +16,9 @@ __FunctionExpression = {}
 --- @param name string|SymbolExpression
 --- @param expressions table<number, Expression>
 --- @param orders table<number, Integer>
+--- @param variables table<number,SymbolExpression>
 --- @return FunctionExpression
-function FunctionExpression:new(name, expressions, orders)
+function FunctionExpression:new(name, expressions, orders, variables)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
@@ -42,6 +45,23 @@ function FunctionExpression:new(name, expressions, orders)
             o.orders[index] = Integer.zero()
         end
     end
+    if variables then 
+        o.variables = variables
+    else
+        o.variables = Copy(expressions)
+        for _,expression in ipairs(o.variables) do 
+            if not expression:isatomic() then 
+                if #expressions == 1 then 
+                    o.variables = {SymbolExpression("x")}
+                elseif #expressions == 2 then 
+                    o.variables = {SymbolExpression("x"),SymbolExpression("y")}
+                elseif #expressions == 3 then 
+                    o.variables = {SymbolExpression("x"),SymbolExpression("y"),SymbolExpression("z")}
+                end
+            end
+            break
+        end
+    end
 
     __o.__index = FunctionExpression
     __o.__tostring = function(a)
@@ -50,32 +70,32 @@ function FunctionExpression:new(name, expressions, orders)
             total = total + integer
         end
         if total == Integer.zero() then
-            local expressionnames = a.name .. '('
+            local out = a.name .. '('
             for index, expression in ipairs(a.expressions) do
-                expressionnames = expressionnames .. tostring(expression)
+                out = out .. tostring(expression)
                 if a.expressions[index + 1] then
-                    expressionnames = expressionnames .. ', '
+                    out = out .. ', '
                 end
             end
-            return expressionnames .. ')'
+            return out .. ')'
         else
-            local expressionnames = 'd^' .. tostring(total) .. a.name .. '/'
+            local out = 'd^' .. tostring(total) .. a.name .. '/'
             for index,order in ipairs(a.orders) do 
                 if order > Integer.zero() then 
-                    expressionnames = expressionnames .. 'd' .. tostring(a.expressions[index])
+                    out = out .. 'd' .. tostring(a.variables[index])
                     if order > Integer.one() then 
-                        expressionnames = expressionnames .. '^' .. tostring(order)
+                        out = out .. '^' .. tostring(order)
                     end
                 end
             end
-            expressionnames = expressionnames .. '('
+            out = out .. '('
             for index, expression in ipairs(a.expressions) do
-                expressionnames = expressionnames .. tostring(expression)
+                out = out .. tostring(expression)
                 if a.expressions[index + 1] then
-                    expressionnames = expressionnames .. ', '
+                    out = out .. ', '
                 end
             end
-            return expressionnames .. ')'
+            return out .. ')'
         end
     end
     __o.__eq = function(a, b)
@@ -219,7 +239,7 @@ function FunctionExpression:tolatex()
                 for index,integer in ipairs(f.orders) do 
                     local i = integer:asnumber()
                     while i > 0 do 
-                        out = out .. self.expressions[index]:tolatex()
+                        out = out .. self.variables[index]:tolatex()
                         i = i - 1
                     end
                 end 
@@ -228,7 +248,7 @@ function FunctionExpression:tolatex()
                 out = '\\frac{\\partial^{' .. order:tolatex() .. '}' .. out .. '}{'
                 for index, integer in ipairs(f.orders) do 
                     if integer > Integer.zero() then 
-                        out = out .. '\\partial ' .. self.expressions[index]:tolatex()
+                        out = out .. '\\partial ' .. self.variables[index]:tolatex()
                         if integer ~= Integer.one() then 
                             out = out .. '^{' .. integer:tolatex() .. '}'
                         end
