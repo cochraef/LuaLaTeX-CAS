@@ -13,8 +13,9 @@ __FunctionExpression = {}
 --- Creates a new function expression with the given operation.
 --- @param name string|SymbolExpression
 --- @param expressions table<number, Expression>
+--- @param orders table<number, Integer>
 --- @return FunctionExpression
-function FunctionExpression:new(name, expressions)
+function FunctionExpression:new(name, expressions, orders)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
@@ -33,17 +34,49 @@ function FunctionExpression:new(name, expressions)
 
     o.name = name
     o.expressions = expressions
+    if orders then 
+        o.orders = orders
+    else
+        o.orders = Copy(expressions)
+        for index,_ in ipairs(o.orders) do 
+            o.orders[index] = Integer.zero()
+        end
+    end
 
     __o.__index = FunctionExpression
     __o.__tostring = function(a)
-        local expressionnames = a.name .. '('
-        for index, expression in ipairs(a.expressions) do
-            expressionnames = expressionnames .. tostring(expression)
-            if a.expressions[index + 1] then
-                expressionnames = expressionnames .. ', '
-            end
+        local total = Integer.zero()
+        for _,integer in ipairs(a.orders) do 
+            total = total + integer
         end
-        return expressionnames .. ')'
+        if total == Integer.zero() then
+            local expressionnames = a.name .. '('
+            for index, expression in ipairs(a.expressions) do
+                expressionnames = expressionnames .. tostring(expression)
+                if a.expressions[index + 1] then
+                    expressionnames = expressionnames .. ', '
+                end
+            end
+            return expressionnames .. ')'
+        else
+            local expressionnames = 'd^' .. tostring(total) .. a.name .. '/'
+            for index,order in ipairs(a.orders) do 
+                if order > Integer.zero() then 
+                    expressionnames = expressionnames .. 'd' .. tostring(a.expressions[index])
+                    if order > Integer.one() then 
+                        expressionnames = expressionnames .. '^' .. tostring(order)
+                    end
+                end
+            end
+            expressionnames = expressionnames .. '('
+            for index, expression in ipairs(a.expressions) do
+                expressionnames = expressionnames .. tostring(expression)
+                if a.expressions[index + 1] then
+                    expressionnames = expressionnames .. ', '
+                end
+            end
+            return expressionnames .. ')'
+        end
     end
     __o.__eq = function(a, b)
         -- if b:type() == TrigExpression then
@@ -84,7 +117,7 @@ function FunctionExpression:autosimplify()
     for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:autosimplify()
     end
-    return FunctionExpression(self.name, results)
+    return FunctionExpression(self.name, results, self.orders)
 end
 
 --- @return table<number, Expression>
@@ -149,15 +182,63 @@ function FunctionExpression:tolatex()
         out = "\\" .. out
     end
     if self:type() ~= TrigExpression and string.len(self.name)>1 then
-        if out:sub(2,2) ~= "'" then
-            local fp = out:find("'")
-            if fp then
-                out = '\\operatorname{' .. out:sub(1,fp-1) .. '}' .. out:sub(fp,-1)
+        --if out:sub(2,2) ~= "'" then
+            --local fp = out:find("'")
+            --if fp then
+            --    out = '\\operatorname{' .. out:sub(1,fp-1) .. '}' .. out:sub(fp,-1)
+            --else
+        out = '\\operatorname{' .. out .. '}'
+            --end
+        --end
+    end
+    if #self.expressions == 1 then 
+        local order = self.orders[1]
+        if order == Integer.zero() then
+            goto continue
+        else
+            if order < Integer(5) then 
+                while order > Integer.zero() do
+                    out = out .. "'"
+                    order = order - Integer.one()
+                end
             else
-                out = '\\operatorname{' .. out .. '}'
+                out = out .. '^{(' .. order:tolatex() .. ')}'
             end
         end
     end
+    if #self.expressions > 1 then 
+        local order = Integer.zero()
+        for _,integer in ipairs(f.orders) do 
+            order = order + integer
+        end
+        if order == Integer.zero() then 
+            goto continue
+        else
+            if order < Integer(4) then 
+                out = out .. '_{'
+                for index,integer in ipairs(f.orders) do 
+                    local i = integer:asnumber()
+                    while i > 0 do 
+                        out = out .. self.expressions[index]:tolatex()
+                        i = i - 1
+                    end
+                end 
+                out = out .. '}'
+            else
+                out = '\\frac{\\partial^{' .. order:tolatex() .. '}' .. out .. '}{'
+                for index, integer in ipairs(f.orders) do 
+                    if integer > Integer.zero() then 
+                        out = out .. '\\partial ' .. self.expressions[index]:tolatex()
+                        if integer ~= Integer.one() then 
+                            out = out .. '^{' .. integer:tolatex() .. '}'
+                        end
+                    end
+                end
+                out = out .. '}'
+            end
+        end
+    end
+    ::continue::
     out = out .. '\\left('
     for index, expression in ipairs(self:subexpressions()) do
         out = out .. expression:tolatex()
