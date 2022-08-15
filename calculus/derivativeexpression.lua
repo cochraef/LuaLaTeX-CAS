@@ -12,15 +12,13 @@ __DerivativeExpression = {}
 -- Creates a new single-variable derivative operation with the given symbol and expression.
 --- @param expression Expression
 --- @param symbol Symbol
---- @param static boolean
 --- @return DerivativeExpression
-function DerivativeExpression:new(expression, symbol, static)
+function DerivativeExpression:new(expression, symbol)
     local o = {}
     local __o = Copy(__ExpressionOperations)
 
     o.expression = Copy(expression)
     o.symbol = symbol or SymbolExpression("x")
-    o.static = static
 
     __o.__index = DerivativeExpression
     __o.__tostring = function(a)
@@ -39,73 +37,69 @@ function DerivativeExpression:new(expression, symbol, static)
 end
 
 --- @return Expression
-function DerivativeExpression:autosimplify()
-    local simplified = self.expression:autosimplify()
-
-    if self.static then
-        return DerivativeExpression(simplified, self.symbol, self.static)
-    end
+function DerivativeExpression:evaluate()
+    local exp = self.expression
 
     -- The derivative of a constant is 0
-    if simplified:isconstant() then
+    if exp:isconstant() then
         return Integer.zero()
     end
 
     -- The derivative of a symbol is either 1 or 0
-    if simplified:type() == SymbolExpression then
-        if self.symbol == simplified then
+    if exp:type() == SymbolExpression then
+        if self.symbol == exp then
             return Integer.one()
         end
         return Integer.zero()
     end
 
     -- Chain rule for arbitrary functions
-    if simplified:type() == FunctionExpression then
-        if simplified.expressions[2] then
+    if exp:type() == FunctionExpression then
+        if exp.expressions[2] then
             return self
         end
-        return (DerivativeExpression(simplified.expressions[1], self.symbol) * DerivativeExpression(FunctionExpression(simplified.name, simplified.expressions), self.symbol, true)):autosimplify()
+        return DerivativeExpression(exp.expressions[1], self.symbol) * FunctionExpression(exp.name, exp.expressions, exp.orders[1] + Integer.one(), exp.variables[1]):autosimplify()
     end
 
     -- Chain rule for trig functions
-    if simplified:type() == TrigExpression then
-        local internal = DerivativeExpression(simplified.expression, self.symbol)
+    if exp:type() == TrigExpression then
+        local internal = DerivativeExpression(exp.expression, self.symbol)
 
-        if simplified.name == "sin" then
-            return (internal * COS(simplified.expression)):autosimplify()
+        if exp.name == "sin" then
+            return (internal * COS(exp.expression)):autosimplify()
         end
-        if simplified.name == "cos" then
-            return (internal * -SIN(simplified.expression)):autosimplify()
+        if exp.name == "cos" then
+            return (internal * -SIN(exp.expression)):autosimplify()
         end
-        if simplified.name == "tan" then
-            return (internal * SEC(simplified.expression)^Integer(2)):autosimplify()
+        if exp.name == "tan" then
+            return (internal * SEC(exp.expression)^Integer(2)):autosimplify()
         end
-        if simplified.name == "csc" then
-            return (internal * -CSC(simplified.expression)*COT(simplified.expression)):autosimplify()
+        if exp.name == "csc" then
+            return (internal * -CSC(exp.expression)*COT(exp.expression)):autosimplify()
         end
-        if simplified.name == "sec" then
-            return (internal * -SEC(simplified.expression)*TAN(simplified.expression)):autosimplify()
+        if exp.name == "sec" then
+            return (internal * -SEC(exp.expression)*TAN(exp.expression)):autosimplify()
         end
-        if simplified.name == "cot" then
-            return (internal * -CSC(simplified.expression)^Integer(2)):autosimplify()
+        if exp.name == "cot" then
+            return (internal * -CSC(exp.expression)^Integer(2)):autosimplify()
         end
-        if simplified.name == "arcsin" then
-            return (internal / (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2))):autosimplify()
+        if exp.name == "arcsin" then
+            return (internal / (Integer(1)-exp.expression^Integer(2))^(Integer(1)/Integer(2))):autosimplify()
         end
-        if simplified.name == "arccos" then
-            return (-internal / (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2))):autosimplify()
+        if exp.name == "arccos" then
+            return (-internal / (Integer(1)-exp.expression^Integer(2))^(Integer(1)/Integer(2))):autosimplify()
         end
-        if simplified.name == "arctan" then
-            return (internal / (Integer(1)+simplified.expression^Integer(2))):autosimplify()
+        if exp.name == "arctan" then
+            return (internal / (Integer(1)+exp.expression^Integer(2))):autosimplify()
         end
-        if simplified.name == "arccsc" then
-            return (-internal / (ABS(simplified.expression) * (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2)))):autosimplify()
+        if exp.name == "arccsc" then
+            return (-internal / (ABS(exp.expression) * (Integer(1)-exp.expression^Integer(2))^(Integer(1)/Integer(2)))):autosimplify()
         end
-        if simplified.name == "arcsec" then
-            return (internal / (ABS(simplified.expression) * (Integer(1)-simplified.expression^Integer(2))^(Integer(1)/Integer(2)))):autosimplify()
+        if exp.name == "arcsec" then
+            return (internal / (ABS(exp.expression) * (Integer(1)-exp.expression^Integer(2))^(Integer(1)/Integer(2)))):autosimplify()
         end
-        if simplified.name == "arccot" then
-            return (-internal / (Integer(1)+simplified.expression^Integer(2))):autosimplify()
+        if exp.name == "arccot" then
+            return (-internal / (Integer(1)+exp.expression^Integer(2))):autosimplify()
         end
     end
 
@@ -115,20 +109,20 @@ function DerivativeExpression:autosimplify()
     end
 
     -- Uses linearity of derivatives to evaluate sum expressions
-    if simplified.operation == BinaryOperation.ADD then
+    if exp.operation == BinaryOperation.ADD then
         local parts = {}
-        for i, expression in pairs(simplified.expressions) do
+        for i, expression in pairs(exp.expressions) do
             parts[i] = DerivativeExpression(expression, self.symbol)
         end
         return BinaryOperation(BinaryOperation.ADD, parts):autosimplify()
     end
 
     -- Uses product rule to evaluate product expressions
-    if simplified.operation == BinaryOperation.MUL then
+    if exp.operation == BinaryOperation.MUL then
         local sums = {}
-        for i, expression in pairs(simplified.expressions) do
+        for i, expression in pairs(exp.expressions) do
             local products = {}
-            for j, innerexpression in pairs(simplified.expressions) do
+            for j, innerexpression in pairs(exp.expressions) do
                 if i ~= j then
                     products[j] = innerexpression
                 else
@@ -141,9 +135,9 @@ function DerivativeExpression:autosimplify()
     end
 
     -- Uses the generalized power rule to evaluate power expressions
-    if simplified.operation == BinaryOperation.POW then
-        local base = simplified.expressions[1]
-        local exponent = simplified.expressions[2]
+    if exp.operation == BinaryOperation.POW then
+        local base = exp.expressions[1]
+        local exponent = exp.expressions[2]
 
         return BinaryOperation.MULEXP({
                     BinaryOperation.POWEXP({base, exponent}),
@@ -157,9 +151,9 @@ function DerivativeExpression:autosimplify()
                     }):autosimplify()
     end
 
-    if simplified:type() == Logarithm then
-        local base = simplified.base
-        local expression = simplified.expression
+    if exp:type() == Logarithm then
+        local base = exp.base
+        local expression = exp.expression
 
         return BinaryOperation.SUBEXP({
                     BinaryOperation.DIVEXP({DD(expression, self.symbol),
@@ -174,6 +168,11 @@ function DerivativeExpression:autosimplify()
     end
 
     return self
+end
+
+--- @return Expression
+function DerivativeExpression:autosimplify()
+    return DerivativeExpression(self.expression:autosimplify(), self.symbol):evaluate()
 end
 
 --- @return table<number, Expression>

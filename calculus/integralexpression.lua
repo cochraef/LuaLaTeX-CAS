@@ -672,10 +672,10 @@ end
 --- @return table<number, Expression>
 function IntegralExpression:subexpressions()
     if self:isdefinite() then
-        return {self.expression, self.lower, self.upper}
+        return {self.expression, self.symbol, self.lower, self.upper}
     end
 
-    return {self.expression}
+    return {self.expression, self.symbol}
 end
 
 --- @param subexpressions table<number, Expression>
