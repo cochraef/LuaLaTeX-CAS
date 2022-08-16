@@ -55,17 +55,29 @@ function DerivativeExpression:evaluate()
 
     -- Chain rule for arbitrary functions
 
-    if exp:type() == FunctionExpression then
+    if exp:type() == FunctionExpression then 
         local results = {}
-        for index,expression in ipairs(exp.expressions) do
-            local inn = DerivativeExpression(expression,self.symbol):autosimplify()
-            local out = Copy(exp)
-            out.orders[index] = out.orders[index] + Integer.one()
-            local result = inn*out
-            table.insert(results,result)
+        for index,expression in ipairs(exp.expressions) do 
+            local dout = FunctionExpression(exp.name,exp.expressions,exp.derivatives)
+            dout.variables = exp.variables
+            dout.derivatives[index] = dout.derivatives[index]+Integer.one()
+            local dinn = DerivativeExpression(expression,self.symbol):evaluate()
+            results[index] = dout*dinn
         end
         return BinaryOperation(BinaryOperation.ADD,results):autosimplify()
     end
+
+    --if exp:type() == FunctionExpression then
+    --    local results = {}
+    --    for index,expression in ipairs(exp.expressions) do
+    --        local inn = DerivativeExpression(expression,self.symbol):autosimplify()
+    --        local out = Copy(exp)
+    --        out.orders[index] = out.orders[index] + Integer.one()
+    --        local result = inn*out
+    --        table.insert(results,result)
+    --    end
+    --    return BinaryOperation(BinaryOperation.ADD,results):autosimplify()
+    --end
 
     --if exp:type() == FunctionExpression then
     --    if exp.expressions[2] then
