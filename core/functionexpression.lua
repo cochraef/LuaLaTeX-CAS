@@ -38,9 +38,13 @@ function FunctionExpression:new(name, expressions, derivatives)
     o.expressions = Copy(expressions)
     o.variables = Copy(expressions)
     for _,expression in ipairs(o.variables) do 
-        if not expression:isatomic() then 
-            if #o.variables < 4 then 
-                o.variables = {SymbolExpression('x'),SymbolExpression('y'),SymbolExpression('z')}
+        if not expression:isatomic() then
+            o.variables = {}
+            if #o.expressions < 4 then 
+                local defaultvars = {SymbolExpression('x'),SymbolExpression('y'),SymbolExpression('z')}
+                for i=1,#o.expressions do 
+                    o.variables[i] = defaultvars[i]
+                end
             else
                 for i=1,#o.expressions do 
                     o.variables[i] = SymbolExpression('x_'..tostring(i))
