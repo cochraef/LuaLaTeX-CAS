@@ -76,14 +76,20 @@ function DiffExpression:new(expression,symbols)
 end
 
 --- @return Expression
-function DiffExpression:autosimplify()
-    local simplified = self.expression:autosimplify()
+function DiffExpression:evaluate()
+    local exp = self.expression
 
-    for index,var in ipairs(self.symbols) do
-        simplified = DerivativeExpression(simplified,var):autosimplify()
+    for _,var in ipairs(self.symbols) do
+        exp = DerivativeExpression(exp,var):evaluate()
     end
-    return simplified
+    return exp
 end
+
+--- @return Expression
+function DiffExpression:autosimplify()
+    return DiffExpression(self.expression:autosimplify(), self.symbols):evaluate()
+end
+
 
 --- @return table<number, Expression>
 function DiffExpression:subexpressions()
