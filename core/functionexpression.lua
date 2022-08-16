@@ -31,35 +31,36 @@ function FunctionExpression:new(name, expressions, orders, variables)
     end
 
     -- TODO: Symbol Checking For Constructing derivatives like this
-    if string.sub(name, #name, #name) == "'" and #expressions == 1 then
-       return DerivativeExpression(FunctionExpression(string.sub(name, 1, #name - 1), expressions), SymbolExpression("x"), true)
-    end
+    --if string.sub(name, #name, #name) == "'" and #expressions == 1 then
+    --   return DerivativeExpression(FunctionExpression(string.sub(name, 1, #name - 1), expressions), SymbolExpression("x"), true)
+    --end
 
     o.name = name
-    o.expressions = expressions
-    if orders then 
-        o.orders = orders
+    o.expressions = Copy(expressions)
+    if orders then
+        o.orders = Copy(orders)
     else
-        o.orders = Copy(expressions)
-        for index,_ in ipairs(o.orders) do 
-            o.orders[index] = Integer.zero()
+        local t = {}
+        for index,_ in ipairs(expressions) do
+            t[index] = Integer.zero()
         end
+        o.orders = t
     end
-    if variables then 
-        o.variables = variables
+    if variables then
+        o.variables = Copy(variables)
     else
         o.variables = Copy(expressions)
-        for _,expression in ipairs(o.variables) do 
-            if not expression:isatomic() then 
-                if #expressions == 1 then 
+        for _,expression in ipairs(o.variables) do
+            if not expression:isatomic() then
+                if #expressions == 1 then
                     o.variables = {SymbolExpression("x")}
-                elseif #expressions == 2 then 
+                elseif #expressions == 2 then
                     o.variables = {SymbolExpression("x"),SymbolExpression("y")}
-                elseif #expressions == 3 then 
+                elseif #expressions == 3 then
                     o.variables = {SymbolExpression("x"),SymbolExpression("y"),SymbolExpression("z")}
                 end
+                break
             end
-            break
         end
     end
 
@@ -79,7 +80,11 @@ function FunctionExpression:new(name, expressions, orders, variables)
             end
             return out .. ')'
         else
-            local out = 'd^' .. tostring(total) .. a.name .. '/'
+            local out = 'd'
+            if total > Integer.one() then 
+                out = out ..'^' .. tostring(total)
+            end
+            out = out .. a.name .. '/'
             for index,order in ipairs(a.orders) do 
                 if order > Integer.zero() then 
                     out = out .. 'd' .. tostring(a.variables[index])
@@ -127,7 +132,7 @@ function FunctionExpression:evaluate()
     for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:evaluate()
     end
-    return FunctionExpression(self.name, results)
+    return FunctionExpression(self.name, results, self.orders, self.variables)
 end
 
 --- @return FunctionExpression
@@ -137,7 +142,7 @@ function FunctionExpression:autosimplify()
     for index, expression in ipairs(self:subexpressions()) do
         results[index] = expression:autosimplify()
     end
-    return FunctionExpression(self.name, results, self.orders)
+    return FunctionExpression(self.name, results, self.orders, self.variables)
 end
 
 --- @return table<number, Expression>
@@ -148,7 +153,7 @@ end
 --- @param subexpressions table<number, Expression>
 --- @return FunctionExpression
 function FunctionExpression:setsubexpressions(subexpressions)
-    return FunctionExpression(self.name, subexpressions)
+    return FunctionExpression(self.name, subexpressions, self.orders, self.variables)
 end
 
 --- @param other Expression
@@ -201,7 +206,7 @@ function FunctionExpression:tolatex()
     if self:type() == TrigExpression then
         out = "\\" .. out
     end
-    if self:type() ~= TrigExpression and string.len(self.name)>1 then
+    if self:type() ~= TrigExpression and #self.name>1 then
         --if out:sub(2,2) ~= "'" then
             --local fp = out:find("'")
             --if fp then
@@ -228,7 +233,7 @@ function FunctionExpression:tolatex()
     end
     if #self.expressions > 1 then 
         local order = Integer.zero()
-        for _,integer in ipairs(f.orders) do 
+        for _,integer in ipairs(self.orders) do 
             order = order + integer
         end
         if order == Integer.zero() then 
@@ -236,7 +241,7 @@ function FunctionExpression:tolatex()
         else
             if order < Integer(4) then 
                 out = out .. '_{'
-                for index,integer in ipairs(f.orders) do 
+                for index,integer in ipairs(self.orders) do 
                     local i = integer:asnumber()
                     while i > 0 do 
                         out = out .. self.variables[index]:tolatex()
@@ -246,7 +251,7 @@ function FunctionExpression:tolatex()
                 out = out .. '}'
             else
                 out = '\\frac{\\partial^{' .. order:tolatex() .. '}' .. out .. '}{'
-                for index, integer in ipairs(f.orders) do 
+                for index, integer in ipairs(self.orders) do 
                     if integer > Integer.zero() then 
                         out = out .. '\\partial ' .. self.variables[index]:tolatex()
                         if integer ~= Integer.one() then 
