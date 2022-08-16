@@ -54,12 +54,25 @@ function DerivativeExpression:evaluate()
     end
 
     -- Chain rule for arbitrary functions
+
     if exp:type() == FunctionExpression then
-        if exp.expressions[2] then
-            return self
+        local results = {}
+        for index,expression in ipairs(exp.expressions) do
+            local inn = DerivativeExpression(expression,self.symbol):autosimplify()
+            local out = Copy(exp)
+            out.orders[index] = out.orders[index] + Integer.one()
+            local result = inn*out
+            table.insert(results,result)
         end
-        return DerivativeExpression(exp.expressions[1], self.symbol) * FunctionExpression(exp.name, exp.expressions, exp.orders[1] + Integer.one(), exp.variables[1]):autosimplify()
+        return BinaryOperation(BinaryOperation.ADD,results):autosimplify()
     end
+
+    --if exp:type() == FunctionExpression then
+    --    if exp.expressions[2] then
+    --        return self
+    --    end
+    --    return DerivativeExpression(exp.expressions[1], self.symbol) * FunctionExpression(exp.name, exp.expressions, exp.orders[1] + Integer.one(), exp.variables[1]):autosimplify()
+    --end
 
     -- Chain rule for trig functions
     if exp:type() == TrigExpression then
