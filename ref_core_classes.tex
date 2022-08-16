@@ -156,14 +156,18 @@ Creates a new \texttt{SymbolExpression}. For example:
 \begin{codebox}[]
 \begin{minted}[breaklines]{lua}
 foo = SymbolExpression("bar")
-tex.print("The Lua variable ``foo'' is the SymbolExpression:", foo:tolatex())
+tex.sprint("The Lua variable ``foo'' is the SymbolExpression: ", foo:tolatex(),".")
 \end{minted}
 \tcblower
 \directlua{
 foo = SymbolExpression("bar")
-tex.print("The Lua variable 'foo' is the SymbolExpression", foo:tolatex())
+tex.sprint("The Lua variable 'foo' is the SymbolExpression: ", foo:tolatex(),".")
 }
 \end{codebox}
+
+\subsubsection{Attributes}
+
+\texttt{SymbolExpression}s have only one attribute: \texttt{symbol}. In the example above, the string \mintinline{lua}{"bar"} is stored in \mintinline{lua}{foo.bar}. 
 
 \subsubsection{Parsing}
 
@@ -219,7 +223,21 @@ The instance variable \texttt{operation} must be a function \mintinline{lua}{fun
     \item \texttt{BinaryOperation.MOD}: \mintinline{lua}{return a % b}
     \item \texttt{BinaryOperation.POW}: \mintinline{lua}{return a ^ b}
 \end{itemize}
-The instance variable \texttt{expressions} must be a table of \texttt{Expression}s.
+The instance variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
+
+\subsubsection{Attributes}
+
+\texttt{BinaryOperation}s have the following attributes: \texttt{name}, \texttt{operation}, and \texttt{expressions}. In the example above, we have:
+\begin{itemize}
+    \item the variable \texttt{expressions} is stored in \mintinline{lua}{w.expressions};
+    \item \mintinline{lua}{w.name} stores the string \mintinline{lua}{"+"}; and 
+    \item \mintinline{lua}{w.operation} stores the function:
+    \begin{minted}{lua}
+BinaryOperation.ADD = function(a, b)
+    return a + b
+end
+    \end{minted}
+\end{itemize}
 
 \subsubsection{Parsing}
 
@@ -257,7 +275,7 @@ tex.print("\\[w=", w:tolatex(), "\\]")
 \end{CAS}
 \[ \print{c} \equiv \print{a} \bmod{\print{b}} \] 
 \end{codebox}
-The above escape will {\bf not} work with \mintinline{latex}{\directlua}, but it will work for \mintinline{latex}{\luaexec} from the \texttt{luacode} package. Indeed, the \texttt{luacode} package was designed to make escapes like this more manageable. Here is the equivalent code using \mintinline{latex}{\luaexec}:
+The above escape will {\bf not} work with \mintinline{latex}{\directlua}, but it will work for \mintinline{latex}{\luaexec} from the \texttt{luacode} package. Indeed, the \texttt{luacode} package was designed (in part) to make escapes like this more manageable. Here is the equivalent code using \mintinline{latex}{\luaexec}:
 \begin{codebox}[]
 \begin{minted}{latex}
 \luaexec{
@@ -279,24 +297,101 @@ tex.print("\\[", c:tolatex(), "\\equiv", a:tolatex(), "\\bmod{", b:tolatex(), "}
 \newcoderef{function FunctionExpression:new(name,expressions)}{return FunctionExpression}{name string|SymbolExpression, expressions table<number,Expression>}
 
 Creates a generic function. For example:
-\begin{CAS}
-    vars('x','f')
-    g = f(x^2)
-    g = diff(g,{x,2})
-\end{CAS}
-\[ \print*{g} \] 
-\begin{CAS}
-    vars('x','f','h')
-    g = f(h(x))
-    g = diff(g,x)
-\end{CAS}
- \[ \print*{g} \] 
- \begin{CAS}
-    vars('t')
-    g = f(3*t,t^2)
-    g = diff(g,t)
- \end{CAS}
- \[ \print*{g} \qquad \text{this is wrong}\] 
+\begin{codebox}
+    \begin{minted}{lua}
+vars('x','y')
+f = FunctionExpression('f',{x,y})
+tex.print("\\[",f:tolatex(),"\\]")
+    \end{minted}
+    \tcblower
+    \luaexec{
+    vars('x','y')
+    f = FunctionExpression('f',{x,y})
+    tex.print("\\[",f:tolatex(),"\\]")
+    }
+\end{codebox}
+The variable \texttt{name} can be a string (like above), or another \texttt{SymbolExpression}. But in this case, the variable \texttt{name} just takes the value of the string \mintinline{lua}{SymbolExpression.symbol}. The variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
 
+\subsubsection{Attributes}
+\texttt{FunctionExpression}s have the following attributes: \texttt{name}, \texttt{expressions}, \texttt{variables}, \texttt{derivatives}. In the example above, we have:
+\begin{itemize}
+    \item the variable \texttt{name}, i.e. the string \mintinline{lua}{'f'}, is stored in \mintinline{lua}{f.name}; and
+    \item the variable \texttt{expressions}, i.e. the table \mintinline{lua}{{x,y}} is stored in \mintinline{lua}{f.expressions}.
+\end{itemize}
+Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The attribute \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$ or $x_1,x_2,\ldots$. For example:
+
+\begin{codebox}
+    \begin{minted}{lua}
+vars('s','t')
+f = FunctionExpression('f',{s*s,s+t+t})
+tex.print("The variables of f are:")
+for _,symbol in ipairs(f.variables) do 
+    tex.print(symbol:tolatex())
+end
+    \end{minted}
+    \tcblower
+\luaexec{
+    vars('s','t')
+    f = FunctionExpression('f',{s*s,s+t+t})
+    tex.print("The variables of f are:")
+    for _,symbol in ipairs(f.variables) do 
+        tex.print(symbol:tolatex())
+    end
+}
+\end{codebox}
+The attribute \texttt{derivatives} is a table of \texttt{Integer}s index by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of zeros. So for the example above, we have:
+\begin{codebox}
+    \begin{minted}{lua}
+for _,integer in ipairs(f.derivatives) do 
+    if integer == Integer.zero() then
+        tex.print("I'm a zero.\\newline")
+    end
+end
+\end{minted}
+\tcblower
+\luaexec{
+    for _,integer in ipairs(f.derivatives) do 
+        if integer == Integer.zero() then
+            tex.print("I'm a zero.\\newline")
+        end
+    end
+}
+\end{codebox}
+We can change the values of \texttt{variables} and \texttt{derivatives} manually (or more naturally by other gizmos found in \texttt{luacas}). For example, keeping the variables from above, we have:
+\begin{codebox}
+    \begin{minted}{lua}
+f.derivatives = {Integer.one(),
+    Integer.one()}
+tex.print("\\[",
+    f:simplify():tolatex(),
+    "\\]")
+\end{minted}
+\tcblower
+\luaexec{
+    f.derivatives = {Integer.one(),Integer.one()}
+    tex.print("\\[", f:simplify():tolatex(), "\\]")
+}
+\end{codebox}
+
+\subsubsection{Parsing}
+
+Thank goodness for this too. The parser nested within the \LaTeX{} environment \mintinline{latex}{\begin{CAS}..\end{CAS}} allows for fairly natural function assignment; the name of the function must be declared in \mintinline{lua}{vars(...)} (or rather, as a \texttt{SymbolExpression}) beforehand:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('s','t','f')
+    f = f(s^2,s+2*t)
+    f.derivatives = {1,1}
+\end{CAS}
+\[ \print{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('s','t','f')
+    f = f(s^2,s+2*t)
+    f.derivatives = {1,1}
+\end{CAS}
+\[ \print{f} \] 
+\end{codebox}
 
 \end{document}
