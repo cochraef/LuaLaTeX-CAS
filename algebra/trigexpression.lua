@@ -23,6 +23,9 @@ function TrigExpression:new(name, expression)
 
     o.name = name
     o.expression = expression
+    o.expressions = {expression}
+    o.variables = {expression}
+    o.derivatives = {Integer.zero()}
 
     __o.__index = TrigExpression
     __o.__tostring = function(a)
