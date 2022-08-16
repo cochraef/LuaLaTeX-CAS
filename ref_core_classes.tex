@@ -282,7 +282,21 @@ Creates a generic function. For example:
 \begin{CAS}
     vars('x','f')
     g = f(x^2)
+    g = diff(g,{x,2})
 \end{CAS}
-\[ \print*{DD(g,x)} \] 
+\[ \print*{g} \] 
+\begin{CAS}
+    vars('x','f','h')
+    g = f(h(x))
+    g = diff(g,x)
+\end{CAS}
+ \[ \print*{g} \] 
+ \begin{CAS}
+    vars('t')
+    g = f(3*t,t^2)
+    g = diff(g,t)
+ \end{CAS}
+ \[ \print*{g} \qquad \text{this is wrong}\] 
+
 
 \end{document}
