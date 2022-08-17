@@ -247,7 +247,7 @@ end
 
 --- @return string
 function DerivativeExpression:tolatex()
-    return '\\frac{d}{d' .. self.symbol:tolatex() .. '}(' .. self.expression:tolatex() .. ')'
+    return '\\frac{d}{d' .. self.symbol:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
 end
 
 -----------------
