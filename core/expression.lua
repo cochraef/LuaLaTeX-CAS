@@ -147,9 +147,9 @@ end
 --- Determines whether an expression is a 'proper' complex constant, i.e., is free of every varaible and is of the form a + bI for nonzero a and b.
 --- @return boolean
 function Expression:iscomplexconstant()
-    return self:isrealconstant() or self.operation == BinaryOperation.ADD and #self.expressions == 2 and self.expressions[1]:isrealconstant()
+    return self:isrealconstant() or (self.operation == BinaryOperation.ADD and #self.expressions == 2 and self.expressions[1]:isrealconstant()
             and ((self.expressions[2].operation == BinaryOperation.MUL and #self.expressions[2].expressions == 2 and self.expressions[2].expressions[1]:isrealconstant() and self.expressions[2].expressions[2] == I)
-            or self.expressions[2] == I)
+            or self.expressions[2] == I)) or (self.operation == BinaryOperation.MUL and #self.expressions == 2 and self.expressions[1]:isrealconstant() and self.expressions[2] == I)
 end
 
 --- A total order on autosimplified expressions. Returns true if self < other.
