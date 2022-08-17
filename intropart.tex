@@ -126,8 +126,77 @@ style=numeric,
 }
 
 \begin{document}
-
+\thispagestyle{empty}
 \part{Introduction}
-    This part contains introduction material.
+
+\begin{multicols}{2}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    f = x
+    for i in range(1,9) do
+        f = f*x
+    end
+    f = f-1
+\end{CAS}
+\parseforest{f}
+\bracketset{action character = @}
+\begin{center}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+
+\begin{CAS}
+    f = factor(f)
+\end{CAS}
+\parseforest{f}
+\begin{center}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\end{minted}
+
+\columnbreak 
+\phantom{}
+\vfill
+\begin{CAS}
+    vars('x')
+    f = x
+    for i in range(1,9) do
+        f = f*x
+    end
+    f = f-1
+\end{CAS}
+\parseforest{f}
+\bracketset{action character = @}
+\begin{center}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\vfill
+\phantom{}
+\end{multicols}
+\vfill
+
+\begin{CAS}
+    f = factor(f)
+\end{CAS}
+\parseforest{f}
+\begin{center}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\vfill
+
 
 \end{document}

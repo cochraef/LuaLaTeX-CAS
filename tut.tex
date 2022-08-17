@@ -51,16 +51,14 @@ style=numeric,
 
 \section{Tutorials}
 
-Taking a cue from the phenomenal TikZ documentation, we introduce basic usage of the \texttt{luacas} package through a few informal tutorials. In the subsections that follow, we'll walk through how each of the outputs below are made using \texttt{luacas}. Crucially, none of the computations below are ``hardcoded''; all computations are performed and printed using \texttt{luacas} to maximize portability and code reuse. 
-
-\newpage
+Taking a cue from the phenomenal TikZ documentation, we introduce basic usage of the \texttt{luacas} package through a few informal tutorials. In the subsections that follow, we'll walk through how each of the outputs below are made using \texttt{luacas}. {\bf Crucially}, none of the computations below are ``hardcoded''; all computations are performed and printed using \texttt{luacas} to maximize portability and code reuse. 
 
 \begin{tcolorbox}[colback=rose!10,
         colframe=rose,
         arc=1pt,
         frame hidden]
 {\bf Tutorial 1:} {\itshape A limit definition of the derivative for Alice.}\vskip0.2cm
-
+\small
 \begin{CAS}
     vars('x','h')
     f = 2*x^3-x
@@ -87,7 +85,7 @@ Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using
     \end{CAS}
     \print{q}& &\text{simplify.}
 \end{aligned} \] 
-So $\print{diff(f,x)} = \print*{diff(f,x)}$.
+%So $\print{diff(f,x)} = \print*{diff(f,x)}$.
 \end{tcolorbox}
 \vfill
 
@@ -95,6 +93,7 @@ So $\print{diff(f,x)} = \print*{diff(f,x)}$.
     colframe=rosenavy,
     arc=1pt,
     frame hidden]
+    \small
     {\bf Tutorial 2:} {\itshape A local max/min diagram for Bob}.
     \vskip 0.2cm
     Consider the function $f(x)$ defined by:
@@ -151,6 +150,7 @@ So $\print{diff(f,x)} = \print*{diff(f,x)}$.
     colframe=roseorange,
     arc=1pt,
     frame hidden]
+    \small
 {\bf Tutorial 3:} {\itshape A limit definition of the derivative for Charlie.}\vskip 0.2cm
 
 \begin{CAS}
