@@ -376,20 +376,53 @@ For example, consider:
     b = (1+1*x)
     c = a*b
 \end{CAS}
-Then:
+Then the expression trees for \texttt{c}, \texttt{c:autosimplify()}, and \texttt{c:simplify()} are as follows:
+
+\begin{multicols}{3}
+    \begin{center}
+        \underline{Tree for \texttt{c}:}
+\parseforest{c}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+
+\columnbreak
+
+\underline{Tree for \texttt{c:autosimplify()}:}
+\parseforest{c:autosimplify()}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+
+\columnbreak
+
+\underline{Tree for \texttt{c:simplify()}:}
+\parseforest{c:simplify()}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\end{multicols}
+Accordingly, we have:
 \begin{codebox}
-    \begin{minted}[breaklines,fontsize=\footnotesize]{lua}
+    \begin{minted}[breaklines,fontsize=\scriptsize]{lua}
 tex.print("The size of \\texttt{c} is",
   tostring(c:size()),"\\newline")
-tex.print("The size of \\texttt{c:autosimpliy()} is",
+tex.print("The size of \\texttt{c:autosimplify()} is",
   tostring(c:autosimplify():size()), "\\newline")
-tex.print("The size of \\texttt{c:simplfy()} is",
+tex.print("The size of \\texttt{c:simplify()} is",
   tostring(c:simplify():size()))
     \end{minted}
     \tcblower
     \luaexec{
     tex.print("The size of \\texttt{c} is", tostring(c:size()),"\\newline")
-    tex.print("The size of \\texttt{c:autosimpliy()} is", tostring(c:autosimplify():size()), "\\newline")
+    tex.print("The size of \\texttt{c:autosimplify()} is", tostring(c:autosimplify():size()), "\\newline")
     tex.print("The size of \\texttt{c:simplfy()} is", tostring(c:simplify():size()))
 }
 \end{codebox}
@@ -594,21 +627,137 @@ end
 \coderef{function Expression:isconstant()}{return bool}
 \index{Core!Methods!\texttt{isconstant}}
 
-Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases, for instance, it returns {\ttfamily false} for the constant $\pi$. This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
+Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases. For instance:
+
+\begin{codebox}
+    \begin{minted}{lua}
+if not pi:isconstant() then 
+  tex.print("$\\pi$ is not constant.")
+end  
+\end{minted}
+\tcblower
+\luaexec{
+if not pi:isconstant() then 
+  tex.print("$\\pi$ is not constant.")
+end  
+}
+\end{codebox}
+This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
 
 \coderef{function Expression:isrealconstant()}{return bool}
 \index{Core!Methods!\texttt{isrealconstant}}
 
-Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$.
+Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$. For example:
+
+\begin{codebox}
+    \begin{minted}{lua}
+if pi:isrealconstant() then 
+  tex.print("$\\pi$ is a real constant.")
+end
+\end{minted}
+\tcblower
+\luaexec{
+    if pi:isrealconstant() then 
+        tex.print("$\\pi$ is a real constant.")
+    end
+}
+\end{codebox}
 
 \coderef{function Expression:iscomplexconstant()}{return bool}
 \index{Core!Methods!\texttt{iscomplexconstant}}
 
-Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$.
+Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$. It's helpful to keep in mind that, oftentimes, content needs to be simplified/evaluated in order to obtain the intended results:
+
+\begin{codebox}[]
+    \begin{minted}{lua}
+a = (Integer.one() + I) ^ Integer(2)
+if a:iscomplexconstant() then 
+    tex.print("$",a:tolatex(),"$ is a complex constant.")
+else 
+    tex.print("$",a:tolatex(),"$ is not a complex constant.")
+end
+\end{minted}
+\tcblower
+\begin{center}
+\luaexec{
+    a =  (Integer.one() + I) ^ Integer(2)
+    if a:iscomplexconstant() then 
+        tex.print("$",a:tolatex(),"$ is a complex constant.")
+    else 
+        tex.print("$",a:tolatex(),"$ is not a complex constant.")
+    end
+}
+\end{center}
+\end{codebox}
+While:
+\begin{codebox}[]
+    \begin{minted}{lua}
+a = (Integer.one()+I) ^ Integer(2)
+a = a:expand():simplify()
+if a:iscomplexconstant() then 
+    tex.print("$",a:tolatex(),"$ is a complex constant.")
+else 
+    tex.print("$",a:tolatex(),"$ is not a complex constant.")
+end
+\end{minted}
+\tcblower
+\begin{center}
+\luaexec{
+    a = (Integer.one()+I) ^ Integer(2)
+    a = a:expand():simplify()
+    if a:iscomplexconstant() then 
+        tex.print("$",a:tolatex(),"$ is a complex constant.")
+    else 
+        tex.print("$",a:tolatex(),"$ is not a complex constant.")
+    end
+}
+\end{center}
+\end{codebox}
 
 \coderef{function Expression:tolatex()}{return string}
 \index{Core!Methods!\texttt{tolatex}}
 
-Converts an expression to \LaTeX{} code.
+Converts an expression to \LaTeX{} code. Some folks have strong feelings about how certain things are typeset. Case and point, which of these is your favorite:
+\[ \int \sin(\frac{y}{2})dy \qquad \int \sin\left( \frac{y}{2} \right)dy \qquad \int \sin\left( \frac{y}{2} \right)\, dy \qquad \int \sin\!\left( \frac{y}{2} \right)\, dy \qquad \int \sin\!\left( \frac{y}{2} \right) \mathop{\mathrm{d}y} \qquad \int \sin\mathopen{}\left( \frac{y}{2} \right) \mathop{dy} \quad ?\]
+We've tried to remain neutral:
+
+\begin{codebox}
+\begin{minted}{latex}
+\begin{CAS}
+    vars('y')
+    f = diff(int(sin(y/2),y),y)
+\end{CAS}
+\[ \print{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('y')
+    f = diff(int(sin(y/2),y),y)
+\end{CAS}
+\[ \print{f} \] 
+\end{codebox} 
+With any luck, we've pleased at least as many people as we've offended. In desperate times, one could rewrite the \texttt{tolatex()} method for any given class. Here, for example, is the \texttt{tolatex()} method as written for the \texttt{DerivativeExpression} class:
+\begin{minted}[breaklines]{lua}
+function DerivativeExpression:tolatex()
+    return '\\frac{d}{d' .. self.symbol:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
+end
+\end{minted} 
+But there are heathens out there that might prefer:
+\begin{minted}[breaklines]{lua}
+function DerivativeExpression:tolatex()
+    return '\\frac{\\mathrm{d}}{\\mathrm{d}' .. self.symbol:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
+end
+\end{minted}
+We now get:
+\begin{codebox}
+\begin{minted}{latex}
+\begin{CAS}
+  f = DerivativeExpression(y+sin(y),y)
+\end{CAS}
+\[ \print{f} \] 
+\end{minted}
+\tcblower 
+\[ \frac{\mathrm{d}}{\mathrm{d}y} \left( y + \sin\mathopen{}\left(y\right) \right).\] 
+\end{codebox}
 
 \end{document}
