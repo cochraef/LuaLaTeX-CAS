@@ -46,76 +46,75 @@ Bob decides to stick with polynomials for these examples; if anything because th
 
 Accordingly, Bob declares variables and chooses two quadratic polynomials to compose, say $f$ and $g$, and sets $dh = g \circ f$:
 
-\inputminted[
-firstline=9,
-lastline=15,
-breaklines]
-{latex}
-{demotut2.tex}
+\begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
+\end{CAS}
+\end{minted}
+\begin{CAS}
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
+\end{CAS}
 
 Bob wants to compute $h$, the integral of $dh$. Bob could certainly compute this quantity by-hand, but why hardcode that information into the document when \texttt{luacas} can do this for you? So Bob uses the \texttt{int} command and shifts the result (with some malice aforethought):
 
-\inputminted[
-firstline=17,
-lastline=19,
-breaklines]
-{latex}
-{demotut2.tex}
+\begin{minted}{latex}
+\begin{CAS}
+    h = int(dh,x) + 10
+\end{CAS}
+\end{minted}
+\begin{CAS}
+    h = int(dh,x) + 10
+\end{CAS}
 
 Bob is curious to know the value of $h$. So he uses \mintinline{latex}{\print{h}} to produce:
 \begin{codebox}
-    {\small\inputminted[
-        firstline=21,
-        lastline=21,
-        breaklines]
-        {latex}
-        {demotut2.tex}}
+\begin{minted}{latex}
+\[ \print{h} \] 
+\end{minted}
     \tcblower
-    \begin{CAS}
-        vars('x')
-        f = x^2+2*x-2
-        g = x^2-1
-        subs = {[x] = f}
-        dh = substitute(subs,g)
-        h  = int(dh,x)+10
-    \end{CAS}
-    \[\print{h} \] 
+\[\print{h} \] 
 \end{codebox}
 This isn't exactly what Bob had in mind. It occurs to Bob that he may need to simplify the expression $h$, so he tries:
 
 \begin{codebox}
-    {\small\inputminted[
-        firstline=23,
-        lastline=26,
-        breaklines]
-        {latex}
-        {demotut2.tex}
-    }
+\begin{minted}{latex}
+\begin{CAS}
+    h = simplify(int(dh,x)+10)
+\end{CAS}
+\[ \print{h} \] 
+\end{minted}
     \tcblower
-    \begin{CAS}
-        h = simplify(h)
-    \end{CAS}
-    \[\print{h} \] 
+\begin{CAS}
+    h = simplify(h)
+\end{CAS}
+\[\print{h} \] 
 \end{codebox}
 
 That's more like it! Now, Bob wants to find the roots to $dh$. Bob uses the \texttt{roots} command to do this:
 
-\inputminted[
-    firstline=28,
-    lastline=30,
-    breaklines]
-    {latex}
-    {demotut2.tex}
+\begin{minted}{latex}
+\begin{CAS}
+    r = roots(dh)
+\end{CAS}
+\end{minted}
+\begin{CAS}
+    r = roots(dh)
+\end{CAS}
 
-But then Bob wonders to himself, ``How do I actually retrieve the roots of $dh$ from \texttt{luacas}?'' The assignment \mintinline{lua}{r = roots(dh)} stores the roots of the polynomial $dh$ in a table named \texttt{r}. With indices beginning at $1$, Bob can retrieve the entries of that table via:
+But then Bob wonders to himself, ``How do I actually retrieve the roots of $dh$ from \texttt{luacas}?'' The assignment \mintinline{lua}{r = roots(dh)} stores the roots of the polynomial $dh$ in a table named \texttt{r}:
 
-\begin{codebox}
-    {\small\inputminted[
-    firstline=32,
-    lastline=32,
-    breaklines]
-    {latex}
-    {demotut2.tex}}
+\begin{codebox}[]
+\begin{minted}{latex}
+\[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad\print{r[4]} \] 
+\end{minted}
     \tcblower 
     \begin{CAS}
         r = roots(dh)
@@ -126,12 +125,12 @@ But then Bob wonders to himself, ``How do I actually retrieve the roots of $dh$ 
 Splendid! Bob would now like to evaluate the function $h$ at these roots (for these are the local max/min values of $h$). Here's Bob's first thought:
 
 \begin{codebox}
-    {\small\inputminted[
-    firstline=34,
-    lastline=37,
-    breaklines]
-    {latex}
-    {demotut2.tex}}
+\begin{minted}{latex}
+\begin{CAS}
+  v = simplify(substitute({[x]=r[1]},h))
+\end{CAS}
+\[ \print{v} \] 
+\end{minted}
     \tcblower 
     \begin{CAS}
         v = simplify(substitute({[x]=r[1]},h))
@@ -145,14 +144,18 @@ What the heck?! Bob is (understandably) confused. But here's where Bob learns a 
 
 The \LaTeX{} environment \mintinline{latex}{\begin{CAS}..\end{CAS}} is really a glorified Lua environment. The ``glory'' comes in how the contents of the environment are parsed in a special manner to make interacting with the CAS (mostly) easy. Bob has encountered a situation where that interaction is not as easy as we'd like. 
 
-For comparison, consider the following simple use of \texttt{luacas} using the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment:
-\begin{codebox}
-    {\footnotesize\inputminted[
-    firstline=39,
-    lastline=44,
-    breaklines]
-    {latex}
-    {demotut2.tex}}
+For comparison, consider the following:
+\begin{multicols}{2}
+Here's some code using the \mintinline{latex}{\begin{CAS}..\end{CAS}}:
+\begin{codebox}\small
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('y')
+    a = 1
+    b = y+a
+\end{CAS}
+\[ \print{b} \] 
+\end{minted}
     \tcblower 
     \begin{CAS}
         vars('y')
@@ -161,14 +164,16 @@ For comparison, consider the following simple use of \texttt{luacas} using the \
     \end{CAS}
     \[ \print{b} \] 
 \end{codebox}
-Here's the same thing but using \mintinline{latex}{\directlua} instead:
-\begin{codebox}
-    {\footnotesize\inputminted[
-    firstline=46,
-    lastline=51,
-    breaklines]
-    {latex}
-    {demotut2.tex}}
+Here's that same code but using \mintinline{latex}{\directlua} instead:
+\begin{codebox}\small
+\begin{minted}{latex}
+\directlua{
+    vars('y')
+    a = Integer(1)
+    b = y+a
+}
+\[ \print{b} \] 
+\end{minted}
     \tcblower 
     \directlua{
     vars('y')
@@ -177,6 +182,7 @@ Here's the same thing but using \mintinline{latex}{\directlua} instead:
 }
 \[ \print{b} \] 
 \end{codebox}
+\end{multicols}
 The essential difference being:
 \begin{itemize}
     \item Using \mintinline{latex}{\begin{CAS}..\end{CAS}}, the parser automatically interprets any digit strings as an \texttt{Integer}; this is a special class defined within the bowels of \texttt{luacas}. Ultimately, it allows for us to define things like the addition of an \texttt{Integer} and an \texttt{Expression} (in this case, the result is a new \texttt{Expression}). 
@@ -197,13 +203,16 @@ The good news is that, excluding the annoyance between \texttt{Integer} and Lua 
 
 After that enlightening interlude, Bob realizes that he should probably use \mintinline{latex}{\directlua} (or \mintinline{latex}{\luaexec} from the \texttt{luacode} package) to build a table of values:
 
-\begin{codebox}
-    {\footnotesize\inputminted[
-    firstline=54,
-    lastline=63,
-    breaklines]
-    {latex}
-    {demotut2.tex}}
+\begin{codebox}[]
+\begin{minted}{latex}
+\directlua{
+    v = {}
+    for i=1,4 do 
+        table.insert(v,simplify(substitute({[x]=r[i]},h)))
+    end
+}
+\[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad\print{v[4]} \]   
+\end{minted}
     \tcblower 
     \directlua{
     v = {}
@@ -234,73 +243,75 @@ For comparison, the command \mintinline{latex}{\print{h}} is equivalent to:
 \end{minted}
 For Bob's purposes, \mintinline{latex}{\fetch{h}} is exactly what he needs:
 
-\tcbsidebyside[ 
-    sidebyside adapt=right,
-    enhanced,skin=bicolor,
-    arc=1pt,
-    colframe=brown,
-    colback=brown!15,colbacklower=white,
-    boxrule=1pt,
-    notitle
-    ]
-    {\small
-    \inputminted[ 
-        firstline = 65,
-        lastline  = 77,
-        breaklines
-        ]
-        {latex}
-        {demotut2.tex}}
-    {\begin{tikzpicture}
-        \begin{axis}[legend pos = north west]
-            \addplot [domain=-3.5:1.5,samples=100] {\fetch{h}};
-            \addlegendentry{$f$};
-            \addplot[densely dashed] 
-                [domain=-3.25:1.25,samples=100] {\fetch{dh}};
-            \addlegendentry{$df/dx$};
-            \addplot[gray,dashed,thick]
-                [domain=-3.5:1.5] {0};
-        \end{axis}
-    \end{tikzpicture}}
+\begin{codebox}\small
+\begin{minted}[breaklines]{latex}
+\begin{tikzpicture}[scale=0.9]
+  \begin{axis}[legend pos = north west]
+    \addplot [domain=-3.5:1.5,samples=100]
+      {\fetch{h}};
+    \addlegendentry{$f$};
+    \addplot[densely dashed] 
+      [domain=-3.25:1.25,samples=100]
+      {\fetch{dh}};
+    \addlegendentry{$df/dx$};
+    \addplot[gray,dashed,thick]
+      [domain=-3.5:1.5] {0};
+  \end{axis}
+\end{tikzpicture}
+\end{minted}
+\tcblower
+\begin{tikzpicture}[scale=0.9]
+    \begin{axis}[legend pos = north west]
+        \addplot [domain=-3.5:1.5,samples=100] {\fetch{h}};
+        \addlegendentry{$f$};
+        \addplot[densely dashed] 
+            [domain=-3.25:1.25,samples=100] {\fetch{dh}};
+        \addlegendentry{$df/dx$};
+        \addplot[gray,dashed,thick]
+            [domain=-3.5:1.5] {0};
+    \end{axis}
+\end{tikzpicture}
+\end{codebox}
 Alternatively, Bob could use \mintinline{latex}{\store}. The \mintinline{latex}{\store} command will \emph{fetch} the contents of its mandatory argument and store it in a macro of the same name. 
-\inputminted[ 
-    firstline=79,
-    lastline=80,
-    breaklines
-    ]
-    {latex}
-    {demotut2.tex}
+\begin{minted}{latex}
+\store{h}
+\store{dh}
+\end{minted}
 Now the macros \mintinline{latex}{\h} and \mintinline{latex}{\dh} can be used in place of \mintinline{latex}{\fetch{h}} and \mintinline{latex}{\fetch{dh}}, respectively. An optional argument can be used to store contents in a macro under a different name. This is useful for situations like the following:
-\inputminted[ 
-    firstline=82,
-    lastline=82,
-    breaklines
-    ]
-    {latex}
-    {demotut2.tex}
+\begin{minted}{latex}
+\store{r[1]}[rootone]
+\end{minted}
 Now \mintinline{latex}{\rootone} can be used in place of \mintinline{latex}{\fetch{r[1]}}. But Bob wants to fetch all the values stored in \texttt{r} (and \texttt{v}, for that matter). In this case, Bob can use:
-\inputminted[ 
-    firstline=84,
-    lastline=85,
-    breaklines
-]{latex}{demotut2.tex}
+\begin{minted}{latex}
+\store{r}
+\store{v}
+\end{minted}
 The command \mintinline{latex}{\store{r}} is equivalent to:
 \begin{minted}{latex}
 \def\r{{ \fetch{r[1]}, \fetch{r[2]}, \fetch{r[3]}, \fetch{r[4]} }}
 \end{minted}
 The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \mintinline{latex}{\pgfmathsetmacro}. For example:
 
-\begin{codebox}
-    {\small\inputminted[ 
-        firstline = 160,
-        lastline = 172,
-        breaklines
-    ]
-    {latex}
-    {demotut2.tex}}
+\begin{codebox}\small
+\begin{minted}{latex}
+\begin{tikzpicture}[scale=0.6]
+  \draw [dashed,latex-latex]
+    (-7,0) -- (4,0);
+  \foreach \k in {0,1,2,3}{
+    \pgfmathsetmacro\a{\r[\k]}
+    \draw (\a,0) circle (\a);
+  }
+  \foreach \x in {-6,...,3}{
+    \draw[fill,orange]
+      (\x,0) circle (2pt)
+      node[below] {\footnotesize$\x$};
+  }
+\end{tikzpicture}
+\end{minted}
     \tcblower
     \store{r}
-    \begin{tikzpicture}[scale=0.7]
+    \begin{center}
+    \begin{tikzpicture}[scale=0.65]
         \draw [dashed,latex-latex] (-7,0) -- (4,0);
         \foreach \k in {0,1,2,3}{
             \pgfmathsetmacro\a{\r[\k]}
@@ -311,6 +322,7 @@ The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \
             node[below] {\footnotesize$\x$};
         }
     \end{tikzpicture}
+\end{center}
 \end{codebox}
 
 Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project shared below:

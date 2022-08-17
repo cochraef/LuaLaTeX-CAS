@@ -1,0 +1,25 @@
+\begin{theindex}
+
+  \item {Core Classes}
+    \subitem \texttt  {SymbolExpression}, \hyperpage{22}
+  \item {Core Methods}
+    \subitem \texttt  {autosimplify}, \hyperpage{26}
+    \subitem \texttt  {evaluate}, \hyperpage{26}
+    \subitem \texttt  {expand}, \hyperpage{29}
+    \subitem \texttt  {factor}, \hyperpage{30}
+    \subitem \texttt  {freeof}, \hyperpage{29}
+    \subitem \texttt  {isatomic}, \hyperpage{30}
+    \subitem \texttt  {iscomplexconstant}, \hyperpage{31}
+    \subitem \texttt  {isconstant}, \hyperpage{30}
+    \subitem \texttt  {isrealconstant}, \hyperpage{31}
+    \subitem \texttt  {setsubexpressions}, \hyperpage{29}
+    \subitem \texttt  {simplify}, \hyperpage{27}
+    \subitem \texttt  {size}, \hyperpage{28}
+    \subitem \texttt  {subexpressions}, \hyperpage{27}
+    \subitem \texttt  {substitute}, \hyperpage{29}
+    \subitem \texttt  {tolatex}, \hyperpage{31}
+  \item {Parsing}
+    \subitem \texttt  {BinaryOperation}, \hyperpage{22}
+    \subitem \texttt  {FunctionExpression}, \hyperpage{24}
+
+\end{theindex}

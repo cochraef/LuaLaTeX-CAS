@@ -101,10 +101,10 @@ style=numeric,
 
 \makeindex
 
-\def\currref{Core Methods}
+\def\currref{Core!Classes}
 
-\newcommand{\coderef}[2]{%
-\index{\currref!\texttt{#1}}%
+\newcommand{\coderef}[3]{%
+\index{\currref!\texttt{#3}}%
 \begin{codehead}[sidebyside,segmentation hidden]%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -114,8 +114,8 @@ style=numeric,
 \end{codehead}%
 }
 
-\newcommand{\newcoderef}[3]{%
-\index{\currref!\texttt{#1}}%
+\newcommand{\newcoderef}[4]{%
+\index{\currref!\texttt{#4}}%
 \begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -150,7 +150,7 @@ There are several classes in the core module; but only some classes are callable
 \end{center}
 \end{multicols}
 
-\coderef{function SymbolExpression:new(string)}{return SymbolExpression} 
+\coderef{function SymbolExpression:new(string)}{return SymbolExpression}{SymbolExpression}
 
 Creates a new \texttt{SymbolExpression}. For example:
 \begin{codebox}[]
@@ -165,11 +165,11 @@ tex.sprint("The Lua variable 'foo' is the SymbolExpression: ", foo:tolatex(),"."
 }
 \end{codebox}
 
-\subsubsection{Attributes}
+\subsubsection*{Attributes}
 
 \texttt{SymbolExpression}s have only one attribute: \texttt{symbol}. In the example above, the string \mintinline{lua}{"bar"} is stored in \mintinline{lua}{foo.bar}. 
 
-\subsubsection{Parsing}
+\subsubsection*{Parsing}
 
 The command \mintinline{lua}{vars()} in \texttt{test.parser} creates a new \texttt{SymbolExpression} for every string in the argument; each such \texttt{SymbolExpression} is assigned to a variable of the same name. For example:
 
@@ -184,7 +184,7 @@ x = SymbolExpression("x")
 y = SymbolExpression("y")
 \end{minted}
 
-\newcoderef{function BinaryOperation:new(operation, expressions)}{return BinaryOperation}{operation function, expressions table<number,Expression>}
+\newcoderef{function BinaryOperation:new(operation, expressions)}{return BinaryOperation}{operation function, expressions table<number,Expression>}{BinaryOperation}
 
 Creates a new \texttt{BinaryOperation}. For example:
 
@@ -225,7 +225,7 @@ The instance variable \texttt{operation} must be a function \mintinline{lua}{fun
 \end{itemize}
 The instance variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
 
-\subsubsection{Attributes}
+\subsubsection*{Attributes}
 
 \texttt{BinaryOperation}s have the following attributes: \texttt{name}, \texttt{operation}, and \texttt{expressions}. In the example above, we have:
 \begin{itemize}
@@ -239,7 +239,7 @@ end
     \end{minted}
 \end{itemize}
 
-\subsubsection{Parsing}
+\subsubsection*{Parsing}
 
 Thank goodness for this. Creating new \texttt{BinaryOperation}s isn't nearly as cumbersome as the above would indicate. Using Lua's powerful metamethods, we can parse expressions much more easily. For example, the construction of \texttt{w} given above can be done much more naturally using:
 \begin{codebox}
@@ -294,7 +294,7 @@ tex.print("\\[", c:tolatex(), "\\equiv", a:tolatex(), "\\bmod{", b:tolatex(), "}
 }
 \end{codebox}
 
-\newcoderef{function FunctionExpression:new(name,expressions)}{return FunctionExpression}{name string|SymbolExpression, expressions table<number,Expression>}
+\newcoderef{function FunctionExpression:new(name,expressions)}{return FunctionExpression}{name string|SymbolExpression, expressions table<number,Expression>}{FunctionExpression}
 
 Creates a generic function. For example:
 \begin{codebox}
@@ -312,7 +312,7 @@ tex.print("\\[",f:tolatex(),"\\]")
 \end{codebox}
 The variable \texttt{name} can be a string (like above), or another \texttt{SymbolExpression}. But in this case, the variable \texttt{name} just takes the value of the string \mintinline{lua}{SymbolExpression.symbol}. The variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
 
-\subsubsection{Attributes}
+\subsubsection*{Attributes}
 \texttt{FunctionExpression}s have the following attributes: \texttt{name}, \texttt{expressions}, \texttt{variables}, \texttt{derivatives}. In the example above, we have:
 \begin{itemize}
     \item the variable \texttt{name}, i.e. the string \mintinline{lua}{'f'}, is stored in \mintinline{lua}{f.name}; and
@@ -373,7 +373,7 @@ tex.print("\\[",
 }
 \end{codebox}
 
-\subsubsection{Parsing}
+\subsubsection*{Parsing}
 
 Thank goodness for this too. The parser nested within the \LaTeX{} environment \mintinline{latex}{\begin{CAS}..\end{CAS}} allows for fairly natural function assignment; the name of the function must be declared in \mintinline{lua}{vars(...)} (or rather, as a \texttt{SymbolExpression}) beforehand:
 \begin{codebox}

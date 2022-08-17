@@ -20,6 +20,63 @@
     \tcbuselibrary{xparse}
 \usepackage{microtype}
 
+\begin{filecontents*}{demotut3.dat}
+\begin{CAS}
+    vars('x','h')
+    f = 1/(x^2+1)
+    subs = {[x]=x+h}
+    q = (substitute(subs,f)-f)/h
+    q = expand(q)
+\end{CAS}
+
+\parseforest{q}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {
+        font=\ttfamily,
+        rectangle,
+        rounded corners=1pt
+    },
+    where level=0{%
+        fill=orange!25
+    }{},
+    @\forestresult
+\end{forest}
+
+\begin{CAS}
+    r = diff(q,x,h)
+\end{CAS}
+\whatis{q} vs \whatis{r}
+
+\luaexec{if q.operation == BinaryOperation.ADD then 
+    tex.print("I'm an \\texttt{ADD}")
+end}
+
+\luaexec{tex.print("I'm an order", r.degree, "derivative.")}
+
+\parseshrub{q}
+\begin{forest}
+    for tree = {draw,rectangle,rounded corners=1pt,fill=lightgray!20,font=\ttfamily}
+    @\shrubresult
+\end{forest}
+
+\parseshrub{q.expressions[1]}
+\begin{forest}
+    for tree = {draw,rectangle,
+    rounded corners=1pt,fill=lightgray!20,
+    font=\ttfamily, s sep=2cm}
+    @\shrubresult
+\end{forest}
+
+\parseshrub{r}
+\begin{forest}
+    for tree = {draw,rectangle,
+    rounded corners=1pt,fill=lightgray!20,
+    font=\ttfamily, s sep=1cm}
+    @\shrubresult
+\end{forest}
+\end{filecontents*}
+
 \usepackage[
 backend=biber,
 style=numeric,
@@ -75,12 +132,12 @@ At the heart of any CAS is the idea of an \texttt{Expression}. Mathematically sp
     notitle
     ]{
     \inputminted[ 
-        firstline = 17,
-        lastline = 29,
+        firstline = 21,
+        lastline = 33,
         breaklines
     ]
     {latex}
-    {demotut3.tex}}
+    {demotut3.dat}}
     {\parseforest{q}
     \bracketset{action character = @}
     \begin{forest}
@@ -100,12 +157,12 @@ Charlie can print the \texttt{Expression} type directly into their document usin
 
 \begin{codebox}
     \inputminted[ 
-        firstline = 31,
-        lastline = 34,
+        firstline = 35,
+        lastline = 38,
         breaklines
     ]
     {latex}
-    {demotut3.tex}
+    {demotut3.dat}
     \tcblower
     \begin{CAS}
         r = diff(q,x,h)
@@ -127,12 +184,12 @@ At any rate, Charlie now knows, according to \texttt{luacas}, that \texttt{q} is
     notitle
     ]{
     \inputminted[ 
-        firstline = 36,
-        lastline = 38,
+        firstline = 40,
+        lastline = 42,
         breaklines
     ]
     {latex}
-    {demotut3.tex}}
+    {demotut3.dat}}
     {
     \luaexec{
     if q.operation == BinaryOperation.ADD then 
@@ -152,12 +209,12 @@ Of course, different \texttt{Expression} types have different attributes. For ex
     notitle
     ]{
     \inputminted[ 
-        firstline = 40,
-        lastline = 40,
+        firstline = 44,
+        lastline = 44,
         breaklines
     ]
     {latex}
-    {demotut3.tex}}
+    {demotut3.dat}}
     {
     \luaexec{
         tex.print("I'm an order", r.degree, "derivative.")
@@ -182,12 +239,12 @@ The expression \texttt{q.expressions[1]} is another \texttt{BinaryOperation}. In
     notitle
     ]{\small
     \inputminted[ 
-        firstline = 48,
-        lastline = 54,
+        firstline = 52,
+        lastline = 58,
         breaklines
     ]
     {latex}
-    {demotut3.tex}}
+    {demotut3.dat}}
     {\parseshrub{q.expressions[1]}
      \bracketset{action character = @}
         \begin{forest}
@@ -208,12 +265,12 @@ The ``shrub'' is essentially the first level of the ``forest'', but with some ex
     notitle
     ]{\small
     \inputminted[ 
-        firstline = 56,
-        lastline = 62,
+        firstline = 60,
+        lastline = 66,
         breaklines
     ]
     {latex}
-    {demotut3.tex}}
+    {demotut3.dat}}
     {\parseshrub{r}
     \bracketset{action character = @}
     \begin{forest}
@@ -329,7 +386,7 @@ Now Charlie has:
 \begin{codebox}
     \begin{minted}{latex}
 \begin{CAS}
-    q = q:simplifynum()
+    q = q:mysimplify()
 \end{CAS}
 \[ \print{q} \] 
 \end{minted}
@@ -409,5 +466,69 @@ Of course, the schlubs that manage this package feel for Charlie, and recognize 
 \[ \print{d} = \print{e} \] 
 \end{codebox}
 
-\end{document}
+Here's Charlie's complete code (but using \mintinline{latex}{\directlua}) instead:
 
+\begin{minted}[breaklines]{latex}
+\begin{CAS}
+    vars('x','h')
+    f = x/(x^2+1)
+\end{CAS}
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appropriate difference quotient:
+\begin{CAS}
+    subs = {[x] = x+h}
+    q = (f:substitute(subs) - f)/h
+\end{CAS}
+\directlua{
+    function Expression:mycombine()
+        local a = self.expressions[1].expressions[1].expressions[1]
+        local b = self.expressions[1].expressions[1].expressions[2]
+        local c = self.expressions[1].expressions[2].expressions[1]
+        local d = self.expressions[1].expressions[2].expressions[2]
+        local numerator = a*d-b*c
+        local denominator = self.expressions[2]*b*d
+        return numerator/denominator
+    end
+    function Expression:mysimplify()
+        local a = self.expressions[1]
+        local b = self.expressions[2]
+        a = simplify(a)
+        return a/b 
+    end
+    function Expression:myfactor()
+        local a = self.expressions[1]
+        local b = self.expressions[2]
+        a = factor(a)
+        return a/b
+    end
+}
+\[ \begin{aligned} 
+    \print{q} &=
+    \begin{CAS}
+        q = q:mycombine()
+    \end{CAS}
+    \print{q}& &\text{get a common denominator} \\ 
+    &= 
+    \begin{CAS}
+        q = q:mysimplify()
+    \end{CAS}
+    \print{q}& &\text{simplify the numerator} \\ 
+    &= 
+    \begin{CAS}
+        q = q:myfactor()
+    \end{CAS}
+    \print{q} & &\text{factor numerator} \\ 
+    &=
+    \begin{CAS}
+        q = simplify(q)
+    \end{CAS}
+    \print{q}& &\text{cancel the $h$s} \\ 
+    &\xrightarrow{h\to 0}
+    \begin{CAS}
+        subs = {[h] = 0}
+        q = substitute(subs,q):autosimplify()
+    \end{CAS}
+    \print{q}& &\text{take limit.}
+\end{aligned} \] 
+\end{minted}
+
+\end{document}

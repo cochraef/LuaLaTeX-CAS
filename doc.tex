@@ -99,13 +99,15 @@ style=numeric,
     bottom color=white}},
     title={#2}
 }
-
+\usepackage{makeidx}
 \makeindex
 
-\def\currref{Core Methods}
+\makeatletter
+\newcommand*{\currentname}{\@currentlabelname}
+\makeatother
 
-\newcommand{\coderef}[2]{%
-\index{\currref!\texttt{#1}}%
+\newcommand{\coderef}[3]{%
+\index{{\currentname}!\texttt{#3}}%
 \begin{codehead}[sidebyside,segmentation hidden]%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -115,8 +117,8 @@ style=numeric,
 \end{codehead}%
 }
 
-\newcommand{\newcoderef}[3]{%
-\index{\currref!\texttt{#1}}%
+\newcommand{\newcoderef}[4]{%
+\index{{\currentname}!\texttt{#4}}%
 \begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -392,6 +394,8 @@ CASparse([[
 \newpage
 
 \printbibliography
+
+\printindex
 
 
 \end{document}
