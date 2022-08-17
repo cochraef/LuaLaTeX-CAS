@@ -113,9 +113,9 @@ function PI:approximate()
     return Integer(313383936) / Integer(99753205)
 end
 
-function PI:isconstant()
-    return true
-end
+--function PI:isconstant()
+--    return true
+--end
 
 -- The constant e.
 E = SymbolExpression("e")
@@ -125,9 +125,8 @@ function E:approximate()
     return Integer(517656) / Integer(190435)
 end
 
-
 -- The imaginary constant i.
 I = SymbolExpression("i")
 function I:tolatex()
-    return "i" 
+    return "i"
 end
