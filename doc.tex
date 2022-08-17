@@ -102,12 +102,7 @@ style=numeric,
 \usepackage{makeidx}
 \makeindex
 
-\makeatletter
-\newcommand*{\currentname}{\@currentlabelname}
-\makeatother
-
-\newcommand{\coderef}[3]{%
-\index{{\currentname}!\texttt{#3}}%
+\newcommand{\coderef}[2]{%
 \begin{codehead}[sidebyside,segmentation hidden]%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -117,8 +112,7 @@ style=numeric,
 \end{codehead}%
 }
 
-\newcommand{\newcoderef}[4]{%
-\index{{\currentname}!\texttt{#4}}%
+\newcommand{\newcoderef}[3]{%
 \begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
     \mintinline{lua}{#1}%
     \tcblower%

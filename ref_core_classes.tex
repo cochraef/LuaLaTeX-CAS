@@ -101,10 +101,7 @@ style=numeric,
 
 \makeindex
 
-\def\currref{Core!Classes}
-
-\newcommand{\coderef}[3]{%
-\index{\currref!\texttt{#3}}%
+\newcommand{\coderef}[2]{%
 \begin{codehead}[sidebyside,segmentation hidden]%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -114,8 +111,7 @@ style=numeric,
 \end{codehead}%
 }
 
-\newcommand{\newcoderef}[4]{%
-\index{\currref!\texttt{#4}}%
+\newcommand{\newcoderef}[3]{%
 \begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -150,7 +146,8 @@ There are several classes in the core module; but only some classes are callable
 \end{center}
 \end{multicols}
 
-\coderef{function SymbolExpression:new(string)}{return SymbolExpression}{SymbolExpression}
+\coderef{function SymbolExpression:new(string)}{return SymbolExpression}
+\index{Core!Classes!\texttt{SymbolExpression}}
 
 Creates a new \texttt{SymbolExpression}. For example:
 \begin{codebox}[]
@@ -184,7 +181,8 @@ x = SymbolExpression("x")
 y = SymbolExpression("y")
 \end{minted}
 
-\newcoderef{function BinaryOperation:new(operation, expressions)}{return BinaryOperation}{operation function, expressions table<number,Expression>}{BinaryOperation}
+\newcoderef{function BinaryOperation:new(operation, expressions)}{return BinaryOperation}{operation function, expressions table<number,Expression>}
+\index{Core!Classes!\texttt{BinaryOperation}}
 
 Creates a new \texttt{BinaryOperation}. For example:
 
@@ -294,7 +292,8 @@ tex.print("\\[", c:tolatex(), "\\equiv", a:tolatex(), "\\bmod{", b:tolatex(), "}
 }
 \end{codebox}
 
-\newcoderef{function FunctionExpression:new(name,expressions)}{return FunctionExpression}{name string|SymbolExpression, expressions table<number,Expression>}{FunctionExpression}
+\newcoderef{function FunctionExpression:new(name,expressions)}{return FunctionExpression}{name string|SymbolExpression, expressions table<number,Expression>}
+\index{Core!Classes!\texttt{FunctionExpression}}
 
 Creates a generic function. For example:
 \begin{codebox}

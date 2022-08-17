@@ -102,10 +102,7 @@ style=numeric,
 
 \makeindex
 
-\def\currref{Core Methods}
-
-\newcommand{\coderef}[3]{%
-\index{\currref!\texttt{#3}}%
+\newcommand{\coderef}[2]{%
 \begin{codehead}[sidebyside,segmentation hidden]%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -115,8 +112,7 @@ style=numeric,
 \end{codehead}%
 }
 
-\newcommand{\newcoderef}[4]{%
-\index{\currref!\texttt{#4}}%
+\newcommand{\newcoderef}[3]{%
 \begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -130,7 +126,9 @@ style=numeric,
 
 \subsection{Core Methods}
 
-\coderef{function Expression:evaluate()}{return Expression}{evaluate}
+\coderef{function Expression:evaluate()}{return Expression}
+\index{Core!Methods!\texttt{evaluate}}
+
 Applies to an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
 
 For example, the code:
@@ -150,7 +148,8 @@ produces:
 }
 \[ \print{z} = \print{z:evaluate()}.\]   
 
-\coderef{function Expression:autosimplify()}{return Expression}{autosimplify}
+\coderef{function Expression:autosimplify()}{return Expression}
+\index{Core!Methods!\texttt{autosimplify}}
 
 Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method also calls the {\ttfamily evaluate()} method.
 
@@ -226,7 +225,8 @@ In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()} 
 \end{multicols}
 {\bf Note:} \texttt{w:autosimplify()} is exactly the same as it was before despite the different starting point. This is an essential function of \texttt{autosimplify()}.
 
-\coderef{function Expression:simplify()}{return Expression}{simplify}
+\coderef{function Expression:simplify()}{return Expression}
+\index{Core!Methods!\texttt{simplify}}
 
 Performs more extensive simplification of an expression. This may be slow, so this function is separate from autosimplification and is not called unless the user specifically directs the CAS to do so. The method aims to find an expression tree equivalent to the one given that is ``smaller'' in size as measured by the number of nodes in the expression tree. 
 
@@ -272,7 +272,8 @@ And here are the corresponding expression trees:
 \end{center}
 \end{multicols}
 
-\coderef{function Expression:subexpressions()}{return table<number, Expression>}{subexpressions}
+\coderef{function Expression:subexpressions()}{return table<number, Expression>}
+\index{Core!Methods!\texttt{subexpressions}}
 
 Returns a list of all subexpressions of an expression. This gives a unified interface to the instance variables for subexpressions, which have different names across classes.
 
@@ -355,7 +356,8 @@ end
 \end{codebox}
 \vskip 0.2cm
 
-\coderef{function Expression:size()}{return Integer}{size}
+\coderef{function Expression:size()}{return Integer}
+\index{Core!Methods!\texttt{size}}
 
 Returns the number of nodes of the tree that constitutes an expression, or roughly the total number of expression objects that make up the expression.
 
@@ -393,11 +395,13 @@ tex.print("The size of \\texttt{c:simplfy()} is",
 \end{codebox}
 \vskip 0.2cm
 
-\coderef{function Expression:setsubexpressions(subexpressions)}{return Expression}{setsubexpressions}
+\coderef{function Expression:setsubexpressions(subexpressions)}{return Expression}
+\index{Core!Methods!\texttt{setsubexpressions}}
 
 Creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
 
-\coderef{function Expression:freeof(symbol)}{return bool}{freeof}
+\coderef{function Expression:freeof(symbol)}{return bool}
+\index{Core!Methods!\texttt{freeof}}
 
 Determines whether or not an expression contains a particular {\ttfamily SymbolExpression} somewhere in the tree.
 
@@ -448,7 +452,8 @@ end
 }
     \end{codebox}
 
-\coderef{function Expression:substitute(map)}{return Expression}{substitute}
+\coderef{function Expression:substitute(map)}{return Expression}
+\index{Core!Methods!\texttt{substitute}}
 
 Takes a table mapping expressions to other expressions and recursively maps each instance of an expression with its corresponding table expression.
 
@@ -472,7 +477,8 @@ Takes a table mapping expressions to other expressions and recursively maps each
 \[ \print{z} \] 
 \end{codebox}
 
-\coderef{function Expression:expand()}{return Expression}{expand}
+\coderef{function Expression:expand()}{return Expression}
+\index{Core!Methods!\texttt{expand}}
 
 Expands an expression, turning products of sums into sums of products.
 
@@ -496,7 +502,8 @@ Expands an expression, turning products of sums into sums of products.
 \[ \print{c} = \print{c:expand()} \] 
 \end{codebox}
 
-\coderef{function Expression:factor()}{return Expression}{factor}
+\coderef{function Expression:factor()}{return Expression}
+\index{Core!Methods!\texttt{factor}}
 
 Factors an expression, turning sums of products into products of sums. For general \texttt{Expressions} this functionality is somewhat limited. For example:
 \begin{codebox}
@@ -534,7 +541,8 @@ On the other hand:
 \end{codebox}
 
 
-\coderef{function Expression:isatomic()}{return bool}{isatomic}
+\coderef{function Expression:isatomic()}{return bool}
+\index{Core!Methods!\texttt{isatomic}}
 
 Determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
 
@@ -583,19 +591,23 @@ end
 \end{codebox}
 \vskip 0.2cm
 
-\coderef{function Expression:isconstant()}{return bool}{isconstant}
+\coderef{function Expression:isconstant()}{return bool}
+\index{Core!Methods!\texttt{isconstant}}
 
 Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases, for instance, it returns {\ttfamily false} for the constant $\pi$. This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
 
-\coderef{function Expression:isrealconstant()}{return bool}{isrealconstant}
+\coderef{function Expression:isrealconstant()}{return bool}
+\index{Core!Methods!\texttt{isrealconstant}}
 
 Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$.
 
-\coderef{function Expression:iscomplexconstant()}{return bool}{iscomplexconstant}
+\coderef{function Expression:iscomplexconstant()}{return bool}
+\index{Core!Methods!\texttt{iscomplexconstant}}
 
 Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$.
 
-\coderef{function Expression:tolatex()}{return string}{tolatex}
+\coderef{function Expression:tolatex()}{return string}
+\index{Core!Methods!\texttt{tolatex}}
 
 Converts an expression to \LaTeX{} code.
 

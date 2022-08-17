@@ -1,25 +1,25 @@
 \begin{theindex}
 
-  \item {Core Classes}
-    \subitem \texttt  {SymbolExpression}, \hyperpage{22}
-  \item {Core Methods}
-    \subitem \texttt  {autosimplify}, \hyperpage{26}
-    \subitem \texttt  {evaluate}, \hyperpage{26}
-    \subitem \texttt  {expand}, \hyperpage{29}
-    \subitem \texttt  {factor}, \hyperpage{30}
-    \subitem \texttt  {freeof}, \hyperpage{29}
-    \subitem \texttt  {isatomic}, \hyperpage{30}
-    \subitem \texttt  {iscomplexconstant}, \hyperpage{31}
-    \subitem \texttt  {isconstant}, \hyperpage{30}
-    \subitem \texttt  {isrealconstant}, \hyperpage{31}
-    \subitem \texttt  {setsubexpressions}, \hyperpage{29}
-    \subitem \texttt  {simplify}, \hyperpage{27}
-    \subitem \texttt  {size}, \hyperpage{28}
-    \subitem \texttt  {subexpressions}, \hyperpage{27}
-    \subitem \texttt  {substitute}, \hyperpage{29}
-    \subitem \texttt  {tolatex}, \hyperpage{31}
-  \item {Parsing}
-    \subitem \texttt  {BinaryOperation}, \hyperpage{22}
-    \subitem \texttt  {FunctionExpression}, \hyperpage{24}
+  \item Core
+    \subitem Classes
+      \subsubitem \texttt{BinaryOperation}, \hyperpage{22}
+      \subsubitem \texttt{FunctionExpression}, \hyperpage{24}
+      \subsubitem \texttt{SymbolExpression}, \hyperpage{22}
+    \subitem Methods
+      \subsubitem \texttt{autosimplify}, \hyperpage{26}
+      \subsubitem \texttt{evaluate}, \hyperpage{26}
+      \subsubitem \texttt{expand}, \hyperpage{29}
+      \subsubitem \texttt{factor}, \hyperpage{30}
+      \subsubitem \texttt{freeof}, \hyperpage{29}
+      \subsubitem \texttt{isatomic}, \hyperpage{30}
+      \subsubitem \texttt{iscomplexconstant}, \hyperpage{31}
+      \subsubitem \texttt{isconstant}, \hyperpage{30}
+      \subsubitem \texttt{isrealconstant}, \hyperpage{31}
+      \subsubitem \texttt{setsubexpressions}, \hyperpage{29}
+      \subsubitem \texttt{simplify}, \hyperpage{27}
+      \subsubitem \texttt{size}, \hyperpage{28}
+      \subsubitem \texttt{subexpressions}, \hyperpage{27}
+      \subsubitem \texttt{substitute}, \hyperpage{29}
+      \subsubitem \texttt{tolatex}, \hyperpage{31}
 
 \end{theindex}
