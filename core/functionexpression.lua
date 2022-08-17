@@ -271,7 +271,7 @@ function FunctionExpression:tolatex()
         end
     end
     ::continue::
-    out = out ..'\\!' .. '\\left('
+    out = out ..'\\mathopen{}' .. '\\left('
     for index, expression in ipairs(self:subexpressions()) do
         out = out .. expression:tolatex()
         if self:subexpressions()[index + 1] then
