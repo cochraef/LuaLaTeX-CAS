@@ -101,8 +101,6 @@ style=numeric,
 
 \makeindex
 
-\def\currref{Core Methods}
-
 \newcommand{\coderef}[2]{%
 \index{\currref!\texttt{#1}}%
 \begin{codehead}[sidebyside,segmentation hidden]%
@@ -124,10 +122,113 @@ style=numeric,
     \end{flushright}%
 \end{newcodehead}%
 }
+\usetikzlibrary{shapes.multipart}
+\useforestlibrary{edges}
+
+\def\error{\color{roseorange}}
+\def\self{\color{gray}}
+\def\call{\color{rose}\bfseries}
 
 \begin{document}
 
 \section{Core}
-    This section contains reference materials for the core functionality of \texttt{luacas}.
-
+    This section contains reference materials for the core functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
+    \begin{itemize}
+        \item {\error\ttfamily\itshape method}: a method that returns an error; 
+        \item {\self\ttfamily\itshape method}: a method that returns itself; 
+        \item {\ttfamily\itshape method}: a new method or an old method that does something different than what it inherits;
+        \item {\tikz[baseline=-0.5ex]\node[fill=roseblue!50] {\ttfamily\bfseries Class};}: a callable class.
+    \end{itemize}
+    \vfill
+\forestset{
+rect/.style = {rectangle split,
+               rectangle split parts=2,
+               draw,
+               rounded corners = 1pt,
+               font = \ttfamily\bfseries,
+               }
+}
+\tikzset{
+    every two node part/.style={font=\ttfamily\itshape\footnotesize}
+}
+\begin{center}
+    \begin{forest}
+        for tree = {node options={align=left},
+                           rect
+                    }
+        [Expression\nodepart{two}\begin{minipage}{0.5\textwidth}\vskip-0.2cm\begin{multicols}{2}
+            {\error evaluate()} \\
+            {\error autosimplify()} \\  
+            simplify() \\ 
+            size() \\ 
+            {\error subexpressions()} \\ 
+            {\error setsubexpressions()} \\
+            {\error freeof()} \\ 
+            {\error substitute(map)} \\
+            {\self expand()} \\
+            {\self factor()} \\
+            {\self combine()} \\
+            getsubexpressionsrec() \\ 
+            {\error isatomic()} \\ 
+            {\error isconstant()} \\
+            isrealconstant() \\ 
+            iscomplexconstant() \\ 
+            {\error order(other)} \\ 
+            {\self topolynomial()} \\
+            {\error tolatex()} \\
+            type()\end{multicols}\end{minipage}
+            [AtomicExpression\nodepart{two}
+                {\self tocompoundexpression()} \\
+                {\self evaluate()} \\ 
+                {\self autosimplify()} \\ 
+                subexpressions() \\ 
+                {\self setsubexpressions()} \\ 
+                substitute(map) \\ 
+                isatomic() \\ 
+                tolatex()
+                [SymbolExpression\nodepart{two}
+                    {\call new(symbol)} \\
+                    freeof() \\
+                    isconstant() \\
+                    order(other) \\
+                    topolynomial()
+                ,fill = roseblue!50]
+                [ConstantExpression\nodepart{two}
+                    freeof()\\
+                    isconstant() \\
+                    order(other)
+                ]
+            ]
+            [CompoundExpression\nodepart{two}
+                freeof() \\
+                substitute(map) \\
+                isatomic() \\ 
+                isconstant()
+                [BinaryOperation\nodepart{two}
+                    {\call new(operation,expressions)} \\
+                    evaluate() \\
+                    autosimplify() (!)\\
+                    subexpressions() \\
+                    expand() \\
+                    factor() \\
+                    combine() \\
+                    order(other) \\
+                    {iscommutatitve()}\\
+                    topolynomial() \\
+                    tolatex()
+                , fill=roseblue!50]
+                [FunctionExpression\nodepart{two}
+                    {\call new(name,expressions)}\\
+                    evaluate()\\
+                    autosimplify()\\
+                    subexpressions()\\
+                    setsubexpressions()\\
+                    order(other)\\
+                    tolatex()                
+                , fill=roseblue!50]
+            ]
+        ]
+    \end{forest}
+\end{center}
+\vfill
 \end{document}

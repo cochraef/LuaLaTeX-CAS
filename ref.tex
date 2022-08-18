@@ -10,7 +10,7 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{positioning,calc}
-\usepackage{forest}
+\usepackage[edges]{forest}
 \usepackage{minted}
 \usemintedstyle{pastie}
 \usepackage[hidelinks]{hyperref}
@@ -125,9 +125,71 @@ style=numeric,
 \end{newcodehead}%
 }
 
+
 \begin{document}
 
 \part{Reference}
-    This part contains reference material.
+This part contains reference material.
+\vfill
+
+
+\forestset{multiple directions/.style={for tree={#1}, phantom, for relative level=1{no edge, delay={!c.content/.pgfmath=content("!u")}, before computing xy={l=0,s=0}}},
+    multiple directions/.default={},
+    grow subtree/.style={for tree={grow=#1}}, 
+    grow' subtree/.style={for tree={grow'=#1}}}
+
+\begin{center}
+    \begin{forest}
+        core/.style = {draw={rosenavy,thick},
+            font={\ttfamily\bfseries\color{rosenavy}},
+            fill = roseblue!#1},
+        algebra/.style = {draw={rose,thick},
+            font={\ttfamily\bfseries\color{rose}},
+            fill = rose!#1},
+        calculus/.style = {draw={roseorange,thick},
+            font={\ttfamily\bfseries\color{roseorange}},
+            fill = roseorange!#1},
+        multiple directions,
+        for tree = {font = \ttfamily\bfseries,
+            draw,
+            rounded corners=1pt,
+            grow'=south east,
+            edge = {-stealth},
+            s sep = 0.2cm}
+        [Expression
+            [, grow subtree = 90
+                [AtomicExpression, core = {0}, for tree = {grow=east,child anchor=west,node options={anchor=west},forked edges}, calign=last,l sep = 0.5cm, s sep = 0.2cm
+                [SymbolExpression, core={50}]
+                [ConstantExpression, core ={0}
+                    [PolynomialRing,algebra={30}]
+                    [Ring, algebra ={0}
+                        [EuclideanDomain, algebra={0}]
+                        [Field, algebra = {0}
+                            [IntegerModN, algebra={30}]
+                            [Rational, algebra={30}]   
+                        ]
+                        [Integer,algebra={30}]
+                    ]
+                ]
+            ]]
+            [, grow subtree = -90
+                [CompoundExpression, core = {0}, for tree = {grow=east,child anchor=west,node options={anchor=west},forked edges}, calign=last,l sep = 0.5cm, s sep = 0.2cm
+                [FunctionExpression, core = {40}
+                    [TrigExpression,algebra={30}]
+                ]
+                [BinaryOperation, core = {40}]
+                [Logarithm, algebra={30}]
+                [FactorialExpression, algebra={30}]
+                [RootExpression, algebra={30}]
+                [SqrtExpression, algebra={30}]
+                [AbsExpression, algebra={30}]
+                [DerivativeExpression,calculus={20}]
+                [DiffExpression, calculus={20}]
+                [IntegralExpression, calculus={20}]
+            ]]
+        ]
+    \end{forest}
+\end{center}
+\vfill
 
 \end{document}

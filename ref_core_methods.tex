@@ -742,13 +742,17 @@ function DerivativeExpression:tolatex()
     return '\\frac{d}{d' .. self.symbol:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
 end
 \end{minted} 
-But there are heathens out there that might prefer:
+But there are heathens that live among us who might prefer:
 \begin{minted}[breaklines]{lua}
 function DerivativeExpression:tolatex()
     return '\\frac{\\mathrm{d}}{\\mathrm{d}' .. self.symbol:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
 end
 \end{minted}
-We now get:
+If we include the above function in a separate file, say \texttt{mytex.lua}, and use:
+
+\mintinline{latex}{\directlua{dofile('mytex.lua')}}
+
+or simply include the above function directly into the document via \mintinline{latex}{\directlua} or \mintinline{latex}{\luaexec}, then we would get:
 \begin{codebox}
 \begin{minted}{latex}
 \begin{CAS}

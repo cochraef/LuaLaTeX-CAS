@@ -121,6 +121,11 @@ style=numeric,
     \end{flushright}%
 \end{newcodehead}%
 }
+
+\def\error{\color{roseorange}}
+\def\self{\color{gray}}
+\def\call{\color{rose}\bfseries}
+
 \begin{document}
 \title{A portable Computer Algebra System capable of symbolic computation for use in Lua\LaTeX{}: \\  The {\ttfamily luacas} package }
 \author{Evan Cochrane \\ {\itshape Timothy All}}
@@ -171,7 +176,7 @@ Every object in the CAS is an expression, meaning it inherits from the {\ttfamil
 \begin{figure}[h]
 \centering
 
-\begin{tikzpicture}[interface/.style={rectangle, draw=orange!60, fill=orange!5, very thick, minimum size=5mm,outer sep=3pt},class/.style={text width=2.5cm,rectangle, draw=blue!60, fill=blue!5, very thick, minimum size=5mm}]
+\begin{tikzpicture}[interface/.style={rectangle, draw=roseorange!60, fill=roseorange!5, very thick, minimum size=5mm,outer sep=3pt},class/.style={text width=2.5cm,rectangle, draw=rosenavy!60, fill=rosenavy!5, very thick, minimum size=5mm}]
 
 \node[interface] at (0, 0) (exp) {\ttfamily Expression};
 \node[interface] at (-2, -2) (atom) {\ttfamily AtomicExpression};
