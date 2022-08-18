@@ -11,7 +11,7 @@
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 \usetikzlibrary{positioning,calc}
-\usepackage{forest}
+\usepackage[edges]{forest}
 \usepackage{minted}
 \usemintedstyle{pastie}
 \usepackage[hidelinks]{hyperref}
@@ -122,9 +122,9 @@ style=numeric,
 \end{newcodehead}%
 }
 
-\def\error{\color{roseorange}}
+\def\error{\color{red}}
 \def\self{\color{gray}}
-\def\call{\color{rose}\bfseries}
+\def\call{$\star$ }
 
 \begin{document}
 \title{A portable Computer Algebra System capable of symbolic computation for use in Lua\LaTeX{}: \\  The {\ttfamily luacas} package }

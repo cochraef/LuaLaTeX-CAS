@@ -127,9 +127,17 @@ style=numeric,
 
 
 \begin{document}
-
+\thispagestyle{empty}
 \part{Reference}
-This part contains reference material.
+This part contains reference material for the classes and methods that incorporate the \texttt{luacas} package. Some classes are \emph{callable} while others are not. The callable classes are essentially the objects that a user might reasonably interact with while using \texttt{luacas}. Thankfully, most of this interaction will be filtered through a rudimentary parser. Those classes that are not callable exist for the purposes of inheritance. 
+
+The classes in the diagram below are color-coded according to:
+\begin{itemize}
+    \item (\tikz[baseline=-0.5ex]\node[text=rosenavy,fill=roseblue!40]{\ttfamily\bfseries Class};) {\color{rosenavy}\ttfamily\bfseries Class}: a (callable) class belonging to the core module; 
+    \item (\tikz[baseline=-0.5ex]\node[text=rose,fill=rose!30]{\ttfamily\bfseries Class};) {\color{rose}\ttfamily\bfseries Class}: a (callable) class belonging to the algebra module; 
+    \item (\tikz[baseline=-0.5ex]\node[text=roseorange,fill=roseorange!30]{\ttfamily\bfseries Class};) {\color{roseorange}\ttfamily\bfseries Class}: a (callable) class belonging to the calculus module.
+\end{itemize}
+Inheritance is indicated with an arrow:
 \vfill
 
 

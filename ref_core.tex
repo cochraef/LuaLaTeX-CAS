@@ -125,11 +125,12 @@ style=numeric,
 \usetikzlibrary{shapes.multipart}
 \useforestlibrary{edges}
 
-\def\error{\color{roseorange}}
+\def\error{\color{red}}
 \def\self{\color{gray}}
-\def\call{\color{rose}\bfseries}
+\def\call{$\star$ }
 
 \begin{document}
+\thispagestyle{empty}
 
 \section{Core}
     This section contains reference materials for the core functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
@@ -143,7 +144,7 @@ style=numeric,
 \forestset{
 rect/.style = {rectangle split,
                rectangle split parts=2,
-               draw,
+               draw = {rosenavy,thick},
                rounded corners = 1pt,
                font = \ttfamily\bfseries,
                }

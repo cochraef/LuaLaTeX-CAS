@@ -309,7 +309,7 @@ tex.print("\\[",f:tolatex(),"\\]")
     tex.print("\\[",f:tolatex(),"\\]")
     }
 \end{codebox}
-The variable \texttt{name} can be a string (like above), or another \texttt{SymbolExpression}. But in this case, the variable \texttt{name} just takes the value of the string \mintinline{lua}{SymbolExpression.symbol}. The variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
+The variable \texttt{name} can be a string (like above), or another \texttt{SymbolExpression}. But in this case, the variable \texttt{name} just takes the value of the string \mintinline{lua}{SymbolExpression.symbol}. The variable \texttt{expressions} must be a table of \texttt{Expression}s indexed by Lua numbers.
 
 \subsubsection*{Attributes}
 \texttt{FunctionExpression}s have the following attributes: \texttt{name}, \texttt{expressions}, \texttt{variables}, \texttt{derivatives}. In the example above, we have:
@@ -338,13 +338,13 @@ end
     end
 }
 \end{codebox}
-The attribute \texttt{derivatives} is a table of \texttt{Integer}s index by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of zeros. So for the example above, we have:
+The attribute \texttt{derivatives} is a table of \texttt{Integer}s index by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of (\texttt{Integer}) zeros. So for the example above, we have:
 \begin{codebox}
     \begin{minted}{lua}
 for _,integer in ipairs(f.derivatives) do 
-    if integer == Integer.zero() then
-        tex.print("I'm a zero.\\newline")
-    end
+  if integer == Integer.zero() then
+    tex.print("I'm a zero.\\newline")
+  end
 end
 \end{minted}
 \tcblower

@@ -151,7 +151,7 @@ produces:
 \coderef{function Expression:autosimplify()}{return Expression}
 \index{Core!Methods!\texttt{autosimplify}}
 
-Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method also calls the {\ttfamily evaluate()} method.
+Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method calls the {\ttfamily evaluate()} method first.
 
 Consider the code:
 
@@ -200,6 +200,9 @@ For example, suppose the user inputs:
     w = x/y + (z/x+y/z)
 \end{CAS}
 \end{minted}
+\begin{CAS}
+    w = x/y + (z/x+y/z)
+\end{CAS}
 In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()} look as follows:
 
 \begin{multicols}{2}
