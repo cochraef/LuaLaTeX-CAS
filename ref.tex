@@ -101,10 +101,7 @@ style=numeric,
 
 \makeindex
 
-\def\currref{Core Methods}
-
 \newcommand{\coderef}[2]{%
-\index{\currref!\texttt{#1}}%
 \begin{codehead}[sidebyside,segmentation hidden]%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -115,7 +112,6 @@ style=numeric,
 }
 
 \newcommand{\newcoderef}[3]{%
-\index{\currref!\texttt{#1}}%
 \begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
     \mintinline{lua}{#1}%
     \tcblower%
@@ -125,17 +121,16 @@ style=numeric,
 \end{newcodehead}%
 }
 
-
 \begin{document}
 \thispagestyle{empty}
 \part{Reference}
-This part contains reference material for the classes and methods that incorporate the \texttt{luacas} package. Some classes are \emph{callable} while others are not. The callable classes are essentially the objects that a user might reasonably interact with while using \texttt{luacas}. Thankfully, most of this interaction will be filtered through a rudimentary parser. Those classes that are not callable exist for the purposes of inheritance. 
+This part contains reference material for the classes and methods that incorporate the \texttt{luacas} package. Some classes are \emph{concrete} while others are \emph{abstract}. The concrete classes are essentially the objects that a user might reasonably interact with while using \texttt{luacas}. Thankfully, most of this interaction will be filtered through a rudimentary (but functional!) parser. Abstract classes exist for the purposes of inheritance. 
 
 The classes in the diagram below are color-coded according to:
 \begin{itemize}
-    \item (\tikz[baseline=-0.5ex]\node[text=rosenavy,fill=roseblue!40]{\ttfamily\bfseries Class};) {\color{rosenavy}\ttfamily\bfseries Class}: a (callable) class belonging to the core module; 
-    \item (\tikz[baseline=-0.5ex]\node[text=rose,fill=rose!30]{\ttfamily\bfseries Class};) {\color{rose}\ttfamily\bfseries Class}: a (callable) class belonging to the algebra module; 
-    \item (\tikz[baseline=-0.5ex]\node[text=roseorange,fill=roseorange!30]{\ttfamily\bfseries Class};) {\color{roseorange}\ttfamily\bfseries Class}: a (callable) class belonging to the calculus module.
+    \item (\tikz[baseline=-0.5ex]\node[text=rosenavy,fill=roseblue!40]{\ttfamily\bfseries Class};) {\color{rosenavy}\ttfamily\bfseries Class}: a (concrete) class belonging to the core module; 
+    \item (\tikz[baseline=-0.5ex]\node[text=rose,fill=rose!30]{\ttfamily\bfseries Class};) {\color{rose}\ttfamily\bfseries Class}: a (concrete) class belonging to the algebra module; 
+    \item (\tikz[baseline=-0.5ex]\node[text=roseorange,fill=roseorange!30]{\ttfamily\bfseries Class};) {\color{roseorange}\ttfamily\bfseries Class}: a (concrete) class belonging to the calculus module.
 \end{itemize}
 Inheritance is indicated with an arrow:
 \vfill
@@ -161,23 +156,43 @@ Inheritance is indicated with an arrow:
         for tree = {font = \ttfamily\bfseries,
             draw,
             rounded corners=1pt,
-            grow'=south east,
             edge = {-stealth},
             s sep = 0.2cm}
         [Expression
             [, grow subtree = 90
-                [AtomicExpression, core = {0}, for tree = {grow=east,child anchor=west,node options={anchor=west},forked edges}, calign=last,l sep = 0.5cm, s sep = 0.2cm
-                [SymbolExpression, core={50}]
-                [ConstantExpression, core ={0}
-                    [Ring, algebra ={0}
-                        [EuclideanDomain, algebra={0}
-                            [Field, algebra = {0}
-                                [IntegerModN, algebra={30}]
-                                [Rational, algebra={30}]   
+                [AtomicExpression, 
+                    core = {0},
+                    for tree = {grow=east,
+                        child anchor=west,
+                        node options={anchor=west},
+                        forked edges},
+                        calign=last,
+                        l sep = 0.5cm,
+                        s sep = 0.2cm
+                [SymbolExpression,
+                    core={50}]
+                [ConstantExpression,
+                    core ={0},
+                    for tree = {grow = north,
+                        node options = {anchor=north}
+                    }
+                    [Ring,
+                        algebra ={0},
+                        for tree = {grow = east}
+                        [EuclideanDomain,
+                            algebra={0}
+                            [Field,
+                                algebra = {0}
+                                [IntegerModN,
+                                    algebra={30}]
+                                [Rational,
+                                    algebra={30}]   
                             ]
-                            [Integer,algebra={30}]
+                            [Integer,
+                                algebra={30}]
                         ]
-                        [PolynomialRing,algebra={30}]
+                        [PolynomialRing,
+                            algebra={30}]
                     ]
                 ]
             ]]
