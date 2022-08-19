@@ -22,6 +22,8 @@
 \usepackage{microtype}
 \usepackage[toc]{multitoc}
 
+\renewcommand{\comment}[1]{}
+
 \usepackage[
 backend=biber,
 style=numeric,
@@ -162,7 +164,8 @@ style=numeric,
 \appendix
 
 \include{latexcode.tex}
-    
+
+\comment{
 \section{Lua Documentation}
 
 This section is geared towards those who are interested in the inner workings of the Lua end of the CAS. In particular, anyone who wishes to modify or expand the CAS for their own purposes should read this.
@@ -389,6 +392,7 @@ CASparse([[
     r = int(sin(x) + 2*x^2 + 3, x, 0, 6)
 ]])
 \end{minted}
+}
 
 \newpage
 
