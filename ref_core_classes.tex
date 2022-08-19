@@ -237,6 +237,19 @@ end
     \end{minted}
 \end{itemize}
 
+The entries of \texttt{w.expressions} can be used/fetched in a reasonable way:
+\begin{codebox}
+    \begin{minted}{latex}
+\[ \print{w.expressions[1]} \]
+\[ \print{w.expressions[2]} \]
+\[ \print{w.expressions[3]} \]
+    \end{minted}
+    \tcblower
+    \[ \print{w.expressions[1]} \]
+    \[ \print{w.expressions[2]} \] 
+    \[ \print{w.expressions[3]} \]
+\end{codebox}
+
 \subsubsection*{Parsing}
 
 Thank goodness for this. Creating new \texttt{BinaryOperation}s isn't nearly as cumbersome as the above would indicate. Using Lua's powerful metamethods, we can parse expressions much more easily. For example, the construction of \texttt{w} given above can be done much more naturally using:

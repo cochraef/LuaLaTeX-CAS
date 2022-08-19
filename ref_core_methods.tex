@@ -126,27 +126,7 @@ style=numeric,
 
 \subsection{Core Methods}
 
-\coderef{function Expression:evaluate()}{return Expression}
-\index{Core!Methods!\texttt{evaluate}}
-
-Applies to an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
-
-For example, the code:
-\begin{minted}{latex}
-\directlua{
-    x = Integer(1)/Integer(2)
-    y = Integer(2)/Integer(3)
-    z = BinaryOperation(BinaryOperation.ADD,{x,y})
-}
-\[ \print{z} = \print{z:evaluate()}.\] 
-\end{minted}
-produces:
-\directlua{
-    x = Integer(1)/Integer(2)
-    y = Integer(2)/Integer(3)
-    z = BinaryOperation(BinaryOperation.ADD,{x,y})
-}
-\[ \print{z} = \print{z:evaluate()}.\]   
+Any of the methods below can be used within \mintinline{latex}{\begin{CAS}..\end{CAS}}. There are times when the parser or \LaTeX{} front-end allows for simpler syntax or usability. 
 
 \coderef{function Expression:autosimplify()}{return Expression}
 \index{Core!Methods!\texttt{autosimplify}}
@@ -203,20 +183,16 @@ For example, suppose the user inputs:
 \begin{CAS}
     w = x/y + (z/x+y/z)
 \end{CAS}
-In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()} look as follows:
+In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()}, respectively, look as follows:
 
 \begin{multicols}{2}
 \begin{center}
-    \underline{Expression tree for \texttt{w}}
-
 \parseforest{w}
 \bracketset{action character = @}
 \begin{forest}
     for tree = {font = \ttfamily}
     @\forestresult
 \end{forest}
-
-\underline{Expression tree for \texttt{w:autosimplify}}
 
 \parseforest{w:autosimplify()}
 \bracketset{action character = @}
@@ -226,7 +202,389 @@ In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()} 
 \end{forest}
 \end{center}
 \end{multicols}
-{\bf Note:} \texttt{w:autosimplify()} is exactly the same as it was before despite the different starting point. This is an essential function of \texttt{autosimplify()}.
+{\bf Note:} \texttt{w:autosimplify()} is exactly the same as it was before despite the different starting point. This is an essential function of \texttt{autosimplify()}. 
+
+\subsubsection*{Parsing}
+
+The starred variant of the \LaTeX{} command \mintinline{latex}{\print} will automatically apply the method \texttt{autosimplify()} to its argument:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    a = x+x/2
+\end{CAS}
+\[ \print{a} = \print*{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    a = x+x/2
+\end{CAS}
+\[ \print{a} = \print*{a} \] 
+\end{codebox} 
+Alternatively, you can call \texttt{autosimplify()} directly within \mintinline{latex}{\begin{CAS}..\end{CAS}}:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    a = (x+x/2):autosimplify()
+\end{CAS}
+\[ \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    a = (x+x/2):autosimplify()
+\end{CAS}
+\[ \print{a} \] 
+\end{codebox} 
+
+\coderef{function Expression:evaluate()}{return Expression}
+\index{Core!Methods!\texttt{evaluate}}
+
+Applies to an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
+
+For example, the code:
+\begin{minted}{latex}
+\directlua{
+    x = Integer(1)/Integer(2)
+    y = Integer(2)/Integer(3)
+    z = BinaryOperation(BinaryOperation.ADD,{x,y})
+}
+\[ \print{z} = \print{z:evaluate()}.\] 
+\end{minted}
+produces:
+\directlua{
+    x = Integer(1)/Integer(2)
+    y = Integer(2)/Integer(3)
+    z = BinaryOperation(BinaryOperation.ADD,{x,y})
+}
+\[ \print{z} = \print{z:evaluate()}.\]   
+
+\subsubsection*{Parsing}
+
+Arithmetic like above is done automatically:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    x = 1/2
+    y = 2/3
+    z = x+y
+\end{CAS}
+\[ z = \print{z} \]  
+\end{minted}
+\tcblower
+\begin{CAS}
+    x = 1/2
+    y = 2/3
+    z = x+y
+\end{CAS}
+\[ z = \print{z} \]  
+\end{codebox}
+
+Otherwise, the \texttt{evaluate()} method will attempt to evaluate all subexpressions, and then stop there:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS} 
+    vars('x')
+    y = diff(x^2+x,x)+diff(2*x,x)
+    y = y:evaluate()
+\end{CAS}
+\[ \print{y} \] 
+\end{minted}
+\tcblower
+\begin{CAS} 
+    vars('x')
+    y = diff(x^2+x,x)+diff(2*x,x)
+    y = y:evaluate()
+\end{CAS}
+\[ \print{y} \] 
+\end{codebox}
+Whereas \texttt{autosimplify()} will return $3+2x$; indeed, the \texttt{autosimplify()} (usually) begins by evaluating first. 
+
+\coderef{function Expression:expand()}{return Expression}
+\index{Core!Methods!\texttt{expand}}
+
+Expands an expression, turning products of sums into sums of products.
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x','y','z','w')
+    a = x+y
+    b = z+w
+    c = a*b
+\end{CAS}
+\[ \print{c} = \print{c:expand()} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x','y','z','w')
+    a = x+y
+    b = z+w
+    c = a*b
+\end{CAS}
+\[ \print{c} = \print{c:expand()} \] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+There is an \texttt{expand()} function in the parser; though it calls the \texttt{autosimplify()} method first. So, for example, \mintinline{lua}{expand(c)} is equivalent to \mintinline{lua}{c:autosimplify():expand()}. 
+
+\coderef{function Expression:factor()}{return Expression}
+\index{Core!Methods!\texttt{factor}}
+
+Factors an expression, turning sums of products into products of sums. For general \texttt{Expressions} this functionality is somewhat limited. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    a = x-1
+    b = a*x+a
+\end{CAS}
+\[ \print{b} = \print{b:factor()} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x','y')
+    a = x-y
+    b = a*x+a*y
+\end{CAS}
+\[ \print{b} = \print{b:factor()} \] 
+\end{codebox}
+On the other hand:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x','y')
+    a = x^2-y^2
+\end{CAS}
+\[ \print{a} = \print{a:factor()} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x','y')
+    a = x^2-y^2
+\end{CAS}
+\[ \print{a} = \print{a:factor()} \] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+There is a \texttt{factor()} function in the parser that is more data-aware than the basic \texttt{:factor()} method mentioned here. For example:
+\begin{codebox}
+    \begin{minted}[fontsize = \small]{latex}
+\begin{CAS}
+    x = 12512
+\end{CAS}
+\[ \print{x:factor()} = \print{factor(x)} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    x = 12512
+\end{CAS}
+\[ \print{x:factor()} = \print{factor(x)} \] 
+\end{codebox}
+
+\coderef{function Expression:freeof(symbol)}{return bool}
+\index{Core!Methods!\texttt{freeof}}
+
+Determines whether or not an expression contains a particular {\ttfamily SymbolExpression} somewhere in the tree.
+
+The method \texttt{freeof()} is quite literal. For example:
+\begin{codebox}
+\begin{minted}[fontsize=\footnotesize]{lua}
+x = SymbolExpression("foo")
+y = SymbolExpression("bar")
+z = x+y
+if z:freeof(x) then 
+    tex.print("I'm free!")
+else 
+    tex.print("I'm bound.")
+end
+\end{minted}
+\tcblower
+\directlua{
+    x = SymbolExpression("foo")
+    y = SymbolExpression("bar")
+    z = x+y
+    if z:freeof(x) then 
+        tex.print("I'm free!")
+    else 
+        tex.print("I'm bound.")
+    end
+}
+\end{codebox}
+On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("foo")} contains a single node with no edges. With nary a \mintinline{lua}{SymbolExpression("fo")} to find in such a tree, we have:
+\begin{codebox}
+    \begin{minted}[fontsize=\footnotesize]{lua}
+x = SymbolExpression("foo")
+y = SymbolExpression("fo")
+if x:freeof(y) then 
+    tex.print("I'm free!")
+else 
+    tex.print("I'm bound.")
+end
+    \end{minted}
+    \tcblower
+    \directlua{
+    x = SymbolExpression("foo")
+    y = SymbolExpression("fo")
+    if x:freeof(y) then 
+        tex.print("I'm free!")
+    else 
+        tex.print("I'm bound.")
+    end
+}
+    \end{codebox}
+
+\coderef{function Expression:isatomic()}{return bool}
+\index{Core!Methods!\texttt{isatomic}}
+
+Determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. So, for example, \texttt{Integer(5)} and \texttt{Integer(15)} are atomic, and so is \texttt{Integer(20)}. But \texttt{Integer(5)+Integer(15)} is not atomic. Here's another example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+x = SymbolExpression("x")
+y = x*x+x
+if x:isatomic() then 
+  tex.print(tostring(x),"is atomic;")
+end 
+if not y:isatomic() then 
+  tex.print(tostring(y),"is compound.")
+end
+\end{minted}
+\tcblower
+\directlua{
+x = SymbolExpression("x")
+y = x*x+x
+if x:isatomic() then 
+  tex.print(tostring(x),"is atomic;")
+end 
+if not y:isatomic() then 
+  tex.print(tostring(y),"is compound.")
+end
+}
+\end{codebox}
+Since \texttt{SymbolExpression} inherits from \texttt{AtomicExpression}, we have that \texttt{isatomic()} is taken literally as well. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small,breaklines]{lua}
+y = SymbolExpression("x*x+x")
+if not y:isatomic() then 
+    tex.print(tostring(y),"is compound.")
+else
+    tex.print("But",tostring(y),"is atomic,
+        from a certain point of view.")
+end
+\end{minted}
+\tcblower
+\directlua{
+    y = SymbolExpression("x*x+x")
+if not y:isatomic() then 
+    tex.print(tostring(y),"is compound.")
+else
+    tex.print("But",tostring(y),"is atomic,
+        from a certain point of view.")
+end
+}
+\end{codebox}
+\vskip 0.2cm
+
+\coderef{function Expression:iscomplexconstant()}{return bool}
+\index{Core!Methods!\texttt{iscomplexconstant}}
+
+Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$. It's helpful to keep in mind that, oftentimes, content needs to be simplified/evaluated in order to obtain the intended results:
+
+\begin{codebox}[]
+    \begin{minted}{lua}
+a = (Integer.one() + I) ^ Integer(2)
+if a:iscomplexconstant() then 
+    tex.print("$",a:tolatex(),"$ is a complex constant.")
+else 
+    tex.print("$",a:tolatex(),"$ is not a complex constant.")
+end
+\end{minted}
+\tcblower
+\begin{center}
+\luaexec{
+    a =  (Integer.one() + I) ^ Integer(2)
+    if a:iscomplexconstant() then 
+        tex.print("$",a:tolatex(),"$ is a complex constant.")
+    else 
+        tex.print("$",a:tolatex(),"$ is not a complex constant.")
+    end
+}
+\end{center}
+\end{codebox}
+While:
+\begin{codebox}[]
+    \begin{minted}{lua}
+a = (Integer.one()+I) ^ Integer(2)
+a = a:expand():simplify()
+if a:iscomplexconstant() then 
+    tex.print("$",a:tolatex(),"$ is a complex constant.")
+else 
+    tex.print("$",a:tolatex(),"$ is not a complex constant.")
+end
+\end{minted}
+\tcblower
+\begin{center}
+\luaexec{
+    a = (Integer.one()+I) ^ Integer(2)
+    a = a:expand():simplify()
+    if a:iscomplexconstant() then 
+        tex.print("$",a:tolatex(),"$ is a complex constant.")
+    else 
+        tex.print("$",a:tolatex(),"$ is not a complex constant.")
+    end
+}
+\end{center}
+\end{codebox}
+
+\coderef{function Expression:isconstant()}{return bool}
+\index{Core!Methods!\texttt{isconstant}}
+
+Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases. For instance:
+
+\begin{codebox}
+    \begin{minted}{lua}
+if not pi:isconstant() then 
+  tex.print("$\\pi$ is not constant.")
+end  
+\end{minted}
+\tcblower
+\luaexec{
+if not pi:isconstant() then 
+  tex.print("$\\pi$ is not constant.")
+end  
+}
+\end{codebox}
+This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
+
+\coderef{function Expression:isrealconstant()}{return bool}
+\index{Core!Methods!\texttt{isrealconstant}}
+
+Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$. For example:
+
+\begin{codebox}
+    \begin{minted}{lua}
+if pi:isrealconstant() then 
+  tex.print("$\\pi$ is a real constant.")
+end
+\end{minted}
+\tcblower
+\luaexec{
+    if pi:isrealconstant() then 
+        tex.print("$\\pi$ is a real constant.")
+    end
+}
+\end{codebox}
+
+\coderef{function Expression:setsubexpressions(subexpressions)}{return Expression}
+\index{Core!Methods!\texttt{setsubexpressions}}
+
+Creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
+
 
 \coderef{function Expression:simplify()}{return Expression}
 \index{Core!Methods!\texttt{simplify}}
@@ -274,6 +632,82 @@ And here are the corresponding expression trees:
 \end{forest}
 \end{center}
 \end{multicols}
+
+\subsubsection*{Parsing}
+
+There is a \texttt{simplify()} function for those unfamiliar with Lua methods. So, for example, \mintinline{lua}{c:simplify()} is equivalent to \mintinline{lua}{simplify(c)}.  
+
+\coderef{function Expression:size()}{return Integer}
+\index{Core!Methods!\texttt{size}}
+
+Returns the number of nodes of the tree that constitutes an expression, or roughly the total number of expression objects that make up the expression.
+
+For example, consider:
+\begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    a = (1-x+0*x)
+    b = (1+1*x)
+    c = a*b
+\end{CAS}
+\end{minted}
+\begin{CAS}
+    vars('x')
+    a = (1-x+0*x)
+    b = (1+1*x)
+    c = a*b
+\end{CAS}
+Then the expression trees for \texttt{c}, \texttt{c:autosimplify()}, and \texttt{c:simplify()} are as follows:
+
+\begin{multicols}{3}
+    \begin{center}
+        \underline{Tree for \texttt{c}:}
+\parseforest{c}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+
+\columnbreak
+
+\underline{Tree for \texttt{c:autosimplify()}:}
+\parseforest{c:autosimplify()}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+
+\columnbreak
+
+\underline{Tree for \texttt{c:simplify()}:}
+\parseforest{c:simplify()}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\end{multicols}
+Accordingly, we have:
+\begin{codebox}
+    \begin{minted}[breaklines,fontsize=\scriptsize]{lua}
+tex.print("The size of \\texttt{c} is",
+  tostring(c:size()),"\\newline")
+tex.print("The size of \\texttt{c:autosimplify()} is",
+  tostring(c:autosimplify():size()), "\\newline")
+tex.print("The size of \\texttt{c:simplify()} is",
+  tostring(c:simplify():size()))
+    \end{minted}
+    \tcblower
+    \luaexec{
+    tex.print("The size of \\texttt{c} is", tostring(c:size()),"\\newline")
+    tex.print("The size of \\texttt{c:autosimplify()} is", tostring(c:autosimplify():size()), "\\newline")
+    tex.print("The size of \\texttt{c:simplfy()} is", tostring(c:simplify():size()))
+}
+\end{codebox}
+\vskip 0.2cm
 
 \coderef{function Expression:subexpressions()}{return table<number, Expression>}
 \index{Core!Methods!\texttt{subexpressions}}
@@ -359,139 +793,10 @@ end
 \end{codebox}
 \vskip 0.2cm
 
-\coderef{function Expression:size()}{return Integer}
-\index{Core!Methods!\texttt{size}}
-
-Returns the number of nodes of the tree that constitutes an expression, or roughly the total number of expression objects that make up the expression.
-
-For example, consider:
-\begin{minted}{latex}
-\begin{CAS}
-    vars('x')
-    a = (1-x+0*x)
-    b = (1+1*x)
-    c = a*b
-\end{CAS}
-\end{minted}
-\begin{CAS}
-    vars('x')
-    a = (1-x+0*x)
-    b = (1+1*x)
-    c = a*b
-\end{CAS}
-Then the expression trees for \texttt{c}, \texttt{c:autosimplify()}, and \texttt{c:simplify()} are as follows:
-
-\begin{multicols}{3}
-    \begin{center}
-        \underline{Tree for \texttt{c}:}
-\parseforest{c}
-\bracketset{action character = @}
-\begin{forest}
-    for tree = {font = \ttfamily}
-    @\forestresult
-\end{forest}
-
-\columnbreak
-
-\underline{Tree for \texttt{c:autosimplify()}:}
-\parseforest{c:autosimplify()}
-\bracketset{action character = @}
-\begin{forest}
-    for tree = {font = \ttfamily}
-    @\forestresult
-\end{forest}
-
-\columnbreak
-
-\underline{Tree for \texttt{c:simplify()}:}
-\parseforest{c:simplify()}
-\bracketset{action character = @}
-\begin{forest}
-    for tree = {font = \ttfamily}
-    @\forestresult
-\end{forest}
-\end{center}
-\end{multicols}
-Accordingly, we have:
-\begin{codebox}
-    \begin{minted}[breaklines,fontsize=\scriptsize]{lua}
-tex.print("The size of \\texttt{c} is",
-  tostring(c:size()),"\\newline")
-tex.print("The size of \\texttt{c:autosimplify()} is",
-  tostring(c:autosimplify():size()), "\\newline")
-tex.print("The size of \\texttt{c:simplify()} is",
-  tostring(c:simplify():size()))
-    \end{minted}
-    \tcblower
-    \luaexec{
-    tex.print("The size of \\texttt{c} is", tostring(c:size()),"\\newline")
-    tex.print("The size of \\texttt{c:autosimplify()} is", tostring(c:autosimplify():size()), "\\newline")
-    tex.print("The size of \\texttt{c:simplfy()} is", tostring(c:simplify():size()))
-}
-\end{codebox}
-\vskip 0.2cm
-
-\coderef{function Expression:setsubexpressions(subexpressions)}{return Expression}
-\index{Core!Methods!\texttt{setsubexpressions}}
-
-Creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
-
-\coderef{function Expression:freeof(symbol)}{return bool}
-\index{Core!Methods!\texttt{freeof}}
-
-Determines whether or not an expression contains a particular {\ttfamily SymbolExpression} somewhere in the tree.
-
-The method \texttt{freeof()} is quite literal. For example:
-\begin{codebox}
-\begin{minted}[fontsize=\footnotesize]{lua}
-x = SymbolExpression("foo")
-y = SymbolExpression("bar")
-z = x+y
-if z:freeof(x) then 
-    tex.print("I'm free!")
-else 
-    tex.print("I'm bound.")
-end
-\end{minted}
-\tcblower
-\directlua{
-    x = SymbolExpression("foo")
-    y = SymbolExpression("bar")
-    z = x+y
-    if z:freeof(x) then 
-        tex.print("I'm free!")
-    else 
-        tex.print("I'm bound.")
-    end
-}
-\end{codebox}
-On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("foo")} contains a single node with no edges. With nary a \mintinline{lua}{SymbolExpression("fo")} to find in such a tree, we have:
-\begin{codebox}
-    \begin{minted}[fontsize=\footnotesize]{lua}
-x = SymbolExpression("foo")
-y = SymbolExpression("fo")
-if x:freeof(y) then 
-    tex.print("I'm free!")
-else 
-    tex.print("I'm bound.")
-end
-    \end{minted}
-    \tcblower
-    \directlua{
-    x = SymbolExpression("foo")
-    y = SymbolExpression("fo")
-    if x:freeof(y) then 
-        tex.print("I'm free!")
-    else 
-        tex.print("I'm bound.")
-    end
-}
-    \end{codebox}
-
 \coderef{function Expression:substitute(map)}{return Expression}
 \index{Core!Methods!\texttt{substitute}}
 
-Takes a table mapping expressions to other expressions and recursively maps each instance of an expression with its corresponding table expression.
+The input \texttt{map} is a table that maps expressions to expressions; the method then recursively maps each instance of an expression with its corresponding table expression.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -513,209 +818,15 @@ Takes a table mapping expressions to other expressions and recursively maps each
 \[ \print{z} \] 
 \end{codebox}
 
-\coderef{function Expression:expand()}{return Expression}
-\index{Core!Methods!\texttt{expand}}
+\subsubsection*{Parsing}
 
-Expands an expression, turning products of sums into sums of products.
+There is a \texttt{substitute()} function with a slightly more user-friendly syntax. In particular, 
 
-\begin{codebox}
-    \begin{minted}[fontsize=\small]{latex}
-\begin{CAS}
-    vars('x','y','z','w')
-    a = x+y
-    b = z+w
-    c = a*b
-\end{CAS}
-\[ \print{c} = \print{c:expand()} \] 
-\end{minted}
-\tcblower
-\begin{CAS}
-    vars('x','y','z','w')
-    a = x+y
-    b = z+w
-    c = a*b
-\end{CAS}
-\[ \print{c} = \print{c:expand()} \] 
-\end{codebox}
+\mintinline{lua}{(x/y):substitute({[y]=w,[x]=y})}
 
-\coderef{function Expression:factor()}{return Expression}
-\index{Core!Methods!\texttt{factor}}
+is equivalent to 
 
-Factors an expression, turning sums of products into products of sums. For general \texttt{Expressions} this functionality is somewhat limited. For example:
-\begin{codebox}
-    \begin{minted}[fontsize=\small]{latex}
-\begin{CAS}
-    vars('x')
-    a = x-1
-    b = a*x+a
-\end{CAS}
-\[ \print{b} = \print{b:factor()} \] 
-\end{minted}
-\tcblower
-\begin{CAS}
-    vars('x','y')
-    a = x-y
-    b = a*x+a*y
-\end{CAS}
-\[ \print{b} = \print{b:factor()} \] 
-\end{codebox}
-On the other hand:
-\begin{codebox}
-    \begin{minted}[fontsize=\small]{latex}
-\begin{CAS}
-    vars('x','y')
-    a = x^2-y^2
-\end{CAS}
-\[ \print{a} = \print{a:factor()} \] 
-\end{minted}
-\tcblower
-\begin{CAS}
-    vars('x','y')
-    a = x^2-y^2
-\end{CAS}
-\[ \print{a} = \print{a:factor()} \] 
-\end{codebox}
-
-
-\coderef{function Expression:isatomic()}{return bool}
-\index{Core!Methods!\texttt{isatomic}}
-
-Determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. Otherwise, an expression is \emph{compound}. Atomic expressions and compound expressions are both sub-interfaces to expressions, and all classes inherit from one of those interfaces.
-
-\begin{codebox}
-    \begin{minted}[fontsize=\small]{lua}
-x = SymbolExpression("x")
-y = x*x+x
-if x:isatomic() then 
-    tex.print("I'm atomic.")
-end 
-if not y:isatomic() then 
-    tex.print("But I'm compound.")
-end
-\end{minted}
-\tcblower
-\directlua{
-    x = SymbolExpression("x")
-    y = x*x+x
-    if x:isatomic() then 
-        tex.print("I'm atomic.")
-    end 
-    if not y:isatomic() then 
-        tex.print("But I'm compound.")
-    end
-}
-\end{codebox}
-Since \texttt{SymbolExpression} inherits from \texttt{AtomicExpression}, we have that \texttt{isatomic()} is taken literally as well. For example:
-\begin{codebox}
-    \begin{minted}[fontsize=\small]{lua}
-y = SymbolExpression("x*x+x")
-if not y:isatomic() then 
-    tex.print("But I'm compound.")
-else
-    tex.print("But I'm atomic!")
-end
-\end{minted}
-\tcblower
-\directlua{
-    y = SymbolExpression("x*x+x")
-    if not y:isatomic() then 
-        tex.print("But I'm compound.")
-    else
-        tex.print("But I'm atomic!")
-    end
-}
-\end{codebox}
-\vskip 0.2cm
-
-\coderef{function Expression:isconstant()}{return bool}
-\index{Core!Methods!\texttt{isconstant}}
-
-Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases. For instance:
-
-\begin{codebox}
-    \begin{minted}{lua}
-if not pi:isconstant() then 
-  tex.print("$\\pi$ is not constant.")
-end  
-\end{minted}
-\tcblower
-\luaexec{
-if not pi:isconstant() then 
-  tex.print("$\\pi$ is not constant.")
-end  
-}
-\end{codebox}
-This is because {\ttfamily isconstant()} is meant to check for certain autosimplification  transformations that can be performed on arbitrary {\ttfamily Ring} elements but not on those constants. Use {\ttfamily isrealconstant()} for what mathematicians think of as constants.
-
-\coderef{function Expression:isrealconstant()}{return bool}
-\index{Core!Methods!\texttt{isrealconstant}}
-
-Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$. For example:
-
-\begin{codebox}
-    \begin{minted}{lua}
-if pi:isrealconstant() then 
-  tex.print("$\\pi$ is a real constant.")
-end
-\end{minted}
-\tcblower
-\luaexec{
-    if pi:isrealconstant() then 
-        tex.print("$\\pi$ is a real constant.")
-    end
-}
-\end{codebox}
-
-\coderef{function Expression:iscomplexconstant()}{return bool}
-\index{Core!Methods!\texttt{iscomplexconstant}}
-
-Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$. It's helpful to keep in mind that, oftentimes, content needs to be simplified/evaluated in order to obtain the intended results:
-
-\begin{codebox}[]
-    \begin{minted}{lua}
-a = (Integer.one() + I) ^ Integer(2)
-if a:iscomplexconstant() then 
-    tex.print("$",a:tolatex(),"$ is a complex constant.")
-else 
-    tex.print("$",a:tolatex(),"$ is not a complex constant.")
-end
-\end{minted}
-\tcblower
-\begin{center}
-\luaexec{
-    a =  (Integer.one() + I) ^ Integer(2)
-    if a:iscomplexconstant() then 
-        tex.print("$",a:tolatex(),"$ is a complex constant.")
-    else 
-        tex.print("$",a:tolatex(),"$ is not a complex constant.")
-    end
-}
-\end{center}
-\end{codebox}
-While:
-\begin{codebox}[]
-    \begin{minted}{lua}
-a = (Integer.one()+I) ^ Integer(2)
-a = a:expand():simplify()
-if a:iscomplexconstant() then 
-    tex.print("$",a:tolatex(),"$ is a complex constant.")
-else 
-    tex.print("$",a:tolatex(),"$ is not a complex constant.")
-end
-\end{minted}
-\tcblower
-\begin{center}
-\luaexec{
-    a = (Integer.one()+I) ^ Integer(2)
-    a = a:expand():simplify()
-    if a:iscomplexconstant() then 
-        tex.print("$",a:tolatex(),"$ is a complex constant.")
-    else 
-        tex.print("$",a:tolatex(),"$ is not a complex constant.")
-    end
-}
-\end{center}
-\end{codebox}
+\mintinline{lua}{substitute({[y]=w,[x]=y}, x/y)} 
 
 \coderef{function Expression:tolatex()}{return string}
 \index{Core!Methods!\texttt{tolatex}}
@@ -766,5 +877,127 @@ or simply include the above function directly into the document via \mintinline{
 \tcblower 
 \[ \frac{\mathrm{d}}{\mathrm{d}y} \left( y + \sin\mathopen{}\left(y\right) \right).\] 
 \end{codebox}
+
+\subsubsection*{Parsing}
+
+The \LaTeX{} command \mintinline{latex}{\print} calls the method \mintinline{lua}{tolatex()} unto its argument and uses \mintinline{lua}{tex.print()} to display the results. The starred variant \mintinline{latex}{\print*} applies the \texttt{autosimplify()} method before applying \mintinline{lua}{tolatex()}. 
+
+Additionally, one can use the \texttt{disp()} function within \mintinline{latex}{\begin{CAS}..\end{CAS}}. 
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+  f = DerivativeExpression(y+sin(y),y)
+  disp(f)
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = DerivativeExpression(y+sin(y),y)
+    disp(f)
+\end{CAS}
+\end{codebox}
+
+The function \texttt{disp} takes two optional boolean arguments both are set to \texttt{false} by default. The first optional boolean controls \emph{inline} vs \emph{display} mode; the second optional boolean controls whether the method \texttt{autosimplify()} is called before printing:
+
+\begin{multicols}{3}
+    \begin{codebox}[]
+\begin{minted}{latex}
+\begin{CAS}
+    disp(f,true)
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+ disp(f,true)
+\end{CAS}
+\end{codebox}
+    \begin{codebox}[]
+\begin{minted}{latex}
+\begin{CAS}
+ disp(f,true,true)
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+ disp(f,true,true)
+\end{CAS}
+\end{codebox}
+    \begin{codebox}[]
+\begin{minted}{latex}
+\begin{CAS}
+ disp(f,false,true)
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+ disp(f,false,true)
+\end{CAS}
+\end{codebox}
+\end{multicols}
+
+
+\coderef{function Expression:topolynomial()}{return Expression | bool}
+\index{Core!Methods!\texttt{topolynomial}}
+
+Attempts to cast \texttt{Expression} into a polynomial type; there are multiple outputs. The first output is \texttt{self} or \texttt{PolynomialRing}; the second output is \mintinline{lua}{false} or \mintinline{lua}{true}, respectively. \texttt{PolynomialRing} is the name of the class that codifies univariate polynomials proper. 
+
+Polynomial computations tend to be significantly faster when those polynomials are stored as arrays of coefficients (as opposed to, say, when they are stored as generic \texttt{BinaryOperation}s). Hence the need for a method like \texttt{topolynomial()}. 
+
+{\bf Warning:} the method expects the input to be autosimplified. For example:
+\newpage
+\begin{multicols}{2}
+\begin{codebox}[]
+    \begin{minted}{latex}
+\begin{CAS}
+  vars('x')
+  f = 3+2*x+x^2
+  f,b = f:topolynomial()
+  if b then 
+    tex.print("\\[",f:tolatex(),"\\]")
+  else 
+    tex.print("womp womp")
+  end
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = 3+2*x+x^2
+    f,b = f:topolynomial()
+    if b then 
+        tex.print("\\[",f:tolatex(),"\\]")
+    else 
+        tex.print("\\[ \\text{womp womp} \\]")
+    end
+\end{CAS}
+\end{codebox}
+\begin{codebox}[]
+    \begin{minted}{latex}
+\begin{CAS}
+  vars('x')
+  f = 3+2*x+x^2
+  f,b = f:autosimplify():topolynomial()
+  if b then 
+    tex.print("\\[",f:tolatex(),"\\]")
+  else 
+    tex.print("womp womp")
+  end
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = 3+2*x+x^2
+    f,b = f:autosimplify():topolynomial()
+    if b then 
+        tex.print("\\[",f:tolatex(),"\\]")
+    else 
+        tex.print("\\[ \\text{womp womp} \\]")
+    end
+\end{CAS}
+\end{codebox}
+\end{multicols}
+
 
 \end{document}
