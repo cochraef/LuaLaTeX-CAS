@@ -14,14 +14,22 @@ function split(str, sep)
 end
 
 -- Displays an expression. For use in the parser.
-function disp(expression, inline)
+function disp(expression, inline, simp)
     if type(expression) ~= "table" then
         tex.print(tostring(expression))
     elseif expression.autosimplify then
         if inline then
-            tex.print('$' .. expression:autosimplify():tolatex() .. '$')
+            if simp then 
+                tex.print('$' .. expression:autosimplify():tolatex() .. '$')
+            else 
+                tex.print('$' .. expression:tolatex() .. '$')
+            end
         else
-            tex.print('\\[' .. expression:autosimplify():tolatex() .. '\\]')
+            if simp then
+                tex.print('\\[' .. expression:autosimplify():tolatex() .. '\\]')
+            else 
+                tex.print('\\[' .. expression:tolatex() .. '\\]')
+            end
         end
     else
         tex.print(tostring(expression))
