@@ -164,8 +164,8 @@ Inheritance is indicated with an arrow:
                     core = {0},
                     for tree = {grow=east,
                         child anchor=west,
-                        node options={anchor=west},
-                        forked edges},
+                        node options={anchor=west}},
+                        forked edges,
                         calign=last,
                         l sep = 0.5cm,
                         s sep = 0.2cm
@@ -197,19 +197,36 @@ Inheritance is indicated with an arrow:
                 ]
             ]]
             [, grow subtree = -90
-                [CompoundExpression, core = {0}, for tree = {grow=east,child anchor=west,node options={anchor=west},forked edges}, calign=last,l sep = 0.5cm, s sep = 0.2cm
-                [FunctionExpression, core = {40}
+                [CompoundExpression, 
+                    core = {0}, 
+                    for tree = {grow=east,
+                        child anchor=west,
+                        node options={anchor=west}},forked edges,
+                        calign=last,
+                        l sep = 0.5cm,
+                        s sep = 0.2cm
+                [FunctionExpression,
+                    core = {40}
                     [TrigExpression,algebra={30}]
                 ]
-                [BinaryOperation, core = {40}]
-                [Logarithm, algebra={30}]
-                [FactorialExpression, algebra={30}]
-                [RootExpression, algebra={30}]
-                [SqrtExpression, algebra={30}]
-                [AbsExpression, algebra={30}]
-                [DerivativeExpression,calculus={20}]
-                [DiffExpression, calculus={20}]
-                [IntegralExpression, calculus={20}]
+                [BinaryOperation,
+                    core = {40}]
+                [Logarithm,
+                    algebra={30}]
+                [FactorialExpression,
+                    algebra={30}]
+                [RootExpression,
+                    algebra={30}]
+                [SqrtExpression,
+                    algebra={30}]
+                [AbsExpression,
+                    algebra={30}]
+                [DerivativeExpression,
+                    calculus={20}]
+                [DiffExpression,
+                    calculus={20}]
+                [IntegralExpression,
+                    calculus={20}]
             ]]
         ]
     \end{forest}

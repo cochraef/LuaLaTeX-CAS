@@ -174,6 +174,7 @@ function Expression:getthefancyshrub()
     end
     if self:type() == IntegralExpression then 
         string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
+        string = string .. "[ $\\mathtt{"..self.symbol:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.symbol};} ]"
         if self:isdefinite() then 
             string = string .. "[ $\\mathtt{"..self.lower:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.lower};} ] "
             string = string .. "[ $\\mathtt{"..self.upper:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.upper};} ] "

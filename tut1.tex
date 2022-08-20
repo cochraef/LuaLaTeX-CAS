@@ -20,6 +20,16 @@
     \tcbuselibrary{xparse}
 \usepackage{microtype}
 
+\definecolor{rose}{RGB}{128,0,0}
+\definecolor{roseyellow}{RGB}{222,205,99}
+\definecolor{roseblue}{RGB}{167,188,214}
+\definecolor{rosenavy}{RGB}{79,117,139}
+\definecolor{roseorange}{RGB}{232,119,34}
+\definecolor{rosegreen}{RGB}{61,68,30}
+\definecolor{rosewhite}{RGB}{223,209,167}
+\definecolor{rosebrown}{RGB}{108,87,27}
+\definecolor{rosegray}{RGB}{84,88,90}
+
 \usepackage[
 backend=biber,
 style=numeric,
@@ -180,42 +190,47 @@ Here's Alice's completed code:
 \end{minted}
     
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
-\begin{codebox}[sidebyside align=top]
-    \begin{minted}{latex}
+
+\begin{minted}{latex}
 \begin{CAS}
     vars('x','h')
     f = 2*x^3-x
 \end{CAS}
-...
-    \end{minted}
-    \tcblower
-    \begin{CAS}
-        vars('x','h')
-        f = 2*x^3-x
-    \end{CAS}
-    Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
-    \begin{CAS}
-        subs = {[x] = x+h}
-        q = (f:substitute(subs) - f)/h
-    \end{CAS}
-    \[ \begin{aligned}
-        \print{q} &= 
-        \begin{CAS} 
-            q = expand(q)
-        \end{CAS}
-        \print{q}& &\text{expand/simplify} \\
-        \begin{CAS}
-            subs = {[h]=0}
-            q = q:substitute(subs)
-        \end{CAS}
-        &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\ 
-        &= 
-        \begin{CAS}
-            q = simplify(q)
-        \end{CAS}
-        \print{q}& &\text{simplify.}
-    \end{aligned} \] 
-    So $\print{diff(f,x)} = \print*{diff(f,x)}$.     
-\end{codebox}
+\end{minted}
+And here is Alice's completed project:
+\begin{tcolorbox}[colback=rose!10,
+    colframe=rose,
+    arc=1pt,
+    frame hidden]
+{\bf Tutorial 1:} {\itshape A limit definition of the derivative for Alice.}\vskip0.2cm
+
+\begin{CAS}
+vars('x','h')
+f = 2*x^3-x
+\end{CAS}
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appropriate difference quotient:
+\begin{CAS}
+subs = {[x] = x+h}
+q = (f:substitute(subs) - f)/h
+\end{CAS}
+\[ \begin{aligned}
+\print{q} &= 
+\begin{CAS} 
+    q = expand(q)
+\end{CAS}
+\print{q}& &\text{expand/simplify} \\
+\begin{CAS}
+    subs = {[h]=0}
+    q = q:substitute(subs)
+\end{CAS}
+&\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\ 
+&= 
+\begin{CAS}
+    q = simplify(q)
+\end{CAS}
+\print{q}& &\text{simplify.}
+\end{aligned} \] 
+%So $\print{diff(f,x)} = \print*{diff(f,x)}$.
+\end{tcolorbox}
 
 \end{document}

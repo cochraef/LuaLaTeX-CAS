@@ -20,6 +20,7 @@
     \tcbuselibrary{xparse,documentation}
 \usepackage{microtype}
 \usepackage{makeidx}
+\usepackage{fontawesome}
 
 \usepackage[
 backend=biber,
@@ -162,9 +163,9 @@ tex.sprint("The Lua variable 'foo' is the SymbolExpression: ", foo:tolatex(),"."
 }
 \end{codebox}
 
-\subsubsection*{Attributes}
+\subsubsection*{Fields}
 
-\texttt{SymbolExpression}s have only one attribute: \texttt{symbol}. In the example above, the string \mintinline{lua}{"bar"} is stored in \mintinline{lua}{foo.bar}. 
+\texttt{SymbolExpression}s have only one field: \texttt{symbol}. In the example above, the string \mintinline{lua}{"bar"} is stored in \mintinline{lua}{foo.bar}. 
 
 \subsubsection*{Parsing}
 
@@ -223,9 +224,9 @@ The instance variable \texttt{operation} must be a function \mintinline{lua}{fun
 \end{itemize}
 The instance variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
 
-\subsubsection*{Attributes}
+\subsubsection*{Fields}
 
-\texttt{BinaryOperation}s have the following attributes: \texttt{name}, \texttt{operation}, and \texttt{expressions}. In the example above, we have:
+\texttt{BinaryOperation}s have the following fields: \texttt{name}, \texttt{operation}, and \texttt{expressions}. In the example above, we have:
 \begin{itemize}
     \item the variable \texttt{expressions} is stored in \mintinline{lua}{w.expressions};
     \item \mintinline{lua}{w.name} stores the string \mintinline{lua}{"+"}; and 
@@ -269,8 +270,8 @@ tex.print("\\[w=", w:tolatex(), "\\]")
 
 {\bf Warning:} there are escape issues to be aware of with the operator \mintinline{latex}{%}. If you're writing custom \texttt{luacas} functions in a separate \texttt{.lua} file, then there are no issues; use \mintinline{latex}{%} with reckless abandon. But when using the operator \mintinline{latex}{%} within, say \mintinline{latex}{\begin{CAS}..\end{CAS}}, then one should write \mintinline{latex}{\%} in place of \mintinline{latex}{%}:
 
-\begin{codebox}[]
-\begin{minted}{latex}
+\begin{codebox}
+\begin{minted}[breaklines]{latex}
 \begin{CAS}
     a = 17
     b = 5
@@ -284,7 +285,8 @@ tex.print("\\[w=", w:tolatex(), "\\]")
     b = 5
     c = a \% b
 \end{CAS}
-\[ \print{c} \equiv \print{a} \bmod{\print{b}} \] 
+\[ \print{c} \equiv 
+    \print{a} \bmod{\print{b}} \] 
 \end{codebox}
 The above escape will {\bf not} work with \mintinline{latex}{\directlua}, but it will work for \mintinline{latex}{\luaexec} from the \texttt{luacode} package. Indeed, the \texttt{luacode} package was designed (in part) to make escapes like this more manageable. Here is the equivalent code using \mintinline{latex}{\luaexec}:
 \begin{codebox}[]
@@ -324,13 +326,13 @@ tex.print("\\[",f:tolatex(),"\\]")
 \end{codebox}
 The variable \texttt{name} can be a string (like above), or another \texttt{SymbolExpression}. But in this case, the variable \texttt{name} just takes the value of the string \mintinline{lua}{SymbolExpression.symbol}. The variable \texttt{expressions} must be a table of \texttt{Expression}s indexed by Lua numbers.
 
-\subsubsection*{Attributes}
-\texttt{FunctionExpression}s have the following attributes: \texttt{name}, \texttt{expressions}, \texttt{variables}, \texttt{derivatives}. In the example above, we have:
+\subsubsection*{Fields}
+\texttt{FunctionExpression}s have the following fields: \texttt{name}, \texttt{expressions}, \texttt{variables}, \texttt{derivatives}. In the example above, we have:
 \begin{itemize}
     \item the variable \texttt{name}, i.e. the string \mintinline{lua}{'f'}, is stored in \mintinline{lua}{f.name}; and
     \item the variable \texttt{expressions}, i.e. the table \mintinline{lua}{{x,y}} is stored in \mintinline{lua}{f.expressions}.
 \end{itemize}
-Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The attribute \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$ or $x_1,x_2,\ldots$. For example:
+Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The field \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$ or $x_1,x_2,\ldots$. For example:
 
 \begin{codebox}
     \begin{minted}{lua}
@@ -351,9 +353,9 @@ end
     end
 }
 \end{codebox}
-The attribute \texttt{derivatives} is a table of \texttt{Integer}s index by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of (\texttt{Integer}) zeros. So for the example above, we have:
+The field \texttt{derivatives} is a table of \texttt{Integer}s index by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of (\texttt{Integer}) zeros. So for the example above, we have:
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 for _,integer in ipairs(f.derivatives) do 
   if integer == Integer.zero() then
     tex.print("I'm a zero.\\newline")

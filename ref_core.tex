@@ -155,8 +155,13 @@ rect/.style = {rectangle split,
 \begin{center}
     \begin{forest}
         for tree = {node options={align=left},
-                           rect
-                    }
+                           rect,
+                           grow= south,
+                           parent anchor=south,
+                           child anchor=north,
+                           edge = {-stealth}
+                    },
+                    forked edges
         [Expression\nodepart{two}\begin{minipage}{0.5\textwidth}\vskip-0.2cm\begin{multicols}{2}
             {\error evaluate()} \\
             {\error autosimplify()} \\  

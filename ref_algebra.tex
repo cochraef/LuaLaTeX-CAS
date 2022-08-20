@@ -181,7 +181,8 @@ rectalg/.style = {rectangle split,
     \begin{forest}
         for tree = {node options={align=left},
             edge = {-stealth}
-        }
+        },
+        forked edges
         [Expression\nodepart{two}$\cdots$,rectcore={0}
             [AtomicExpression\nodepart{two}$\cdots$,rectcore={0}
                 [SymbolExpression\nodepart{two}$\cdots$,rectcore={50}]
@@ -282,10 +283,10 @@ Here is a diagram of the classes in the algebra module that fall under (accordin
     \begin{forest}
         for tree = {node options={align=left},
                     grow = south,
-                    forked edges,
                     edge = {-stealth},
                     child anchor = west
-                    }
+                    },
+        forked edges
         [Expression\nodepart{two}$\cdots$,
             rectcore={0}
             [CompoundExpression\nodepart{two}

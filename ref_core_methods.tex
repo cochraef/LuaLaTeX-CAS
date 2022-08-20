@@ -263,7 +263,7 @@ produces:
 
 \subsubsection*{Parsing}
 
-Arithmetic like above is done automatically:
+Arithmetic like above is actually done automatically (via the \texttt{Ring} interface):
 \begin{codebox}
     \begin{minted}{latex}
 \begin{CAS}
@@ -580,6 +580,73 @@ end
 }
 \end{codebox}
 
+\coderef{function Expression:order(Expression)}{return boolean}
+\index{Core!Methods!\texttt{order}}
+
+For the goals of autosimplification, \texttt{Expression}s must be ordered. \texttt{Expression:order(other)} method returns \mintinline{lua}{true} if \texttt{Expression} is ``less than'' \texttt{other} according to this ordering. On certain classes, the ordering intuitive:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+a = 4
+b = 3
+if a:order(2) then 
+    tex.print(a:tolatex(),
+    "is less than",
+    b:tolatex())
+else 
+    tex.print(b:tolatex(),
+        "is less than",
+         a:tolatex())
+end
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 4
+    b = 3
+    if a:order(2) then 
+        tex.print(a:tolatex(),
+        "is less than",
+        b:tolatex())
+    else 
+        tex.print(b:tolatex(),
+            "is less than",
+             a:tolatex())
+    end
+\end{CAS}
+\end{codebox}
+
+On \texttt{SymbolExpression}s, the ordering is lexigraphic:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+vars('x','y')
+if y:order(x) then 
+    tex.print(y:tolatex(),
+    "is less than",
+    x:tolatex())
+else 
+    tex.print(x:tolatex(),
+        "is less than",
+         y:tolatex())
+end
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x','y')
+    if y:order(x) then 
+        tex.print(y:tolatex(),
+        "is less than",
+        x:tolatex())
+    else 
+        tex.print(x:tolatex(),
+            "is less than",
+             y:tolatex())
+    end
+\end{CAS}
+\end{codebox}
+
+Of course, inter-class comparisons can be made as well -- but these are predominantly dictated by typesetting conventions. 
+
 \coderef{function Expression:setsubexpressions(subexpressions)}{return Expression}
 \index{Core!Methods!\texttt{setsubexpressions}}
 
@@ -610,28 +677,6 @@ The code above produces:
     c = a*b
 \end{CAS}
 \[ \print{c} = \print{c:autosimplify()} = \print{c:simplify()}. \] 
-And here are the corresponding expression trees:
-\begin{multicols}{2}
-\begin{center}
-    \underline{Expression tree for \texttt{c:autosimplify()}}
-
-\parseforest{c:autosimplify()}
-\bracketset{action character = @}
-\begin{forest}
-    for tree = {font = \ttfamily}
-    @\forestresult
-\end{forest}
-
-\underline{Expression tree for \texttt{c:simplify()}}
-    
-\parseforest{c:simplify()}
-\bracketset{action character = @}
-\begin{forest}
-    for tree = {font = \ttfamily}
-    @\forestresult
-\end{forest}
-\end{center}
-\end{multicols}
 
 \subsubsection*{Parsing}
 
@@ -712,24 +757,24 @@ tex.print("The size of \\texttt{c:simplify()} is",
 \coderef{function Expression:subexpressions()}{return table<number, Expression>}
 \index{Core!Methods!\texttt{subexpressions}}
 
-Returns a list of all subexpressions of an expression. This gives a unified interface to the instance variables for subexpressions, which have different names across classes.
-
-For example, consider:
-\begin{minted}{latex}
+Returns a list of all subexpressions of an expression. This gives a unified interface to the instance variables for subexpressions, which have different names across classes. For example, consider:
+\begin{codebox}
+\begin{minted}[breaklines,fontsize=\footnotesize]{latex}
 \begin{CAS}
     vars('x','y','z')
     a = x*y+y*z
     b = int(sin(x),x,0,pi/2)
 \end{CAS}
-\[ a = \print{a} \qquad \text{and} \qquad b=\print{b}.\] 
+\[ a = \print{a} \quad \text{and} \quad b=\print{b}.\] 
 \end{minted}
-This code produces:
+\tcblower
 \begin{CAS}
     vars('x','y','z')
     a = x*y+y*z
-    b = int(sin(x),x,0,pi)
+    b = int(sin(x),x,0,pi/2)
 \end{CAS}
-\[ a = \print{a} \qquad \text{and} \qquad b=\print{b}.\] 
+\[ a = \print{a} \quad \text{and} \quad b=\print{b}.\] 
+\end{codebox}
 Here are the expression shrubs for \texttt{a} and \texttt{b}:
 
 \begin{multicols}{2}
@@ -944,8 +989,8 @@ Attempts to cast \texttt{Expression} into a polynomial type; there are multiple 
 
 Polynomial computations tend to be significantly faster when those polynomials are stored as arrays of coefficients (as opposed to, say, when they are stored as generic \texttt{BinaryOperation}s). Hence the need for a method like \texttt{topolynomial()}. 
 
-{\bf Warning:} the method expects the input to be autosimplified. For example:
-\newpage
+{\bf Warning:} the \texttt{topolynomial()} method expects the input to be autosimplified. For example:
+
 \begin{multicols}{2}
 \begin{codebox}[]
     \begin{minted}{latex}
@@ -998,6 +1043,57 @@ Polynomial computations tend to be significantly faster when those polynomials a
 \end{CAS}
 \end{codebox}
 \end{multicols}
+
+\coderef{function Expression:type()}{return Expression | bool}
+\index{Core!Methods!\texttt{type}}
+
+Returns the \mintinline{lua}{__index} metatable for \texttt{Expression}. In other words, this function returns the type of \texttt{Expression}. Here's typical usage:
+
+\begin{codebox}
+    \begin{minted}[breaklines]{latex}
+\begin{CAS}
+  vars('x')
+  if x:type() == SymbolExpression then 
+    tex.print(x:tolatex(), "is a SymbolExpression.")
+  end
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    if x:type() == SymbolExpression then 
+        tex.print(x:tolatex(), "is a SymbolExpression.")
+    end
+\end{CAS}
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The \LaTeX{} command \mintinline{latex}{\whatis} can be used to print the type of \texttt{Expression}:
+
+\begin{codebox}
+    \begin{minted}{latex}
+x is a \whatis{x}
+    \end{minted}
+    \tcblower
+    x is a \whatis{x}
+\end{codebox}
+
+Alternatively, there's a \mintinline{lua}{whatis()} function and a \mintinline{lua}{longwhatis()} function that can be called within a Lua environment (like \mintinline{latex}{\directlua} or \mintinline{latex}{\luaexec}):
+
+\begin{codebox}
+\begin{minted}{lua}
+tex.print(whatis(x), '\\newline')
+tex.print(longwhatis(x))
+\end{minted}
+\tcblower
+\directlua{
+    tex.print(whatis(x), '\\newline')
+    tex.print(longwhatis(x))
+}
+\end{codebox}
+
+
 
 
 \end{document}
