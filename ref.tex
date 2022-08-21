@@ -133,8 +133,6 @@ The classes in the diagram below are color-coded according to:
     \item (\tikz[baseline=-0.5ex]\node[text=roseorange,fill=roseorange!30]{\ttfamily\bfseries Class};) {\color{roseorange}\ttfamily\bfseries Class}: a (concrete) class belonging to the calculus module.
 \end{itemize}
 Inheritance is indicated with an arrow:
-\vfill
-
 
 \forestset{multiple directions/.style={for tree={#1}, phantom, for relative level=1{no edge, delay={!c.content/.pgfmath=content("!u")}, before computing xy={l=0,s=0}}},
     multiple directions/.default={},
@@ -231,6 +229,6 @@ Inheritance is indicated with an arrow:
         ]
     \end{forest}
 \end{center}
-\vfill
+Every object in \texttt{luacas} is an expression, meaning it inherits from the {\ttfamily Expression} type (class). Since the {\ttfamily Expression} type itself has no constructor and cannot be instantiated, it it closer to an interface in Java OOP terms.\footnote{In reality, interfaces are unnecessary in Lua due to its weak typing - Lua doesn't check whether an object has a method at compile time. The {\ttfamily Expression} type is really an abstract class in Java terms, but we will call it an interface for simplicity.} {\ttfamily Expression}s can store any number of other expressions as sub-expressions, depending on type. This means that {\ttfamily Expression} objects are really trees. Types that inherit from {\ttfamily Expression} that can not store other expressions are called \emph{atomic expressions}, and correspond to the leaf nodes of the tree. Other expression types are \emph{compound expressions}. Thus, every {\ttfamily Expression} type inherits from one of {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression}. The {\ttfamily ConstantExpresssion} interface is a subinterface to {\ttfamily AtomicExpression}. Types that inherit from {\ttfamily ConstantExpression} roughly correspond to numbers (interpreted broadly). 
 
 \end{document}

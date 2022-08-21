@@ -187,21 +187,21 @@ rectalg/.style = {rectangle split,
             [AtomicExpression\nodepart{two}$\cdots$,rectcore={0}
                 [SymbolExpression\nodepart{two}$\cdots$,rectcore={50}]
                 [ConstantExpression\nodepart{two}$\cdots$,rectcore={0}
-                    [Ring\nodepart{two}\begin{minipage}{0.75\textwidth}\begin{multicols}{3}
-                    :getring()\\
-                    :inring(ring)\\
-                    :iscommutative()\\
-                    :add(b)\\
+                    [Ring\nodepart{two}\begin{minipage}{0.45\textwidth}\begin{multicols}{3}
+                    {\error :getring}\\
+                    {\error :inring(ring)}\\
+                    {\error :iscommutative}\\
+                    {\error :add(b)}\\
                     :sub(b)\\
-                    :neg(b)\\
-                    :mul(b)\\
+                    {\error :neg(b)}\\
+                    {\error :mul(b)}\\
                     :pow(n)\\
-                    :eq(b)\\
-                    :lt(b)\\
-                    :le(b)\\
-                    :zero()\\
-                    :one()\\
-                    .makering\\
+                    {\error :eq(b)}\\
+                    {\error :lt(b)}\\
+                    {\error :le(b)}\\
+                    {\error :zero()}\\
+                    {\error :one()}\\
+                    {\error .makering}\\
                     .resultantring
                     \end{multicols}\end{minipage}
                     ,rectalg={0}
@@ -214,7 +214,7 @@ rectalg/.style = {rectangle split,
                             .resultantmulti\\
                             .monicgcdremainders\\
                             .partialfractions\\
-                            :isatomic\\
+                            %:isatomic\\
                             :new\\
                             .mul{\textunderscore}rec\\
                             :divremainder\\
@@ -231,7 +231,7 @@ rectalg/.style = {rectangle split,
                             $\cdots$
                             ,rectalg={30}]
                         [EuclideanDomain\nodepart{two}
-                            :divremainder\\
+                            {\error :divremainder}\\
                             :iscommutative
                         ,rectalg={0}
                             [Integer\nodepart{two}

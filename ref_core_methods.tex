@@ -130,6 +130,7 @@ Any of the methods below can be used within \mintinline{latex}{\begin{CAS}..\end
 
 \coderef{function Expression:autosimplify()}{return Expression}
 \index{Core!Methods!\texttt{autosimplify}}
+\addcontentsline{toc}{subsubsection}{\ttfamily autosimplify}
 
 Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method calls the {\ttfamily evaluate()} method first.
 
@@ -241,6 +242,7 @@ Alternatively, you can call \texttt{autosimplify()} directly within \mintinline{
 
 \coderef{function Expression:evaluate()}{return Expression}
 \index{Core!Methods!\texttt{evaluate}}
+\addcontentsline{toc}{subsubsection}{\ttfamily evaluate}
 
 Applies to an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
 
@@ -304,6 +306,7 @@ Whereas \texttt{autosimplify()} will return $3+2x$; indeed, the \texttt{autosimp
 
 \coderef{function Expression:expand()}{return Expression}
 \index{Core!Methods!\texttt{expand}}
+\addcontentsline{toc}{subsubsection}{\ttfamily expand}
 
 Expands an expression, turning products of sums into sums of products.
 
@@ -333,6 +336,7 @@ There is an \texttt{expand()} function in the parser; though it calls the \textt
 
 \coderef{function Expression:factor()}{return Expression}
 \index{Core!Methods!\texttt{factor}}
+\addcontentsline{toc}{subsubsection}{\ttfamily factor}
 
 Factors an expression, turning sums of products into products of sums. For general \texttt{Expressions} this functionality is somewhat limited. For example:
 \begin{codebox}
@@ -388,6 +392,7 @@ There is a \texttt{factor()} function in the parser that is more data-aware than
 
 \coderef{function Expression:freeof(symbol)}{return bool}
 \index{Core!Methods!\texttt{freeof}}
+\addcontentsline{toc}{subsubsection}{\ttfamily freeof}
 
 Determines whether or not an expression contains a particular {\ttfamily SymbolExpression} somewhere in the tree.
 
@@ -440,6 +445,7 @@ end
 
 \coderef{function Expression:isatomic()}{return bool}
 \index{Core!Methods!\texttt{isatomic}}
+\addcontentsline{toc}{subsubsection}{\ttfamily isatomic}
 
 Determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. So, for example, \texttt{Integer(5)} and \texttt{Integer(15)} are atomic, and so is \texttt{Integer(20)}. But \texttt{Integer(5)+Integer(15)} is not atomic. Here's another example:
 
@@ -492,6 +498,7 @@ end
 
 \coderef{function Expression:iscomplexconstant()}{return bool}
 \index{Core!Methods!\texttt{iscomplexconstant}}
+\addcontentsline{toc}{subsubsection}{\ttfamily iscomplexconstant}
 
 Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$. It's helpful to keep in mind that, oftentimes, content needs to be simplified/evaluated in order to obtain the intended results:
 
@@ -543,6 +550,7 @@ end
 
 \coderef{function Expression:isconstant()}{return bool}
 \index{Core!Methods!\texttt{isconstant}}
+\addcontentsline{toc}{subsubsection}{\ttfamily isconstant}
 
 Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases. For instance:
 
@@ -563,6 +571,7 @@ This is because {\ttfamily isconstant()} is meant to check for certain autosimpl
 
 \coderef{function Expression:isrealconstant()}{return bool}
 \index{Core!Methods!\texttt{isrealconstant}}
+\addcontentsline{toc}{subsubsection}{\ttfamily isrealconstant}
 
 Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$. For example:
 
@@ -582,6 +591,7 @@ end
 
 \coderef{function Expression:order(Expression)}{return boolean}
 \index{Core!Methods!\texttt{order}}
+\addcontentsline{toc}{subsubsection}{\ttfamily order}
 
 For the goals of autosimplification, \texttt{Expression}s must be ordered. \texttt{Expression:order(other)} method returns \mintinline{lua}{true} if \texttt{Expression} is ``less than'' \texttt{other} according to this ordering. On certain classes, the ordering intuitive:
 
@@ -649,12 +659,14 @@ Of course, inter-class comparisons can be made as well -- but these are predomin
 
 \coderef{function Expression:setsubexpressions(subexpressions)}{return Expression}
 \index{Core!Methods!\texttt{setsubexpressions}}
+\addcontentsline{toc}{subsubsection}{\ttfamily setsubexpressions}
 
 Creates a copy of an expression with the list of subexpressions as its new subexpressions. This can reduce code duplication in other methods.
 
 
 \coderef{function Expression:simplify()}{return Expression}
 \index{Core!Methods!\texttt{simplify}}
+\addcontentsline{toc}{subsubsection}{\ttfamily simplify}
 
 Performs more extensive simplification of an expression. This may be slow, so this function is separate from autosimplification and is not called unless the user specifically directs the CAS to do so. The method aims to find an expression tree equivalent to the one given that is ``smaller'' in size as measured by the number of nodes in the expression tree. 
 
@@ -684,6 +696,7 @@ There is a \texttt{simplify()} function for those unfamiliar with Lua methods. S
 
 \coderef{function Expression:size()}{return Integer}
 \index{Core!Methods!\texttt{size}}
+\addcontentsline{toc}{subsubsection}{\ttfamily size}
 
 Returns the number of nodes of the tree that constitutes an expression, or roughly the total number of expression objects that make up the expression.
 
@@ -756,6 +769,7 @@ tex.print("The size of \\texttt{c:simplify()} is",
 
 \coderef{function Expression:subexpressions()}{return table<number, Expression>}
 \index{Core!Methods!\texttt{subexpressions}}
+\addcontentsline{toc}{subsubsection}{\ttfamily subexpressions}
 
 Returns a list of all subexpressions of an expression. This gives a unified interface to the instance variables for subexpressions, which have different names across classes. For example, consider:
 \begin{codebox}
@@ -840,6 +854,7 @@ end
 
 \coderef{function Expression:substitute(map)}{return Expression}
 \index{Core!Methods!\texttt{substitute}}
+\addcontentsline{toc}{subsubsection}{\ttfamily substitute}
 
 The input \texttt{map} is a table that maps expressions to expressions; the method then recursively maps each instance of an expression with its corresponding table expression.
 
@@ -875,6 +890,7 @@ is equivalent to
 
 \coderef{function Expression:tolatex()}{return string}
 \index{Core!Methods!\texttt{tolatex}}
+\addcontentsline{toc}{subsubsection}{\ttfamily tolatex}
 
 Converts an expression to \LaTeX{} code. Some folks have strong feelings about how certain things are typeset. Case and point, which of these is your favorite:
 \[ \int \sin(\frac{y}{2})dy \qquad \int \sin\left( \frac{y}{2} \right)dy \qquad \int \sin\left( \frac{y}{2} \right)\, dy \qquad \int \sin\!\left( \frac{y}{2} \right)\, dy \qquad \int \sin\!\left( \frac{y}{2} \right) \mathop{\mathrm{d}y} \qquad \int \sin\mathopen{}\left( \frac{y}{2} \right) \mathop{dy} \quad ?\]
@@ -984,8 +1000,9 @@ The function \texttt{disp} takes two optional boolean arguments both are set to 
 
 \coderef{function Expression:topolynomial()}{return Expression | bool}
 \index{Core!Methods!\texttt{topolynomial}}
+\addcontentsline{toc}{subsubsection}{\ttfamily topolynomial}
 
-Attempts to cast \texttt{Expression} into a polynomial type; there are multiple outputs. The first output is \texttt{self} or \texttt{PolynomialRing}; the second output is \mintinline{lua}{false} or \mintinline{lua}{true}, respectively. \texttt{PolynomialRing} is the name of the class that codifies univariate polynomials proper. 
+Attempts to cast \texttt{Expression} into a polynomial type ({\ttfamily PolynomialRing}); there are multiple outputs. The first output is \texttt{self} or \texttt{PolynomialRing}; the second output is \mintinline{lua}{false} or \mintinline{lua}{true}, respectively. \texttt{PolynomialRing} is the name of the class that codifies univariate polynomials proper. 
 
 Polynomial computations tend to be significantly faster when those polynomials are stored as arrays of coefficients (as opposed to, say, when they are stored as generic \texttt{BinaryOperation}s). Hence the need for a method like \texttt{topolynomial()}. 
 
@@ -1046,6 +1063,7 @@ Polynomial computations tend to be significantly faster when those polynomials a
 
 \coderef{function Expression:type()}{return Expression | bool}
 \index{Core!Methods!\texttt{type}}
+\addcontentsline{toc}{subsubsection}{\ttfamily type}
 
 Returns the \mintinline{lua}{__index} metatable for \texttt{Expression}. In other words, this function returns the type of \texttt{Expression}. Here's typical usage:
 

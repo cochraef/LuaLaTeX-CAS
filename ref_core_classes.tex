@@ -126,19 +126,19 @@ style=numeric,
 
 \subsection{Core Classes}
 
-There are several classes in the core module; but only some classes are callable:
+There are several classes in the core module; but only some classes are concrete:
 
 \begin{multicols}{2}
     \begin{center}
-        \underline{Non-callable classes:}
+        \underline{Abstract classes:}
     \begin{itemize}
         \item \texttt{Expression}
         \item \texttt{AtomicExpression}
-        \item \texttt{ConstantExpression}
         \item \texttt{CompoundExpression}
+        \item \texttt{ConstantExpression}
     \end{itemize}
 
-        \underline{Callable classes:}
+        \underline{Concrete classes:}
     \begin{itemize}
         \item \texttt{SymbolExpression}
         \item \texttt{BinaryOperation}
@@ -147,8 +147,11 @@ There are several classes in the core module; but only some classes are callable
 \end{center}
 \end{multicols}
 
+The abstract classes are setup for inheritance. \emph{Every} expression in \texttt{luacas} inherits from either {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression} which, in turn, inherit from {\ttfamily Expression}. 
+
 \coderef{function SymbolExpression:new(string)}{return SymbolExpression}
 \index{Core!Classes!\texttt{SymbolExpression}}
+\addcontentsline{toc}{subsubsection}{\ttfamily SymbolExpression}
 
 Creates a new \texttt{SymbolExpression}. For example:
 \begin{codebox}[]
@@ -184,6 +187,7 @@ y = SymbolExpression("y")
 
 \newcoderef{function BinaryOperation:new(operation, expressions)}{return BinaryOperation}{operation function, expressions table<number,Expression>}
 \index{Core!Classes!\texttt{BinaryOperation}}
+\addcontentsline{toc}{subsubsection}{\ttfamily BinaryOperation}
 
 Creates a new \texttt{BinaryOperation}. For example:
 
@@ -213,15 +217,22 @@ tex.print("\\[w=",w:tolatex(),"\\]")
 }
 \end{codebox}
 The instance variable \texttt{operation} must be a function \mintinline{lua}{function f(a,b)} assigned to one of the following types:
-\begin{itemize}
-    \item \texttt{BinaryOperation.ADD}: \mintinline{lua}{return a + b}
-    \item \texttt{BinaryOperation.SUB}: \mintinline{lua}{return a - b}
-    \item \texttt{BinaryOperation.MUL}: \mintinline{lua}{return a * b}
-    \item \texttt{BinaryOperation.DIV}: \mintinline{lua}{return a / b}
-    \item \texttt{BinaryOperation.IDIV}: \mintinline{lua}{return a // b}
-    \item \texttt{BinaryOperation.MOD}: \mintinline{lua}{return a % b}
-    \item \texttt{BinaryOperation.POW}: \mintinline{lua}{return a ^ b}
-\end{itemize}
+\bgroup
+\setdescription{style=multiline,
+        topsep=10pt,
+        leftmargin=4.5cm,
+        font=\ttfamily
+        }
+\begin{description}
+    \item[BinaryOperation.ADD:] \mintinline{lua}{return a + b}
+    \item[BinaryOperation.SUB:] \mintinline{lua}{return a - b}
+    \item[BinaryOperation.MUL:] \mintinline{lua}{return a * b}
+    \item[BinaryOperation.DIV:] \mintinline{lua}{return a / b}
+    \item[BinaryOperation.IDIV:] \mintinline{lua}{return a // b}
+    \item[BinaryOperation.MOD:] \mintinline{lua}{return a % b}
+    \item[BinaryOperation.POW:] \mintinline{lua}{return a ^ b}
+\end{description}
+\egroup
 The instance variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
 
 \subsubsection*{Fields}
@@ -309,6 +320,7 @@ tex.print("\\[", c:tolatex(), "\\equiv", a:tolatex(), "\\bmod{", b:tolatex(), "}
 
 \newcoderef{function FunctionExpression:new(name,expressions)}{return FunctionExpression}{name string|SymbolExpression, expressions table<number,Expression>}
 \index{Core!Classes!\texttt{FunctionExpression}}
+\addcontentsline{toc}{subsubsection}{\ttfamily FunctionExpression}
 
 Creates a generic function. For example:
 \begin{codebox}

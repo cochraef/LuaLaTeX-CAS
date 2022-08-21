@@ -140,7 +140,7 @@ style=numeric,
         \item {\ttfamily\itshape method}: a new method or an old method that does something different than what it inherits;
         \item {\tikz[baseline=-0.5ex]\node[fill=roseblue!50] {\ttfamily\bfseries Class};}: a callable class.
     \end{itemize}
-    \vfill
+
 \forestset{
 rect/.style = {rectangle split,
                rectangle split parts=2,
@@ -237,5 +237,13 @@ rect/.style = {rectangle split,
         ]
     \end{forest}
 \end{center}
-\vfill
+The number of core methods should generally be kept small, since every new type of expression must implement all of these methods. The exception to this, of course, is core methods that call other core methods that provide a unified interface to expressions. For instance, {\ttfamily size()} calls {\ttfamily subexpressions()}, so it only needs to be implemented in the expression interface.
+
+All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. As mentioned previously, metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
+
+\begin{itemize}
+    \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua (and elsewhere...). 
+    
+    \item {\ttfamily \_\_eq} determines whether an expression is structurally identical to another expression.
+\end{itemize}
 \end{document}
