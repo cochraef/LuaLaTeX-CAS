@@ -10,7 +10,7 @@ __Integer = {}
 --------------------------
 
 -- The length of each digit in base 10. 10^15 < 2^53 < 10^16, so 15 is the highest value that will work with double-percision numbers.
--- For multiplication to work properly, however, this also must be even so we can take the square root of the digit size exaxtly.
+-- For multiplication to work properly, however, this also must be even so we can take the square root of the digit size exactly.
 -- 10^14 is still larger than 2^26, so it is still efficient to do multiplication this way.
 Integer.DIGITLENGTH = 14
 -- The maximum size for a digit. While this doesn't need to be a power of 10, it makes implementing converting to and from strings much easier.
