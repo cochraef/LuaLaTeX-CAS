@@ -261,8 +261,13 @@ function PolynomialRing:tolatex()
         while loc >=0 do 
             local coeff = self.coefficients[loc]
             if coeff == Integer.one() then 
-                out = out .. "+"
-                goto continue
+                if loc == 0 then 
+                    out = out .. "+" .. coeff:tolatex()
+                    goto skip
+                else
+                    out = out .. "+"
+                    goto continue
+                end
             end
             if coeff < Integer.zero() then 
                 out = out .. "-" .. coeff:neg():tolatex()
@@ -297,11 +302,11 @@ function PolynomialRing:tolatex()
 end
 
 function PolynomialRing:isatomic() 
-    if self.degree >= Integer.one() then 
-        return false
-    else
+    --if self.degree >= Integer.one() then 
+    --    return false
+    --else
         return true
-    end
+    --end
 end
 
 -- Creates a new polynomial ring given an array of coefficients and a symbol
@@ -315,10 +320,10 @@ function PolynomialRing:new(coefficients, symbol, degree)
     o.coefficients = {}
     o.degree = degree or Integer(-1)
 
-    if type(symbol) ~= "string" then
+    if type(symbol) ~= "string" and not symbol.symbol then
         error("Symbol must be a string")
     end
-    o.symbol = symbol
+    o.symbol = symbol.symbol or symbol
 
     -- Determines what ring the polynomial ring should have as its child
     for index, coefficient in pairs(coefficients) do
