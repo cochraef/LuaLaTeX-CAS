@@ -175,6 +175,12 @@ function IntegerModN:one()
     return IntegerModN(Integer.one(), self.modulus)
 end
 
+--- @return string
+function IntegerModN:tolatex()
+    local out = self.element:tolatex()
+    out = out .. '\\bmod{' .. self.modulus:tolatex() .. '}'
+    return out
+end
 -----------------
 -- Inheritance --
 -----------------
