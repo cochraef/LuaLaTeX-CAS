@@ -60,7 +60,6 @@ function Rational:reduce()
     local gcd = Integer.gcd(self.numerator, self.denominator)
     self.numerator = self.numerator//gcd
     self.denominator = self.denominator//gcd
-
 end
 
 
