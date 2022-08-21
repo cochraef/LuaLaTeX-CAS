@@ -119,6 +119,10 @@ function combine(expr)
     return expr:combine()
 end
 
+function Mod(i,n)
+    return IntegerModN(i,n)
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
