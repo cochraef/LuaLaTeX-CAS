@@ -319,13 +319,13 @@ Takes a table of {\ttfamily coefficients} not necessarily in the same ring and a
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-  f = PolynomialRing({0,1/3,1/2,1/6},'t')
+  f = PolynomialRing({0,1/3,-1/2,1/6},'t')
 \end{CAS}
 \[ \print{f} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
-    f = PolynomialRing({0,1/3,1/2,1/6},'t')
+    f = PolynomialRing({0,1/3,-1/2,1/6},'t')
 \end{CAS}
 \[ \print{f} \] 
 \end{codebox}
@@ -369,7 +369,39 @@ for i=0,f.degree:asnumber() do
 
 \subsubsection*{Parsing}
 
+The function \mintinline{lua}{Poly()} is a shortcut for \mintinline{lua}{PolynomialRing:new()}. If the second argument \texttt{symbol} is omitted, then the default is \texttt{'x'}:
 
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({0,1/3,-1/2,1/6})
+\end{CAS}
+\[ \print{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({0,1/3,-1/2,1/6})
+\end{CAS}
+\[ \print{f} \] 
+\end{codebox}
+
+Alternatively, one could typeset the polynomial naturally and use the \texttt{topoly()} function. This is the same as the \texttt{topolynomial()} method except that the \texttt{autosimplify()} method is automatically called first:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = 1/3*x - 1/2*x^2 + 1/6*x^3
+    f = topoly(f)
+\end{CAS}
+\[ \print{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = 1/3*x - 1/2*x^2 + 1/6*x^3
+    f = topoly(f)
+\end{CAS}
+\[ \print{f} \] 
+\end{codebox}
 
 \newcoderef{function Rational:new(n,d,keep)}{return Rational}{n Ring, d Ring, keep bool}
 \index{Algebra!Classes!\texttt{Rational}}
@@ -377,16 +409,59 @@ for i=0,f.degree:asnumber() do
 
 Takes a numerator {\ttfamily n} and denominator {\ttfamily d} in the same {\ttfamily Ring} and constructs a rational expression in the field of fractions over that ring. For the integers, this is the ring of rational numbers. If the {\ttfamily keep} flag is omitted, the constructed object will be simplified to have smallest possible denominator, possibly returning an object in the original {\ttfamily Ring}. Typically, the {\ttfamily Ring} will be either {\ttfamily Integer} or {\ttfamily PolynomialRing}, so {\ttfamily Rational} can be viewed as a constructor for either a rational number or a rational function. 
 
+For example:
+\begin{codebox}
+    \begin{minted}{lua}
+a = Integer(6)
+b = Integer(10)
+c = Rational(a,b)
+tex.print('\\[',c:tolatex(),'\\]')
+\end{minted}
+\tcblower
+\luaexec{
+    a = Integer(6)
+    b = Integer(10)
+    c = Rational(a,b)
+    tex.print('\\[',c:tolatex(),'\\]')
+}
+\end{codebox}
+But also:
+\begin{codebox}
+    \begin{minted}{lua}
+a = Poly({Integer(2),Integer(3)})
+b = Poly({Integer(4),Integer(1)})
+c = Rational(a,b)
+tex.print('\\[',c:tolatex(),'\\]')
+\end{minted}
+\tcblower
+\luaexec{
+a = Poly({Integer(2),Integer(3)})
+b = Poly({Integer(4),Integer(1)})
+c = Rational(a,b)
+tex.print('\\[',c:tolatex(),'\\]')
+}
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+\texttt{Raional}s are constructed naturally using the \texttt{/} operator:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    a = Poly({2,3})
+    b = Poly({4,1})
+    c = a/b
+\end{CAS}
+\[ \print{c} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = Poly({2,3})
+    b = Poly({4,1})
+    c = a/b
+\end{CAS}
+\[ \print{c} \] 
+\end{codebox}
 
 \end{document}
-
-
-\begin{itemize}
-    \item {\ttfamily AbsExpression(expression)} creates a new expression corresponding to the absolute value of \\ {\ttfamily expression}.
-    \item {\ttfamily Logarithm(base, expression)} creates a new expression corresponding to the logarithm base {\ttfamily base} of {\ttfamily expression}.
-    \item {\ttfamily FactorialExpression(expression)} creates a new expression corresonding to the factorial of {\ttfamily expression}.
-    \item {\ttfamily SqrtExpression(expression, root)} creates a new expression corresponding the the {\ttfamily root}th root of {\ttfamily expression}. If {\ttfamily root} is omitted, it defaults to $2$.
-    \item {\ttfamily TrigExpression(name, expression)} creates a new expression corresponding to a trigonometric function applied to {\ttfamily expression}. The valid names are $\sin$, $\cos$, $\tan$, $\csc$, $\sec$, $\cot$, $\arcsin$, $\arccos$, $\arctan$, arccsc, arcsec, and arccot.
-    
-    \item {\ttfamily RootExpression(expression)} creates an expression that represents the solutions to {\ttfamily expression} $= 0$ when they would be unwieldy or impossible to display using standard algebraic functions.
-\end{itemize}
