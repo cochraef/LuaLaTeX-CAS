@@ -28,11 +28,16 @@ function BinaryOperation:simplifypower()
 
     -- Simplifies complex numbers raised to negative integer powers
     if not base:isrealconstant() and base:iscomplexconstant() and exponent:isconstant() and exponent:getring() == Integer:getring() and exponent < Integer.zero() then
-        local a = base.expressions[1]
+        local a
         local b
-        if base.expressions[2] == I then
+        if base.operation == BinaryOperation.MUL then
+            a = Integer.zero()
+            b = base.expressions[1]
+        elseif base.operation == BinaryOperation.ADD and base.expressions[2] == I then
+            a = base.expressions[1]
             b = Integer.one()
         else
+            a = base.expressions[1]
             b = base.expressions[2].expressions[1]
         end
         return (((a-b*I)/(a^Integer(2)+b^Integer(2)))^(-exponent)):expand():autosimplify()

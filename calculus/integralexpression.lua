@@ -14,7 +14,7 @@ __IntegralExpression = {}
 --------------------------
 
 --- Recursive part of the indefinite integral operator. Returns nil if the expression could not be integrated.
---- We switch to funcional programming here because it is more natural.
+--- We switch to prodcedural programming here because it is more natural.
 --- @param expression Expression
 --- @param symbol SymbolExpression
 --- @return Expression|nil
