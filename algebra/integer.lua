@@ -121,6 +121,18 @@ function Integer.powmod(a, b, n)
     end
 end
 
+--- @return RingIdentifier
+local t = {ring=Integer}
+t = setmetatable(t, {__index = Integer, __eq = function(a, b)
+    return a["ring"] == b["ring"]
+end, __tostring = function(a)
+    return "ZZ"
+end})
+function Integer.makering()
+    return t
+end
+
+
 ----------------------------
 -- Instance functionality --
 ----------------------------
@@ -235,12 +247,6 @@ end
 
 --- Returns the ring this object is an element of.
 --- @return RingIdentifier
-local t = {ring=Integer}
-t = setmetatable(t, {__index = Integer, __eq = function(a, b)
-    return a["ring"] == b["ring"]
-end, __tostring = function(a)
-    return "ZZ"
-end})
 function Integer:getring()
     return t
 end

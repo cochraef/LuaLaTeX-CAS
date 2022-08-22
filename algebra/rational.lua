@@ -6,6 +6,35 @@
 Rational = {}
 __Rational = {}
 
+
+--------------------------
+-- Static functionality --
+--------------------------
+
+-- Metatable for ring objects.
+local __obj = {__index = Rational, __eq = function(a, b)
+    return a["ring"] == b["ring"] and
+            (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
+            (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
+end, __tostring = function(a)
+        if a.child and a.symbol then
+            return tostring(a.child.child) .. "(" .. a.symbol .. ")"
+        end
+        return "QQ"
+    end}
+
+--- @param symbol SymbolExpression
+--- @param child RingIdentifier
+--- @return RingIdentifier
+function Rational.makering(symbol, child)
+    local t = {ring = PolynomialRing}
+    t.symbol = symbol
+    t.child = child
+    t = setmetatable(t, __obj)
+    return t
+end
+
+
 ----------------------------
 -- Instance functionality --
 ----------------------------
@@ -61,19 +90,6 @@ function Rational:reduce()
     self.numerator = self.numerator//gcd
     self.denominator = self.denominator//gcd
 end
-
-
--- Metatable for ring objects.
-local __obj = {__index = Rational, __eq = function(a, b)
-    return a["ring"] == b["ring"] and
-            (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
-            (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
-end, __tostring = function(a)
-        if a.child and a.symbol then
-            return tostring(a.child.child) .. "(" .. a.symbol .. ")"
-        end
-        return "QQ"
-    end}
 
 
 --- @return RingIdentifier
