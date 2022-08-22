@@ -337,6 +337,7 @@ Takes a table of {\ttfamily coefficients} not necessarily in the same ring and a
     \item {\ttfamily f.coefficients} stores the 0-indexed table of coefficients of {\ttfamily f};
     \item {\ttfamily f.degree} stores the {\ttfamily Integer} that represents the degree of {\ttfamily f};
     \item {\ttfamily f.symbol} stores the {\ttfamily string} representing the variable or {\ttfamily symbol} of {\ttfamily f}.
+    \item {\ttfamily f.ring} stores the \texttt{RingIdentifier} for the ring of coefficients.
 \end{itemize}
 For example:
 \begin{codebox}
@@ -351,6 +352,9 @@ for i=0,f.degree:asnumber() do
     '}\\]'
   )
 end
+if f.ring == Rational.getring() then 
+  tex.print('Rational coefficients')
+end
 \end{minted}
 \tcblower
 \luaexec{
@@ -363,6 +367,9 @@ for i=0,f.degree:asnumber() do
     tostring(i),
     '}\\]'
   )
+  end
+  if f.ring == Rational.getring() then 
+    tex.print('Coefficients are rational')
   end
 }
 \end{codebox}
@@ -441,6 +448,27 @@ c = Rational(a,b)
 tex.print('\\[',c:tolatex(),'\\]')
 }
 \end{codebox}
+
+\subsubsection*{\sffamily Fields}
+
+\texttt{Rational}s naturally have the two fields: \texttt{numerator}, \texttt{denominator}. These fields store precisely what you think.
+
+If \texttt{numerator} or \texttt{denominator} are \texttt{PolynomialRing}s, then the constructed \texttt{Rational} will have two additional fields: \texttt{symbol} and \texttt{ring}. The field \texttt{ring} stores the \texttt{RingIdentifier} for the \texttt{PolynomialRing} to which either the numerator or denominator belong.
+
+\begin{codebox}[]
+    \begin{minted}{lua}
+if c.ring == PolynomialRing.getring() then 
+  tex.print('$',c:tolatex(),'$ is a Rational Function in the variable',c.symbol)
+end
+\end{minted}
+\tcblower
+\luaexec{
+if c.ring == PolynomialRing.getring() then 
+  tex.print('$',c:tolatex(),'$ is a Rational Function in the variable',c.symbol)
+end
+}
+\end{codebox}
+If the \texttt{.ring} field is nil, then the \texttt{Rational} represents a rational number (i.e., a ratio of \texttt{Integer}s). 
 
 \subsubsection*{Parsing}
 
