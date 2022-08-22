@@ -142,7 +142,7 @@ style=numeric,
         \item {\ttfamily\itshape method}: a new method or an old method that returns something different than what it inherits;
         \item {\tikz[baseline=-0.5ex]\node[fill=rose!30] {\ttfamily\bfseries Class};}: a concrete class.
     \end{itemize}
-Here is a diagram of the classes in the algebra module that fall under (according to inheritance) the \texttt{AtomicExpression} branch of classes. Most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
+Here is a diagram of the classes in the algebra module that fall under (according to inheritance) the \texttt{AtomicExpression} branch of classes. However, not all of them are proper {\ttfamily ConstantExpression}s, so some of them override the {\ttfamily isconstant()} method. Most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
     \vfill
 \forestset{
 rectcore/.style = {rectangle split,
