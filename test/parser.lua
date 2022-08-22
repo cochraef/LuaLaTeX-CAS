@@ -123,6 +123,16 @@ function Mod(i,n)
     return IntegerModN(i,n)
 end
 
+function Poly(coefficients,symbol,degree)
+    local variable = symbol or 'x' 
+    return PolynomialRing:new(coefficients,variable,degree)
+end
+
+function topoly(a)
+    a = a:autosimplify()
+    return a:topolynomial()
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
