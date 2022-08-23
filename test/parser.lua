@@ -129,8 +129,20 @@ function Poly(coefficients,symbol,degree)
 end
 
 function topoly(a)
-    a = a:autosimplify()
+    a = a:expand():autosimplify()
     return a:topolynomial()
+end
+
+function extendedgcd(a,b)
+    if a:type() == Integer and b:type() == Integer then 
+        return Integer.extendedgcd(a,b) 
+    end
+    A, ATF = topoly(a) 
+    B, BTF = topoly(b) 
+    if ATF and BTF then 
+        return PolynomialRing.extendedgcd(A,B)
+    end
+    return nil,nil,nil
 end
 
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
