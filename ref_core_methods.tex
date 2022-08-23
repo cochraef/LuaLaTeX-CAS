@@ -856,7 +856,7 @@ end
 \index{Core!Methods!\texttt{substitute}}
 \addcontentsline{toc}{subsubsection}{\ttfamily substitute}
 
-The input \texttt{map} is a table that maps expressions to expressions; the method then recursively maps each instance of an expression with its corresponding table expression.
+The input \texttt{map} is a table that maps expressions to expressions; the method then recursively maps each instance of an expression with its corresponding table expression. One should take care when replacing multiple compound expressions in a single command, since there is no guarantee as to the order in which subexpressions in the table are replaced.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}

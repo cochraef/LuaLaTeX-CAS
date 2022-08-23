@@ -138,11 +138,12 @@ style=numeric,
     This section contains reference materials for the algebra functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
     \begin{itemize}
         \item {\error\ttfamily\itshape method}: an abstract method;
-        \item {\self\ttfamily\itshape method}: a method that returns itself; 
-        \item {\ttfamily\itshape method}: a new method or an old method that returns something different than what it inherits;
+        \item {\self\ttfamily\itshape method}: a method that returns the expression unchanged; 
+        \item {\ttfamily\itshape method}:  method that is either unique, implements an abstract method, or overrides an abstract
+method;
         \item {\tikz[baseline=-0.5ex]\node[fill=rose!30] {\ttfamily\bfseries Class};}: a concrete class.
     \end{itemize}
-Here is a diagram of the classes in the algebra module that fall under (according to inheritance) the \texttt{AtomicExpression} branch of classes. However, not all of them are proper {\ttfamily ConstantExpression}s, so some of them override the {\ttfamily isconstant()} method. Most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
+Here is an inhertiance diagram of the classes in the algebra module that are derived from the \texttt{AtomicExpression} branch of classes. However, not all of them are proper {\ttfamily ConstantExpression}s, so some of them override the {\ttfamily isconstant()} method. Most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
     \vfill
 \forestset{
 rectcore/.style = {rectangle split,
@@ -277,7 +278,7 @@ rectalg/.style = {rectangle split,
 
 \newpage
 
-Here is a diagram of the classes in the algebra module that fall under (according to inheritance) the \texttt{CompoundExpression} branch of classes. Again, most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
+Here is an inhertiance diagram of the classes in the algebra module that are derived from the \texttt{CompoundExpression} branch of classes. Again, most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
 \vfill
 \begin{center}
     \begin{forest}

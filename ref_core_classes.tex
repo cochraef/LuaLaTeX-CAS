@@ -147,7 +147,7 @@ There are several classes in the core module; but only some classes are concrete
 \end{center}
 \end{multicols}
 
-The abstract classes are setup for inheritance. \emph{Every} expression in \texttt{luacas} inherits from either {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression} which, in turn, inherit from {\ttfamily Expression}. 
+The abstract classes provide a unified interface for the concrete classes (expressions) using inhertiance. \emph{Every} expression in \texttt{luacas} inherits from either {\ttfamily AtomicExpression} or {\ttfamily CompoundExpression} which, in turn, inherit from {\ttfamily Expression}. 
 
 \coderef{function SymbolExpression:new(string)}{return SymbolExpression}
 \index{Core!Classes!\texttt{SymbolExpression}}
@@ -168,7 +168,7 @@ tex.sprint("The Lua variable 'foo' is the SymbolExpression: ", foo:tolatex(),"."
 
 \subsubsection*{Fields}
 
-\texttt{SymbolExpression}s have only one field: \texttt{symbol}. In the example above, the string \mintinline{lua}{"bar"} is stored in \mintinline{lua}{foo.bar}. 
+\texttt{SymbolExpression}s have only one field: \texttt{symbol}. In the example above, the string \mintinline{lua}{"bar"} is stored in \mintinline{lua}{foo.symbol}. 
 
 \subsubsection*{Parsing}
 

@@ -135,10 +135,10 @@ style=numeric,
 \section{Core}
     This section contains reference materials for the core functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
     \begin{itemize}
-        \item {\error\ttfamily\itshape method}: a method that returns an error; 
-        \item {\self\ttfamily\itshape method}: a method that returns itself; 
-        \item {\ttfamily\itshape method}: a new method or an old method that does something different than what it inherits;
-        \item {\tikz[baseline=-0.5ex]\node[fill=roseblue!50] {\ttfamily\bfseries Class};}: a callable class.
+        \item {\error\ttfamily\itshape method}: an abstract method (a method that must be implemented by a subclass to be called); 
+        \item {\self\ttfamily\itshape method}: a method that returns the expression unchanged;
+        \item {\ttfamily\itshape method}: a method that is either unique, implements an abstract method, or overrides an abstract method;
+        \item {\tikz[baseline=-0.5ex]\node[fill=roseblue!50] {\ttfamily\bfseries Class};}: a concrete class.
     \end{itemize}
 
 \forestset{
