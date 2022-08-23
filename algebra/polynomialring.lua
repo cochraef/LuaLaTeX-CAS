@@ -648,7 +648,9 @@ function PolynomialRing:evaluateAt(x)
     local out = self:zero()
     for i = self.degree:asnumber(), 0, -1 do
         out = out + self.coefficients[i]
-        out = out * x
+        if i ~= 0 then 
+            out = out * x
+        end
     end
     return out
 end
