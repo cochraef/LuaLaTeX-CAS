@@ -152,20 +152,20 @@ style=numeric,
 
 \subsection{Algebra Methods}
 
-Many classes in the algebra package inherit from the {\ttfamily Ring} interface, which itself inherits from the \\ {\ttfamily ConstantExpression} interface. The {\ttfamily Ring} interface requires the following arithmetic operations, which have corresponding abstract metamethods listed below. The abstract methods get passed to concrete methods in the concrete classes that inherit from {\ttfamily Ring} in the obvious way.
+Many classes in the algebra package inherit from the {\ttfamily Ring} interface. The {\ttfamily Ring} interface requires the following arithmetic operations, which have corresponding abstract metamethods listed below. Of course, these abstract methods get passed to the appropriate concrete methods in the concrete classes that inherit from {\ttfamily Ring}.
 
 For {\ttfamily Ring} objects {\ttfamily a} and {\ttfamily b}:
 
 \SetLabelAlign{parright}{\parbox[t]{\labelwidth}{\raggedleft#1}}
 \begin{description}%[labelwidth = 6.5cm,align=parright]
-    \item[\lilcoderef{function a:add(b)}{return (a + b)}] Adds two ring elements.
-    \item[\lilcoderef{function a:sub(b)}{return (a - b)}] Subtracts one ring element from another. Subtraction has a default implementation in {\ttfamily Ring.lua} as adding the additive inverse, but this can be overwritten if a faster performance method is available.
-    \item[\lilcoderef{function a:neg()}{return (-a)}] Returns the additive inverse of a ring element.
-    \item[\lilcoderef{function a:mul(b)}{return (a * b)}] Multiplies two ring elements.
-    \item[\lilcoderef{function a:pow(n)}{return (a ^ n)}] Raises one ring element to the power of an integer. Exponentiation has a default implementation as repeated multiplication, but this can (and probably should) be overwritten for faster performance.
-    \item[\lilcoderef{function a:eq(b)}{return (a == b)}] Tests if two ring elements are the same.
-    \item[\lilcoderef{function a:lt(b)}{return (a < b)}] Tests if one ring element is less than another under some total order. If the ring does not have a natural total order, this method does not need to be implemented.
-    \item[\lilcoderef{function a:le(b)}{return (a <= b)}] Tests if one ring element is less than or equal to another under some total order. If the ring does not have a natural total order, this method does not need to be implemented.
+    \item[\lilcoderef{function a:add(b)}{return a + b}] Adds two ring elements.
+    \item[\lilcoderef{function a:sub(b)}{return a - b}] Subtracts one ring element from another. Subtraction has a default implementation in {\ttfamily Ring.lua} as adding the additive inverse, but this can be overwritten if a faster performance method is available.
+    \item[\lilcoderef{function a:neg()}{return -a}] Returns the additive inverse of a ring element.
+    \item[\lilcoderef{function a:mul(b)}{return a * b}] Multiplies two ring elements.
+    \item[\lilcoderef{function a:pow(n)}{return a ^ n}] Raises one ring element to the power of an integer. Exponentiation has a default implementation as repeated multiplication, but this can (and probably should) be overwritten for faster performance.
+    \item[\lilcoderef{function a:eq(b)}{return a == b}] Tests if two ring elements are the same.
+    \item[\lilcoderef{function a:lt(b)}{return a < b}] Tests if one ring element is less than another under some total order. If the ring does not have a natural total order, this method does not need to be implemented.
+    \item[\lilcoderef{function a:le(b)}{return a <= b}] Tests if one ring element is less than or equal to another under some total order. If the ring does not have a natural total order, this method does not need to be implemented.
     \item[\lilcoderef{function a:zero()}{return Ring}] Returns the additive identity of the ring to which \texttt{a} belongs.
     \item[\lilcoderef{function a:one()}{return Ring}] Returns the multiplicative identity of the ring to which \texttt{a} belongs.
 \end{description}
@@ -173,7 +173,7 @@ For {\ttfamily Ring} objects {\ttfamily a} and {\ttfamily b}:
 \reversemarginpar
 Arithmetic\marginnote{\color{rose}\large\faHandPointRight} of {\ttfamily Ring} elements will (generally) not form a {\ttfamily BinaryOperation}. Instead, the appropriate \mintinline{lua}{__RingOperation} is called which then passes the arithmetic to a specific ring, if possible. For example:
 \begin{codebox}
-    \begin{minted}[fontsize=\small]{latex}
+    \begin{minted}[breaklines]{latex}
 \begin{CAS}
     f = Poly({2,1})
     g = Poly({2,5})
@@ -191,7 +191,7 @@ Arithmetic\marginnote{\color{rose}\large\faHandPointRight} of {\ttfamily Ring} e
 \end{codebox}
 So why have the {\ttfamily Ring} class to begin with? Many of the rings in the algebra package are subsets of one another. For instance, integers are subsets of rationals, which are subsets of polynomial rings over the rationals, etc. To smoothly convert objects from one ring to another, it's good to have a class like {\ttfamily Ring} to handle all the ``traffic.'' 
 
-For example, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information about the exact ring of an object, including the symbol the ring has if it's a polynomial ring, for instance. To perform operations on two elements of different rings, the CAS does the following: 
+For example, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information about the exact ring of an object, including the symbol the ring has if it's a polynomial ring. To perform operations on two elements of different rings, the CAS does the following: 
 
 To get the generic {\ttfamily RingIdentifier} from a class, it uses the static method:
 \coderef{function Ring.makering()}{return RingIdentifier}
@@ -297,5 +297,148 @@ Finally, the CAS is able to perform the operation with the correct \mintinline{l
 
 
 To add another class that implements {\ttfamily Ring} and has proper conversion abilities, the {\ttfamily resultantring} method needs to be updated to include all possible resultant rings constructed from the new ring and existing rings. The other three methods need to be implemented as well.
+
+We now discuss the more arithmetic methods included in the algebra package. 
+
+\coderef{function PolynomialRing.derivative()}{return PolynomialRing}
+
+Returns the formal derivative of the given polynomial. For example:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({1,1,1/2,1/6})
+    g = f:derivative()
+\end{CAS}
+\[ \print{f} \xrightarrow{d/dx}
+    \print{g} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({1,1,1/2,1/6})
+    g = f:derivative()
+\end{CAS}
+\[ \print{f} \xrightarrow{d/dx}
+    \print{g} \] 
+\end{codebox}
+
+\newcoderef{function PolynomialRing:divremainder(poly1)}{return poly2,poly3}{poly1 PolynomialRing,..., poly3 PolynomialRing}
+
+Uses synthetic division to return the quotient (\texttt{poly2}) and remainder (\texttt{poly3}) of \texttt{self/poly1}. For example:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({2,2,1})
+    g = Poly({1,1})
+    q,r = f:divremainder(g)
+\end{CAS}
+\[ \print{f} = (\print{g})(\print{q}) 
+    + \print{r} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({2,2,1})
+    g = Poly({1,1})
+    q,r = f:divremainder(g)
+\end{CAS}
+\[ \print{f} = (\print{g})(\print{q}) 
+    + \print{r} \]
+\end{codebox}
+
+\newcoderef{function PolynomialRing.extendedgcd(poly1,poly2)}{return poly3, poly4, poly5}{poly1 PolynomialRing, poly2 PolynomialRing, ..., poly5 PolynomialRing}
+
+Given two \texttt{PolynomialRing} elements \texttt{poly1,poly2} returns:
+\begin{itemize}
+    \item \texttt{poly3}: the gcd of \texttt{poly1,poly2};
+    \item \texttt{poly4,poly5}: the coefficients from Bezout's lemma via the extended gcd. 
+\end{itemize}
+For example:
+
+\begin{codebox}[]
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    f = topoly((x-1)*(x-2)*(x-3))
+    g = topoly((x-1)*(x+2)*(x+3))
+    h,a,b = PolynomialRing.extendedgcd(f,g)
+\end{CAS}
+\[ \print{f*a+g*b} = (\print{f})\left( \print{a} \right) + 
+    (\print{g})\left(\print{b} \right)\] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = topoly((x-1)*(x-2)*(x-3))
+    g = topoly((x-1)*(x+2)*(x+3))
+    h,a,b = PolynomialRing.extendedgcd(f,g)
+\end{CAS}
+\[ \print{f*a+g*b} = (\print{f})\left( \print{a} \right) + 
+    (\print{g})\left(\print{b} \right)\] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \texttt{extendedgcd()} is a shortcut to \texttt{Polynomial.extendedgcd()}:
+
+\begin{codebox}[]
+    \begin{minted}{latex}
+\begin{CAS}
+    f = topoly((x+2)*(x-3))
+    g = topoly((x+4)*(x-3))
+    h,a,b = extendedgcd(f,g)
+\end{CAS}
+\[ \print{h} = (\print{f}) \left( \print{a} \right) + 
+    (\print{g})\left( \print{b} \right). \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly((x+2)*(x-3))
+    g = topoly((x+4)*(x-3))
+    h,a,b = extendedgcd(f,g)
+\end{CAS}
+\[ \print{h} = (\print{f}) \left( \print{a} \right) + (\print{g})\left( \print{b} \right). \] 
+\end{codebox}
+
+\coderef{function PolynomialRing:evaluateAt(Expression)}{return Expression}
+
+Uses Horner's rule to evaluate a polynomial at \texttt{Expression}. Typically, the input \texttt{Expression} is an \texttt{Integer} or \texttt{Rational}. For example:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({2,2,1})
+    p = f:evaluateAt(1/2)
+\end{CAS}
+\[ \left. \print{f} \right|_{x=1/2}
+    = \print{p} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({2,2,1})
+    p = f:evaluateAt(1/2)
+\end{CAS}
+\[ \left. \print{f} \right|_{x=1/2}
+    = \print{p} \]
+\end{codebox}
+
+\coderef{function PolynomialRing:factor()}{return BinaryOperation}
+
+Factors the given polynomial into irreducible terms. For example:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({8,24,32,24,10,2})
+    a = f:factor()
+\end{CAS}
+\[ \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({8,24,32,24,10,2})
+    a = f:factor()
+\end{CAS}
+\[ \print{a} \] 
+\end{codebox}
 
 \end{document}
