@@ -305,7 +305,7 @@ function PolynomialRing:isatomic()
     --if self.degree >= Integer.one() then 
     --    return false
     --else
-        return true
+        return false
     --end
 end
 
