@@ -1,0 +1,202 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse,documentation}
+\usepackage{microtype}
+\usepackage{makeidx}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\definecolor{rose}{RGB}{128,0,0}
+\definecolor{roseyellow}{RGB}{222,205,99}
+\definecolor{roseblue}{RGB}{167,188,214}
+\definecolor{rosenavy}{RGB}{79,117,139}
+\definecolor{roseorange}{RGB}{232,119,34}
+\definecolor{rosegreen}{RGB}{61,68,30}
+\definecolor{rosewhite}{RGB}{223,209,167}
+\definecolor{rosebrown}{RGB}{108,87,27}
+\definecolor{rosegray}{RGB}{84,88,90}
+
+\definecolor{codegreen}{HTML}{49BE25}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\newtcolorbox{codehead}[1][]{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize,
+    #1
+}
+
+\usepackage{varwidth}
+
+\newtcolorbox{newcodehead}[2][]{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize,
+    #1,
+    fonttitle=\bfseries\ttfamily\footnotesize,
+    coltitle=rosegray,
+    attach boxed title to top text right,
+    boxed title style={frame hidden,size=small,bottom=-1mm,
+    interior style={fill=none,
+    top color=white,
+    bottom color=white}},
+    title={#2}
+}
+
+\makeindex
+
+\def\currref{Core Methods}
+
+\newcommand{\coderef}[2]{%
+\index{\currref!\texttt{#1}}%
+\begin{codehead}[sidebyside,segmentation hidden]%
+    \mintinline{lua}{#1}%
+    \tcblower%
+    \begin{flushright}%
+    \mintinline{lua}{#2}%
+    \end{flushright}%
+\end{codehead}%
+}
+
+\newcommand{\newcoderef}[3]{%
+\index{\currref!\texttt{#1}}%
+\begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
+    \mintinline{lua}{#1}%
+    \tcblower%
+    \begin{flushright}%
+    \mintinline{lua}{#2}%
+    \end{flushright}%
+\end{newcodehead}%
+}
+
+\begin{document}
+\thispagestyle{empty}
+\part{Introduction}
+
+\begin{multicols}{2}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('x')
+    f = x
+    for i in range(1,9) do
+        f = f*x
+    end
+    f = f-1
+\end{CAS}
+\parseforest{f}
+\bracketset{action character = @}
+\begin{center}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+
+\begin{CAS}
+    f = factor(f)
+\end{CAS}
+\parseforest{f}
+\begin{center}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\end{minted}
+
+\columnbreak 
+\phantom{}
+\vfill
+\begin{CAS}
+    vars('x')
+    f = x
+    for i in range(1,9) do
+        f = f*x
+    end
+    f = f-1
+\end{CAS}
+\parseforest{f}
+\bracketset{action character = @}
+\begin{center}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\vfill
+\phantom{}
+\end{multicols}
+\vfill
+
+\begin{CAS}
+    f = factor(f)
+\end{CAS}
+\parseforest{f}
+\begin{center}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily}
+    @\forestresult
+\end{forest}
+\end{center}
+\vfill
+
+
+\end{document}

@@ -1,0 +1,249 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse,documentation}
+\usepackage{microtype}
+\usepackage{makeidx}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\definecolor{rose}{RGB}{128,0,0}
+\definecolor{roseyellow}{RGB}{222,205,99}
+\definecolor{roseblue}{RGB}{167,188,214}
+\definecolor{rosenavy}{RGB}{79,117,139}
+\definecolor{roseorange}{RGB}{232,119,34}
+\definecolor{rosegreen}{RGB}{61,68,30}
+\definecolor{rosewhite}{RGB}{223,209,167}
+\definecolor{rosebrown}{RGB}{108,87,27}
+\definecolor{rosegray}{RGB}{84,88,90}
+
+\definecolor{codegreen}{HTML}{49BE25}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\newtcolorbox{codehead}[1][]{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize,
+    #1
+}
+
+\usepackage{varwidth}
+
+\newtcolorbox{newcodehead}[2][]{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize,
+    #1,
+    fonttitle=\bfseries\ttfamily\footnotesize,
+    coltitle=rosegray,
+    attach boxed title to top text right,
+    boxed title style={frame hidden,size=small,bottom=-1mm,
+    interior style={fill=none,
+    top color=white,
+    bottom color=white}},
+    title={#2}
+}
+
+\makeindex
+
+\newcommand{\coderef}[2]{%
+\index{\currref!\texttt{#1}}%
+\begin{codehead}[sidebyside,segmentation hidden]%
+    \mintinline{lua}{#1}%
+    \tcblower%
+    \begin{flushright}%
+    \mintinline{lua}{#2}%
+    \end{flushright}%
+\end{codehead}%
+}
+
+\newcommand{\newcoderef}[3]{%
+\index{\currref!\texttt{#1}}%
+\begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
+    \mintinline{lua}{#1}%
+    \tcblower%
+    \begin{flushright}%
+    \mintinline{lua}{#2}%
+    \end{flushright}%
+\end{newcodehead}%
+}
+\usetikzlibrary{shapes.multipart}
+\useforestlibrary{edges}
+
+\def\error{\color{red}}
+\def\self{\color{gray}}
+\def\call{$\star$ }
+
+\begin{document}
+\thispagestyle{empty}
+
+\section{Core}
+    This section contains reference materials for the core functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
+    \begin{itemize}
+        \item {\error\ttfamily\itshape method}: an abstract method (a method that must be implemented by a subclass to be called); 
+        \item {\self\ttfamily\itshape method}: a method that returns the expression unchanged;
+        \item {\ttfamily\itshape method}: a method that is either unique, implements an abstract method, or overrides an abstract method;
+        \item {\tikz[baseline=-0.5ex]\node[fill=roseblue!50] {\ttfamily\bfseries Class};}: a concrete class.
+    \end{itemize}
+
+\forestset{
+rect/.style = {rectangle split,
+               rectangle split parts=2,
+               draw = {rosenavy,thick},
+               rounded corners = 1pt,
+               font = \ttfamily\bfseries,
+               }
+}
+\tikzset{
+    every two node part/.style={font=\ttfamily\itshape\footnotesize}
+}
+\begin{center}
+    \begin{forest}
+        for tree = {node options={align=left},
+                           rect,
+                           grow= south,
+                           parent anchor=south,
+                           child anchor=north,
+                           edge = {-stealth}
+                    },
+                    forked edges
+        [Expression\nodepart{two}\begin{minipage}{0.5\textwidth}\vskip-0.2cm\begin{multicols}{2}
+            {\error evaluate()} \\
+            {\error autosimplify()} \\  
+            simplify() \\ 
+            size() \\ 
+            {\error subexpressions()} \\ 
+            {\error setsubexpressions()} \\
+            {\error freeof()} \\ 
+            {\error substitute(map)} \\
+            {\self expand()} \\
+            {\self factor()} \\
+            {\self combine()} \\
+            getsubexpressionsrec() \\ 
+            {\error isatomic()} \\ 
+            {\error isconstant()} \\
+            isrealconstant() \\ 
+            iscomplexconstant() \\ 
+            {\error order(other)} \\ 
+            {\self topolynomial()} \\
+            {\error tolatex()} \\
+            type()\end{multicols}\end{minipage}
+            [AtomicExpression\nodepart{two}
+                {\self tocompoundexpression()} \\
+                {\self evaluate()} \\ 
+                {\self autosimplify()} \\ 
+                subexpressions() \\ 
+                {\self setsubexpressions()} \\ 
+                substitute(map) \\ 
+                isatomic() \\ 
+                tolatex()
+                [SymbolExpression\nodepart{two}
+                    {\call new(symbol)} \\
+                    freeof() \\
+                    isconstant() \\
+                    order(other) \\
+                    topolynomial()
+                ,fill = roseblue!50]
+                [ConstantExpression\nodepart{two}
+                    freeof()\\
+                    isconstant() \\
+                    order(other)
+                ]
+            ]
+            [CompoundExpression\nodepart{two}
+                freeof() \\
+                substitute(map) \\
+                isatomic() \\ 
+                isconstant()
+                [BinaryOperation\nodepart{two}
+                    {\call new(operation,expressions)} \\
+                    evaluate() \\
+                    autosimplify() (!)\\
+                    subexpressions() \\
+                    setsubexpressions() \\ 
+                    expand() \\
+                    factor() \\
+                    combine() \\
+                    order(other) \\
+                    {iscommutatitve()}\\
+                    topolynomial() \\
+                    tolatex()
+                , fill=roseblue!50]
+                [FunctionExpression\nodepart{two}
+                    {\call new(name,expressions)}\\
+                    evaluate()\\
+                    autosimplify()\\
+                    subexpressions()\\
+                    setsubexpressions()\\
+                    order(other)\\
+                    tolatex()                
+                , fill=roseblue!50]
+            ]
+        ]
+    \end{forest}
+\end{center}
+The number of core methods should generally be kept small, since every new type of expression must implement all of these methods. The exception to this, of course, is core methods that call other core methods that provide a unified interface to expressions. For instance, {\ttfamily size()} calls {\ttfamily subexpressions()}, so it only needs to be implemented in the expression interface.
+
+All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. As mentioned previously, metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
+
+\begin{itemize}
+    \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua (and elsewhere...). 
+    
+    \item {\ttfamily \_\_eq} determines whether an expression is structurally identical to another expression.
+\end{itemize}
+\end{document}

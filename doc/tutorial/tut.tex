@@ -1,0 +1,217 @@
+\documentclass{article}
+
+\usepackage{standalone}
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse}
+\usepackage{microtype}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\definecolor{rose}{RGB}{128,0,0}
+\definecolor{roseyellow}{RGB}{222,205,99}
+\definecolor{roseblue}{RGB}{167,188,214}
+\definecolor{rosenavy}{RGB}{79,117,139}
+\definecolor{roseorange}{RGB}{232,119,34}
+\definecolor{rosegreen}{RGB}{61,68,30}
+\definecolor{rosewhite}{RGB}{223,209,167}
+\definecolor{rosebrown}{RGB}{108,87,27}
+\definecolor{rosegray}{RGB}{84,88,90}
+
+\begin{document}
+
+\section{Tutorials}
+
+Taking a cue from the phenomenal TikZ documentation, we introduce basic usage of the \texttt{luacas} package through a few informal tutorials. In the subsections that follow, we'll walk through how each of the outputs below are made using \texttt{luacas}. {\bf Crucially}, none of the computations below are ``hardcoded''; all computations are performed and printed using \texttt{luacas} to maximize portability and code reuse. 
+
+\begin{tcolorbox}[colback=rose!10,
+        colframe=rose,
+        arc=1pt,
+        frame hidden]
+{\bf Tutorial 1:} {\itshape A limit definition of the derivative for Alice.}\vskip0.2cm
+\small
+\begin{CAS}
+    vars('x','h')
+    f = 2*x^3-x
+\end{CAS}
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appropriate difference quotient:
+\begin{CAS}
+    subs = {[x] = x+h}
+    q = (f:substitute(subs) - f)/h
+\end{CAS}
+\[ \begin{aligned}
+    \print{q} &= 
+    \begin{CAS} 
+        q = expand(q)
+    \end{CAS}
+    \print{q}& &\text{expand/simplify} \\
+    \begin{CAS}
+        subs = {[h]=0}
+        q = q:substitute(subs)
+    \end{CAS}
+    &\xrightarrow{h\to 0} \print{q}& &\text{take limit} \\ 
+    &= 
+    \begin{CAS}
+        q = simplify(q)
+    \end{CAS}
+    \print{q}& &\text{simplify.}
+\end{aligned} \] 
+%So $\print{diff(f,x)} = \print*{diff(f,x)}$.
+\end{tcolorbox}
+\vfill
+
+\begin{tcolorbox}[colback=rosenavy!10,
+    colframe=rosenavy,
+    arc=1pt,
+    frame hidden]
+    \small
+    {\bf Tutorial 2:} {\itshape A local max/min diagram for Bob}.
+    \vskip 0.2cm
+    Consider the function $f(x)$ defined by:
+    \begin{CAS}
+        vars('x')
+        f = x^2+2*x-2
+        g = x^2-1
+        subs = {[x] = f}
+        dh = expand(substitute(subs,g))
+        h = simplify(int(dh,x)+10)
+    \end{CAS}
+    $\displaystyle f(x) = \print{h}$.
+\begin{multicols}{2}
+    Note that: 
+    \[ f'(x) = \print{dh}.\] 
+    The roots to $f'(x)=0$ equation are:
+    \begin{CAS}
+        r = roots(dh)
+    \end{CAS}
+    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]}.\] 
+    Recall: $f'(x_0)$ measures the slope of the tangent line to $y=f(x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak (local maximum) or a valley (local minimum). 
+    \directlua{
+    v = {}
+    for i=1,4 do 
+        table.insert(v,simplify(substitute({[x]=r[i]},h)))
+    end
+    }
+    \columnbreak 
+    \store{h}\store{dh}
+    \begin{tikzpicture}[scale=0.95]
+        \begin{axis}[legend pos = north west]
+            \addplot 
+            [domain=-3.5:1.5,samples=100] {\h};
+            \addlegendentry{$f$};
+            \addplot[densely dashed] 
+            [domain=-3.25:1.25,samples=100] {\dh};
+            \addlegendentry{$df/dx$};
+            \addplot[gray,dashed,thick]
+            [domain=-3.5:1.5] {0};
+            \luaexec{for i=1,4 do 
+                tex.print("\\draw[fill=purple,purple]",
+                    "(axis cs:{", tostring(r[i]) ,"},0) circle (1.5pt)",
+                    "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) circle (1.5pt)",
+                    "(axis cs:{", tostring(r[i]) ,"},{", tostring(v[i]), "}) edge[dashed] (axis cs:{", tostring(r[i]) ,"},0);")
+                end}
+        \end{axis}
+    \end{tikzpicture}
+\end{multicols}
+\end{tcolorbox}
+
+\vfill
+
+\begin{tcolorbox}[colback=roseorange!10,
+    colframe=roseorange,
+    arc=1pt,
+    frame hidden]
+    \small
+{\bf Tutorial 3:} {\itshape A limit definition of the derivative for Charlie.}\vskip 0.2cm
+
+\begin{CAS}
+    vars('x','h')
+    f = x/(x^2+1)
+\end{CAS}
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appropriate difference quotient:
+\begin{CAS}
+    subs = {[x] = x+h}
+    q = (f:substitute(subs) - f)/h
+\end{CAS}
+\directlua{
+    function Expression:mycombine()
+        local a = self.expressions[1].expressions[1].expressions[1]
+        local b = self.expressions[1].expressions[1].expressions[2]
+        local c = self.expressions[1].expressions[2].expressions[1]
+        local d = self.expressions[1].expressions[2].expressions[2]
+        local numerator = a*d-b*c
+        local denominator = self.expressions[2]*b*d
+        return numerator/denominator
+    end
+    function Expression:mysimplify()
+        local a = self.expressions[1]
+        local b = self.expressions[2]
+        a = simplify(a)
+        return a/b 
+    end
+    function Expression:myfactor()
+        local a = self.expressions[1]
+        local b = self.expressions[2]
+        a = factor(a)
+        return a/b
+    end
+}
+\[ \begin{aligned} 
+    \print{q} &=
+    \begin{CAS}
+        q = q:mycombine()
+    \end{CAS}
+    \print{q}& &\text{get a common denominator} \\ 
+    &= 
+    \begin{CAS}
+        q = q:mysimplify()
+    \end{CAS}
+    \print{q}& &\text{simplify the numerator} \\ 
+    &= 
+    \begin{CAS}
+        q = q:myfactor()
+    \end{CAS}
+    \print{q} & &\text{factor numerator} \\ 
+    &=
+    \begin{CAS}
+        q = simplify(q)
+    \end{CAS}
+    \print{q}& &\text{cancel the $h$s} \\ 
+    &\xrightarrow{h\to 0}
+    \begin{CAS}
+        subs = {[h] = 0}
+        q = substitute(subs,q):autosimplify()
+    \end{CAS}
+    \print{q}& &\text{take limit.}
+\end{aligned} \] 
+\end{tcolorbox}
+\end{document}

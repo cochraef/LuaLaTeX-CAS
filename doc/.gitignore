@@ -1,0 +1,15 @@
+*.asy
+*.pdf
+*.txt
+*.aux
+*.log
+*.gz
+*.pygtex
+*.pygstyle
+*.out
+*.toc
+*.bcf
+*.idx
+*.ilg
+*.xml
+*.pyg
