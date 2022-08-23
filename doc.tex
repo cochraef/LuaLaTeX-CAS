@@ -73,6 +73,28 @@ style=numeric,
     #1
 }
 
+\DeclareTotalTCBox{\lilcoderef}{O{} m m}{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    enhanced,
+    nobeforeafter,
+    tcbox raise base,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=1mm,
+    right=1mm,
+    top=1mm,
+    bottom=1mm,
+    oversize,
+    #1
+}{\mintinline{lua}{#2} \mintinline{lua}{#3}}
+
+
 \usepackage{varwidth}
 
 \newtcolorbox{newcodehead}[2][]{
@@ -103,6 +125,8 @@ style=numeric,
     title={#2}
 }
 \usepackage{makeidx}
+\usepackage{fontawesome5}
+\usepackage{marginnote}
 \makeindex
 
 \newcommand{\coderef}[2]{%
@@ -165,6 +189,8 @@ style=numeric,
 \include{ref_algebra.tex}
 
 \include{ref_algebra_classes.tex}
+
+\include{ref_algebra_methods.tex}
 
 \appendix
 
