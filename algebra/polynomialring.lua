@@ -644,15 +644,13 @@ function PolynomialRing:tocompoundexpression()
 end
 
 -- Uses Horner's rule to evaluate a polynomial at a point
-function PolynomialRing:evaluateAt(x)
-    local out = self:zero()
-    for i = self.degree:asnumber(), 0, -1 do
+function PolynomialRing:evaluateat(x)
+    local out = self:zeroc()
+    for i = self.degree:asnumber(), 1, -1 do
         out = out + self.coefficients[i]
-        if i ~= 0 then 
-            out = out * x
-        end
+        out = out * x
     end
-    return out
+    return out + self.coefficients[0]
 end
 
 -- Multiplies this polynomial by x^n
@@ -770,12 +768,12 @@ function PolynomialRing:rationalroots()
         for _, af in ipairs(afactors) do
             for _, bf in ipairs(bfactors) do
                 local testroot = Rational(af, bf, true)
-                if remaining:evaluateAt(testroot) == Integer.zero() then
+                if remaining:evaluateat(testroot) == Integer.zero() then
                     roots[#roots+1] = PolynomialRing({-testroot.numerator, testroot.denominator}, self.symbol)
                     remaining = remaining // roots[#roots]
                     goto nextfactor
                 end
-                if remaining:evaluateAt(-testroot) == Integer.zero() then
+                if remaining:evaluateat(-testroot) == Integer.zero() then
                     roots[#roots+1] = PolynomialRing({testroot.numerator, testroot.denominator}, self.symbol)
                     remaining = remaining // roots[#roots]
                     goto nextfactor
