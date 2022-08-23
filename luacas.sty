@@ -1,0 +1,287 @@
+% Copyright (c) ???
+%
+% Permission is granted to copy, distribute and/or modify this
+% software under the terms of the LaTeX Project Public License
+% (LPPL), version 1.3c or any later version.
+%
+% This software is provided 'as is', without warranty of any kind,
+% either expressed or implied, including, but not limited to, the
+% implied warranties of merchantability and fitness for a
+% particular purpose.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{luacas}
+    [2022/05/07 v1.0 CAS written in Lua for LaTeX]
+
+\RequirePackage{iftex}
+\ifluatex
+    \RequirePackage{luacode}
+\else
+    {\PackageError{luacas}
+    {Not running under LuaLaTeX}
+    {This package requires LuaLaTeX. Try compiling this document with\MessageBreak 'lualatex' instead of 'latex'. This is a fatal error; I'm aborting now.}%
+    }\stop
+\fi
+
+%Required Packages
+\RequirePackage{xparse}
+\RequirePackage{pgfkeys}
+\RequirePackage{verbatim}
+\RequirePackage{tikz}
+\RequirePackage{xcolor}
+\RequirePackage{mathtools}
+
+%These files contain Lua code for parsing luacas output; they also initialize the CAS itself
+\directlua{require('test.parser')
+           require('test.helper')
+} 
+
+\NewDocumentEnvironment{CAS}%
+    {+b}%
+    {\luaexec{CASparse([[#1]])}}%
+    {}
+
+\newcommand{\get}%
+    [2][true]%
+    {\directlua{disp(#2, #1)}}  
+    
+\newcommand{\fetch}[1]{
+    \directlua{tex.print(tostring(#1))}
+}
+
+\NewDocumentCommand{\store}{m O{#1}}{
+    \expandafter\def\csname #2\endcsname{%
+        \directlua{
+            input = #1
+            if not input[1] then
+                tex.sprint{tostring(input)}
+            else
+                tex.sprint("{")
+                for _,entry in ipairs(input) do 
+                    tex.sprint(tostring(entry),",")
+                end
+                tex.sprint("}")
+            end
+        }%
+    }%
+}%
+    
+\NewDocumentCommand{\yoink}{m O{#1}}{%
+\expandafter\def\csname #2\endcsname{%
+    \directlua{
+        tex.print(tostring(#1))
+        }%
+    }%
+}
+
+%\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
+
+%%%%%%%%%%
+%% Core %%
+%%%%%%%%%%
+
+%pretty print
+
+\NewDocumentCommand{\print}{s m}{%
+    \IfBooleanTF{#1}{%
+        \directlua{
+            local sym = #2
+            tex.print(sym:autosimplify():tolatex())
+        }%
+    }{%
+        \directlua{
+            local sym = #2
+            tex.print(sym:tolatex())
+        }%
+    }%
+}
+
+%verbatim print
+
+\NewDocumentCommand{\vprint}{s m}{%
+    \IfBooleanTF{#1}{%
+        \directlua{
+            local sym = #2
+            tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym)..[[\end{verbatim}}]])
+        }%
+    }{%
+        \directlua{
+            local sym = #2
+            tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym:autosimplify())..[[\end{verbatim}}]])
+        }%
+    }%
+}
+
+%prints the first level of an expression tree; for use within a tikzpicture environment
+
+\NewDocumentCommand{\printshrub}{s m}{%
+    \IfBooleanTF{#1}{%
+        \directlua{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
+            tex.print(sym:gettheshrub())
+            tex.print(";")
+        }%
+    }{%
+        \directlua{
+            local sym = #2
+            tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
+            tex.print(sym:gettheshrub())
+            tex.print(";")
+        }%
+    }
+}
+
+%prints the full expression tree; for use within a tikzpicture environment
+    
+\NewDocumentCommand{\printtree}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\node {",nameof(sym),"}")
+            tex.print(sym:getthetree())
+            tex.print(";")
+        }%
+    }{%
+        \luaexec{
+            local sym = #2
+            tex.print("\\node {",nameof(sym),"}")
+            tex.print(sym:getthetree())
+            tex.print(";")
+        }%
+    }
+}
+
+%parses an expression tree for use within the forest environment; result is stored in \forestresult
+
+\NewDocumentCommand{\parseforest}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\def\\forestresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(sym:gettheforest())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }{%
+        \luaexec  {
+            local sym = #2
+            tex.print("\\def\\forestresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(sym:gettheforest())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }
+}
+
+\NewDocumentCommand{\parseshrub}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            tex.print("\\def\\shrubresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(", tikz+={\\node[anchor=south] at (.north) {test};}")
+            tex.print(sym:getthefancyshrub())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }{%
+        \luaexec{
+            local sym = #2
+            tex.print("\\def\\shrubresult{")
+            tex.print("[")
+            tex.print(nameof(sym))
+            tex.print(", tikz+={\\node[anchor=south,font=\\ttfamily\\footnotesize,gray] at (.north) {",longwhatis(sym),"};}")
+            tex.print(sym:getthefancyshrub())
+            tex.print("]")
+            tex.print("}")
+        }%
+    }
+}
+
+\NewDocumentCommand{\whatis}{m}{%
+    \luaexec{
+        tex.sprint("{\\ttfamily",longwhatis(#1),"}")
+    }%
+}
+
+\NewDocumentCommand{\freeof}{s m m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym1 = #2
+            local sym2 = #3
+            if sym1:freeof(sym2) then 
+                tex.print(1)
+            else
+                tex.print(0)
+            end
+        }
+    }{%
+        \luaexec{
+            local sym1 = #2
+            local sym2 = #3
+            sym1 = sym1:autosimplify()
+            sym2 = sym2:autosimplify()
+            if sym1:freeof(sym2) then
+                tex.print(1)
+            else
+                tex.print(0)
+            end
+        }%
+    }%
+}
+
+\NewDocumentCommand{\isatomic}{s m}{%
+    \IfBooleanTF{#1}{
+        \luaexec{
+            local sym = #2
+            if sym:isatomic() then 
+                tex.print(1)
+            else
+                tex.print(0)
+            end
+        }
+    }{%
+        \luaexec{
+            local sym = #2
+            sym = sym:autosimplify()
+            if sym:isatomic() then 
+                tex.print(1)
+            else
+                tex.print(0)
+            end
+        }%
+    }%   
+}
+
+\NewDocumentCommand{\isconstant}{s m}{%
+    \IfBooleanTF{#1}{%
+        \luaexec{
+            local sym = #2
+            if sym:isconstant() then 
+                tex.print(1)
+            else 
+                tex.print(0)
+            end
+        }%
+    }{%
+        \luaexec{%
+            local sym = #2
+            sym = sym:autosimplify()
+            if sym:isconstant() then 
+                tex.print(1)
+            else 
+                tex.print(0)
+            end
+        }%
+    }%
+}
