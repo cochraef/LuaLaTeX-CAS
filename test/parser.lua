@@ -19,15 +19,15 @@ function disp(expression, inline, simple)
         tex.print(tostring(expression))
     elseif expression.autosimplify then
         if inline then
-            if simple then 
+            if simple then
                 tex.print('$' .. expression:autosimplify():tolatex() .. '$')
-            else 
+            else
                 tex.print('$' .. expression:tolatex() .. '$')
             end
         else
             if simple then
                 tex.print('\\[' .. expression:autosimplify():tolatex() .. '\\]')
-            else 
+            else
                 tex.print('\\[' .. expression:tolatex() .. '\\]')
             end
         end
@@ -104,7 +104,7 @@ function exp(x)
 end
 
 function substitute(tbl,expr)
-    return expr:substitute(tbl) 
+    return expr:substitute(tbl)
 end
 
 function roots(poly)
@@ -154,6 +154,7 @@ arcsec = ARCSEC
 arccot = ARCCOT
 
 function ZTable(t)
+    t = t or {}
     return setmetatable(t, JoinTables(getmetatable(t),
             {__index = function (t, k)
                     if type(k) == "table" and k.type and k:type() == Integer then
@@ -257,10 +258,22 @@ function CASparse(input)
     end
 end
 
-
 CASparse([[
 
-    vars("x")
-    print(int(ln(x)*x, x):autosimplify())
-
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
+    h = simplify(int(dh,x)+10)
+    r = roots(dh)
+    r = ZTable(r)
+    v = ZTable()
+    for i in range(1, 4) do
+        v[i] = simplify(substitute({[x]=r[i]},h))
+    end
+    print(v[1])
+    print(v[2])
+    print(v[3])
+    print(v[4])
 ]])
