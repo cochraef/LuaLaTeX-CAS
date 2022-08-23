@@ -1,0 +1,46 @@
+\parseforest{q}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {
+        font=\ttfamily,
+        rectangle,
+        rounded corners=1pt
+    },
+    where level=0{%
+        fill=orange!25
+    }{},
+    @\forestresult
+\end{forest}
+
+\begin{CAS}
+    r = diff(q,x,h)
+\end{CAS}
+\whatis{q} vs \whatis{r}
+
+\luaexec{if q.operation == BinaryOperation.ADD then 
+    tex.print("I'm an \\texttt{ADD}")
+end}
+
+\luaexec{tex.print("I'm an order", r.degree, "derivative.")}
+
+\parseshrub{q}
+\begin{forest}
+  for tree = {draw,rectangle,rounded corners=1pt,fill=lightgray!20  font=\ttfamily}
+  @\shrubresult
+\end{forest}
+
+\parseshrub{q.expressions[1]}
+\begin{forest}
+  for tree = {draw,rectangle,
+  rounded corners=1pt,fill=lightgray!20,
+  font=\ttfamily, s sep=2cm}
+  @\shrubresult
+\end{forest}
+
+\parseshrub{r}
+\begin{forest}
+    for tree = {draw,rectangle,
+    rounded corners=1pt,fill=lightgray!20,
+    font=\ttfamily, s sep=1cm}
+    @\shrubresult
+\end{forest}

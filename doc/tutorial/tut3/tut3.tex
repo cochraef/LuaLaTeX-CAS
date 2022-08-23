@@ -30,63 +30,6 @@
 \definecolor{rosebrown}{RGB}{108,87,27}
 \definecolor{rosegray}{RGB}{84,88,90}
 
-\begin{filecontents*}{demotut3.dat}
-\begin{CAS}
-    vars('x','h')
-    f = 1/(x^2+1)
-    subs = {[x]=x+h}
-    q = (substitute(subs,f)-f)/h
-    q = expand(q)
-\end{CAS}
-
-\parseforest{q}
-\bracketset{action character = @}
-\begin{forest}
-    for tree = {
-        font=\ttfamily,
-        rectangle,
-        rounded corners=1pt
-    },
-    where level=0{%
-        fill=orange!25
-    }{},
-    @\forestresult
-\end{forest}
-
-\begin{CAS}
-    r = diff(q,x,h)
-\end{CAS}
-\whatis{q} vs \whatis{r}
-
-\luaexec{if q.operation == BinaryOperation.ADD then 
-    tex.print("I'm an \\texttt{ADD}")
-end}
-
-\luaexec{tex.print("I'm an order", r.degree, "derivative.")}
-
-\parseshrub{q}
-\begin{forest}
-    for tree = {draw,rectangle,rounded corners=1pt,fill=lightgray!20,font=\ttfamily}
-    @\shrubresult
-\end{forest}
-
-\parseshrub{q.expressions[1]}
-\begin{forest}
-    for tree = {draw,rectangle,
-    rounded corners=1pt,fill=lightgray!20,
-    font=\ttfamily, s sep=2cm}
-    @\shrubresult
-\end{forest}
-
-\parseshrub{r}
-\begin{forest}
-    for tree = {draw,rectangle,
-    rounded corners=1pt,fill=lightgray!20,
-    font=\ttfamily, s sep=1cm}
-    @\shrubresult
-\end{forest}
-\end{filecontents*}
-
 \usepackage[
 backend=biber,
 style=numeric,
@@ -143,8 +86,8 @@ At the heart of any CAS is the idea of an \texttt{Expression}. Mathematically sp
     frame hidden
     ]{
     \inputminted[ 
-        firstline = 21,
-        lastline = 33,
+        firstline = 1,
+        lastline = 13,
         breaklines
     ]
     {latex}
@@ -162,14 +105,15 @@ At the heart of any CAS is the idea of an \texttt{Expression}. Mathematically sp
         }{},
         @\forestresult
     \end{forest}}
+
 The root of the tree above is \texttt{ADD} since $q$ is, at its heart, the addition of two other expressions. Charlie wonders how they might check to see if a mystery \texttt{Expression} is an \texttt{ADD}? But this is putting the cart before the horse; Charlie should truly wonder how to check for the \emph{type} of \texttt{Expression} -- then they can worry about other attributes. 
 
 Charlie can print the \texttt{Expression} type directly into their document using the \mintinline{latex}{\whatis} command:
 
 \begin{codebox}
     \inputminted[ 
-        firstline = 35,
-        lastline = 38,
+        firstline = 15,
+        lastline = 18,
         breaklines
     ]
     {latex}
@@ -196,8 +140,8 @@ At any rate, Charlie now knows, according to \texttt{luacas}, that \texttt{q} is
     frame hidden
     ]{
     \inputminted[ 
-        firstline = 40,
-        lastline = 42,
+        firstline = 20,
+        lastline = 22,
         breaklines
     ]
     {latex}
@@ -222,8 +166,8 @@ Of course, different \texttt{Expression} types have different attributes. For ex
     frame hidden
     ]{
     \inputminted[ 
-        firstline = 44,
-        lastline = 44,
+        firstline = 24,
+        lastline = 24,
         breaklines
     ]
     {latex}
@@ -253,8 +197,8 @@ The expression \texttt{q.expressions[1]} is another \texttt{BinaryOperation}. In
     frame hidden
     ]{\small
     \inputminted[ 
-        firstline = 52,
-        lastline = 58,
+        firstline = 26,
+        lastline = 30,
         breaklines
     ]
     {latex}
@@ -280,8 +224,8 @@ The ``shrub'' is essentially the first level of the ``forest'', but with some ex
     frame hidden
     ]{\small
     \inputminted[ 
-        firstline = 60,
-        lastline = 66,
+        firstline = 40,
+        lastline = 46,
         breaklines
     ]
     {latex}

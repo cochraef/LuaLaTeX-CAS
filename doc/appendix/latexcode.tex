@@ -51,7 +51,7 @@ style=numeric,
 
 \section{The \LaTeX{} code}
 
-As noted above, this package is really a Lua program; the package {\ttfamily luacas.sty} is merely a shell to make accessing that Lua program easy and manageable from within \LaTeX{}. 
+As noted above, this package is really a Lua program; the package {\ttfamily luacas.dat} is merely a shell to make accessing that Lua program easy and manageable from within \LaTeX{}. 
 \inputminted[
     firstline=12,
     lastline=14,
@@ -59,7 +59,7 @@ As noted above, this package is really a Lua program; the package {\ttfamily lua
     linenos,
     numbersep=5pt]
     {latex}
-    {luacas.sty}
+    {luacas.dat}
 
 We check to make sure the user is compiling with Lua\LaTeX{}; if not, an error message is printed and compilation is aborted. 
 
@@ -70,7 +70,7 @@ We check to make sure the user is compiling with Lua\LaTeX{}; if not, an error m
     linenos,
     numbersep=5pt]
     {latex}
-    {luacas.sty}
+    {luacas.dat}
 
 The following pacakages are required for various macros:
 
@@ -81,7 +81,7 @@ The following pacakages are required for various macros:
     linenos,
     numbersep=5pt]
     {latex}
-    {luacas.sty}
+    {luacas.dat}
 
 The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between the Lua program and \LaTeX{}. 
 
@@ -92,6 +92,6 @@ The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between th
     linenos,
     numbersep=5pt]
     {latex}
-    {luacas.sty}
+    {luacas.dat}
 
 \end{document}

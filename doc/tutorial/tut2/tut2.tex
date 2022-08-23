@@ -199,12 +199,9 @@ The essential difference being:
     \item Using \mintinline{latex}{\directlua}, there is no parsing, so the user (aka Bob) is responsible for telling \texttt{luacas} what to interpret as an \texttt{Integer} versus what to interpret as a normal Lua number. 
 \end{itemize}
 Generally speaking, we like what the parser in \mintinline{latex}{\begin{CAS}..\end{CAS}} does: it keeps us from having to wrap all integers in \texttt{Integer(..)}. But the price we pay is that the parser indiscriminately wraps \emph{all} digit strings in \texttt{Integer(..)}. This causes a problem in the following line in Bob's code:
-\inputminted[ 
-    firstline=35,
-    lastline=35
-    ]
-    {lua}
-    {demotut2.tex}
+\begin{minted}{lua}
+v = simplify(substitute({[x]=r[1]},h))
+\end{minted} 
 The parser sees \mintinline{lua}{r[1]} and interprets \texttt{1} as \texttt{Integer(1)} -- but \mintinline{lua}{r[Integer(1)]} is \texttt{nil}, so no substitution is performed. 
 
 The good news is that, excluding the annoyance between \texttt{Integer} and Lua number, interacting with the CAS via \mintinline{latex}{\directlua} is not much different than interacting with it via \mintinline{latex}{\begin{CAS}..\end{CAS}}
