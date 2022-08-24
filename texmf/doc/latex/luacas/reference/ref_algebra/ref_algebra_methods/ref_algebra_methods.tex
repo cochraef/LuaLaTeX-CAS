@@ -530,4 +530,51 @@ Given two polynomials \texttt{poly1} and \texttt{poly2}, returns a list of the r
 }
 \end{codebox}
 
+\coderef{function PolynomialRing.mul_rec(poly1,poly2)}{return PolynomialRing}
+
+Performs Karatsuba multiplication without constructing new polynomials recursively. But grade-school multiplication of polynomials is actually faster here up to a very large polynomial size due to Lua's overhead.
+
+\newcoderef{function PolynomialRing.partialfractions(g,f,ffactors)}{return BinaryOperation}{g PolynomialRing, f PolynomialRing, ffactors BinaryOperation}
+Returns the partial fraction decomposition of the rational function \texttt{g/f} given \texttt{PolynomialRing}s \texttt{g, f}, and some (not necessarily irreducible) factorization of \texttt{f}. If the factorization is omitted, the irreducible factorization is used. The degree of \texttt{g} must be less than the degree of \texttt{f}.
+
+\begin{codebox}[]
+    \begin{minted}{latex}
+\begin{CAS}
+    g = topoly(4*x^2+2*x+2)
+    f = topoly((x^2+1)^2*(x+1))
+    a = PolynomialRing.partialfractions(g,f)
+\end{CAS}
+\[ \print{g/f} = \print*{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    g = topoly(4*x^2+2*x+2)
+    f = topoly((x^2+1)^2*(x+1))
+    a = PolynomialRing.partialfractions(g,f)
+\end{CAS}
+\[ \print{g/f} = \print*{a} \] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinline{lua}{PolynomialRing.partialfractions()}. Additionally, the \texttt{parfrac} function will automatically try to convert the first two arguments to the \texttt{PolynomialRing} type via \mintinline{lua}{topoly()}. 
+\begin{codebox}[]
+    \begin{minted}{latex}
+\begin{CAS}
+    g = 4*x^2+2*x+2
+    f = (x^2+1)^2*(x+1)
+    a = parfrac(g,f)
+\end{CAS}
+\[ \print{g/f} = \print*{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    g = 4*x^2+2*x+2
+    f = (x^2+1)^2*(x+1)
+    a = parfrac(g,f)
+\end{CAS}
+\[ \print{g/f} = \print*{a} \] 
+\end{codebox}
+
+
 \end{document}
