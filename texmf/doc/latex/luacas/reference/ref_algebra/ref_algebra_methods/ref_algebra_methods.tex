@@ -576,5 +576,39 @@ The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinl
 \[ \print{g/f} = \print*{a} \] 
 \end{codebox}
 
+\newcoderef{function PolynomialRing:rationalroots()}{return remaining, roots}{remaining PolynomialRing, roots table<number,PolynomialRing>}
+
+This method finds the factors of \texttt{PolynomialRing} (up to multiplicity) that correspond to rational roots; these factors are stored in a table \texttt{roots} and returned in the second output of the method. Those factors are then divided out of \texttt{Polynomialring}; the \texttt{PolynomialRing} that remains is returned in the first output of the method. For example: 
+
+\begin{codebox}
+    \begin{minted}[breaklines,fontsize=\small]{latex}
+\begin{CAS}
+  f = topoly((x-1)^2*(x+1)*(x^2+1))
+  g,r = f:rationalroots()
+\end{CAS}
+The factors of $f$ corresponding to rational roots are:
+\luaexec{
+  for i =1, \#r do 
+    tex.print('\\[', r[i]:tolatex(), '\\]')
+  end
+}
+The part of $f$ that remains after dividing out these linear terms is:
+\[ \print{g} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly((x-1)^2*(x+1)*(x^2+1))
+    g,r = f:rationalroots()
+  \end{CAS}
+  The factors of $f$ corresponding to rational roots are:
+  \luaexec{
+    for i =1, \#r do 
+      tex.print('\\[', r[i]:tolatex(), '\\]')
+    end
+  }
+  The part of $f$ that remains after dividing out these linear terms is:
+  \[ \print{g} \]
+\end{codebox}
+
 
 \end{document}
