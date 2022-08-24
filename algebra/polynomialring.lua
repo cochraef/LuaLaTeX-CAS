@@ -245,7 +245,7 @@ end
 function PolynomialRing:tolatex()
     local out = ''
     local loc = self.degree:asnumber()
-    if loc == 0 then 
+    if loc == 0 then
         return self.coefficients[loc]:tolatex()
     end
     if self.ring == Rational.getring() or self.ring == Integer.getring() then 
