@@ -138,7 +138,7 @@ function PolynomialRing.monicgcdremainders(a, b)
     while true do
         local q = remainders[#remainders - 1] // remainders[#remainders]
         local c = remainders[#remainders - 1] - q*remainders[#remainders]
-        if c ~= Integer(0) then
+        if c ~= Integer.zero() then
             remainders[#remainders+1] = c/c:lc()
         else
             break
