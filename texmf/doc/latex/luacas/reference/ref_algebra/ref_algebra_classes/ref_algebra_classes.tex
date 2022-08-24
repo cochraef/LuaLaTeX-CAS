@@ -492,4 +492,62 @@ If the \texttt{.ring} field is nil, then the \texttt{Rational} represents a rati
 \[ \print{c} \] 
 \end{codebox}
 
+\coderef{function AbsExpression:new(expression)}{return AbsExpression}
+
+Creates a new absolute value expression with the given expression.
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({1,1})
+    g = Poly({-1,1})
+    h = AbsExpression(f/g)
+\end{CAS}
+\[ h = \print{h} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({1,1})
+    g = Poly({-1,1})
+    h = AbsExpression(f/g)
+\end{CAS}
+\[ h = \print{h} \] 
+\end{codebox}
+
+\subsubsection*{Fields}
+
+\texttt{AbsExpression}s have only one field: \texttt{.expression}. This field simply holds the \texttt{Expression} inside the absolute value:
+\begin{codebox}
+\begin{minted}[fontsize=\small]{lua}
+tex.print('\\[',h.expression:tolatex(),'\\]')
+\end{minted}
+\tcblower
+\directlua{
+    tex.print('\\[',h.expression:tolatex(),'\\]')
+}
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{abs()} is a shortcut to \mintinline{lua}{AbsExpression:new()}. For example:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Poly({1,1})
+    g = Poly({-1,1})
+    h = abs(f/g)
+\end{CAS}
+\[ h = \print{h} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({1,1})
+    g = Poly({-1,1})
+    h = abs(f/g)
+\end{CAS}
+\[ h = \print{h} \] 
+\end{codebox}
+
+
 \end{document}
