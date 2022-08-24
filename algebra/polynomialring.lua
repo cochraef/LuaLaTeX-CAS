@@ -616,7 +616,7 @@ end
 
 -- This expression is free of a symbol if and only if the symbol is not the symbol used to create the ring.
 function PolynomialRing:freeof(symbol)
-    return ~(symbol.symbol==self.symbol)
+    return symbol.symbol ~= self.symbol
 end
 
 -- Replaces each expression in the map with its value.
