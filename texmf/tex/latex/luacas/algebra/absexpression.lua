@@ -71,7 +71,7 @@ end
 
 --- @return string
 function AbsExpression:tolatex()
-    return "|" .. self.expression:tolatex() .. "|"
+    return "\\left|" .. self.expression:tolatex() .. "\\right|"
 end
 
 -----------------
