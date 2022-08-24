@@ -145,6 +145,16 @@ function extendedgcd(a,b)
     return nil,nil,nil
 end
 
+function parfrac(f,g,ffactor)
+    local f,check1 = topoly(f) 
+    local g,check2 = topoly(g)
+    if check1 and check2 then 
+        return PolynomialRing.partialfractions(f,g,ffactor)
+    else 
+        return f/g 
+    end
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
