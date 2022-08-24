@@ -317,6 +317,7 @@ function PolynomialRing:isatomic()
         return false
     --end
 end
+--test
 
 -- Creates a new polynomial ring given an array of coefficients and a symbol
 function PolynomialRing:new(coefficients, symbol, degree)
