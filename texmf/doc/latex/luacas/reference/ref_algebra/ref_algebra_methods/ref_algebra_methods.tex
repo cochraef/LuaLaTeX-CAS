@@ -472,8 +472,10 @@ Recall: the default symbol for \texttt{Poly} is \texttt{'x'}. So, for example:
 
 \newcoderef{function PolynomialRing.gcd(poly1,poly2)}{return poly3}{poly1 PolynomialRing,..., poly3 PolynomialRing}
 
-Returns the greatest common divisor of two polynomials in a ring (assuming \texttt{poly1,poly2} belong to a Euclidean domain). 
+Returns the greatest common divisor of two polynomials in a ring (assuming \texttt{poly1,poly2} belong to a Euclidean domain). For example:
 
+\begin{codebox}[]
+    \begin{minted}{latex}
 \begin{CAS}
     vars('x')
     f = topoly((x^2+1)*(x-1))
@@ -481,6 +483,16 @@ Returns the greatest common divisor of two polynomials in a ring (assuming \text
     h = PolynomialRing.gcd(f,g)
 \end{CAS}
 \[ \gcd(\print{f},\print{g}) = \print{h} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = topoly((x^2+1)*(x-1))
+    g = topoly((x^2+1)*(x+2))
+    h = PolynomialRing.gcd(f,g)
+\end{CAS}
+\[ \gcd(\print{f},\print{g}) = \print{h} \] 
+\end{codebox}
 
 
 \end{document}
