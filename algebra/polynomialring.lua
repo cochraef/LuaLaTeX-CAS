@@ -269,6 +269,15 @@ function PolynomialRing:tolatex()
                     goto continue
                 end
             end
+            if coeff == Integer(-1) then 
+                if loc == 0 then 
+                    out = out .. "-" .. coeff:neg():tolatex()
+                    goto skip
+                else
+                    out = out .. "-"
+                    goto continue
+                end
+            end
             if coeff < Integer.zero() then 
                 out = out .. "-" .. coeff:neg():tolatex()
             end 
