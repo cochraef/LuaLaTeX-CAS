@@ -174,6 +174,7 @@ arctan = ARCTAN
 arccsc = ARCCSC
 arcsec = ARCSEC
 arccot = ARCCOT
+abs = ABS
 
 function ZTable(t)
     t = t or {}
