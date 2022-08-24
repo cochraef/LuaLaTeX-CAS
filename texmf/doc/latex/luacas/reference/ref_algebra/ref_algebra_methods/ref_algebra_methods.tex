@@ -441,4 +441,18 @@ Factors the given polynomial into irreducible terms. For example:
 \[ \print{a} \] 
 \end{codebox}
 
+\newcoderef{function PolynomialRing:freeof(symbol)}{return bool}{symbol SymbolExpression}
+
+Checks the value of the field \mintinline{lua}{PolynomialRing.symbol} against \texttt{symbol}; returns \mintinline{lua}{true} if these symbols are not equal, and returns \mintinline{lua}{false} otherwise. 
+
+\begin{CAS}
+    f = Poly({2,2,1})
+    vars('t')
+    if f:freeof(t) then 
+        tex.print('free')
+    else 
+        tex.print('bound')
+    end
+\end{CAS}
+
 \end{document}
