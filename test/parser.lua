@@ -280,23 +280,3 @@ function CASparse(input)
         print(err)
     end
 end
-
-CASparse([[
-
-    vars('x')
-    f = x^2+2*x-2
-    g = x^2-1
-    subs = {[x] = f}
-    dh = substitute(subs,g)
-    h = simplify(int(dh,x)+10)
-    r = roots(dh)
-    r = ZTable(r)
-    v = ZTable()
-    for i in range(1, 4) do
-        v[i] = simplify(substitute({[x]=r[i]},h))
-    end
-    print(v[1])
-    print(v[2])
-    print(v[3])
-    print(v[4])
-]])
