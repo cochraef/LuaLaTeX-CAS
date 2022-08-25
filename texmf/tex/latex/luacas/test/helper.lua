@@ -196,6 +196,10 @@ function Expression:getthefancyshrub()
         string = string .. "[ $\\mathtt{"..self.root:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.root};} ]"
         return string
     end
+    if self:type() == TrigExpression then 
+        string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]"
+        return string
+    end
     for index, expression in ipairs(self:subexpressions()) do
         string = string.." [ $\\mathtt{"..expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression["..index.."]};} ] "
     end
