@@ -549,5 +549,65 @@ The function \mintinline{lua}{abs()} is a shortcut to \mintinline{lua}{AbsExpres
 \[ h = \print{h} \] 
 \end{codebox}
 
+\newcoderef{function Logarithm:new(base,arg)}{return Logarithm}{base Expression, arg Expression}
+
+Creates a new \texttt{Logarithm} expression with the given \texttt{base} and \texttt{arg}ument. Some basic simplification rules are known to \texttt{autosimplify()}:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('b','x','y')
+    f = Logarithm(b,x^y)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('b','x','y')
+    f = Logarithm(b,x^y)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{codebox}
+
+\subsubsection*{Fields}
+
+\texttt{Logarithm}s have two fields: \texttt{base} and \texttt{expression}; \texttt{base} naturally stores the base of the logarithm (i.e., the first argument of \texttt{Logarithm}) while \texttt{expression} stores the argument of the logarithm (i.e., the second argument of \texttt{Logarithm}). 
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{log()} is a shortcut to \texttt{Logarithm}:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    vars('b')
+    f = log(b,b)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('b')
+    f = log(b,b)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{codebox}
+
+There is also a \mintinline{lua}{ln()} function to shortcut \texttt{Logarithm} where the base is \texttt{e}, the natural exponent.
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = ln(e)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = ln(e)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{codebox}
+
 
 \end{document}
