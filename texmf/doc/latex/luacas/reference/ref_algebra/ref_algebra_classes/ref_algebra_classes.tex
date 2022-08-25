@@ -755,4 +755,55 @@ The function \mintinline{lua}{sqrt()} shortcuts \texttt{SqrtExpression()}:
 \[ \print{c} = \print*{c} \] 
 \end{codebox}
 
+\newcoderef{function TrigExpression:new(name,expression)}{return TrigExpression}{name string|SymbolExpression, expression Expression}
+
+Creates a new trig expression with the given \texttt{name} and \texttt{expression}. For example:
+
+\begin{codebox}
+    \begin{minted}{lua}
+vars('x')
+f = TrigExpression('sin',x)
+tex.print('\\[',f:tolatex(),'\\]')
+\end{minted}
+\tcblower
+\directlua{
+    vars('x')
+    f = TrigExpression('sin',x)
+    tex.print('\\[',f:tolatex(),'\\]')
+}
+\end{codebox}
+
+\subsubsection*{Fields}
+
+\texttt{TrigExpression}s have many fields:
+\begin{itemize}
+    \item \mintinline{lua}{TrigExpression.name} stores the string \texttt{name}, i.e. the first argument of \mintinline{lua}{TrigExpression()};
+    \item \mintinline{lua}{TrigExpression.expression} stores the \texttt{Expression} \texttt{expression}, i.e. the second argument of \mintinline{lua}{TrigExpression()};
+    \item and all fields inherited from \texttt{FunctionExpression} (e.g. \mintinline{lua}{TrigExpression.derivatives} which defaults to \mintinline{lua}{Integer.zero()}). 
+\end{itemize}
+
+\parseshrub{f}
+\bracketset{action character = @}
+\begin{forest}
+    @\shrubresult
+\end{forest}
+
+\subsubsection*{Parsing}
+
+The usual trigonometric functions have the anticipated shortcut names. For example:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = arctan(x^2)
+\end{CAS}
+\[ \print{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = arctan(x^2)
+\end{CAS}
+\[ \print{f} \] 
+\end{codebox}
+
 \end{document}
