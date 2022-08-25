@@ -155,6 +155,10 @@ function parfrac(f,g,ffactor)
     end
 end
 
+function factorial(a)
+    return FactorialExpression(a) 
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI

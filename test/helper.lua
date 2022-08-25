@@ -32,6 +32,9 @@
     if a:type() == IntegralExpression then 
         return "Intgrl"
     end
+    if a:type() == SqrtExpression then 
+        return "Sqrt"
+    end
     return "No Clue"
 end
 
@@ -65,6 +68,9 @@ function longwhatis(a)
     end
     if a:type() == IntegralExpression then 
         return "IntegralExpression" 
+    end
+    if a:type() == SqrtExpression then 
+        return "SqrtExpression" 
     end
     return "No Clue"
 end
@@ -111,6 +117,9 @@ function nameof(sym)
     end
     if sym:type() == IntegralExpression then 
         return "$\\mathtt{\\int}$" 
+    end
+    if sym:type() == SqrtExpression then 
+        return "$\\mathtt{\\sqrt{\\phantom{x}}}$"
     end
     return "No Clue"
 end
@@ -180,6 +189,11 @@ function Expression:getthefancyshrub()
             string = string .. "[ $\\mathtt{"..self.upper:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.upper};} ] "
             return string 
         end 
+        return string
+    end
+    if self:type() == SqrtExpression then 
+        string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]"
+        string = string .. "[ $\\mathtt{"..self.root:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.root};} ]"
         return string
     end
     for index, expression in ipairs(self:subexpressions()) do
