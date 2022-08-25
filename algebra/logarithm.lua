@@ -37,13 +37,56 @@ function Logarithm:new(base, expression)
     return o
 end
 
---- TODO: evaluate logs that evaluate to exact integers.
+--- @return Expression
+function Logarithm:evaluate()
+    if not self.base:isconstant() or not self.expression:isconstant() or self.base < Integer.zero() or self.expression < Integer.zero() then
+        return self
+    end
+
+    if self.base == Integer.zero() or self.expression == Integer.zero() or self.base == Integer(1) then
+        error("Arithmetic error: division by zero")
+    end
+
+    local result = Integer.one()
+    local base = self.base
+    local expression = self.expression
+    local sign = Integer.one()
+    if base < Integer.one() then
+        base = Integer.one() / base
+        sign = -sign
+    end
+
+
+    local current = base
+    while current < expression do
+        current = current * base
+        result = result + Integer.one()
+    end
+    if current == expression then
+        return sign * result
+    else
+        while current > expression do
+            current = current / base
+            result = result - Integer.one()
+        end
+        if current == expression then
+            return sign * result
+        end
+    end
+
+    return self
+end
 
 --- @return Expression
 function Logarithm:autosimplify()
 
     local base = self.base:autosimplify()
     local expression = self.expression:autosimplify()
+
+    local evaluated = Logarithm(base, expression):evaluate()
+    if evaluated:type() ~= Logarithm then
+        return evaluated
+    end
 
     -- Uses the property that log(b, 1) = 0
     if expression == Integer.one() then

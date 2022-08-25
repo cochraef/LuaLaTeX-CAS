@@ -124,6 +124,7 @@ require("test.calculus.integrals")
 require("test.expressions.autosimplify")
 require("test.expressions.simplify")
 require("test.expressions.functions")
+require("test.expressions.logarithms")
 -- require("test.expressions.rationalexponent")
 require("test.expressions.substitute")
 
