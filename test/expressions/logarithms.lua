@@ -5,6 +5,7 @@ local c = BinaryOperation.POWEXP({Integer(2), LOG(Integer(2), SymbolExpression("
 local d = Logarithm(Integer(2), Integer(256))
 local e = Logarithm(Integer(4), Integer(8))
 local f = Logarithm(Integer(1)/Integer(5), Integer((125)))
+local g = Logarithm(Integer(1)/Integer(9), Integer(1)/Integer(243))
 
 starttest("logarithms")
 testeq(a, "log(e, x)")
@@ -14,4 +15,5 @@ testeq(c:autosimplify(), "y", c)
 testeq(d:autosimplify(), parse("8"), d)
 testeq(e:autosimplify(), parse("2/3"), e)
 testeq(f:autosimplify(), parse("-3"), f)
+testeq(g:autosimplify(), parse("5/2"), g)
 endtest()
