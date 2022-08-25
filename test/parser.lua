@@ -145,6 +145,16 @@ function extendedgcd(a,b)
     return nil,nil,nil
 end
 
+function parfrac(f,g,ffactor)
+    local f,check1 = topoly(f) 
+    local g,check2 = topoly(g)
+    if check1 and check2 then 
+        return PolynomialRing.partialfractions(f,g,ffactor)
+    else 
+        return f/g 
+    end
+end
+
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.
 e = E
 pi = PI
@@ -164,6 +174,7 @@ arctan = ARCTAN
 arccsc = ARCCSC
 arcsec = ARCSEC
 arccot = ARCCOT
+abs = ABS
 
 function ZTable(t)
     t = t or {}
@@ -269,23 +280,3 @@ function CASparse(input)
         print(err)
     end
 end
-
-CASparse([[
-
-    vars('x')
-    f = x^2+2*x-2
-    g = x^2-1
-    subs = {[x] = f}
-    dh = substitute(subs,g)
-    h = simplify(int(dh,x)+10)
-    r = roots(dh)
-    r = ZTable(r)
-    v = ZTable()
-    for i in range(1, 4) do
-        v[i] = simplify(substitute({[x]=r[i]},h))
-    end
-    print(v[1])
-    print(v[2])
-    print(v[3])
-    print(v[4])
-]])

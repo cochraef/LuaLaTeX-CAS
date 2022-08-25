@@ -138,7 +138,7 @@ function PolynomialRing.monicgcdremainders(a, b)
     while true do
         local q = remainders[#remainders - 1] // remainders[#remainders]
         local c = remainders[#remainders - 1] - q*remainders[#remainders]
-        if c ~= Integer(0) then
+        if c ~= Integer.zero() then
             remainders[#remainders+1] = c/c:lc()
         else
             break
@@ -245,7 +245,7 @@ end
 function PolynomialRing:tolatex()
     local out = ''
     local loc = self.degree:asnumber()
-    if loc == 0 then 
+    if loc == 0 then
         return self.coefficients[loc]:tolatex()
     end
     if self.ring == Rational.getring() or self.ring == Integer.getring() then 
@@ -317,6 +317,7 @@ function PolynomialRing:isatomic()
         return false
     --end
 end
+--test
 
 -- Creates a new polynomial ring given an array of coefficients and a symbol
 function PolynomialRing:new(coefficients, symbol, degree)
