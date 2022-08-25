@@ -397,6 +397,7 @@ Alternatively, one could typeset the polynomial naturally and use the \texttt{to
 \begin{codebox}
     \begin{minted}{latex}
 \begin{CAS}
+    vars('x')
     f = 1/3*x - 1/2*x^2 + 1/6*x^3
     f = topoly(f)
 \end{CAS}
@@ -404,6 +405,7 @@ Alternatively, one could typeset the polynomial naturally and use the \texttt{to
 \end{minted}
 \tcblower
 \begin{CAS}
+    vars('x')
     f = 1/3*x - 1/2*x^2 + 1/6*x^3
     f = topoly(f)
 \end{CAS}
@@ -609,5 +611,122 @@ There is also a \mintinline{lua}{ln()} function to shortcut \texttt{Logarithm} w
 \[ \print{f} = \print*{f} \] 
 \end{codebox}
 
+\newcoderef{function FactorialExpression:new(expression)}{return FactorialExpression}{expression Expression}
+
+Creates a new \texttt{FactorialExpression} with the given \texttt{expression}. For example:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    a = FactorialExpression(5)
+\end{CAS}
+\[ \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = FactorialExpression(5)
+\end{CAS}
+\[ \print{a} \] 
+\end{codebox}
+The \texttt{evaluate()} method will compute factorials of positive \texttt{Integer}s:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    a = FactorialExpression(5)
+\end{CAS}
+\[ \print{a} = \print{a:evaluate()} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = FactorialExpression(5)
+\end{CAS}
+\[ \print{a} = \print{a:evaluate()} \] 
+\end{codebox}
+
+\subsubsection*{Fields}
+
+\texttt{FactorialExpression}s have only one field: \texttt{expression}. This field stores the argument of \texttt{FactorialExpression()}. 
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{factorial()} is a shortcut to \texttt{FactorialExpression()}:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    a = factorial(5)
+\end{CAS}
+\[ \print{a} = \print{a:evaluate()} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = factorial(5)
+\end{CAS}
+\[ \print{a} = \print{a:evaluate()} \] 
+\end{codebox}
+
+\newcoderef{function SqrtExpression:new(expression, root)}{return SqrtExpression}{expression Expression, root Integer}
+
+Creates a new \texttt{SqrtExpression} with the given \texttt{expression} and \texttt{root}. If \texttt{root} is omitted, then \texttt{root} defaults to \mintinline{lua}{Integer(2)}. For example:
+
+\begin{codebox}
+    \begin{minted}{lua}
+a = SqrtExpression(Integer(8))
+b = SqrtExpression(Integer(8),Integer(3))
+c = a+b 
+tex.print('\\[',c:tolatex(),'\\]')
+\end{minted}
+\tcblower
+\directlua{
+    a = SqrtExpression(Integer(8))
+b = SqrtExpression(Integer(8),Integer(3))
+c = a+b 
+tex.print('\\[',c:tolatex(),'\\]')
+}
+\end{codebox}
+The \texttt{autosimplify()} method does a few things here. For the example above:
+\begin{codebox}
+    \begin{minted}{lua}
+a = SqrtExpression(Integer(8))
+b = SqrtExpression(Integer(8),Integer(3))
+c = (a+b):autosimplify() 
+tex.print('\\[',c:tolatex(),'\\]')
+\end{minted}
+\tcblower
+\directlua{
+    a = SqrtExpression(Integer(8))
+b = SqrtExpression(Integer(8),Integer(3))
+c = (a+b):autosimplify() 
+tex.print('\\[',c:tolatex(),'\\]')
+}
+\end{codebox}
+On the other hand, if \texttt{root} or \texttt{expression} are not constants, then typically \mintinline{lua}{autosimplify()} will convert \texttt{SqrtExpression} to the appropriate \texttt{BinaryOperation}. For example:
+
+\directlua{
+    vars('x')
+    a = SqrtExpression(x,Integer(3))
+    b = a:autosimplify()
+}
+
+\begin{multicols}{2}
+    \begin{center}
+        \underline{Tree for \texttt{a}}
+
+\parseforest{a}
+\bracketset{action character = @}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
+        \underline{Tree for \texttt{a:autosimplify()}}
+        
+\parseforest{a:autosimplify()}
+\bracketset{action character = @}
+\begin{forest}
+    @\forestresult
+\end{forest}
+\end{center}
+\end{multicols}
 
 \end{document}
