@@ -713,20 +713,46 @@ On the other hand, if \texttt{root} or \texttt{expression} are not constants, th
     \begin{center}
         \underline{Tree for \texttt{a}}
 
-\parseforest{a}
+\parseshrub{a}
 \bracketset{action character = @}
 \begin{forest}
-    @\forestresult
+    for tree = {s sep=2cm,
+        font=\ttfamily}
+    @\shrubresult
 \end{forest}
 
         \underline{Tree for \texttt{a:autosimplify()}}
-        
-\parseforest{a:autosimplify()}
+
+\parseshrub{a:autosimplify()}
 \bracketset{action character = @}
 \begin{forest}
-    @\forestresult
+    for tree = {s sep=2cm,
+        font=\ttfamily}
+    @\shrubresult
 \end{forest}
 \end{center}
 \end{multicols}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{sqrt()} shortcuts \texttt{SqrtExpression()}:
+
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    a = sqrt(1/9)
+    b = sqrt(27/16,3)
+    c = a+b
+\end{CAS}
+\[ \print{c} = \print*{c} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = sqrt(1/9)
+    b = sqrt(27/16,3)
+    c = a+b
+\end{CAS}
+\[ \print{c} = \print*{c} \] 
+\end{codebox}
 
 \end{document}
