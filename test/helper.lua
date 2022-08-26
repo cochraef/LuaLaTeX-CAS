@@ -44,6 +44,9 @@
     if a:type() == Logarithm then 
         return "LOG" 
     end
+    if a:type() == RootExpression then 
+        return "RootOf" 
+    end
     return "No Clue"
 end
 
@@ -89,6 +92,9 @@ function longwhatis(a)
     end
     if a:type() == Logarithm then 
         return "Logarithm" 
+    end
+    if a:type() == RootExpression then 
+        return "RootExpression" 
     end
     return "No Clue"
 end
@@ -163,6 +169,9 @@ function nameof(sym)
     end
     if sym:type() == Logarithm then 
         return "log" 
+    end
+    if sym:type() == RootExpression then 
+        return "RootOf" 
     end
     return "No Clue"
 end
@@ -262,6 +271,10 @@ function Expression:getthefancyshrub()
     if self:type() == Logarithm then 
         string = string .. " [$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]" 
         string = string .. " [$\\mathtt{" ..self.base:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray]  at (.south) {.base};} ]"
+        return string 
+    end
+    if self:type() == RootExpression then 
+        string = string .. "[$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]" 
         return string 
     end
     for index, expression in ipairs(self:subexpressions()) do
