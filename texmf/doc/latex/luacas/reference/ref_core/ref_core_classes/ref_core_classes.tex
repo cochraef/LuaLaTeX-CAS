@@ -155,7 +155,7 @@ The abstract classes provide a unified interface for the concrete classes (expre
 
 Creates a new \texttt{SymbolExpression}. For example:
 \begin{codebox}[]
-\begin{minted}[breaklines]{lua}
+\begin{minted}[breaklines,fontsize=\small]{lua}
 foo = SymbolExpression("bar")
 tex.sprint("The Lua variable ``foo'' is the SymbolExpression: ", foo:tolatex(),".")
 \end{minted}
@@ -192,7 +192,7 @@ y = SymbolExpression("y")
 Creates a new \texttt{BinaryOperation}. For example:
 
 \begin{codebox}
-\begin{minted}{lua}
+\begin{minted}[fontsize=\small]{lua}
 vars('x','y','z')
 w = BinaryOperation(
     BinaryOperation.ADD,
@@ -251,7 +251,7 @@ end
 
 The entries of \texttt{w.expressions} can be used/fetched in a reasonable way:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \[ \print{w.expressions[1]} \]
 \[ \print{w.expressions[2]} \]
 \[ \print{w.expressions[3]} \]
@@ -266,7 +266,7 @@ The entries of \texttt{w.expressions} can be used/fetched in a reasonable way:
 
 Thank goodness for this. Creating new \texttt{BinaryOperation}s isn't nearly as cumbersome as the above would indicate. Using Lua's powerful metamethods, we can parse expressions much more easily. For example, the construction of \texttt{w} given above can be done much more naturally using:
 \begin{codebox}
-\begin{minted}{lua}
+\begin{minted}[fontsize=\small]{lua}
 vars('x','y','z')
 w = x*y+y+z
 tex.print("\\[w=", w:tolatex(), "\\]")
@@ -282,7 +282,7 @@ tex.print("\\[w=", w:tolatex(), "\\]")
 {\bf Warning:} there are escape issues to be aware of with the operator \mintinline{latex}{%}. If you're writing custom \texttt{luacas} functions in a separate \texttt{.lua} file, then there are no issues; use \mintinline{latex}{%} with reckless abandon. But when using the operator \mintinline{latex}{%} within, say \mintinline{latex}{\begin{CAS}..\end{CAS}}, then one should write \mintinline{latex}{\%} in place of \mintinline{latex}{%}:
 
 \begin{codebox}
-\begin{minted}[breaklines]{latex}
+\begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
     a = 17
     b = 5
@@ -301,7 +301,7 @@ tex.print("\\[w=", w:tolatex(), "\\]")
 \end{codebox}
 The above escape will {\bf not} work with \mintinline{latex}{\directlua}, but it will work for \mintinline{latex}{\luaexec} from the \texttt{luacode} package. Indeed, the \texttt{luacode} package was designed (in part) to make escapes like this more manageable. Here is the equivalent code using \mintinline{latex}{\luaexec}:
 \begin{codebox}[]
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \luaexec{
 a = Integer(17)
 b = Integer(5)
@@ -324,7 +324,7 @@ tex.print("\\[", c:tolatex(), "\\equiv", a:tolatex(), "\\bmod{", b:tolatex(), "}
 
 Creates a generic function. For example:
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 vars('x','y')
 f = FunctionExpression('f',{x,y})
 tex.print("\\[",f:tolatex(),"\\]")
@@ -347,7 +347,7 @@ The variable \texttt{name} can be a string (like above), or another \texttt{Symb
 Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The field \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$ or $x_1,x_2,\ldots$. For example:
 
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 vars('s','t')
 f = FunctionExpression('f',{s*s,s+t+t})
 tex.print("The variables of f are:")
@@ -385,7 +385,7 @@ end
 \end{codebox}
 We can change the values of \texttt{variables} and \texttt{derivatives} manually (or more naturally by other gizmos found in \texttt{luacas}). For example, keeping the variables from above, we have:
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 f.derivatives = {Integer.one(),
     Integer.one()}
 tex.print("\\[",
@@ -403,7 +403,7 @@ tex.print("\\[",
 
 Thank goodness for this too. The parser nested within the \LaTeX{} environment \mintinline{latex}{\begin{CAS}..\end{CAS}} allows for fairly natural function assignment; the name of the function must be declared in \mintinline{lua}{vars(...)} (or rather, as a \texttt{SymbolExpression}) beforehand:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('s','t','f')
     f = f(s^2,s+2*t)

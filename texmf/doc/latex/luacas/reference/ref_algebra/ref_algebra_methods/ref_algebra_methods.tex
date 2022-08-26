@@ -173,7 +173,7 @@ For {\ttfamily Ring} objects {\ttfamily a} and {\ttfamily b}:
 \reversemarginpar
 Arithmetic\marginnote{\color{rose}\large\faHandPointRight} of {\ttfamily Ring} elements will (generally) not form a {\ttfamily BinaryOperation}. Instead, the appropriate \mintinline{lua}{__RingOperation} is called which then passes the arithmetic to a specific ring, if possible. For example:
 \begin{codebox}
-    \begin{minted}[breaklines]{latex}
+    \begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
     f = Poly({2,1})
     g = Poly({2,5})
@@ -304,7 +304,7 @@ We now discuss the more arithmetic methods included in the algebra package.
 
 Returns the formal derivative of the given polynomial. For example:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = Poly({1,1,1/2,1/6})
     g = f:derivative()
@@ -326,7 +326,7 @@ Returns the formal derivative of the given polynomial. For example:
 Uses synthetic division to return the quotient (\texttt{poly2}) and remainder (\texttt{poly3}) of \texttt{self/poly1}. For example:
 
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = Poly({2,2,1})
     g = Poly({1,1})
@@ -355,7 +355,7 @@ Given two \texttt{PolynomialRing} elements \texttt{poly1,poly2} returns:
 For example:
 
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x')
     f = topoly((x-1)*(x-2)*(x-3))
@@ -381,7 +381,7 @@ For example:
 The function \texttt{extendedgcd()} is a shortcut to \texttt{Polynomial.extendedgcd()}:
 
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = topoly((x+2)*(x-3))
     g = topoly((x+4)*(x-3))
@@ -404,7 +404,7 @@ The function \texttt{extendedgcd()} is a shortcut to \texttt{Polynomial.extended
 Uses Horner's rule to evaluate a polynomial at \texttt{Expression}. Typically, the input \texttt{Expression} is an \texttt{Integer} or \texttt{Rational}. For example:
 
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = Poly({2,2,1})
     p = f:evaluateat(1/2)
@@ -426,7 +426,7 @@ Uses Horner's rule to evaluate a polynomial at \texttt{Expression}. Typically, t
 Factors the given polynomial into irreducible terms. For example:
 
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = Poly({8,24,32,24,10,2})
     a = f:factor()
@@ -447,7 +447,7 @@ Checks the value of the field \mintinline{lua}{PolynomialRing.symbol} against \t
 
 Recall: the default symbol for \texttt{Poly} is \texttt{'x'}. So, for example:
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = Poly({2,2,1})
     vars('t')
@@ -475,7 +475,7 @@ Recall: the default symbol for \texttt{Poly} is \texttt{'x'}. So, for example:
 Returns the greatest common divisor of two polynomials in a ring (assuming \texttt{poly1,poly2} belong to a Euclidean domain). For example:
 
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x')
     f = topoly((x^2+1)*(x-1))
@@ -538,7 +538,7 @@ Performs Karatsuba multiplication without constructing new polynomials recursive
 Returns the partial fraction decomposition of the rational function \texttt{g/f} given \texttt{PolynomialRing}s \texttt{g, f}, and some (not necessarily irreducible) factorization of \texttt{f}. If the factorization is omitted, the irreducible factorization is used. The degree of \texttt{g} must be less than the degree of \texttt{f}.
 
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     g = topoly(4*x^2+2*x+2)
     f = topoly((x^2+1)^2*(x+1))
@@ -559,7 +559,7 @@ Returns the partial fraction decomposition of the rational function \texttt{g/f}
 
 The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinline{lua}{PolynomialRing.partialfractions()}. Additionally, the \texttt{parfrac} function will automatically try to convert the first two arguments to the \texttt{PolynomialRing} type via \mintinline{lua}{topoly()}. 
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     g = 4*x^2+2*x+2
     f = (x^2+1)^2*(x+1)

@@ -88,7 +88,8 @@ At the heart of any CAS is the idea of an \texttt{Expression}. Mathematically sp
     \inputminted[ 
         firstline = 1,
         lastline = 13,
-        breaklines
+        breaklines,
+        fontsize=\small
     ]
     {latex}
     {demotut3.dat}}
@@ -114,7 +115,8 @@ Charlie can print the \texttt{Expression} type directly into their document usin
     \inputminted[ 
         firstline = 15,
         lastline = 18,
-        breaklines
+        breaklines,
+        fontsize=\small
     ]
     {latex}
     {demotut3.dat}
@@ -142,7 +144,8 @@ At any rate, Charlie now knows, according to \texttt{luacas}, that \texttt{q} is
     \inputminted[ 
         firstline = 20,
         lastline = 22,
-        breaklines
+        breaklines,
+        fontsize=\small
     ]
     {latex}
     {demotut3.dat}}
@@ -168,7 +171,8 @@ Of course, different \texttt{Expression} types have different attributes. For ex
     \inputminted[ 
         firstline = 24,
         lastline = 24,
-        breaklines
+        breaklines,
+        fontsize=\small
     ]
     {latex}
     {demotut3.dat}}
@@ -309,7 +313,7 @@ end
 Now Charlie only needs to ensure that \texttt{myfile.lua} is in a location visible to their TeX installation (e.g. in the current working folder). Charlie can then produce the following:
 
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \directlua{dofile('myfile.lua')}
 \begin{CAS}
     q = q:mycombine()
@@ -343,7 +347,7 @@ end
 }
 Now Charlie has:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     q = q:mysimplify()
 \end{CAS}
@@ -374,7 +378,7 @@ function Expression:factornum()
 end
 }
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 After factoring the numerator:
 \begin{CAS}
     q = q:myfactor()
@@ -402,7 +406,7 @@ Armed with their custom functions \texttt{mycombine}, \texttt{mysimplify}, and \
 
 Of course, the schlubs that manage this package feel for Charlie, and recognize that there are other situations in which folks may want to combine a sum of rational expressions into a single rational expression. Accordingly, there is indeed a \texttt{combine} command included in \texttt{luacas} that performs this task:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x','y','z')
     a = y/z
@@ -427,7 +431,7 @@ Of course, the schlubs that manage this package feel for Charlie, and recognize 
 
 Here's Charlie's complete code (but using \mintinline{latex}{\directlua}) instead:
 
-\begin{minted}[breaklines]{latex}
+\begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
     vars('x','h')
     f = x/(x^2+1)
@@ -440,7 +444,7 @@ Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using
 \directlua{
 \end{minted}
 And now the Lua code:
-\begin{minted}{lua}
+\begin{minted}[breaklines,fontsize=\small]{lua}
     function Expression:mycombine()
         local a = self.expressions[1].expressions[1].expressions[1]
         local b = self.expressions[1].expressions[1].expressions[2]
@@ -464,7 +468,7 @@ And now the Lua code:
     end
 \end{minted}
 And now back to the \LaTeX{} code:
-\begin{minted}{latex}
+\begin{minted}[breaklines,fontsize=\small]{latex}
 }
 \[ \begin{aligned} 
     \print{q} &=

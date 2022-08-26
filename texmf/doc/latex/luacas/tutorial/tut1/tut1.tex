@@ -82,7 +82,7 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
     q = (substitute(subs,f)- f)/h
 \end{CAS}
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \[ \print{q} \] 
     \end{minted}
     \tcblower
@@ -90,7 +90,7 @@ Alice is curious to know if $q$ is what she thinks it is. So Alice decides to ha
 \end{codebox}
 So far so good! Alice wants to expand the numerator of $q$; she finds the aptly named \texttt{expand} method helpful in this regard. Alice redefines \mintinline{lua}{q} to be \mintinline{lua}{q=expand(q)}, and prints the result to see if things worked as expected:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x','h')
     f = x^2
@@ -110,7 +110,7 @@ Alice is pleasantly surprised that the result of the expansion has been \emph{si
 
 Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quotient has been expanded and simplified, this amounts to another substitution:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x','h')
     f = x^2
@@ -131,7 +131,7 @@ Finally, Alice wants to take the limit as $h\to 0$. Now that our difference quot
 \end{codebox}
 Alice is slightly disappointed that $0+2x$ is returned and not $2x$. Alice takes a guess that there's a \mintinline{lua}{simplify} command. This does the trick: adding the line \mintinline{lua}{q = simplify(q)} before leaving the \texttt{CAS} environment returns the expected $2x$:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x','h')
     f = x^2
@@ -159,7 +159,7 @@ Alice is pretty happy with how everything is working, but she wants to be able t
     \item CAS macros persist -- if Alice assigns \mintinline{lua}{f = x^2} within \mintinline{latex}{\begin{CAS}..\end{CAS}}, then the CAS remembers that \mintinline{lua}{f = x^2} the next time Alice enters the CAS environment. 
 \end{itemize}
 Here's Alice's completed code:
-\begin{minted}[breaklines]{latex}
+\begin{minted}[breaklines,fontsize=\small]{latex}
     \begin{CAS}
         vars('x','h')
         f = x^2
@@ -191,7 +191,7 @@ Here's Alice's completed code:
     
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x','h')
     f = 2*x^3-x

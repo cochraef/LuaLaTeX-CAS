@@ -209,7 +209,7 @@ In this case, the expression trees for \texttt{w} and \texttt{w:autosimplify()},
 
 The starred variant of the \LaTeX{} command \mintinline{latex}{\print} will automatically apply the method \texttt{autosimplify()} to its argument:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x')
     a = x+x/2
@@ -225,7 +225,7 @@ The starred variant of the \LaTeX{} command \mintinline{latex}{\print} will auto
 \end{codebox} 
 Alternatively, you can call \texttt{autosimplify()} directly within \mintinline{latex}{\begin{CAS}..\end{CAS}}:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x')
     a = (x+x/2):autosimplify()
@@ -267,7 +267,7 @@ produces:
 
 Arithmetic like above is actually done automatically (via the \texttt{Ring} interface):
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     x = 1/2
     y = 2/3
@@ -286,7 +286,7 @@ Arithmetic like above is actually done automatically (via the \texttt{Ring} inte
 
 Otherwise, the \texttt{evaluate()} method will attempt to evaluate all subexpressions, and then stop there:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS} 
     vars('x')
     y = diff(x^2+x,x)+diff(2*x,x)
@@ -398,7 +398,7 @@ Determines whether or not an expression contains a particular {\ttfamily SymbolE
 
 The method \texttt{freeof()} is quite literal. For example:
 \begin{codebox}
-\begin{minted}[fontsize=\footnotesize]{lua}
+\begin{minted}[fontsize=\small]{lua}
 x = SymbolExpression("foo")
 y = SymbolExpression("bar")
 z = x+y
@@ -422,7 +422,7 @@ end
 \end{codebox}
 On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("foo")} contains a single node with no edges. With nary a \mintinline{lua}{SymbolExpression("fo")} to find in such a tree, we have:
 \begin{codebox}
-    \begin{minted}[fontsize=\footnotesize]{lua}
+    \begin{minted}[fontsize=\small]{lua}
 x = SymbolExpression("foo")
 y = SymbolExpression("fo")
 if x:freeof(y) then 
@@ -503,7 +503,7 @@ end
 Determines whether an expression is a complex number in the mathematical sense, such as $3 + \sqrt{2}i$. It's helpful to keep in mind that, oftentimes, content needs to be simplified/evaluated in order to obtain the intended results:
 
 \begin{codebox}[]
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 a = (Integer.one() + I) ^ Integer(2)
 if a:iscomplexconstant() then 
     tex.print("$",a:tolatex(),"$ is a complex constant.")
@@ -525,7 +525,7 @@ end
 \end{codebox}
 While:
 \begin{codebox}[]
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 a = (Integer.one()+I) ^ Integer(2)
 a = a:expand():simplify()
 if a:iscomplexconstant() then 
@@ -555,7 +555,7 @@ end
 Determines whether an expression is atomic and contains no variables. This method is counterintuitive in some cases. For instance:
 
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 if not pi:isconstant() then 
   tex.print("$\\pi$ is not constant.")
 end  
@@ -576,7 +576,7 @@ This is because {\ttfamily isconstant()} is meant to check for certain autosimpl
 Determines whether an expression is a real number in the mathematical sense, such as $2$, $\sqrt{5}$, or $\sin(3)$. For example:
 
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 if pi:isrealconstant() then 
   tex.print("$\\pi$ is a real constant.")
 end
@@ -750,12 +750,14 @@ Then the expression trees for \texttt{c}, \texttt{c:autosimplify()}, and \texttt
 \end{multicols}
 Accordingly, we have:
 \begin{codebox}
-    \begin{minted}[breaklines,fontsize=\scriptsize]{lua}
+    \begin{minted}[breaklines,fontsize=\small]{lua}
 tex.print("The size of \\texttt{c} is",
   tostring(c:size()),"\\newline")
-tex.print("The size of \\texttt{c:autosimplify()} is",
+tex.print("The size of
+  \\texttt{c:autosimplify()} is",
   tostring(c:autosimplify():size()), "\\newline")
-tex.print("The size of \\texttt{c:simplify()} is",
+tex.print("The size of
+  \\texttt{c:simplify()} is",
   tostring(c:simplify():size()))
     \end{minted}
     \tcblower
@@ -897,7 +899,7 @@ Converts an expression to \LaTeX{} code. Some folks have strong feelings about h
 We've tried to remain neutral:
 
 \begin{codebox}
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('y')
     f = diff(int(sin(y/2),y),y)
@@ -929,7 +931,7 @@ If we include the above function in a separate file, say \texttt{mytex.lua}, and
 
 or simply include the above function directly into the document via \mintinline{latex}{\directlua} or \mintinline{latex}{\luaexec}, then we would get:
 \begin{codebox}
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
   f = DerivativeExpression(y+sin(y),y)
 \end{CAS}
@@ -946,7 +948,7 @@ The \LaTeX{} command \mintinline{latex}{\print} calls the method \mintinline{lua
 Additionally, one can use the \texttt{disp()} function within \mintinline{latex}{\begin{CAS}..\end{CAS}}. 
 
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
   f = DerivativeExpression(y+sin(y),y)
   disp(f)
@@ -963,7 +965,7 @@ The function \texttt{disp} takes two optional boolean arguments both are set to 
 
 \begin{multicols}{3}
     \begin{codebox}[]
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     disp(f,true)
 \end{CAS}
@@ -974,7 +976,7 @@ The function \texttt{disp} takes two optional boolean arguments both are set to 
 \end{CAS}
 \end{codebox}
     \begin{codebox}[]
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
  disp(f,true,true)
 \end{CAS}
@@ -985,7 +987,7 @@ The function \texttt{disp} takes two optional boolean arguments both are set to 
 \end{CAS}
 \end{codebox}
     \begin{codebox}[]
-\begin{minted}{latex}
+\begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
  disp(f,false,true)
 \end{CAS}
@@ -1010,7 +1012,7 @@ Polynomial computations tend to be significantly faster when those polynomials a
 
 \begin{multicols}{2}
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
   vars('x')
   f = 3+2*x+x^2
@@ -1035,7 +1037,7 @@ Polynomial computations tend to be significantly faster when those polynomials a
 \end{CAS}
 \end{codebox}
 \begin{codebox}[]
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
   vars('x')
   f = 3+2*x+x^2
@@ -1068,7 +1070,7 @@ Polynomial computations tend to be significantly faster when those polynomials a
 Returns the \mintinline{lua}{__index} metatable for \texttt{Expression}. In other words, this function returns the type of \texttt{Expression}. Here's typical usage:
 
 \begin{codebox}
-    \begin{minted}[breaklines]{latex}
+    \begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
   vars('x')
   if x:type() == SymbolExpression then 
@@ -1090,7 +1092,7 @@ Returns the \mintinline{lua}{__index} metatable for \texttt{Expression}. In othe
 The \LaTeX{} command \mintinline{latex}{\whatis} can be used to print the type of \texttt{Expression}:
 
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 x is a \whatis{x}
     \end{minted}
     \tcblower
@@ -1100,7 +1102,7 @@ x is a \whatis{x}
 Alternatively, there's a \mintinline{lua}{whatis()} function and a \mintinline{lua}{longwhatis()} function that can be called within a Lua environment (like \mintinline{latex}{\directlua} or \mintinline{latex}{\luaexec}):
 
 \begin{codebox}
-\begin{minted}{lua}
+\begin{minted}[fontsize=\small]{lua}
 tex.print(whatis(x), '\\newline')
 tex.print(longwhatis(x))
 \end{minted}
