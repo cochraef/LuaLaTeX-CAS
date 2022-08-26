@@ -107,12 +107,12 @@ function substitute(tbl,expr)
     return expr:substitute(tbl)
 end
 
-function roots(poly)
-    poly = expand(poly)
-    if poly.topolynomial then 
-        poly = poly:topolynomial()
+function roots(expression)
+    poly,ispoly = topoly(expression)
+    if ispoly then  
+        return poly:roots()
     end
-    return poly:roots()
+    return RootExpression(expression)
 end
 
 function combine(expr)
