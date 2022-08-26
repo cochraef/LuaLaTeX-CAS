@@ -118,6 +118,10 @@ function RootExpression:order(other)
     return self.expression:order(other.expression)
 end
 
+--- @return string
+function RootExpression:tolatex()
+    return '\\operatorname{RootOf}\\left(' .. self.expression:tolatex() .. '\\right)'
+end
 
 -----------------
 -- Inheritance --
