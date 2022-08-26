@@ -24,7 +24,11 @@ function TrigExpression:new(name, expression)
     o.name = name
     o.expression = expression
     o.expressions = {expression}
-    o.variables = {expression}
+    if expression:isatomic() then 
+        o.variables = {expression}
+    else
+        o.variables = {SymbolExpression('x')}
+    end
     o.derivatives = {Integer.zero()}
 
     __o.__index = TrigExpression
