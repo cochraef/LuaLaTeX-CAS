@@ -20,7 +20,8 @@
     \tcbuselibrary{xparse,documentation}
 \usepackage{microtype}
 \usepackage{makeidx}
-\usepackage{fontawesome}
+\usepackage{fontawesome5}
+\usepackage{marginnote}
 
 \usepackage[
 backend=biber,
@@ -216,7 +217,7 @@ w = BinaryOperation(
 tex.print("\\[w=",w:tolatex(),"\\]")
 }
 \end{codebox}
-The instance variable \texttt{operation} must be a function \mintinline{lua}{function f(a,b)} assigned to one of the following types:
+The variable \texttt{operation} must be a function \mintinline{lua}{function f(a,b)} assigned to one of the following types:
 \bgroup
 \setdescription{style=multiline,
         topsep=10pt,
@@ -233,7 +234,7 @@ The instance variable \texttt{operation} must be a function \mintinline{lua}{fun
     \item[BinaryOperation.POW:] \mintinline{lua}{return a ^ b}
 \end{description}
 \egroup
-The instance variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
+The variable \texttt{expressions} must be a table of \texttt{Expression}s index by Lua numbers.
 
 \subsubsection*{Fields}
 
@@ -249,22 +250,38 @@ end
     \end{minted}
 \end{itemize}
 
+\begin{multicols}{2}
 The entries of \texttt{w.expressions} can be used/fetched in a reasonable way:
-\begin{codebox}
+\begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
-\[ \print{w.expressions[1]} \]
-\[ \print{w.expressions[2]} \]
-\[ \print{w.expressions[3]} \]
+$\print{w.expressions[1]} \quad
+ \print{w.expressions[2]} \quad
+ \print{w.expressions[3]}$
     \end{minted}
     \tcblower
-    \[ \print{w.expressions[1]} \]
-    \[ \print{w.expressions[2]} \] 
-    \[ \print{w.expressions[3]} \]
+$\print{w.expressions[1]} \quad
+ \print{w.expressions[2]} \quad
+ \print{w.expressions[3]}$
 \end{codebox}
+
+\begin{center}
+    \bracketset{action character = @}
+    \parseshrub{w}
+    \begin{forest}
+        for tree = {font = \ttfamily,
+            draw,
+            rounded corners = 1pt,
+            fill = gray!20,
+            l sep = 1.5cm,
+            s sep = 2cm}
+        @\shrubresult
+    \end{forest}
+\end{center}
+\end{multicols}
 
 \subsubsection*{Parsing}
 
-Thank goodness for this. Creating new \texttt{BinaryOperation}s isn't nearly as cumbersome as the above would indicate. Using Lua's powerful metamethods, we can parse expressions much more easily. For example, the construction of \texttt{w} given above can be done much more naturally using:
+Thank goodness for this. Creating new \texttt{BinaryOperation}s isn't nearly as cumbersome as the above would indicate. Using Lua's powerful metamethods, we can parse expressions easily. For example, the construction of \texttt{w} given above can be done much more naturally using:
 \begin{codebox}
 \begin{minted}[fontsize=\small]{lua}
 vars('x','y','z')
@@ -278,8 +295,8 @@ tex.print("\\[w=", w:tolatex(), "\\]")
     tex.print("\\[w=", w:tolatex(), "\\]")
 }
 \end{codebox}
-
-{\bf Warning:} there are escape issues to be aware of with the operator \mintinline{latex}{%}. If you're writing custom \texttt{luacas} functions in a separate \texttt{.lua} file, then there are no issues; use \mintinline{latex}{%} with reckless abandon. But when using the operator \mintinline{latex}{%} within, say \mintinline{latex}{\begin{CAS}..\end{CAS}}, then one should write \mintinline{latex}{\%} in place of \mintinline{latex}{%}:
+\reversemarginpar
+{\bf Warning:}\marginnote{\color{rose}\faExclamationTriangle} there are escape issues to be aware of with the operator \mintinline{latex}{%}. If you're writing custom \texttt{luacas} functions in a separate \texttt{.lua} file, then there are no issues; use \mintinline{latex}{%} with reckless abandon. But when using the operator \mintinline{latex}{%} within, say \mintinline{latex}{\begin{CAS}..\end{CAS}}, then one should write \mintinline{latex}{\%} in place of \mintinline{latex}{%}:
 
 \begin{codebox}
 \begin{minted}[breaklines,fontsize=\small]{latex}
@@ -344,6 +361,7 @@ The variable \texttt{name} can be a string (like above), or another \texttt{Symb
     \item the variable \texttt{name}, i.e. the string \mintinline{lua}{'f'}, is stored in \mintinline{lua}{f.name}; and
     \item the variable \texttt{expressions}, i.e. the table \mintinline{lua}{{x,y}} is stored in \mintinline{lua}{f.expressions}.
 \end{itemize}
+
 Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The field \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$ or $x_1,x_2,\ldots$. For example:
 
 \begin{codebox}
@@ -365,7 +383,7 @@ end
     end
 }
 \end{codebox}
-The field \texttt{derivatives} is a table of \texttt{Integer}s index by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of (\texttt{Integer}) zeros. So for the example above, we have:
+The field \texttt{derivatives} is a table of \texttt{Integer}s indexed by Lua numbers whose length equals \mintinline{lua}{#o.variables}. The default value for this table is a table of (\texttt{Integer}) zeros. So for the example above, we have:
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
 for _,integer in ipairs(f.derivatives) do 
@@ -384,7 +402,8 @@ end
 }
 \end{codebox}
 We can change the values of \texttt{variables} and \texttt{derivatives} manually (or more naturally by other gizmos found in \texttt{luacas}). For example, keeping the variables from above, we have:
-\begin{codebox}
+\begin{multicols}{2}
+\begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
 f.derivatives = {Integer.one(),
     Integer.one()}
@@ -398,6 +417,21 @@ tex.print("\\[",
     tex.print("\\[", f:simplify():tolatex(), "\\]")
 }
 \end{codebox}
+
+\begin{center}
+\parseshrub{f}
+\bracketset{action character = @}
+\begin{forest}
+    for tree = {font = \ttfamily,
+        draw,
+        rounded corners = 1pt,
+        fill = gray!20,
+        l sep = 1.5cm,
+        s sep = 0.75cm}
+    @\shrubresult
+\end{forest}
+\end{center}
+\end{multicols}
 
 \subsubsection*{Parsing}
 

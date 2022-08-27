@@ -132,7 +132,7 @@ Any of the methods below can be used within \mintinline{latex}{\begin{CAS}..\end
 \index{Core!Methods!\texttt{autosimplify}}
 \addcontentsline{toc}{subsubsection}{\ttfamily autosimplify}
 
-Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them. The {\ttfamily autosimplify()} method calls the {\ttfamily evaluate()} method first.
+Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them.
 
 Consider the code:
 
@@ -173,7 +173,7 @@ It seems that \texttt{autosimplify()} did nothing; but there are significant str
 \end{center}
 \end{multicols}
 
-Ironically, the \emph{autosimplified} expression tree on the right looks more complicated than the one on the left! But the main purpose of \texttt{autosimplify()} is to take an expression (that truly could be input in a myriad of ways) and convert that expression into something \emph{anticipatable}. 
+Ironically, the \emph{autosimplified} expression tree on the right looks more complicated than the one on the left! But on of the primary functions of \texttt{autosimplify()} is to take an expression (that truly could be input in a myriad of ways) and convert that expression into something \emph{anticipatable}. 
 
 For example, suppose the user inputs:
 \begin{minted}{latex}
@@ -244,7 +244,7 @@ Alternatively, you can call \texttt{autosimplify()} directly within \mintinline{
 \index{Core!Methods!\texttt{evaluate}}
 \addcontentsline{toc}{subsubsection}{\ttfamily evaluate}
 
-Applies to an expression that represents an operation on expressions to its subexpressions. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if all of the expressions are numbers. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
+Attempts to apply operations found in the expression tree of \texttt{Expression}. For instance, evaluating a {\ttfamily DerivativeExpression} applies the derivative operator with respect to the {\ttfamily symbol} field to its {\ttfamily expression} field. Evaluating a {\ttfamily BinaryOperation} with its {\ttfamily operation} field set to {\ttfamily ADD} returns the sum of the numbers in the {\ttfamily expressions} field, if possible. If the expression does not represent an operation or is unable to be evaluated, calling {\ttfamily evaluate()} on an expression returns itself.
 
 For example, the code:
 \begin{minted}{latex}
@@ -375,7 +375,7 @@ On the other hand:
 
 \subsubsection*{Parsing}
 
-There is a \texttt{factor()} function in the parser that is more data-aware than the basic \texttt{:factor()} method mentioned here. For example:
+There is a \texttt{factor()} function in the parser that is more type-aware than the basic \texttt{:factor()} method mentioned here. For example:
 \begin{codebox}
     \begin{minted}[fontsize = \small]{latex}
 \begin{CAS}
@@ -399,47 +399,51 @@ Determines whether or not an expression contains a particular {\ttfamily SymbolE
 The method \texttt{freeof()} is quite literal. For example:
 \begin{codebox}
 \begin{minted}[fontsize=\small]{lua}
-x = SymbolExpression("foo")
-y = SymbolExpression("bar")
-z = x+y
-if z:freeof(x) then 
-    tex.print("I'm free!")
+vars('foo','bar')
+baz = foo+bar
+if baz:freeof(foo) then 
+    tex.print(baz:tolatex(), "is free of", 
+              foo:tolatex(),"!")
 else 
-    tex.print("I'm bound.")
+    tex.print(baz:tolatex(), "is bound by",
+              foo:tolatex(),".")
 end
 \end{minted}
 \tcblower
 \directlua{
-    x = SymbolExpression("foo")
-    y = SymbolExpression("bar")
-    z = x+y
-    if z:freeof(x) then 
-        tex.print("I'm free!")
-    else 
-        tex.print("I'm bound.")
-    end
+vars('foo','bar')
+baz = foo+bar
+if baz:freeof(foo) then 
+    tex.print(baz:tolatex(), "is free of", 
+              foo:tolatex(),"!")
+else 
+    tex.print(baz:tolatex(), "is bound by",
+              foo:tolatex(),".")
+end
 }
 \end{codebox}
 On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("foo")} contains a single node with no edges. With nary a \mintinline{lua}{SymbolExpression("fo")} to find in such a tree, we have:
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
-x = SymbolExpression("foo")
-y = SymbolExpression("fo")
-if x:freeof(y) then 
-    tex.print("I'm free!")
+vars('foo','fo')
+if foo:freeof(fo) then 
+    tex.print(foo:tolatex(),"is free of",
+              fo:tolatex(),"!")
 else 
-    tex.print("I'm bound.")
+    tex.print(foo:tolatex(),"is bound by",
+              fo:tolatex(),'.')
 end
     \end{minted}
     \tcblower
     \directlua{
-    x = SymbolExpression("foo")
-    y = SymbolExpression("fo")
-    if x:freeof(y) then 
-        tex.print("I'm free!")
-    else 
-        tex.print("I'm bound.")
-    end
+vars('foo','fo')
+if foo:freeof(fo) then 
+    tex.print(foo:tolatex(),"is free of",
+              fo:tolatex(),"!")
+else 
+    tex.print(foo:tolatex(),"is bound by",
+              fo:tolatex(),'.')
+end
 }
     \end{codebox}
 
@@ -447,7 +451,12 @@ end
 \index{Core!Methods!\texttt{isatomic}}
 \addcontentsline{toc}{subsubsection}{\ttfamily isatomic}
 
-Determines whether an expression is \emph{atomic}, i.e., whether it has any subexpression fields. So, for example, \texttt{Integer(5)} and \texttt{Integer(15)} are atomic, and so is \texttt{Integer(20)}. But \texttt{Integer(5)+Integer(15)} is not atomic. Here's another example:
+Determines whether an expression is \emph{atomic}. Typically, atomicity is measured by whether the \texttt{Expression} has any subexpression fields. So, for example, \texttt{Integer(5)} and \texttt{Integer(15)} are atomic, and so is \texttt{Integer(20)}. But:
+\begin{minted}{lua}
+BinaryOperation(BinaryOperation.ADD,
+    {Integer(5),Integer(15)})
+\end{minted}
+is non-atomic.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
@@ -593,9 +602,12 @@ end
 \index{Core!Methods!\texttt{order}}
 \addcontentsline{toc}{subsubsection}{\ttfamily order}
 
-For the goals of autosimplification, \texttt{Expression}s must be ordered. \texttt{Expression:order(other)} method returns \mintinline{lua}{true} if \texttt{Expression} is ``less than'' \texttt{other} according to this ordering. On certain classes, the ordering intuitive:
+For the goals of autosimplification, \texttt{Expression}s must be ordered. \texttt{Expression:order(other)} method returns \mintinline{lua}{true} if \texttt{Expression} is ``less than'' \texttt{other} according to this ordering. 
 
-\begin{codebox}
+\begin{multicols}{2}
+On certain classes, the ordering intuitive:
+
+\begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
 a = 4
 b = 3
@@ -625,35 +637,39 @@ end
 \end{CAS}
 \end{codebox}
 
+\columnbreak
+
 On \texttt{SymbolExpression}s, the ordering is lexigraphic:
 
-\begin{codebox}
+\begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
-vars('x','y')
-if y:order(x) then 
-    tex.print(y:tolatex(),
+vars('a')
+vars('b')
+if b:order(a) then 
+    tex.print(b:tolatex(),
     "is less than",
-    x:tolatex())
+    a:tolatex())
 else 
-    tex.print(x:tolatex(),
+    tex.print(a:tolatex(),
         "is less than",
-         y:tolatex())
+         b:tolatex())
 end
 \end{minted}
 \tcblower
 \begin{CAS}
-    vars('x','y')
-    if y:order(x) then 
-        tex.print(y:tolatex(),
+    vars('a','b')
+    if b:order(a) then 
+        tex.print(b:tolatex(),
         "is less than",
-        x:tolatex())
+        a:tolatex())
     else 
-        tex.print(x:tolatex(),
+        tex.print(a:tolatex(),
             "is less than",
-             y:tolatex())
+             b:tolatex())
     end
 \end{CAS}
 \end{codebox}
+\end{multicols}
 
 Of course, inter-class comparisons can be made as well -- but these are predominantly dictated by typesetting conventions. 
 
@@ -863,32 +879,30 @@ The input \texttt{map} is a table that maps expressions to expressions; the meth
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    x = SymbolExpression("foo")
-    y = SymbolExpression("bar")
-    w = SymbolExpression("baz")
-    z = (x/y):substitute({[y]=w,[x]=y})
+  vars('foo','bar','baz')
+  qux = (foo/bar)
+  qux = qux:substitute({[foo]=bar,[bar]=baz})
 \end{CAS}
-\[ \print{z} \] 
+\[ \print{qux} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
-    x = SymbolExpression("foo")
-    y = SymbolExpression("bar")
-    w = SymbolExpression("baz")
-    z = (x/y):substitute({[y]=w,[x]=y})
-\end{CAS}
-\[ \print{z} \] 
+    vars('foo','bar','baz')
+    qux = (foo/bar)
+    qux = qux:substitute({[foo]=bar,[bar]=baz})
+  \end{CAS}
+  \[ \print{qux} \] 
 \end{codebox}
 
 \subsubsection*{Parsing}
 
 There is a \texttt{substitute()} function with a slightly more user-friendly syntax. In particular, 
 
-\mintinline{lua}{(x/y):substitute({[y]=w,[x]=y})}
+\mintinline{lua}{(foo/bar):substitute({[foo]=bar,[bar]=baz})}
 
 is equivalent to 
 
-\mintinline{lua}{substitute({[y]=w,[x]=y}, x/y)} 
+\mintinline{lua}{substitute({[foo]=bar,[bar]=baz}, foo/bar)} 
 
 \coderef{function Expression:tolatex()}{return string}
 \index{Core!Methods!\texttt{tolatex}}
@@ -929,7 +943,7 @@ If we include the above function in a separate file, say \texttt{mytex.lua}, and
 
 \mintinline{latex}{\directlua{dofile('mytex.lua')}}
 
-or simply include the above function directly into the document via \mintinline{latex}{\directlua} or \mintinline{latex}{\luaexec}, then we would get:
+or include the above function directly into the document via \mintinline{latex}{\directlua} or \mintinline{latex}{\luaexec}, then we would get:
 \begin{codebox}
 \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}

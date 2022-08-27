@@ -610,5 +610,17 @@ The part of $f$ that remains after dividing out these linear terms is:
   \[ \print{g} \]
 \end{codebox}
 
+\coderef{function PolynomialRing:roots()}{return table<number, Expression}
+
+Returns a list of roots of \texttt{PolynomialRing}, simplified up to cubics.
+
+\begin{CAS}
+    vars('x')
+    f = x^4+x^3+x^2+x+1
+    f = f:substitute({[x]=x^2+1})
+    f = topoly(f)
+    g = f:decompose()
+\end{CAS}
+\[ \print{g[1]} \quad \print{g[2]}\] 
 
 \end{document}
