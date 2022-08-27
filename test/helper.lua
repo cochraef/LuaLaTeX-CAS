@@ -277,6 +277,29 @@ function Expression:getthefancyshrub()
         string = string .. "[$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]" 
         return string 
     end
+    if self:type() == FunctionExpression then 
+        local string1 = ''
+        local string2 = ''
+        local string3 = ''
+        for index=1, #self.variables do 
+            string1 = string1 .. tostring(self.expressions[index])
+            if index < #self.variables then 
+                string1 = string1 .. ","
+            end
+            string2 = string2 .. tostring(self.variables[index])
+            if index < #self.variables then 
+                string2 = string2 .. ","
+            end
+            string3 = string3 .. tostring(self.derivatives[index])
+            if index < #self.variables then 
+                string3 = string3 .. ","
+            end
+        end
+        string = string .. "[$\\mathtt{ \\{" .. string1 .. "\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expressions};} ]"
+        string = string .. "[$\\mathtt{ \\{" .. string2 .. "\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.variables};} ]"
+        string = string .. "[$\\mathtt{ \\{" .. string3 .. "\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.derivatives};} ]"
+        return string
+    end
     for index, expression in ipairs(self:subexpressions()) do
         string = string.." [ $\\mathtt{"..expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression["..index.."]};} ] "
     end
