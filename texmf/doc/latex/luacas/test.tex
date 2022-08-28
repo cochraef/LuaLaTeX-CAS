@@ -7,7 +7,13 @@
     f = Poly({2,2,3,4,5,4,3,2,1})
     r = f:roots()
 \end{CAS}
-\[ \print{r[1]} \qquad \print{r[2]} \]
+\luaexec{
+    if r[1]:type() == RootExpression then 
+        tex.print('root expression')
+    end
+    tex.print('$',tostring(r[1]),'$')
+}
+\[ \print{r[1]} \qquad \print{r[2]}\] 
 \luaexec{
     roots = {}
     factorization = f:factor()
@@ -20,6 +26,8 @@
     if factorroots == false then 
         tex.print('false')
     end
+    replaceroots = {}
 }
+\[ \print{r[1] + r[2]} \] 
 
 \end{document}

@@ -431,6 +431,7 @@ Of course, the schlubs that manage this package feel for Charlie, and recognize 
 
 Here's Charlie's complete code (but using \mintinline{latex}{\directlua}) instead:
 
+\begin{codebox}[frame hidden,breakable]
 \begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
     vars('x','h')
@@ -443,7 +444,9 @@ Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using
 \end{CAS}
 \directlua{
 \end{minted}
+\end{codebox}
 And now the Lua code:
+\begin{codebox}[frame hidden, breakable]
 \begin{minted}[breaklines,fontsize=\small]{lua}
     function Expression:mycombine()
         local a = self.expressions[1].expressions[1].expressions[1]
@@ -467,7 +470,9 @@ And now the Lua code:
         return a/b
     end
 \end{minted}
+\end{codebox}
 And now back to the \LaTeX{} code:
+\begin{codebox}[frame hidden,breakable]
 \begin{minted}[breaklines,fontsize=\small]{latex}
 }
 \[ \begin{aligned} 
@@ -499,6 +504,8 @@ And now back to the \LaTeX{} code:
     \print{q}& &\text{take limit.}
 \end{aligned} \] 
 \end{minted}
+\end{codebox}
+And here is Charlie's completed project:
 \begin{tcolorbox}[colback=roseorange!10,
     colframe=roseorange,
     arc=1pt,

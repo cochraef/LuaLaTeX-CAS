@@ -237,13 +237,13 @@ Bob is delighted to find the following commands: \mintinline{latex}{\fetch} and 
 Whereas the \mintinline{latex}{\print} command relies on the \texttt{luacas} method \mintinline{lua}{tolatex()}, the commands \mintinline{latex}{\fetch} and \mintinline{latex}{\store} rely on the \texttt{luacas} function \mintinline{lua}{tostring()}. Bob can view the output of \mintinline{lua}{tostring()} using the \mintinline{latex}{\vprint} command ({\bf v}erbatim {\bf print}). For example, \mintinline{latex}{\vprint{h}} produces:
 \vprint{h} 
 This is more-or-less what Bob wants -- but he doesn't want the verbatim output printed to his document, Bob just wants the contents of \mintinline{lua}{tostring(h)}. Here's where \mintinline{latex}{\fetch} comes in. The command \mintinline{latex}{\fetch{h}} is equivalent to:
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
     \directlua{
         tex.print(tostring(h))
     }
 \end{minted}
 For comparison, the command \mintinline{latex}{\print{h}} is equivalent to:
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
     \directlua{
         tex.print(h:tolatex())
     }
@@ -333,6 +333,7 @@ The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \
 \end{codebox}
 
 Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project shared below:
+\begin{codebox}[frame hidden,breakable]
 \begin{minted}[breaklines,fontsize=\small]{latex}
 Consider the function $f(x)$ defined by:
 \begin{CAS}
@@ -381,6 +382,8 @@ $\displaystyle f(x) = \print{h}$.
   \end{tikzpicture}
 \end{multicols}
 \end{minted}
+\end{codebox}
+And here is Bob's completed project:
 \begin{tcolorbox}[colback=rosenavy!10,
     colframe=rosenavy,
     arc=1pt,

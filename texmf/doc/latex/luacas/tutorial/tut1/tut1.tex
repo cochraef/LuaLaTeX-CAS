@@ -156,9 +156,10 @@ Alternatively, Alice could have used the \mintinline{latex}{\print*} command ins
 Alice is pretty happy with how everything is working, but she wants to be able to typeset the individual steps of this process. Alice is therefore thrilled to learn that the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment is very robust -- it can:
 \begin{itemize}
     \item Be entered into and exited out of essentially anywhere within her \LaTeX{} document, for example, within \mintinline{latex}{\begin{aligned}..\end{aligned}}; and 
-    \item CAS macros persist -- if Alice assigns \mintinline{lua}{f = x^2} within \mintinline{latex}{\begin{CAS}..\end{CAS}}, then the CAS remembers that \mintinline{lua}{f = x^2} the next time Alice enters the CAS environment. 
+    \item CAS variables persist -- if Alice assigns \mintinline{lua}{f = x^2} within \mintinline{latex}{\begin{CAS}..\end{CAS}}, then the CAS remembers that \mintinline{lua}{f = x^2} the next time Alice enters the CAS environment. 
 \end{itemize}
 Here's Alice's completed code:
+\begin{codebox}[frame hidden,breakable]
 \begin{minted}[breaklines,fontsize=\small]{latex}
     \begin{CAS}
         vars('x','h')
@@ -188,6 +189,7 @@ Here's Alice's completed code:
     \end{aligned} \] 
     So $\print{diff(f,x)} = \print*{diff(f,x)}$. 
 \end{minted}
+\end{codebox}
     
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 
