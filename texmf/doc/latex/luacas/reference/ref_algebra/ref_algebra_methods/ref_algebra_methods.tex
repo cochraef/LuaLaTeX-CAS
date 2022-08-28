@@ -615,12 +615,12 @@ The part of $f$ that remains after dividing out these linear terms is:
 Returns a list of roots of \texttt{PolynomialRing}, simplified up to cubics.
 
 \begin{CAS}
-    vars('x')
-    f = x^4+x^3+x^2+x+1
-    f = f:substitute({[x]=x^2+1})
-    f = topoly(f)
-    g = f:decompose()
+    f = Poly({2,2,3,4,5,4,3,2,1})
+    r = f:roots()
 \end{CAS}
-\[ \print{g[1]} \quad \print{g[2]}\] 
+\[ \print{r[1]} \qquad \print{r[2]} \]
+
+
+
 
 \end{document}

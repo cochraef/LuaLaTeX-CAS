@@ -1,0 +1,25 @@
+\documentclass{article}
+\usepackage{luacas}
+
+\begin{document}
+
+\begin{CAS}
+    f = Poly({2,2,3,4,5,4,3,2,1})
+    r = f:roots()
+\end{CAS}
+\[ \print{r[1]} \qquad \print{r[2]} \]
+\luaexec{
+    roots = {}
+    factorization = f:factor()
+    factor = factorization.expressions[2]
+    decomp = factor.expressions[1]:decompose()
+    factorroots = RootExpression(decomp[\#decomp]):autosimplify()
+    if factorroots == true then 
+        tex.print('true')
+    end
+    if factorroots == false then 
+        tex.print('false')
+    end
+}
+
+\end{document}
