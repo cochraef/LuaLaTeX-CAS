@@ -35,7 +35,6 @@ end
 
 --- @return Expression
 function RootExpression:autosimplify(subpart)
-
     local simplified = self.expression:autosimplify()
     local simplified, ispoly = simplified:topolynomial()
 
@@ -92,7 +91,12 @@ function RootExpression:autosimplify(subpart)
                     ((-Integer.one() / (Integer(3) * a)) * (b + C*eta^Integer(2) + delta0 / (C*eta^Integer(2)))):autosimplify()}
         end
     end
-
+    if ispoly then 
+        simplified = simplified:autosimplify()
+    end
+    if subpart then 
+        simplified = (simplified - subpart):autosimplify()
+    end
     return {RootExpression(simplified)}
 end
 
