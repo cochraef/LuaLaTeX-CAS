@@ -128,11 +128,11 @@ style=numeric,
 
 Any of the methods below can be used within \mintinline{latex}{\begin{CAS}..\end{CAS}}. There are times when the parser or \LaTeX{} front-end allows for simpler syntax or usability. 
 
-\coderef{function Expression:autosimplify()}{return Expression}
+\coderef{function Expression:autosimplify()}{return Expression|table<number, Expression>}
 \index{Core!Methods!\texttt{autosimplify}}
 \addcontentsline{toc}{subsubsection}{\ttfamily autosimplify}
 
-Performs fast simplification techniques on an expression. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them.
+Performs fast simplification techniques on an expression. The return depends on the type of input \texttt{Expression}. Generally, one should call {\ttfamily autosimplify()} on expressions before applying other core methods to them.
 
 Consider the code:
 
@@ -402,11 +402,11 @@ The method \texttt{freeof()} is quite literal. For example:
 vars('foo','bar')
 baz = foo+bar
 if baz:freeof(foo) then 
-    tex.print(baz:tolatex(), "is free of", 
-              foo:tolatex(),"!")
+  tex.sprint(baz:tolatex(), " is free of ", 
+            foo:tolatex(),"!")
 else 
-    tex.print(baz:tolatex(), "is bound by",
-              foo:tolatex(),".")
+  tex.sprint(baz:tolatex(), " is bound by ",
+            foo:tolatex(),".")
 end
 \end{minted}
 \tcblower
@@ -414,10 +414,10 @@ end
 vars('foo','bar')
 baz = foo+bar
 if baz:freeof(foo) then 
-    tex.print(baz:tolatex(), "is free of", 
+    tex.sprint(baz:tolatex(), " is free of ", 
               foo:tolatex(),"!")
 else 
-    tex.print(baz:tolatex(), "is bound by",
+    tex.sprint(baz:tolatex(), " is bound by ",
               foo:tolatex(),".")
 end
 }
@@ -427,21 +427,21 @@ On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("fo
     \begin{minted}[fontsize=\small]{lua}
 vars('foo','fo')
 if foo:freeof(fo) then 
-    tex.print(foo:tolatex(),"is free of",
-              fo:tolatex(),"!")
+  tex.sprint(foo:tolatex()," is free of ",
+            fo:tolatex(),"!")
 else 
-    tex.print(foo:tolatex(),"is bound by",
-              fo:tolatex(),'.')
+  tex.sprint(foo:tolatex()," is bound by ",
+            fo:tolatex(),'.')
 end
     \end{minted}
     \tcblower
     \directlua{
 vars('foo','fo')
 if foo:freeof(fo) then 
-    tex.print(foo:tolatex(),"is free of",
+    tex.sprint(foo:tolatex()," is free of ",
               fo:tolatex(),"!")
 else 
-    tex.print(foo:tolatex(),"is bound by",
+    tex.sprint(foo:tolatex()," is bound by ",
               fo:tolatex(),'.')
 end
 }
