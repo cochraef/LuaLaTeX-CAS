@@ -612,14 +612,58 @@ The part of $f$ that remains after dividing out these linear terms is:
 
 \coderef{function PolynomialRing:roots()}{return table<number, Expression}
 
-Returns a list of roots of \texttt{PolynomialRing}, simplified up to cubics.
+Returns a list of roots of \texttt{PolynomialRing}, simplified up to cubics. For example:
 
+\begin{codebox}[]
+    \begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
-    f = Poly({1,0,-2,0,-6,0,-4,0,1})
+    f = topoly(x^6 + 3*x^5 + 6*x^4 + 7*x^3 + 6*x^2 + 3*x + 2)
     r = f:roots()
 \end{CAS}
+$ \left\{ \lprint{r} \right\}$ 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly(x^6 + 3*x^5 + 6*x^4 + 7*x^3 + 6*x^2 + 3*x + 2)
+    r = f:roots()
+\end{CAS}
+$ \left\{ \lprint{r} \right\}$ 
+\end{codebox}
+If the decomposition of \texttt{PolynomialRing} (or a factor thereof) is not a chain of cubics or lesser degree polynomials, then \texttt{RootExpression} is returned instead. For example:
 
+\begin{codebox}[]
+    \begin{minted}[breaklines,fontsize=\small]{latex}
+\begin{CAS}
+    f = topoly(x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2)
+    r = f:roots()
+\end{CAS}
+\[ \left\{ \lprint{r} \right\} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly(x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2)
+    r = f:roots()
+\end{CAS}
+\[ \left\{ \lprint{r} \right\} \] 
+\end{codebox}
 
+\subsubsection*{Parsing}
 
+The function \mintinline{lua}{roots()} shortcuts \mintinline{lua}{PolynomialRing:roots()}. Also, the function \texttt{roots} attempts to cast the argument as a polynomial automatically using \mintinline{lua}{topoly()}. For example:
 
+\begin{codebox}[]
+    \begin{minted}[breaklines,fontsize=\small]{latex}
+\begin{CAS}
+    f = x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2
+    r = roots(f)
+\end{CAS}
+\[ \left\{ \lprint{r} \right\} \] 
+\end{minted}
+\tcblower        
+    \begin{CAS}
+        f = x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2
+        r = roots(f)
+    \end{CAS}
+    \[ \left\{ \lprint{r} \right\} \] 
+\end{codebox}
 \end{document}

@@ -262,14 +262,14 @@ Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an integ
 i = Integer(143)
 n = Integer(57)
 a = IntegerModN(i,n)
-tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(),'\\]')
+tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(),'\\bmod{', n:tolatex(), '}\\]')
 \end{minted}
 \tcblower
 \luaexec{
     i = Integer(143)
     n = Integer(57)
     a = IntegerModN(i,n)
-    tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(),'\\]')
+    tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(),'\\bmod{', n:tolatex(), '}\\]')
 }
 \end{codebox}
 
@@ -299,7 +299,7 @@ The function \texttt{Mod(,)} is a shortcut for \texttt{IntegerModN(,)}:
     n = 57
     a = Mod(i,n)
 \end{CAS}
-\[ \print{i} \equiv \print{a} \] 
+\[\print{i}\equiv\print{a}\bmod{\print{n}}\] 
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -307,7 +307,7 @@ The function \texttt{Mod(,)} is a shortcut for \texttt{IntegerModN(,)}:
     n = 57
     a = Mod(i,n)
 \end{CAS}
-\[ \print{i} \equiv \print{a} \] 
+\[ \print{i} \equiv \print{a} \bmod{\print{n}}\] 
 \end{codebox}
 
 \newcoderef{function PolynomialRing:new(coefficients, symbol, degree)}{return PolynomialRing}{coefficients table<number,Ring>, symbol string|SymbolExpression, degree Integer}
