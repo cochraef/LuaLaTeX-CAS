@@ -177,9 +177,7 @@ end
 
 --- @return string
 function IntegerModN:tolatex()
-    local out = self.element:tolatex()
-    out = out .. '\\bmod{' .. self.modulus:tolatex() .. '}'
-    return out
+    return self.element:tolatex()
 end
 -----------------
 -- Inheritance --
