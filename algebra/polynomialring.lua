@@ -248,7 +248,7 @@ function PolynomialRing:tolatex()
     if loc == 0 then
         return self.coefficients[loc]:tolatex()
     end
-    if self.ring == Rational.getring() or self.ring == Integer.getring() then 
+    if self.ring == Rational.getring() or self.ring == Integer.getring() or self.ring == IntegerModN.getring() then 
         if self.coefficients[loc] ~= Integer.one() then 
             out = out .. self.coefficients[loc]:tolatex() .. self.symbol
         else
