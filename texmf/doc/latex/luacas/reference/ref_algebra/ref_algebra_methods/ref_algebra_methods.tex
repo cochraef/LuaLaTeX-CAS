@@ -423,7 +423,7 @@ Uses Horner's rule to evaluate a polynomial at \texttt{Expression}. Typically, t
 
 \coderef{function PolynomialRing:factor()}{return BinaryOperation}
 
-Factors the given polynomial into irreducible terms. For example:
+Factors the given polynomial into irreducible terms over the polynomial ring to which the coefficients belong. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -437,6 +437,61 @@ Factors the given polynomial into irreducible terms. For example:
 \begin{CAS}
     f = Poly({8,24,32,24,10,2})
     a = f:factor()
+\end{CAS}
+\[ \print{a} \] 
+\end{codebox}
+
+On the other hand:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})
+    a = f:factor()
+\end{CAS}
+\[ \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})
+    a = f:factor()
+\end{CAS}
+\[ \print{a} \] 
+\end{codebox}
+
+The syntax \mintinline{lua}{f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})} is awkward. Alternatively, one can use the following instead:
+\begin{codebox}
+    \begin{minted}{latex}
+\begin{CAS}
+    f = Mod(Poly({1,0,1}),5)
+    a = f:factor()
+\end{CAS}
+\[ \print{f} = \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Mod(Poly({1,0,1}),5)
+    a = f:factor()
+\end{CAS}
+\[ \print{f} = \print{a} \] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{factor()} shortcuts \mintinline{lua}{PolynomialRing:factor()}. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = Poly({8,24,32,24,10,2})
+    a = factor(f)
+\end{CAS}
+\[ \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({8,24,32,24,10,2})
+    a = factor(f)
 \end{CAS}
 \[ \print{a} \] 
 \end{codebox}
