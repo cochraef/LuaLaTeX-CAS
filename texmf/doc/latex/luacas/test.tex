@@ -2,32 +2,19 @@
 \usepackage{luacas}
 
 \begin{document}
+\begin{CAS}
+    f = Poly({1,0,-2,0,-6,0,-4,0,1})
+    r = f:roots()
+    decomp = f:decompose()
+\end{CAS}
+\[ \print{r[1]} \] 
+\[ \print{decomp[1]} \qquad \print{decomp[2]} \] 
 
 \begin{CAS}
-    f = Poly({2,2,3,4,5,4,3,2,1})
+    vars('x')
+    f = topoly(x^8 - 8*x^6 + 24*x^4 - 32*x^2 + 17)
     r = f:roots()
 \end{CAS}
-\luaexec{
-    if r[1]:type() == RootExpression then 
-        tex.print('root expression')
-    end
-    tex.print('$',tostring(r[1]),'$')
-}
-\[ \print{r[1]} \qquad \print{r[2]}\] 
-\luaexec{
-    roots = {}
-    factorization = f:factor()
-    factor = factorization.expressions[2]
-    decomp = factor.expressions[1]:decompose()
-    factorroots = RootExpression(decomp[\#decomp]):autosimplify()
-    if factorroots == true then 
-        tex.print('true')
-    end
-    if factorroots == false then 
-        tex.print('false')
-    end
-    replaceroots = {}
-}
-\[ \print{r[1] + r[2]} \] 
+\[ \print{r[1]} \qquad \print{r[2]}  \qquad \print{r[3]} \qquad \print{r[5]} \] 
 
 \end{document}
