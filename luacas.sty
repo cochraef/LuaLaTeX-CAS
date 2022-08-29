@@ -112,6 +112,25 @@
     }%
 }
 
+\NewDocumentCommand{\lprint}{m O{nil,nil}}{%
+    \luaexec{
+        local tbl = #1
+        local low,upp = #2
+        local tmp =0
+        if tbl[0] == nil then 
+            tmp = 1
+        end
+        upp = upp or \#tbl 
+        low = low or tmp
+        for i=low,upp do 
+            tex.print(tbl[i]:tolatex())
+            if tbl[i+1] then 
+                tex.print(",")
+            end 
+        end
+    }
+}
+
 %prints the first level of an expression tree; for use within a tikzpicture environment
 
 \NewDocumentCommand{\printshrub}{s m}{%
