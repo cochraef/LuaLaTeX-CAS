@@ -804,6 +804,12 @@ function PolynomialRing:roots()
     for i, factor in ipairs(factorization.expressions) do
         if i > 1 then
             local decomp = factor.expressions[1]:decompose()
+            for _, poly in ipairs(decomp) do 
+                if poly.degree > Integer(3) then 
+                    table.insert(roots,RootExpression(factor.expressions[1]))
+                    goto nextfactor 
+                end
+            end
             local factorroots = RootExpression(decomp[#decomp]):autosimplify()
             if factorroots == true then
                 return true
