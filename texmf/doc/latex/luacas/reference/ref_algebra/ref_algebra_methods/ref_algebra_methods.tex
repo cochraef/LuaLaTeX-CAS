@@ -203,13 +203,13 @@ To get the {\ttfamily RingIdentifier} from a specific instance (element) of a ri
 So, for example:
 
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 a = Integer(2)/Integer(3)
 ring = a:getring()
 if ring == Integer.makering() then
-    tex.print('same')
+    tex.print('same rings')
 else
-    tex.print('different')
+    tex.print('different rings')
 end
 \end{minted}
 \tcblower
@@ -231,14 +231,14 @@ From there, the CAS computes the smallest {\ttfamily RingIdentifier} that contai
 So, for example:
 
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 a = Poly({Integer(2),Integer(1)})
 b = Integer(3)
 ring1 = a:getring()
 ring2 = b:getring()
 ring = Ring.resultantring(ring1,ring2)
 if ring == a:getring() then 
-    tex.print('polynomials')
+    tex.print('polynomial ring')
 end
 \end{minted}
 \tcblower
@@ -249,7 +249,7 @@ end
     ring2 = b:getring()
     ring = Ring.resultantring(ring1,ring2)
     if ring == a:getring() then 
-        tex.print('polynomials')
+        tex.print('polynomial ring')
     end
 }
 \end{codebox}
@@ -261,7 +261,7 @@ Finally, the CAS converts both objects into the resultant {\ttfamily RingIdentif
 So, for example: 
 
 \begin{codebox}
-    \begin{minted}{lua}
+    \begin{minted}[fontsize=\small]{lua}
 b = b:inring(ring)
 if b:type() == PolynomialRing then 
     tex.print('b is a polynomial now')
@@ -278,7 +278,7 @@ end
 
 Finally, the CAS is able to perform the operation with the correct \mintinline{lua}{__RingOperation}. This all happens within the hierarchy of \texttt{Ring} classes automatically:
 \begin{codebox}
-    \begin{minted}{latex}
+    \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     a = Poly({1/2,3,1})
     b = 1/2
@@ -298,7 +298,41 @@ Finally, the CAS is able to perform the operation with the correct \mintinline{l
 
 To add another class that implements {\ttfamily Ring} and has proper conversion abilities, the {\ttfamily resultantring} method needs to be updated to include all possible resultant rings constructed from the new ring and existing rings. The other three methods need to be implemented as well.
 
-We now discuss the more arithmetic methods included in the algebra package. 
+\hrulefill
+
+We now discuss the more arithmetic methods included in the algebra package beginning with the \texttt{PolynomialRing} class.
+
+\coderef{function PolynomialRing:decompose()}{return table<number, PolynomialRing} 
+
+Returns a list of polynomials that form a complete decomposition of the given polynomial. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = Poly({5,-4,5,-2,1})
+    d = f:decompose()
+\end{CAS}
+\[ \left\{ \lprint{d} \right\} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = Poly({5,-4,5,-2,1})
+    d = f:decompose()
+\end{CAS}
+\[ \left\{ \lprint{d} \right\} \] 
+\end{codebox}
+In particular, the code:
+\begin{minted}{lua}
+g = d[2]:evaluateat(d[1])
+tex.print('\\[', g:tolatex(), '\\]')
+\end{minted}
+recovers $f$:
+\luaexec{
+    g = d[2]:evaluateat(d[1])
+    tex.print('\\[', g:tolatex(), '\\]')
+}
+
+
 
 \coderef{function PolynomialRing.derivative()}{return PolynomialRing}
 
@@ -319,6 +353,28 @@ Returns the formal derivative of the given polynomial. For example:
 \end{CAS}
 \[ \print{f} \xrightarrow{d/dx}
     \print{g} \] 
+\end{codebox}
+
+\coderef{function PolynomialRing:divisors()}{return table<number, PolynomialRing>} 
+
+Returns a list of all monic divisors of positive degree of the polynomial, assuming the polynomial ring is a Euclidean Domain. For example:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = topoly(x^4 - 2*x^3 - x + 2)
+    d = f:divisors()
+\end{CAS}
+\[ \left\{ \lprint{d} \right\} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = topoly(x^4 - 2*x^3 - x + 2)
+    d = f:divisors()
+\end{CAS}
+\[ \left\{ \lprint{d} \right\} \] 
 \end{codebox}
 
 \newcoderef{function PolynomialRing:divremainder(poly1)}{return poly2,poly3}{poly1 PolynomialRing,..., poly3 PolynomialRing}
@@ -721,4 +777,91 @@ The function \mintinline{lua}{roots()} shortcuts \mintinline{lua}{PolynomialRing
     \end{CAS}
     \[ \left\{ \lprint{r} \right\} \] 
 \end{codebox}
+
+\newcoderef{function PolynomialRing.resultant(a,b)}{return Field}{a PolynomialRing, b PolynomialRing} 
+
+Returns the resultant of two polynomials \texttt{a,b} in the same ring, whose coefficients are all part of a field. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = topoly(x^2-2*x+1)
+    g = topoly(x^2+2*x-3)
+    r = PolynomialRing.resultant(f,g)
+\end{CAS}
+\[ \operatorname{res}(f,g) = \print{r} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly(x^2-2*x+1)
+    g = topoly(x^2+2*x-3)
+    r = PolynomialRing.resultant(f,g)
+\end{CAS}
+\[ \operatorname{res}(f,g) = \print{r} \] 
+\end{codebox}
+
+\coderef{function PolynomialRing:squarefreefactorization()}{return BinaryOperation} 
+
+Returns the square-free factorization of a polynomial defined over the rationals. 
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = topoly(x^7 - 13*x^6 + 66*x^5 - 158*x^4 + 149*x^3 + 63*x^2 - 216*x + 108)
+    s = f:squarefreefactorization()
+\end{CAS}
+\[ \print{s} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = topoly(x^7 - 13*x^6 + 66*x^5 - 158*x^4 + 149*x^3 + 63*x^2 - 216*x + 108)
+    s = f:squarefreefactorization()
+\end{CAS}
+\[ \print{s} \]
+\end{codebox}
+
+If the polynomial is defined over $\mathbf{Z}_p$ (where $p$ is prime), then the method \texttt{modularsquarefreefactorization()} should be used. 
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{factor()} has an optional boolean argument that if set to \mintinline{lua}{true} returns \texttt{squarefreefactorization()} or \texttt{modularsquarefreefactorization()} (as appropriate). For example:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    s = factor(f,true)
+\end{CAS}
+\[ \print{s} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    s = factor(f,true)
+\end{CAS}
+\[ \print{s} \] 
+\end{codebox}
+And also:
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    f = Mod(f,5)
+    s = factor(f,true)
+\end{CAS}
+\[ \print{s} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    f = Mod(f,5)
+    s = factor(f,true)
+\end{CAS}
+\[ \print{s} \]
+\end{codebox}
+
+\hrulefill
+
 \end{document}
