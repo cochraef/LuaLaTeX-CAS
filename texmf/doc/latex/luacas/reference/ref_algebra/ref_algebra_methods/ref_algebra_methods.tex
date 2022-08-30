@@ -862,6 +862,54 @@ And also:
 \[ \print{s} \]
 \end{codebox}
 
-\hrulefill
+\newcoderef{function Integer.gcd(a,b)}{return Integer}{a Integer, b Integer}
+
+Returns the greatest common divisor of \texttt{a,b}. 
+
+\newcoderef{function Integer.extendedgcd(a,b)}{return Integer, Integer, Integer}{a Integer, b Integer}
+
+Returns the greatest common divisor of \texttt{a,b} as well as Bezout's coefficients via extended gcd.
+
+\newcoderef{function Integer.max(a,b)}{return Integer, Integer}{a Integer, b Integer}
+\newcoderef{function INteger.min(a,b)}{return Integer, Integer}{a Integer, b Integer}
+
+Returns the max/min of \texttt{a,b}; the second output is the min/max (respectively). 
+
+\newcoderef{function Integer.absmax(a,b)}{return Integer, Integer, number}{a Integer, b Integer}
+
+Methods for computing the larger magnitude of two integers. Also returns the other integer for sorting purposes, and the number -1 if the two values were swapped, 1 if not.
+
+
+\newcoderef{function Integer.ceillog(a,base)}{return Integer}{a Integer, base Integer}
+
+Returns the ceiling of the log base (defaults to 10) of a. In other words, returns the least n such that $\mathtt{(base)^n > a}$.
+
+\newcoderef{function Integer.powmod(a,b,n)}{return Integer}{a Integer,..., n Integer} 
+
+Returns the \texttt{Integer} $c$ such that $c \equiv a^b \bmod{n}$. This should be used when $a^b$ is potentially large.
+
+\newcoderef{function Integer:divremainder(b)}{return Integer, Integer}{b Integer} 
+
+Returns the quotient and remainder over the integers. Uses the standard base 10 long division algorithm.
+
+\coderef{function Integer:asnumber()}{return number}
+
+Returns this integer as a floating point number. Can only approximate the value of large integers.
+
+\coderef{function Integer:divisors()}{return table<number, Integer>}
+
+Returns all positive divisors of the integer. Not guarenteed to be in any order.
+
+\coderef{function Integer:primefactorization()}{return BinaryOperation}
+
+Returns the prime factorization of this integer as a \texttt{BinaryOperation}.
+
+\coderef{function Integer:findafactor()}{return Integer}
+
+Return a non-trivial factor of n via Pollard Rho, or returns n if n is prime.
+
+\coderef{function Integer:isprime()}{return bool}
+
+Uses Miller-Rabin to determine whether a number is prime up to a very large number.
 
 \end{document}
