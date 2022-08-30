@@ -84,12 +84,22 @@ function range(a, b, step)
     return f, nil, a - step
   end
 
-function factor(exp)
+function factor(exp,squarefrei)
     if exp:type() == Integer then
         return exp:primefactorization()
     end
     if exp:type() == PolynomialRing then 
-        return exp:factor()
+        if not squarefrei then 
+            return exp:factor()
+        else 
+            if exp.ring == Integer.getring() or Rational.getring() then 
+                return exp:squarefreefactorization()
+            end 
+            if exp.ring == IntegerModN.getring() then 
+                return exp:modularsquarefreefactorization() 
+            end
+            return exp:factor()
+        end
     end
     return exp:autosimplify():factor()
 end
