@@ -434,14 +434,14 @@ For example:
 
 \subsubsection*{Parsing}
 
-The function \texttt{extendedgcd()} is a shortcut to \texttt{Polynomial.extendedgcd()}:
+The function \texttt{gcdext()} is a shortcut to \texttt{Polynomial.extendedgcd()}:
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     f = topoly((x+2)*(x-3))
     g = topoly((x+4)*(x-3))
-    h,a,b = extendedgcd(f,g)
+    h,a,b = gcdext(f,g)
 \end{CAS}
 \[ \print{h} = (\print{f}) \left( \print{a} \right) + 
     (\print{g})\left( \print{b} \right). \] 
@@ -450,7 +450,7 @@ The function \texttt{extendedgcd()} is a shortcut to \texttt{Polynomial.extended
 \begin{CAS}
     f = topoly((x+2)*(x-3))
     g = topoly((x+4)*(x-3))
-    h,a,b = extendedgcd(f,g)
+    h,a,b = gcdext(f,g)
 \end{CAS}
 \[ \print{h} = (\print{f}) \left( \print{a} \right) + (\print{g})\left( \print{b} \right). \] 
 \end{codebox}
@@ -864,16 +864,114 @@ And also:
 
 \newcoderef{function Integer.gcd(a,b)}{return Integer}{a Integer, b Integer}
 
-Returns the greatest common divisor of \texttt{a,b}. 
+Returns the greatest common divisor of \texttt{a,b}. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    b = 252
+    c = Integer.gcd(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    b = 252
+    c = Integer.gcd(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} \] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{gcd()} shortcuts \texttt{Integer.gcd()}. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    b = 252
+    c = gcd(a,b)
+\[ \gcd(a,b) = \print{c} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    b = 252
+    c = gcd(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} \] 
+\end{codebox}
+
 
 \newcoderef{function Integer.extendedgcd(a,b)}{return Integer, Integer, Integer}{a Integer, b Integer}
 
-Returns the greatest common divisor of \texttt{a,b} as well as Bezout's coefficients via extended gcd.
+Returns the greatest common divisor of \texttt{a,b} as well as Bezout's coefficients via extended gcd. For example:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    b = 252
+    c,x,y = Integer.extendedgcd(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    b = 252
+    c,x,y = Integer.extendedgcd(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{gcdext()} shortcuts \mintinline{lua}{Integer.extendedgcd()}. For example:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    b = 252
+    c,x,y = gcdext(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    b = 252
+    c,x,y = gcdext(a,b)
+\end{CAS}
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\end{codebox}
 
 \newcoderef{function Integer.max(a,b)}{return Integer, Integer}{a Integer, b Integer}
-\newcoderef{function INteger.min(a,b)}{return Integer, Integer}{a Integer, b Integer}
+\newcoderef{function Integer.min(a,b)}{return Integer, Integer}{a Integer, b Integer}
 
 Returns the max/min of \texttt{a,b}; the second output is the min/max (respectively). 
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 8
+    b = 7
+    c = Integer.max(a,b)
+\end{CAS}
+\[ \max(\print{a},\print{b}) = \print{c} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 8
+    b = 7
+    c = Integer.max(a,b)
+\end{CAS}
+\[ \max(\print{a},\print{b}) = \print{c} \] 
+\end{codebox}
+
 
 \newcoderef{function Integer.absmax(a,b)}{return Integer, Integer, number}{a Integer, b Integer}
 
@@ -884,13 +982,69 @@ Methods for computing the larger magnitude of two integers. Also returns the oth
 
 Returns the ceiling of the log base (defaults to 10) of a. In other words, returns the least n such that $\mathtt{(base)^n > a}$.
 
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 101
+    b = 10
+    c = Integer.ceillog(a,b)
+\end{CAS}
+\[ \print{c} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 101
+    b = 10
+    c = Integer.ceillog(a,b)
+\end{CAS}
+\[ \print{c} \] 
+\end{codebox}
+
 \newcoderef{function Integer.powmod(a,b,n)}{return Integer}{a Integer,..., n Integer} 
 
 Returns the \texttt{Integer} $c$ such that $c \equiv a^b \bmod{n}$. This should be used when $a^b$ is potentially large.
 
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 12341
+    b = 2^16+1
+    p = 62501
+    c = Integer.powmod(a,b,p)
+\end{CAS}
+\[ \print{c} \equiv \print{a}^{\print{b}} \bmod{\print{p}} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 12341
+    b = 2^16+1
+    p = 62501
+    c = Integer.powmod(a,b,p)
+\end{CAS}
+\[ \print{c} \equiv \print{a}^{\print{b}} \bmod{\print{p}} \] 
+\end{codebox}
+
 \newcoderef{function Integer:divremainder(b)}{return Integer, Integer}{b Integer} 
 
 Returns the quotient and remainder over the integers. Uses the standard base 10 long division algorithm.
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    b = 252
+    q,r = Integer.divremainder(a,b)
+\end{CAS}
+\[ \print{a} = \print{b} \cdot \print{q} + \print{r} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    b = 252
+    q,r = Integer.divremainder(a,b)
+\end{CAS}
+\[ \print{a} = \print{b} \cdot \print{q} + \print{r} \] 
+\end{codebox}
 
 \coderef{function Integer:asnumber()}{return number}
 
@@ -898,18 +1052,85 @@ Returns this integer as a floating point number. Can only approximate the value 
 
 \coderef{function Integer:divisors()}{return table<number, Integer>}
 
-Returns all positive divisors of the integer. Not guarenteed to be in any order.
+Returns all positive divisors of the integer. Not guaranteed to be in any order.
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    d = a:divisors()
+\end{CAS}
+\[ \left\{ \lprint{d} \right\} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    d = a:divisors()
+\end{CAS}
+\[ \left\{ \lprint{d} \right\} \] 
+\end{codebox}
 
 \coderef{function Integer:primefactorization()}{return BinaryOperation}
 
 Returns the prime factorization of this integer as a \texttt{BinaryOperation}.
 
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    pf = a:primefactorization()
+\end{CAS}
+\[ \print{pf} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    pf = a:primefactorization()
+\end{CAS}
+\[ \print{pf} \] 
+\end{codebox}
+
 \coderef{function Integer:findafactor()}{return Integer}
 
 Return a non-trivial factor of n via Pollard Rho, or returns n if n is prime.
 
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 408
+    f = a:findafactor()
+\end{CAS}
+\[ \print{f} \mid \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 408
+    f = a:findafactor()
+\end{CAS}
+\[ \print{f} \mid \print{a} \] 
+\end{codebox}
+
+
 \coderef{function Integer:isprime()}{return bool}
 
 Uses Miller-Rabin to determine whether a number is prime up to a very large number.
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    p = 7038304939
+    if p:isprime() then 
+        tex.print("p is prime!")
+    end
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+    p = 7038304939
+    if p:isprime() then 
+        tex.print("p is prime!")
+    end
+\end{CAS}
+\end{codebox}
 
 \end{document}
