@@ -88,6 +88,9 @@ function factor(exp)
     if exp:type() == Integer then
         return exp:primefactorization()
     end
+    if exp:type() == PolynomialRing then 
+        return exp:factor()
+    end
     return exp:autosimplify():factor()
 end
 
@@ -107,20 +110,29 @@ function substitute(tbl,expr)
     return expr:substitute(tbl)
 end
 
-function roots(poly)
-    poly = expand(poly)
-    if poly.topolynomial then 
-        poly = poly:topolynomial()
+function roots(expression)
+    poly,ispoly = topoly(expression)
+    if ispoly then  
+        return poly:roots()
     end
-    return poly:roots()
+    return RootExpression(expression)
 end
 
 function combine(expr)
     return expr:combine()
 end
 
-function Mod(i,n)
-    return IntegerModN(i,n)
+function Mod(f,n)
+    if f:type() == Integer then 
+        return IntegerModN(f,n)
+    end
+    if f:type() == PolynomialRing and f.ring == Integer.getring() then 
+        local coeffs = {}
+        for i=0,f.degree:asnumber() do 
+            coeffs[i] = IntegerModN(f.coefficients[i],n) 
+        end
+        return PolynomialRing(coeffs,f.symbol,f.degree)
+    end
 end
 
 function Poly(coefficients,symbol,degree)

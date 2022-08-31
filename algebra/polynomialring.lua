@@ -248,7 +248,7 @@ function PolynomialRing:tolatex()
     if loc == 0 then
         return self.coefficients[loc]:tolatex()
     end
-    if self.ring == Rational.getring() or self.ring == Integer.getring() then 
+    if self.ring == Rational.getring() or self.ring == Integer.getring() or self.ring == IntegerModN.getring() then 
         if self.coefficients[loc] ~= Integer.one() then 
             out = out .. self.coefficients[loc]:tolatex() .. self.symbol
         else
@@ -804,6 +804,12 @@ function PolynomialRing:roots()
     for i, factor in ipairs(factorization.expressions) do
         if i > 1 then
             local decomp = factor.expressions[1]:decompose()
+            for _, poly in ipairs(decomp) do 
+                if poly.degree > Integer(3) then 
+                    table.insert(roots,RootExpression(factor.expressions[1]))
+                    goto nextfactor 
+                end
+            end
             local factorroots = RootExpression(decomp[#decomp]):autosimplify()
             if factorroots == true then
                 return true
