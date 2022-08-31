@@ -120,16 +120,6 @@ function BinaryOperation:simplifyrationalpower()
                 (BinaryOperation(BinaryOperation.POW, {base.denominator, exponent}):simplifyrationalpower())
     end
 
-    -- Limit for attempting simplification of rational powers automatically
-    if not BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT then
-        BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT = Integer(Integer.DIGITSIZE)
-    end
-
-    -- Limit for attempting simplification of rational powers automatically
-    if base > BinaryOperation.RATIONALPOWERSIMPLIFICATIONLIMIT then
-        return self
-    end
-
     if base == Integer(-1) then
         if exponent == Integer(1) / Integer(2) then
             return I

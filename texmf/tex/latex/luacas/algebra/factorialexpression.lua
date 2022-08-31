@@ -32,14 +32,19 @@ function FactorialExpression:evaluate()
         if self.expression < Integer.zero() then
             error("Aritmetic Error: Factorials of negative integers are not defined.")
         end
-        if self.expression > FactorialExpression.FACTORIALCOMPUTATIONLIMIT then
+
+        if not FactorialExpression.LIMIT then
+            FactorialExpression.LIMIT = Integer(5000)
+        end
+    
+        if self.expression > FactorialExpression.LIMIT then
             return self
         end
         -- TODO: More efficient factorial computations.
         local out = Integer.one()
         local i = Integer.zero()
         while i < self.expression do
-        i = i + Integer(1)
+        i = i + Integer.one()
         out = out * i
         end
         return out
@@ -90,7 +95,7 @@ FactorialExpression = setmetatable(FactorialExpression, __FactorialExpression)
 ----------------------
 
 -- Do not attempt to compute factorials larger than this.
-FactorialExpression.FACTORIALCOMPUTATIONLIMIT = Integer(5000)
+FactorialExpression.LIMIT = Integer(5000)
 
 FACT = function (a)
     return FactorialExpression(a)
