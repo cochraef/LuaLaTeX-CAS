@@ -1133,4 +1133,46 @@ Uses Miller-Rabin to determine whether a number is prime up to a very large numb
 \end{CAS}
 \end{codebox}
 
+\coderef{function Rational:reduce()}{return Rational}
+
+Reduces a rational expression of integers to standard form. This method is called automatically when a new \texttt{Rational} expression is constructed:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = Rational(8,6)   
+\end{CAS}
+\[ \print{a} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = Rational(8,6)  
+\end{CAS}
+\[ \print{a} \]
+\end{codebox}
+
+
+\coderef{function Rational:tocompoundexpression()}{return BinaryOperation}
+
+Converts a \texttt{Rational} expression into the corresponding \texttt{BinaryOperation} expression.
+
+\coderef{function Rational:asnumber()}{return number} 
+
+Returns the given rational as an approximate floating point number. Going the other way, the parser in \mintinline{latex}{\begin{CAS}..\end{CAS}} will convert decimals (as written) to fractions. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    a = 0.375
+\end{CAS}
+\[ \print{a} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    a = 0.375
+\end{CAS}
+\[ \print{a} \] 
+\end{codebox}
+
+
 \end{document}
