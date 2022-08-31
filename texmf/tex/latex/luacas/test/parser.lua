@@ -155,7 +155,16 @@ function topoly(a)
     return a:topolynomial()
 end
 
-function extendedgcd(a,b)
+function gcd(a,b)
+    if a:type() == Integer and b:type() == Integer then 
+        return Integer.gcd(a,b) 
+    end
+    if a:type() == PolynomialRing and b:type() == PolynomialRing then 
+        return PolynomialRing.gcd(a,b) 
+    end
+end
+
+function gcdext(a,b)
     if a:type() == Integer and b:type() == Integer then 
         return Integer.extendedgcd(a,b) 
     end
