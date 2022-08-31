@@ -195,10 +195,10 @@ Here's that same code but using \mintinline{latex}{\directlua} instead:
 \end{multicols}
 The essential difference being:
 \begin{itemize}
-    \item Using \mintinline{latex}{\begin{CAS}..\end{CAS}}, the parser automatically interprets any digit strings as an \texttt{Integer}; this is a special class defined within the bowels of \texttt{luacas}. Ultimately, it allows for us to define things like the addition of an \texttt{Integer} and an \texttt{Expression} (in this case, the result is a new \texttt{Expression}). 
-    \item Using \mintinline{latex}{\directlua}, there is no parsing, so the user (aka Bob) is responsible for telling \texttt{luacas} what to interpret as an \texttt{Integer} versus what to interpret as a normal Lua number. 
+    \item Using \mintinline{latex}{\begin{CAS}..\end{CAS}}, the parser automatically interprets any digit strings as an \texttt{Integer}; this is a special class defined within the bowels of \texttt{luacas}. Ultimately, it allows for us to define things like the addition of an \texttt{Integer} and an \texttt{Expression} (in this case, the result is a new \texttt{Expression}) as well as arbitrary precision arithmetic.
+    \item Using \mintinline{latex}{\directlua}, there is no parsing, so the user (aka Bob) is responsible for telling \texttt{luacas} what to interpret as an \texttt{Integer} versus what to interpret as a normal Lua \texttt{number}. 
 \end{itemize}
-Generally speaking, we like what the parser in \mintinline{latex}{\begin{CAS}..\end{CAS}} does: it keeps us from having to wrap all integers in \texttt{Integer(..)}. But the price we pay is that the parser indiscriminately wraps \emph{all} digit strings in \texttt{Integer(..)}. This causes a problem in the following line in Bob's code:
+Generally speaking, we like what the parser in \mintinline{latex}{\begin{CAS}..\end{CAS}} does: it keeps us from having to wrap all integers in \texttt{Integer(..)} (among other things). But the price we pay is that the parser indiscriminately wraps \emph{all} (or rather, most) digit strings in \texttt{Integer(..)}. This causes a problem in the following line in Bob's code:
 \begin{minted}{lua}
 v = simplify(substitute({[x]=r[1]},h))
 \end{minted} 
