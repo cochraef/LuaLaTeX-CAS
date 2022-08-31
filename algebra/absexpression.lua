@@ -29,7 +29,7 @@ end
 --- @return Expression
 function AbsExpression:evaluate()
     if self.expression:isconstant() then
-        if self.expression >= Integer(0) then
+        if self.expression >= Integer.zero() then
             return self.expression
         end
         return -self.expression
