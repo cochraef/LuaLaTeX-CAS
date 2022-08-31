@@ -740,9 +740,54 @@ function Integer:divisors()
     return divisors
 end
 
+--- Returns whether this integer is a prime power, of the form p^a for prime p and positive integer a.
+--- If it is a prime power, also returns the prime and the power.
+--- @return boolean, Expression|nil, Expression|nil
+function Integer:isprimepower()
+    if self <= Integer.one() then
+        return false
+    end
+    local factorization = self:primefactorization()
+    if factorization:type() == BinaryOperation and #factorization:subexpressions() == 1 then
+        return true, factorization.expressions[1].expressions[2], factorization.expressions[1].expressions[1]
+    end
+    return false
+end
+
+--- Returns whether this integer is a perfect power, of the form a^b for positive integers a and b.
+--- If it is a prime power, also returns the prime and the power.
+--- @return boolean, Expression|nil, Expression|nil
+function Integer:isperfectpower()
+    if self <= Integer.one() then
+        return false
+    end
+    local factorization = self:primefactorization()
+    if factorization:type() ~= BinaryOperation then
+        return false
+    end
+    local power = Integer.zero()
+    for _, term in ipairs(factorization:subexpressions()) do
+        power = Integer.gcd(power, term.expressions[2])
+        if power == Integer.one() then
+            return false
+        end
+    end
+    local base = Integer.one()
+    for _, term in ipairs(factorization:subexpressions()) do
+        base = base * term.expressions[1] ^ (term.expressions[2] / power)
+    end
+    return true, base, power
+end
+
 --- Returns the prime factorization of this integer as a expression.
 --- @return Expression
 function Integer:primefactorization()
+    if not Integer.FACTORIZATIONLIMIT then
+        Integer.FACTORIZATIONLIMIT = Integer(Integer.DIGITSIZE)
+    end
+    if self > Integer.FACTORIZATIONLIMIT then
+        return self
+    end
     local result = self:primefactorizationrec()
     local mul = {}
     local i = 1
@@ -896,3 +941,9 @@ end
 __Integer.__index = EuclideanDomain
 __Integer.__call = Integer.new
 Integer = setmetatable(Integer, __Integer)
+
+----------------------
+-- Static constants --
+----------------------
+
+Integer.FACTORIZATIONLIMIT = Integer(Integer.DIGITSIZE)

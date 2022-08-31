@@ -43,12 +43,35 @@ function Logarithm:evaluate()
         return self
     end
 
-    if self.base == Integer.zero() or self.expression == Integer.zero() or self.base == Integer(1) then
+    if self.base == Integer.zero() or self.expression == Integer.zero() or self.base == Integer.one() then
         error("Arithmetic error: division by zero")
     end
 
-    local result = Integer.one()
+    local power = Integer.one()
     local base = self.base
+    if base:type() == Integer then
+        local pp, b, p = base:isperfectpower()
+        if pp then
+            base = b
+            power = p
+        end
+    end
+
+    if base:type() == Rational then
+        local ppn, bn, pn = base.numerator:isperfectpower()
+        local ppd, bd, pd = base.denominator:isperfectpower()
+        if base.numerator == Integer.one() then
+            ppn = true
+            bn = Integer.one()
+            pn = pd
+        end
+        if ppn and ppd and pn == pd then
+            base = bn / bd
+            power = pn
+        end
+    end
+
+    local result = Integer.one()
     local expression = self.expression
     local sign = Integer.one()
     if base < Integer.one() then
@@ -63,14 +86,14 @@ function Logarithm:evaluate()
         result = result + Integer.one()
     end
     if current == expression then
-        return sign * result
+        return sign * result / power
     else
         while current > expression do
             current = current / base
             result = result - Integer.one()
         end
         if current == expression then
-            return sign * result
+            return sign * result / power
         end
     end
 
