@@ -2,19 +2,17 @@
 \usepackage{luacas}
 
 \begin{document}
+Hi
 \begin{CAS}
-    f = Poly({1,0,-2,0,-6,0,-4,0,1})
-    r = f:roots()
-    decomp = f:decompose()
+    f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})
+    g = Mod(Poly({6,0,1}),5)
 \end{CAS}
-\[ \print{r[1]} \] 
-\[ \print{decomp[1]} \qquad \print{decomp[2]} \] 
-
-\begin{CAS}
-    vars('x')
-    f = topoly(x^8 - 8*x^6 + 24*x^4 - 32*x^2 + 17)
-    r = f:roots()
-\end{CAS}
-\[ \print{r[1]} \qquad \print{r[2]}  \qquad \print{r[3]} \qquad \print{r[5]} \] 
+\[ \print{f} \qquad \print{g} \] 
+\luaexec{
+    if g:type() == PolynomialRing then 
+        tex.print('poly')
+    end
+    tex.print(\#g.coefficients)
+}
 
 \end{document}
