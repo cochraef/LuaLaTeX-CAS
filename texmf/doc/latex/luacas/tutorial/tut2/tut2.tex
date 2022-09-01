@@ -131,7 +131,14 @@ But then Bob wonders to himself, ``How do I actually retrieve the roots of $dh$ 
     \end{CAS}
     \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]} \] 
 \end{codebox}
-
+If Bob truly wants to print the entire list \texttt{r}, Bob can use the \mintinline{latex}{\lprint} (\textbf{l}ist \textbf{print}) command:
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\[ \left\{ \lprint{r} \right\} \] 
+    \end{minted}
+    \tcblower
+    \[ \left\{ \lprint{r} \right\} \] 
+\end{codebox}
 Splendid! Bob would now like to evaluate the function $h$ at these roots (for these are the local max/min values of $h$). Here's Bob's first thought:
 
 \begin{codebox}
@@ -208,7 +215,31 @@ The good news is that, excluding the annoyance between \texttt{Integer} and Lua 
 
 \subsubsection*{Back to the tutorial...}
 
-After that enlightening interlude, Bob realizes that he should probably use \mintinline{latex}{\directlua} (or \mintinline{latex}{\luaexec} from the \texttt{luacode} package) to build a table of values:
+After that enlightening interlude, Bob realizes that some care needs to be taken when constructing tables. Here's a solution from within \mintinline{latex}{\begin{CAS}..\end{CAS}}:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    r = ZTable(r)
+    v = ZTable()
+    for i in range(1, 4) do
+        v[i] = simplify(substitute({[x]=r[i]},h))
+    end
+\end{CAS}
+\[ \left\{ \lprint{v} \right\} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    r = ZTable(r)
+    v = ZTable()
+    for i in range(1, 4) do
+        v[i] = simplify(substitute({[x]=r[i]},h))
+    end
+    \end{CAS}
+    \[ \left\{ \lprint{v} \right\} \] 
+\end{codebox}
+
+The function \mintinline{lua}{ZTable()} sets indices appropriately for use within \mintinline{latex}{\begin{CAS}..\end{CAS}} while the function \mintinline{lua}{range()} protects the bounds of the for-loop. Alternatively, Bob can make tables directly within \mintinline{latex}{\directlua} (or \mintinline{latex}{\luaexec} from the \texttt{luacode} package) using whatever Lua syntax pleases him:
 
 \begin{codebox}[]
 \begin{minted}[fontsize=\small]{latex}
@@ -216,9 +247,8 @@ After that enlightening interlude, Bob realizes that he should probably use \min
     v = {}
     for i=1,4 do 
         table.insert(v,simplify(substitute({[x]=r[i]},h)))
-    end
-}
-\[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad\print{v[4]} \]   
+    end}
+\[ \left\{ \lprint{v} \right\} \]   
 \end{minted}
     \tcblower 
     \directlua{
@@ -227,7 +257,7 @@ After that enlightening interlude, Bob realizes that he should probably use \min
         table.insert(v,simplify(substitute({[x]=r[i]},h)))
     end
 }
-\[ \print{v[1]}, \quad \print{v[2]}, \quad \print{v[3]}, \quad \print{v[4]} \] 
+\[ \left\{ \lprint{v} \right\} \] 
 \end{codebox}
 Great! But still; Bob doesn't want to just pretty-print the roots of $dh$. Bob is determined to plot the results -- he wants to hammer home the point that the roots of $dh$ point to the local extrema of $h$. 
 
@@ -300,7 +330,7 @@ The command \mintinline{latex}{\store{r}} is equivalent to:
 The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \mintinline{latex}{\pgfmathsetmacro}. For example:
 
 \begin{codebox}
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}[fontsize=\small,numbersep=6pt,linenos]{latex}
 \begin{tikzpicture}[scale=0.6]
   \draw [dashed,latex-latex]
     (-7,0) -- (4,0);
@@ -332,7 +362,13 @@ The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \
 \end{center}
 \end{codebox}
 
-Alternatively, one could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution, and it is exactly what Bob does in his complete project shared below:
+Alternatively, Bob could avoid the call to \mintinline{latex}{\pgfmathsetmacro} by replacing lines 5-6 in the above code with the slightly more verbose:
+
+\begin{minted}{latex}
+    \draw ({\fetch{r[\k]}},0) circle (\fetch{r[\k]});
+\end{minted}
+
+Alternatively still, Bob could appeal directly to the \mintinline{lua}{tostring()} function in \texttt{luacas} and iterate over tables like \texttt{r} using Lua itself. This can often be a simpler solution (particularly when working within \mintinline{latex}{\begin{axis}..\end{axis}}), and it is exactly what Bob does in his complete project shared below:
 \begin{codebox}[frame hidden,breakable]
 \begin{minted}[breaklines,fontsize=\small]{latex}
 Consider the function $f(x)$ defined by:
@@ -352,26 +388,24 @@ $\displaystyle f(x) = \print{h}$.
   \begin{CAS}
       r = roots(dh)
   \end{CAS}
-  \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad  \print{r[4]}.\] 
+  \[ \left\{ \lprint{r} \right\} \] 
   Recall: $f'(x_0)$ measures the slope of the tangent line to $y=  (x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to  places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak  (local maximum) or a valley (local minimum). 
-  \directlua{
-      v = {}
-      for i=1,4 do 
-          table.insert(v,simplify(substitute({[x]=r[i]},h)))
-      end
-  }
+  \begin{CAS}
+    r = ZTable(r)
+    v = ZTable()
+    for i in range(1, 4) do
+        v[i] = simplify(substitute({[x]=r[i]},h))
+    end
+  \end{CAS}
   \columnbreak 
   \store{h}\store{dh}
   \begin{tikzpicture}[scale=0.95]
     \begin{axis}[legend pos = north west]
-      \addplot 
-        [domain=-3.5:1.5,samples=100] {\h};
+      \addplot [domain=-3.5:1.5,samples=100] {\h};
       \addlegendentry{$f$};
-      \addplot[densely dashed] 
-        [domain=-3.25:1.25,samples=100] {\dh};
+      \addplot[densely dashed] [domain=-3.25:1.25,samples=100] {\dh};
       \addlegendentry{$df/dx$};
-      \addplot[gray,dashed,thick]
-        [domain=-3.5:1.5] {0};
+      \addplot[gray,dashed,thick] [domain=-3.5:1.5] {0};
       \luaexec{for i=1,4 do 
         tex.print("\\draw[fill=purple,purple]",
           "(axis cs:{",tostring(r[i]),"},0) circle (1.5pt)",
@@ -407,14 +441,15 @@ And here is Bob's completed project:
     \begin{CAS}
         r = roots(dh)
     \end{CAS}
-    \[ \print{r[1]}, \quad \print{r[2]}, \quad \print{r[3]}, \quad \print{r[4]}.\] 
+    \[ \left\{ \lprint{r} \right\} \] 
     Recall: $f'(x_0)$ measures the slope of the tangent line to $y=f(x)$ at $x=x_0$. The values $r$ where $f'(r)=0$ correspond to places where the slope of the tangent line to $y=f(x)$ is horizontal (see the illustration). This gives us a method for identifying locations where the graph $y=f(x)$ attains a peak (local maximum) or a valley (local minimum). 
-    \directlua{
-    v = {}
-    for i=1,4 do 
-        table.insert(v,simplify(substitute({[x]=r[i]},h)))
-    end
-    }
+    \begin{CAS}
+        r = ZTable(r)
+        v = ZTable()
+        for i in range(1, 4) do
+            v[i] = simplify(substitute({[x]=r[i]},h))
+        end
+    \end{CAS}
     \columnbreak 
     \store{h}\store{dh}
     \begin{tikzpicture}[scale=0.95]

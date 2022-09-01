@@ -1,0 +1,210 @@
+\documentclass{article}
+
+\usepackage{luacas}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[shortlabels]{enumitem}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning,calc}
+\usepackage{forest}
+\usepackage{minted}
+\usemintedstyle{pastie}
+\usepackage[hidelinks]{hyperref}
+\usepackage{parskip}
+\usepackage{multicol}
+\usepackage[most]{tcolorbox}
+    \tcbuselibrary{xparse,documentation}
+\usepackage{microtype}
+\usepackage{makeidx}
+
+\usepackage[
+backend=biber,
+style=numeric,
+]{biblatex}
+\addbibresource{sources.bib}
+
+\definecolor{rose}{RGB}{128,0,0}
+\definecolor{roseyellow}{RGB}{222,205,99}
+\definecolor{roseblue}{RGB}{167,188,214}
+\definecolor{rosenavy}{RGB}{79,117,139}
+\definecolor{roseorange}{RGB}{232,119,34}
+\definecolor{rosegreen}{RGB}{61,68,30}
+\definecolor{rosewhite}{RGB}{223,209,167}
+\definecolor{rosebrown}{RGB}{108,87,27}
+\definecolor{rosegray}{RGB}{84,88,90}
+
+\definecolor{codegreen}{HTML}{49BE25}
+
+\newtcolorbox{codebox}[1][sidebyside]{
+    enhanced,skin=bicolor,
+    #1,
+    arc=1pt,
+    colframe=brown,
+    colback=brown!15,colbacklower=white,
+    boxrule=1pt,
+    notitle
+}
+
+\newtcolorbox{codehead}[1][]{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize,
+    #1
+}
+
+\usepackage{varwidth}
+
+\newtcolorbox{newcodehead}[2][]{
+    enhanced,
+    frame hidden,
+    colback=rosegray!15,
+    boxrule=0mm,
+    leftrule=5mm,
+    rightrule=5mm,
+    boxsep=0mm,
+    arc=0mm,
+    outer arc=0mm,
+    left=3mm,
+    right=3mm,
+    top=1mm,
+    bottom=1mm,
+    toptitle=1mm,
+    bottomtitle=1mm,
+    oversize,
+    #1,
+    fonttitle=\bfseries\ttfamily\footnotesize,
+    coltitle=rosegray,
+    attach boxed title to top text right,
+    boxed title style={frame hidden,
+        size=small,
+        bottom=-1mm,
+        interior style={fill=none,
+            top color=white,
+            bottom color=white}
+    },
+    title={#2}
+}
+
+\makeindex
+
+\newcommand{\coderef}[2]{%
+\begin{codehead}[sidebyside,segmentation hidden]%
+    \mintinline{lua}{#1}%
+    \tcblower%
+    \begin{flushright}%
+    \mintinline{lua}{#2}%
+    \end{flushright}%
+\end{codehead}%
+}
+
+\newcommand{\newcoderef}[3]{%
+\begin{newcodehead}[sidebyside,segmentation hidden]{#3}%
+    \mintinline{lua}{#1}%
+    \tcblower%
+    \begin{flushright}%
+    \mintinline{lua}{#2}%
+    \end{flushright}%
+\end{newcodehead}%
+}
+
+\usetikzlibrary{shapes.multipart}
+\useforestlibrary{edges}
+
+\def\error{\color{red}}
+\def\self{\color{gray}}
+\def\call{$\star$ }
+
+\begin{document}
+\thispagestyle{empty}
+
+\section{Calculus}
+    This section contains reference materials for the calculus functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
+    \begin{itemize}
+        \item {\error\ttfamily\itshape method}: an abstract method;
+        \item {\self\ttfamily\itshape method}: a method that returns the expression unchanged; 
+        \item {\ttfamily\itshape method}:  method that is either unique, implements an abstract method, or overrides an abstract
+method;
+        \item {\tikz[baseline=-0.5ex]\node[fill=roseorange!30] {\ttfamily\bfseries Class};}: a concrete class.
+    \end{itemize}
+Here is an inheritance diagram of the classes in the calculus module; all these classes inherit from the \texttt{CompoundExpression} branch of the inheritance tree. Most methods are stated, but some were omitted (because they inherit in the obvious way, they are auxiliary and not likely to be interesting to the end-user, etc). 
+    \vfill
+\forestset{
+rectcore/.style = {rectangle split,
+               rectangle split parts=2,
+               draw = {rosenavy,thick},
+               rounded corners = 1pt,
+               font = \ttfamily\bfseries,
+               fill = roseblue!#1
+               },
+rectalg/.style = {rectangle split,
+               rectangle split parts=2,
+               draw = {rose,thick},
+               rounded corners = 1pt,
+               font = \ttfamily\bfseries,
+               fill = rose!#1
+               },
+rectcalc/.style = {rectangle split,
+               rectangle split parts=2,
+               draw = {roseorange,thick},
+               rounded corners = 1pt,
+               font = \ttfamily\bfseries,
+               fill = roseorange!#1
+               }
+}
+\forestset{
+    multiple directions/.style={
+        for tree={#1},
+        phantom,
+        for relative level=1{
+            no edge,
+            delay={
+                !c.content/.pgfmath=content("!u")},
+            before computing xy={l=0,s=0}
+            }
+        },
+    multiple directions/.default={},
+    grow subtree/.style={for tree={grow=#1}}, 
+    grow' subtree/.style={for tree={grow'=#1}}}
+\tikzset{
+    every two node part/.style={font=\ttfamily\itshape\footnotesize}
+}
+\begin{center}
+    \begin{forest}
+        for tree = {node options={align=left},
+            edge = {-stealth}
+        },
+        forked edges
+        [Expression\nodepart{two}$\cdots$,rectcore={0}
+            [CompoundExpressions\nodepart{two}$\cdots$,rectcore={0}
+                [DerivativeExpression\nodepart{two}
+                :new() \\
+                :evaluate()\\
+                :autosimplify()
+                ,rectcalc=30]
+                [DiffExpression\nodepart{two},rectcalc=30]
+                [IntegralExpression\nodepart{two}$\cdots$,rectcalc=30]  
+            ]
+        ]
+    \end{forest}
+\end{center}
+\vfill
+
+\end{document}
+

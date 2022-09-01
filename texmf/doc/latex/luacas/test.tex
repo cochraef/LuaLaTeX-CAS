@@ -4,15 +4,43 @@
 \begin{document}
 Hi
 \begin{CAS}
-    f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})
-    g = Mod(Poly({6,0,1}),5)
-\end{CAS}
-\[ \print{f} \qquad \print{g} \] 
-\luaexec{
-    if g:type() == PolynomialRing then 
-        tex.print('poly')
+    vars('x')
+    f = x^2+2*x-2
+    g = x^2-1
+    subs = {[x] = f}
+    dh = substitute(subs,g)
+    r = roots(dh)
+    h = (int(dh,x)+10):autosimplify()
+    r = ZTable(r)
+    v = ZTable()
+    for i in range(1, 4) do
+        v[i] = simplify(substitute({[x]=r[i]},h))
     end
-    tex.print(\#g.coefficients)
-}
+    disp(r[1])
+\end{CAS}
+\[ \lprint{r} \] 
 
+\NewDocumentCommand{\newstore}{m O{#1}}{
+    \expandafter\newcommand\csname #2\endcsname[1][]{%
+        \directlua{
+            input = #1
+            if not input[1] then
+                tex.sprint{tostring(input)}
+            else
+                tex.sprint{tostring(input[##1])}
+            end
+        }%
+    }%
+}%
+
+\begin{tikzpicture}[scale=0.65]
+    \draw [dashed,latex-latex] (-7,0) -- (4,0);
+    \foreach \k in {1,2,3,4}{
+        \draw ({\fetch{r[\k]}},0) circle (\fetch{r[\k]});
+    }
+    \foreach \x in {-6,...,3}{
+        \draw[fill,orange] (\x,0) circle (2pt)
+        node[below] {\footnotesize$\x$};
+    }
+\end{tikzpicture}
 \end{document}

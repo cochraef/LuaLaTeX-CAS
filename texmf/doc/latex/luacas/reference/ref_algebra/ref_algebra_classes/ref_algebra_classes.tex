@@ -166,7 +166,7 @@ The other concrete classes in the Algebra package do not inherit from the {\ttfa
 \index{Algebra!Classes!\texttt{SymbolExpression}}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer}
 
-Takes a string, number, or {\ttfamily Integer} input and constructs an \texttt{Integer}. Since Lua can only store integers exactly up to a certain point, it is recommended to use strings to build large integers.
+Takes a \texttt{string}, \texttt{number}, or {\ttfamily Integer} input and constructs an \texttt{Integer} expression. The \texttt{Integer} class allows us to perform exact arithmetic on integers. Indeed, since Lua can only store integers exactly up to a certain point, it is recommended to use strings to build large integers.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
@@ -255,21 +255,21 @@ The contents of the environment \mintinline{latex}{\begin{CAS}..\end{CAS}} are w
 \index{Algebra!Classes!\texttt{IntegerModN}}
 \addcontentsline{toc}{subsubsection}{\ttfamily IntegerModN}
 
-Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an integer in the ring $\mathbb{Z}_n$, the integers modulo $n$. 
+Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an element in the ring $\mathbb{Z}_n$, the integers modulo $n$. 
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
 i = Integer(143)
 n = Integer(57)
 a = IntegerModN(i,n)
-tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(),'\\bmod{', n:tolatex(), '}\\]')
+tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(true),'\\]')
 \end{minted}
 \tcblower
 \luaexec{
     i = Integer(143)
     n = Integer(57)
     a = IntegerModN(i,n)
-    tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(),'\\bmod{', n:tolatex(), '}\\]')
+    tex.print('\\[',i:tolatex(),'\\equiv',a:tolatex(true),'\\]')
 }
 \end{codebox}
 
@@ -715,7 +715,7 @@ The function \mintinline{lua}{factorial()} is a shortcut to \texttt{FactorialExp
 
 \newcoderef{function SqrtExpression:new(expression, root)}{return SqrtExpression}{expression Expression, root Integer}
 
-Creates a new \texttt{SqrtExpression} with the given \texttt{expression} and \texttt{root}. If \texttt{root} is omitted, then \texttt{root} defaults to \mintinline{lua}{Integer(2)}. For example:
+Creates a new \texttt{SqrtExpression} with the given \texttt{expression} and \texttt{root}. Typically, \texttt{expression} is an \texttt{Integer} or \texttt{Rational}, and \texttt{SqrtExpression} is intended to represent a positive real number. If \texttt{root} is omitted, then \texttt{root} defaults to \mintinline{lua}{Integer(2)}. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
@@ -732,19 +732,15 @@ c = a+b
 tex.print('\\[',c:tolatex(),'\\]')
 }
 \end{codebox}
-The \texttt{autosimplify()} method does a few things here. For the example above:
+When \texttt{expression} and \texttt{root} are of the \texttt{Integer} or \texttt{Rational} types, then \texttt{autosimplify()} does a couple things. For example, with \texttt{a,b} as above, we get:
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
-a = SqrtExpression(Integer(8))
-b = SqrtExpression(Integer(8),Integer(3))
-c = (a+b):autosimplify() 
+c = c:autosimplify()
 tex.print('\\[',c:tolatex(),'\\]')
 \end{minted}
 \tcblower
 \directlua{
-    a = SqrtExpression(Integer(8))
-b = SqrtExpression(Integer(8),Integer(3))
-c = (a+b):autosimplify() 
+c = c:autosimplify()
 tex.print('\\[',c:tolatex(),'\\]')
 }
 \end{codebox}

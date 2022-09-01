@@ -831,14 +831,14 @@ The function \mintinline{lua}{factor()} has an optional boolean argument that if
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    f = topoly(x^6 + 2*x^5 + 4*x^4 + 4*x^3 + 5*x^2 + 2*x + 2)
     s = factor(f,true)
 \end{CAS}
 \[ \print{s} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
-    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    f = topoly(x^6 + 2*x^5 + 4*x^4 + 4*x^3 + 5*x^2 + 2*x + 2)
     s = factor(f,true)
 \end{CAS}
 \[ \print{s} \] 
@@ -847,7 +847,7 @@ And also:
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    f = topoly(x^6 + 2*x^5 + 4*x^4 + 4*x^3 + 5*x^2 + 2*x + 2)
     f = Mod(f,5)
     s = factor(f,true)
 \end{CAS}
@@ -855,7 +855,7 @@ And also:
 \end{minted}
 \tcblower
 \begin{CAS}
-    f = topoly(x^6 + 14*x^5 + 238*x^3 + 387*x^2 + 324*x + 108)
+    f = topoly(x^6 + 2*x^5 + 4*x^4 + 4*x^3 + 5*x^2 + 2*x + 2)
     f = Mod(f,5)
     s = factor(f,true)
 \end{CAS}
@@ -1174,5 +1174,50 @@ Returns the given rational as an approximate floating point number. Going the ot
 \[ \print{a} \] 
 \end{codebox}
 
+\coderef{function SqrtExpression:topower()}{return BinaryOperation}
+
+Converts a \texttt{SqrtExpression} to the appropriate \texttt{BinaryOperation}. For example, consider:
+\begin{minted}{latex}
+\begin{CAS}
+    a = sqrt(3)
+    b = a:topower()
+\end{CAS}
+\end{minted}
+\begin{CAS}
+    a = sqrt(3)
+    b = a:topower()
+\end{CAS}
+Then:
+\begin{multicols}{2}
+    \begin{center}
+        \underline{Expression shrub for \texttt{a}:} 
+
+        \parseshrub{a}
+        \bracketset{action character = @}
+        \begin{forest}
+            for tree = {font = \ttfamily,
+                draw,
+                rounded corners = 1pt,
+                fill = gray!20,
+                s sep = 1cm}
+            @\shrubresult
+        \end{forest}
+
+        \columnbreak
+
+        \underline{Expression shrub for \texttt{b}:}
+
+        \parseshrub{b}
+        \bracketset{action character = @}
+        \begin{forest}
+            for tree = {font = \ttfamily,
+                draw,
+                rounded corners = 1pt,
+                fill = gray!20,
+                s sep = 1.75cm}
+            @\shrubresult
+        \end{forest}
+    \end{center}
+\end{multicols}
 
 \end{document}
