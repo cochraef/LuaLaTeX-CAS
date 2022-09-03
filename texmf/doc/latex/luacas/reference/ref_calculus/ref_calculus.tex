@@ -198,8 +198,22 @@ rectcalc/.style = {rectangle split,
                 :evaluate()\\
                 :autosimplify()
                 ,rectcalc=30]
-                [DiffExpression\nodepart{two},rectcalc=30]
-                [IntegralExpression\nodepart{two}$\cdots$,rectcalc=30]  
+                [DiffExpression\nodepart{two}
+                :new()\\
+                :evaluate()\\
+                :autosimplify()
+                ,rectcalc=30]
+                [IntegralExpression\nodepart{two}
+                :new()\\
+                :isdefinite()\\
+                .table()\\
+                .linearproperties()\\
+                .substitutionmethod()\\
+                .rationalfunction()\\
+                .partsmethod()\\
+                .eulersformula()\\
+                .integrate()
+                ,rectcalc=30]  
             ]
         ]
     \end{forest}
