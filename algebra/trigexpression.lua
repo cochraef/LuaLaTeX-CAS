@@ -52,6 +52,81 @@ end
 
 --- @return TrigExpression
 function TrigExpression:evaluate()
+    local expression = self.expression:autosimplify()
+
+    if expression == Integer.zero() then
+        if self.name == "cos" or self.name == "sec" then
+            return Integer.one()
+         end
+         if self.name == "sin" or self.name == "tan" then
+            return Integer.zero()
+         end
+         if self.name == "arctan" or self.name == "arcsin" then
+             return Integer.zero()
+         end
+         if self.name == "arccos" or self.name == "arccot" then
+            return PI / Integer(2)
+         end
+     end
+ 
+     if expression == PI then
+        if self.name == "cos" or self.name == "sec" then
+            return Integer(-1)
+         end
+         if self.name == "sin" or self.name == "tan" then
+            return Integer.zero()
+         end
+     end
+ 
+     if expression:ismulratlPI() then
+        local coeff = expression.expressions[1]
+         if TrigExpression.COSVALUES[tostring(coeff)] ~= nil then
+             if self.name == "cos" then
+                return TrigExpression.COSVALUES[tostring(coeff)]:autosimplify()
+             end
+             if self.name == "sin" then
+                local sign = Integer.one()
+                 if coeff > Integer.one() then
+                    sign = Integer(-1)
+                 end
+                return (sign*sqrt(Integer.one()-cos(expression)^Integer(2))):autosimplify()
+             end
+             if self.name == "tan" then
+                return (sin(expression) / cos(expression)):autosimplify()
+             end
+             if self.name == "sec" then
+                return (Integer.one() / cos(expression)):autosimplify()
+             end
+             if self.name == "csc" then
+                return (Integer.one() / sin(expression)):autosimplify()
+             end
+             if self.name == "cot" then
+                return (cos(expression) / sin(expression)):autosimplify()
+             end
+         end
+     end
+ 
+     if TrigExpression.ACOSVALUES[tostring(expression)] ~= nil then
+        if self.name == "arccos" then
+            return TrigExpression.ACOSVALUES[tostring(expression)]:autosimplify()
+         end
+         if self.name == "arcsin" then
+            if expression == Integer(-1) then
+                return TrigExpression.ACOSVALUES["-1"]:autosimplify()
+             elseif expression.expressions and expression.expressions[1] == Integer(-1) then
+                local expr = (Integer(-1)*sqrt(Integer.one() - expression ^ Integer(2))):autosimplify()
+                 return TrigExpression.ACOSVALUES[tostring(expr)]:autosimplify()
+             else
+                 local expr = (sqrt(Integer.one() - expression ^ Integer(2))):autosimplify()
+                 return TrigExpression.ACOSVALUES[tostring(expr)]:autosimplify()
+             end
+         end
+     end
+ 
+     if self.name == "arctan" and TrigExpression.ATANVALUES[tostring(expression)] ~= nil then
+        return TrigExpression.ATANVALUES[tostring(expression)]:autosimplify()
+    end
+
     return self
 end
 
@@ -68,7 +143,6 @@ end
 --- @return TrigExpression
 function TrigExpression:autosimplify()
     local expression = self.expression:autosimplify()
-
 
     -- even and odd properties of trig functions
     if (self.name == "sin" or self.name == "tan" or self.name == "csc" or self.name == "cot") and
@@ -141,80 +215,7 @@ function TrigExpression:autosimplify()
         ::skip::
     end
 
-    if expression == Integer.zero() then
-       if self.name == "cos" or self.name == "sec" then
-           return Integer.one()
-        end
-        if self.name == "sin" or self.name == "tan" then
-           return Integer.zero()
-        end
-        if self.name == "arctan" or self.name == "arcsin" then
-            return Integer.zero()
-        end
-        if self.name == "arccos" or self.name == "arccot" then
-           return PI / Integer(2)
-        end
-    end
-
-    if expression == PI then
-       if self.name == "cos" or self.name == "sec" then
-           return Integer(-1)
-        end
-        if self.name == "sin" or self.name == "tan" then
-           return Integer.zero()
-        end
-    end
-
-    if expression:ismulratlPI() then
-       local coeff = expression.expressions[1]
-        if TrigExpression.COSVALUES[tostring(coeff)] ~= nil then
-            if self.name == "cos" then
-               return TrigExpression.COSVALUES[tostring(coeff)]:autosimplify()
-            end
-            if self.name == "sin" then
-               local sign = Integer.one()
-                if coeff > Integer.one() then
-                   sign = Integer(-1)
-                end
-               return (sign*sqrt(Integer.one()-cos(expression)^Integer(2))):autosimplify()
-            end
-            if self.name == "tan" then
-               return (sin(expression) / cos(expression)):autosimplify()
-            end
-            if self.name == "sec" then
-               return (Integer.one() / cos(expression)):autosimplify()
-            end
-            if self.name == "csc" then
-               return (Integer.one() / sin(expression)):autosimplify()
-            end
-            if self.name == "cot" then
-               return (cos(expression) / sin(expression)):autosimplify()
-            end
-        end
-    end
-
-    if TrigExpression.ACOSVALUES[tostring(expression)] ~= nil then
-       if self.name == "arccos" then
-           return TrigExpression.ACOSVALUES[tostring(expression)]:autosimplify()
-        end
-        if self.name == "arcsin" then
-           if expression == Integer(-1) then
-               return TrigExpression.ACOSVALUES["-1"]:autosimplify()
-            elseif expression.expressions and expression.expressions[1] == Integer(-1) then
-               local expr = (Integer(-1)*sqrt(Integer.one() - expression ^ Integer(2))):autosimplify()
-                return TrigExpression.ACOSVALUES[tostring(expr)]:autosimplify()
-            else
-                local expr = (sqrt(Integer.one() - expression ^ Integer(2))):autosimplify()
-                return TrigExpression.ACOSVALUES[tostring(expr)]:autosimplify()
-            end
-        end
-    end
-
-    if self.name == "arctan" and TrigExpression.ATANVALUES[tostring(expression)] ~= nil then
-       return TrigExpression.ATANVALUES[tostring(expression)]:autosimplify()
-    end
-
-    return TrigExpression(self.name, expression)
+    return TrigExpression(self.name, expression):evaluate()
 end
 
 --- @return table<number, Expression>
