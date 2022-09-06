@@ -139,7 +139,7 @@ There are a few classes (currently) in the calculus module all of which are conc
 
 \newcoderef{function DerivativeExpression:new(expression, symbol)}{return DerivativeExpression}{expression Expression, symbol SymbolExpression} 
 
-Creates a new single-variable derivative operation of the given \texttt{expression} with respect to the given \texttt{symbol}. If \texttt{symbol} is omitted, then \texttt{symbol} takes the default value of \mintinline{lua}{SymbolExpression("x")}. 
+Creates a new single-variable derivative operation of the given \texttt{expression} with respect to the given \texttt{symbol}. If \texttt{symbol} is omitted, then \texttt{symbol} takes the default value of \mintinline{lua}{SymbolExpression("x")}. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
