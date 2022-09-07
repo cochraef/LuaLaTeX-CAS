@@ -155,4 +155,26 @@ tex.print('\\[', f:tolatex(), '\\]')
 }
 \end{codebox}
 
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{DD()} shortcuts \mintinline{lua}{DerivativeExpression()}. 
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = DD(sin(x)/x)
+\end{CAS}
+\[ \print{f} \] 
+\end{CAS}
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = DD(sin(x)/x)
+\end{CAS}
+\[ \print{f} \] 
+\end{codebox}
+
+
 \end{document}
