@@ -175,6 +175,61 @@ The function \mintinline{lua}{DD()} shortcuts \mintinline{lua}{DerivativeExpress
 \end{CAS}
 \[ \print{f} \] 
 \end{codebox}
+Alternatively, one could also use \mintinline{lua}{diff()} (see below). 
 
+\newcoderef{function DiffExpression(expression, symbols)}{return DiffExpression}{expression Expression, symbols table<number, Symbol>}
+
+Creates a new multi-variable higher-order derivative operation of the given \texttt{expression} with respect to the given \texttt{symbols}. As opposed to \texttt{DerivativeExpression}, the argument \texttt{symbols} cannot be omitted. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+vars('x','y')
+f = DiffExpression(sin(x*y)/y,{x,y})
+tex.print('\\[', f:tolatex(), '\\]')
+\end{minted}
+\tcblower
+\luaexec{
+    vars('x','y')
+    f = DiffExpression(sin(x*y)/y,{x,y})
+    tex.print('\\[', f:tolatex(), '\\]')
+}
+\end{codebox}
+We can also use \texttt{DiffExpression} to create higher-order single variable derivatives:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{lua}
+vars('x')
+f = DiffExpression(sin(x)/x,{x,x})
+tex.print('\\[', f:tolatex(), '\\]')
+\end{minted}
+\tcblower
+\luaexec{
+    vars('x')
+    f = DiffExpression(sin(x)/x,{x,x})
+    tex.print('\\[', f:tolatex(), '\\]')
+}
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{diff()} shortcuts \mintinline{lua}{DiffExpression()}. The arguments of \mintinline{lua}{diff()} can also be given in a more user-friendly, compact form. For example:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x','y')
+    f = diff(sin(x)/x, {x,2})
+    g = diff(sin(x*y)/y,x,y)
+\end{CAS}
+\[ \print{f} = \print*{f} \qquad \print{g} = \print*{g} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x','y')
+    f = diff(sin(x)/x, {x,2})
+    g = diff(sin(x*y)/y,x,y)
+\end{CAS}
+\[ \print{f} = \print*{f} \qquad \print{g} = \print*{g} \]
+\end{codebox}
 
 \end{document}
