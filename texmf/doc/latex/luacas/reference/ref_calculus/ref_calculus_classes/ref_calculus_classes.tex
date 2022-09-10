@@ -219,7 +219,7 @@ The function \mintinline{lua}{diff()} shortcuts \mintinline{lua}{DiffExpression(
 \begin{CAS}
     vars('x','y')
     f = diff(sin(x)/x, {x,2})
-    g = diff(sin(x*y)/y,x,y)
+    g = diff(sin(x*y)/y,x,{y,2})
 \end{CAS}
 \[ \print{f} = \print*{f} \qquad \print{g} = \print*{g} \]
 \end{minted}
@@ -227,9 +227,48 @@ The function \mintinline{lua}{diff()} shortcuts \mintinline{lua}{DiffExpression(
 \begin{CAS}
     vars('x','y')
     f = diff(sin(x)/x, {x,2})
-    g = diff(sin(x*y)/y,x,y)
+    g = diff(sin(x*y)/y,x,{y,2})
 \end{CAS}
 \[ \print{f} = \print*{f} \qquad \print{g} = \print*{g} \]
 \end{codebox}
+
+\newcoderef{function IntegralExpression(expression, symbol, lower, upper)}{return IntegralExpression}{expression Expression, symbol SymbolExpression, lower Expression, upper Expression} 
+
+Creates a new integral operation of the given \texttt{expression} with respect to the given \texttt{symbol} over the given \texttt{lower} and \texttt{upper} bounds. If \texttt{lower} and \texttt{upper} are omitted, then an \emph{indefinite} \texttt{IntegralExpression} is constructed. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small,breaklines]{lua}
+vars('x')
+f = IntegralExpression(sin(sqrt(x)), x)
+g = IntegralExpression(sin(sqrt(x)), x, Integer.zero(), pi)
+tex.print('\\[', f:tolatex(), '\\]')
+tex.print('\\[', g:tolatex(), '\\]')
+\end{minted}
+\tcblower
+\luaexec{
+    vars('x')
+    f = IntegralExpression(sin(sqrt(x)),x)
+    g = IntegralExpression(sin(sqrt(x)),x,Integer.zero(),pi)
+    tex.print('\\[', f:tolatex(), '\\]')
+    tex.print('\\[', g:tolatex(), '\\]')
+}
+\end{codebox}
+
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{int()} shortcuts \mintinline{lua}{IntegralExpression()}. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    g = int(sin(sqrt(x)),x,0,pi)
+\end{CAS}
+\[ \print{g} = \print*{g} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    g = int(sin(sqrt(x)),x,0,pi)
+\end{CAS}
+\[ \print{g} = \print*{g} \]
+\end{codebox} 
 
 \end{document}
