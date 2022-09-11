@@ -154,15 +154,67 @@ style=numeric,
 
 \newcoderef{function IntegralExpression.table(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
 
-Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table.
+Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = IntegralExpression.table(sin(x),x)
+  g = IntegralExpression.table(x*sin(x),x)
+\end{CAS}
+\[ f = \print{f} \qquad g = \print{g} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = IntegralExpression.table(sin(x),x)
+    g = IntegralExpression.table(x*sin(x),x)
+\end{CAS}
+\[ f = \print{f} \qquad g = \print{g} \] 
+\end{codebox}
 
 \newcoderef{function IntegralExpression.linearproperties(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
 
-Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression.integrate()}. 
+Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression.integrate()}. For example:
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = IntegralExpression.linearproperties(sin(x) + e^x,x)
+    g = IntegralExpression.table(sin(x)+e^x,x)
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = IntegralExpression.linearproperties(sin(x) + e^x,x)
+    g = IntegralExpression.table(sin(x)+e^x,x)
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g} \] 
+\end{codebox} 
 
 \newcoderef{function IntegralExpression.substitutionmethod(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression} 
 
 Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via $u$-substitution; returns nil if no suitable substitution is found to be successful. 
+
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    f = IntegralExpression.substitutionmethod(x*sin(x^2),x)
+    g = IntegralExpression.linearproperties(x*sin(x),x)
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g}.\] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    f = IntegralExpression.substitutionmethod(x*sin(x^2),x)
+    g = IntegralExpression.linearproperties(x*sin(x),x)
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g}.\] 
+\end{codebox}
 
 \newcoderef{function IntegralExpression.trialsubstitutions(integrand)}{return table<number, Expression}{integrand Expression}
 

@@ -6,8 +6,11 @@ Hi
 
 \begin{CAS}
     vars('x')
-    a = cos(x+7*pi/3)
+    f = e^x/(e^x*e^x+1)
+    l = IntegralExpression.trialsubstitutions(f:autosimplify())
+    t = IntegralExpression.substitutionmethod(f,x)
 \end{CAS}
 
-\[ \print{a} = \print*{a} \] 
+\[ \{ \lprint{l} \} \] 
+\[ \print{t} \] 
 \end{document}
