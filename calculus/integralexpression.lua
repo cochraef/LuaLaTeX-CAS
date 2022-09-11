@@ -292,23 +292,34 @@ function IntegralExpression.trialsubstitutions(expression)
         end
     end
 
+    --Recursive part - evaluates each term in a sum.
+    if expression:type() == BinaryOperation and expression.operation == BinaryOperation.ADD then 
+        for _,term in ipairs(expression.expressions) do 
+            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
+        end
+    end
+
     -- Function forms and arguments of function forms (includes a recursive part)
     if expression:type() == TrigExpression or expression:type() == Logarithm then
         substitutions[#substitutions+1] = expression
-        substitutions[#substitutions+1] = expression.expression
+        if not expression.expression:isatomic() then 
+            substitutions[#substitutions+1] = expression.expression
+        end
         substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expression))
     end
 
     -- Bases and exponents of powers
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.POW then
+        substitutions[#substitutions+1] = expression
         -- Atomic expressions are technically valid substitutions, but they won't be useful
         if not expression.expressions[1]:isatomic() then
-            substitutions[#substitutions+1] = expression.expressions[1]
+            --substitutions[#substitutions+1] = expression.expressions[1]
+            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expressions[1]))
         end
         if not expression.expressions[2]:isatomic() then
-            substitutions[#substitutions+1] = expression.expressions[2]
+            --substitutions[#substitutions+1] = expression.expressions[2]
+            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expressions[2]))
         end
-        substitutions[#substitutions+1] = expression
     end
 
     return substitutions
