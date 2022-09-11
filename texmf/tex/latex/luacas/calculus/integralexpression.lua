@@ -308,6 +308,7 @@ function IntegralExpression.trialsubstitutions(expression)
         if not expression.expressions[2]:isatomic() then
             substitutions[#substitutions+1] = expression.expressions[2]
         end
+        substitutions[#substitutions+1] = expression
     end
 
     return substitutions
