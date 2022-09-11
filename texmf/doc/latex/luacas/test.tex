@@ -13,4 +13,32 @@ Hi
 
 \[ \{ \lprint{l} \} \] 
 \[ \print{t} \] 
+
+\begin{CAS}
+    vars('a','b','c','d')
+    x = a^(b*c+b*d)
+    x = factor(x)
+\end{CAS}
+\[ \print{x} = \print*{x} \] 
+
+\begin{CAS}
+    vars('x')
+    f = cos(x)/(1+sin(x))
+    f = f:autosimplify()
+    l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+\[ \print{int(f,x)} = \print*{int(f,x)} \] 
+\[ \{ \lprint{l} \} \] 
+
+\begin{CAS}
+    vars('x')
+    f = 1/(1+e^x)
+    f = f:autosimplify()
+    l = IntegralExpression.trialsubstitutions(f)
+    g = f / e^x
+    g = g:autosimplify()
+\end{CAS}
+\[ \print{int(f,x)} = \print*{int(f,x)}\]
+\[ \{ \lprint{l} \} \] 
+\[ \print{g} \] 
 \end{document}
