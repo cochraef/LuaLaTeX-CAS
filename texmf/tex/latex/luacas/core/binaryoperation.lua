@@ -167,7 +167,10 @@ function BinaryOperation:expand()
         local exp = BinaryOperation.MULEXP({Integer.one()});
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
-            exp = exp:expand2(expanded.expressions[1]):autosimplify()
+            exp = exp:expand2(expanded.expressions[1])
+            if _ > 1 then 
+                exp = exp:autosimplify()
+            end
         end
         if pow < 0 then
             exp = exp^Integer(-1)
