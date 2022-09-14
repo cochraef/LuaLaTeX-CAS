@@ -220,6 +220,26 @@ Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via $u$
 
 Generates a list of possible $u$-substitutions to attempt in \mintinline{lua}{IntegralExpression.substitutionmethod()}. 
 
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = cos(x)/(1+sin(x))
+    f = f:autosimplify()
+    l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+\[ \left\{ \lprint{l} \right\}.\] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = cos(x)/(1+sin(x))
+    f = f:autosimplify()
+    l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+\[ \left\{ \lprint{l} \right\}.\] 
+\end{codebox}
+
 \newcoderef{function IntegralExpression.rationalfunction(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
 
 Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo, Rothstein, and Trager's method in the case when \texttt{expression} is a rational function in the variable \texttt{symbol}. If \texttt{integrand} is not a rational function, then nil is returned. 
