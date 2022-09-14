@@ -6,6 +6,23 @@ Hi
 
 \begin{CAS}
     vars('x')
+    f = x*(1+2*x^2)^(1/3)
+    l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+\[ \lprint{l} \] 
+\[ \print{int(f,x)} = \print*{int(f,x)}.\] 
+
+\hrulefill
+
+\begin{CAS}
+    vars('x','y')
+    f = (x+y)^13
+\end{CAS}
+\[ \print{f} = \print{f:expand():autosimplify()}.\]
+\end{document}
+
+\begin{CAS}
+    vars('x')
     f = e^x/(e^x*e^x+1)
     l = IntegralExpression.trialsubstitutions(f:autosimplify())
     t = IntegralExpression.substitutionmethod(f,x)
@@ -41,4 +58,5 @@ Hi
 \[ \print{int(f,x)} = \print*{int(f,x)}\]
 \[ \{ \lprint{l} \} \] 
 \[ \print{g} \] 
-\end{document}
+
+\hrulefill
