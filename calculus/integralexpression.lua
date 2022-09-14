@@ -287,6 +287,7 @@ function IntegralExpression.trialsubstitutions(expression)
 
     -- Recursive part - evaluates each term in a product.
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.MUL then
+        substitutions[#substitutions+1] = expression
         for _, term in ipairs(expression.expressions) do
             substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
         end
@@ -294,6 +295,7 @@ function IntegralExpression.trialsubstitutions(expression)
 
     --Recursive part - evaluates each term in a sum.
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.ADD then 
+        substitutions[#substitutions+1] = expression
         for _,term in ipairs(expression.expressions) do 
             substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
         end
