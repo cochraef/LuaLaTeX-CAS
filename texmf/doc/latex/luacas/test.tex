@@ -15,10 +15,26 @@ Hi
 \hrulefill
 
 \begin{CAS}
-    vars('x','y')
-    f = (x+y)^13
+    vars('x')
+    num = Poly({1})
+    den = Poly({1,0,0,1})
+    g = PolynomialRing.partialfractions(num,den)
+    g = g:autosimplify()
+    num = Poly({-2,3},x)
+    den = Poly({-1,0,0,0,1},x)
+    h = PolynomialRing.partialfractions(num,den)
+    h = h:autosimplify()
 \end{CAS}
-\[ \print{f} = \print{f:expand():autosimplify()}.\]
+%\[ \print{int(h,x)} = \print*{int(h,x)} \] 
+
+\begin{CAS}
+    vars('x')
+    num = 1
+    den = x^4+2*x^2+1
+    den = den:autosimplify()
+    f = num/den
+\end{CAS}
+\[ \print{int(f,x)} = \print*{int(f,x)} \] 
 \end{document}
 
 \begin{CAS}
