@@ -340,7 +340,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.POW and expression.expressions[2] == Integer(-1) then
         g, gstat = expression.expressions[1]:topolynomial()
         if not gstat then
-            return false
+            return nil
         end
         f = PolynomialRing({Integer.one()}, g.symbol)
     else
@@ -376,7 +376,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
 
     -- If the polynomials are not relatively prime, divides out the common factors.
     local gcd = PolynomialRing.gcd(f, g)
-    if gcd ~= Integer(1) then
+    if gcd ~= Integer.one() then
         f, g = f // gcd, g // gcd
     end
 
