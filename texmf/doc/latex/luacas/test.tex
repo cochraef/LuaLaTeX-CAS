@@ -128,6 +128,14 @@ b pseudodivide y is causing trouble
 \end{CAS}
 \[ \print{g} = \print*{g} \] 
 
+\begin{CAS}
+    vars('x')
+    f = 1/(x^2+x+1)
+    g = int(f,x):autosimplify()
+\end{CAS}
+\[ \print{g} \] 
+
+
 \end{document}
 
 \begin{CAS}
@@ -152,6 +160,7 @@ b pseudodivide y is causing trouble
     h = h:autosimplify()
 \end{CAS}
 %\[ \print{int(h,x)} = \print*{int(h,x)} \] 
+
 
 
 \end{document}
