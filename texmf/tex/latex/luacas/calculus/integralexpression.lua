@@ -370,7 +370,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
     do
         local disc =  g.coefficients[1]*g.coefficients[1]-Integer(4)*g.coefficients[2]*g.coefficients[0]
         if f.degree <= Integer.one() and g.degree == Integer(2) and disc < Integer.zero() then
-            return f.coefficients[1] * LN(g.coefficients[0] + g.coefficients[1] * symbol + g.coefficients[2] * symbol ^ Integer(2))/(Integer(2) * g.coefficients[2]) +  (Integer(2)*f.coefficients[0]*g.coefficients[2] - f.coefficients[1]*g.coefficients[1]) / (sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2] - g.coefficients[1] ^ Integer(2))) * Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2))) / sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2))
+            return (f.coefficients[1] * LN(g.coefficients[0] + g.coefficients[1] * symbol + g.coefficients[2] * symbol ^ Integer(2))/(Integer(2) * g.coefficients[2]) +  (Integer(2)*f.coefficients[0]*g.coefficients[2] - f.coefficients[1]*g.coefficients[1]) / (sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2] - g.coefficients[1] ^ Integer(2))) * Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2))) / sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2))):autosimplify()
         end
     end
 
