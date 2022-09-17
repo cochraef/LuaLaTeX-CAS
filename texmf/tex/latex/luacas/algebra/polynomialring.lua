@@ -581,11 +581,11 @@ function PolynomialRing:pseudodivide(b)
         m = s.degree
     end
 
-    --if delta - sigma == Integer.zero() then 
-    --    return p,s
-    --else 
+    if delta - sigma == Integer.zero() then 
+        return p,s
+    else 
         return lcb^(delta - sigma) * p, lcb^(delta - sigma) * s
-    --end
+    end
 end
 
 -- Polynomial rings are never fields, but when dividing by a polynomial by a constant we may want to use / instead of //
