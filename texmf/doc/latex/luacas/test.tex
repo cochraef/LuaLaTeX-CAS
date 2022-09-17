@@ -114,15 +114,16 @@ b pseudodivide y is causing trouble
     qq = lcb ^ Integer(2)
 }
 \[ \print{qq} \] 
-\luaexec{
-    c = b:pseudodivide(y)
-}
+%\luaexec{
+%    c = b:pseudodivide(y)
+%}
 \[ \print{c} \] 
 \begin{CAS}
-    den = x^4 + 2*x^3 + 2*x^2 + 2*x + 1
-    den = den:autosimplify()
-    f = 1/den
-    f = f:autosimplify()
+    den = (x+1)^2*(x^2+2*x+5)
+    num = x^3+2*x^2+x/2+1
+    den = den:expand():autosimplify():topolynomial()
+    num = num:autosimplify():topolynomial()
+    f = PolynomialRing.partialfractions(num,den):autosimplify()
     g = int(f,x)
 \end{CAS}
 \[ \print{g} = \print*{g} \] 
