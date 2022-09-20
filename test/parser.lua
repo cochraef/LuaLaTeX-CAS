@@ -84,12 +84,22 @@ function range(a, b, step)
     return f, nil, a - step
   end
 
-function factor(exp)
+function factor(exp,squarefrei)
     if exp:type() == Integer then
         return exp:primefactorization()
     end
-    if exp:type() == PolynomialRing then 
-        return exp:factor()
+    if exp:type() == PolynomialRing then
+        if not squarefrei then
+            return exp:factor()
+        else 
+            if exp.ring == Integer.getring() or Rational.getring() then
+                return exp:squarefreefactorization()
+            end 
+            if exp.ring == IntegerModN.getring() then
+                return exp:modularsquarefreefactorization()
+            end
+            return exp:factor()
+        end
     end
     return exp:autosimplify():factor()
 end
@@ -145,7 +155,16 @@ function topoly(a)
     return a:topolynomial()
 end
 
-function extendedgcd(a,b)
+function gcd(a,b)
+    if a:type() == Integer and b:type() == Integer then 
+        return Integer.gcd(a,b) 
+    end
+    if a:type() == PolynomialRing and b:type() == PolynomialRing then 
+        return PolynomialRing.gcd(a,b) 
+    end
+end
+
+function gcdext(a,b)
     if a:type() == Integer and b:type() == Integer then 
         return Integer.extendedgcd(a,b) 
     end

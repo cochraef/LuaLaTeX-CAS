@@ -287,7 +287,16 @@ function IntegralExpression.trialsubstitutions(expression)
 
     -- Recursive part - evaluates each term in a product.
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.MUL then
+        substitutions[#substitutions+1] = expression
         for _, term in ipairs(expression.expressions) do
+            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
+        end
+    end
+
+    --Recursive part - evaluates each term in a sum.
+    if expression:type() == BinaryOperation and expression.operation == BinaryOperation.ADD then 
+        substitutions[#substitutions+1] = expression
+        for _,term in ipairs(expression.expressions) do 
             substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
         end
     end
@@ -295,18 +304,23 @@ function IntegralExpression.trialsubstitutions(expression)
     -- Function forms and arguments of function forms (includes a recursive part)
     if expression:type() == TrigExpression or expression:type() == Logarithm then
         substitutions[#substitutions+1] = expression
-        substitutions[#substitutions+1] = expression.expression
+        if not expression.expression:isatomic() then 
+            substitutions[#substitutions+1] = expression.expression
+        end
         substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expression))
     end
 
     -- Bases and exponents of powers
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.POW then
+        substitutions[#substitutions+1] = expression
         -- Atomic expressions are technically valid substitutions, but they won't be useful
         if not expression.expressions[1]:isatomic() then
-            substitutions[#substitutions+1] = expression.expressions[1]
+            --substitutions[#substitutions+1] = expression.expressions[1]
+            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expressions[1]))
         end
         if not expression.expressions[2]:isatomic() then
-            substitutions[#substitutions+1] = expression.expressions[2]
+            --substitutions[#substitutions+1] = expression.expressions[2]
+            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expressions[2]))
         end
     end
 
@@ -326,7 +340,7 @@ function IntegralExpression.rationalfunction(expression, symbol)
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.POW and expression.expressions[2] == Integer(-1) then
         g, gstat = expression.expressions[1]:topolynomial()
         if not gstat then
-            return false
+            return nil
         end
         f = PolynomialRing({Integer.one()}, g.symbol)
     else
@@ -355,14 +369,14 @@ function IntegralExpression.rationalfunction(expression, symbol)
     -- Explicit handling of degree 1 over a binomial.
     do
         local disc =  g.coefficients[1]*g.coefficients[1]-Integer(4)*g.coefficients[2]*g.coefficients[0]
-        if f == Integer.one() and g.degree == Integer(2) and disc < Integer.zero() then
-            return Integer(2) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)) ^ (Integer(1)/Integer(2))) / (Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)) ^ (Integer(1)/Integer(2))
+        if f.degree <= Integer.one() and g.degree == Integer(2) and disc < Integer.zero() then
+            return (f.coefficients[1] * LN(g.coefficients[0] + g.coefficients[1] * symbol + g.coefficients[2] * symbol ^ Integer(2))/(Integer(2) * g.coefficients[2]) +  (Integer(2)*f.coefficients[0]*g.coefficients[2] - f.coefficients[1]*g.coefficients[1]) / (g.coefficients[2] * sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2] - g.coefficients[1] ^ Integer(2))) * ARCTAN((Integer(2)*g.coefficients[2]*symbol+g.coefficients[1]) / sqrt(Integer(4)*g.coefficients[0]*g.coefficients[2]-g.coefficients[1] ^ Integer(2)))):autosimplify()
         end
     end
 
     -- If the polynomials are not relatively prime, divides out the common factors.
     local gcd = PolynomialRing.gcd(f, g)
-    if gcd ~= Integer(1) then
+    if gcd ~= Integer.one() then
         f, g = f // gcd, g // gcd
     end
 

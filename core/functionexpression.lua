@@ -186,12 +186,12 @@ function FunctionExpression:order(other)
         end
     end
 
-    if other:type() ~= FunctionExpression and other:type() ~= TrigExpression then
-        return true
+    if other:type() == SqrtExpression then
+        return self:order(other:topower())
     end
 
-    if other:type() == SqrtExpression then
-        return false
+    if other:type() ~= FunctionExpression and other:type() ~= TrigExpression then
+        return true
     end
 
     if self.name ~= other.name then

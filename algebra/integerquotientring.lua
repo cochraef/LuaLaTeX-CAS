@@ -176,8 +176,13 @@ function IntegerModN:one()
 end
 
 --- @return string
-function IntegerModN:tolatex()
-    return self.element:tolatex()
+function IntegerModN:tolatex(mod)
+    mod = mod or false
+    if mod then 
+        return self.element:tolatex() .. "\\bmod{" .. self.modulus:tolatex() .. "}"
+    else
+        return self.element:tolatex()
+    end
 end
 -----------------
 -- Inheritance --
