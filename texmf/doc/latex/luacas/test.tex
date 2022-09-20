@@ -1,8 +1,169 @@
 \documentclass{article}
+\usepackage{fullpage}
 \usepackage{luacas}
+\usepackage{forest}
 
 \begin{document}
 Hi
+\begin{CAS}
+    vars('x')
+    f = 1/(x^4+2*x^2+1)
+    f = f:autosimplify()
+\end{CAS}
+\[ \print{f} \] 
+\parseforest{f}
+\bracketset{action character = @}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
+\luaexec{
+    den,dencheck = f.expressions[1]:topolynomial()
+    if dencheck then 
+        tex.print('pass')
+    end
+    num = PolynomialRing({Integer.one()}, den.symbol)
+}
+\[ \print{num/den} \] 
+\luaexec{
+    gcd = PolynomialRing.gcd(num,den)
+    if gcd ~= Integer.one() then 
+        f,g = f // gcd, g // gcd 
+    end 
+    if gcd == Integer.one() then 
+        tex.print('pass')
+    end
+}
+\luaexec{
+    q,r = num:divremainder(den)
+    U = IntegralExpression.integrate(q,x)
+    sfden = den:squarefreefactorization()
+    pfrac = PolynomialRing.partialfractions(r,den,sfden)
+}
+\[ \text{pfrac} = \print{pfrac} \] 
+\luaexec{
+    V = Integer.zero()
+    for _, term in ipairs(pfrac.expressions) do
+        local i = \#term.expressions
+        if i > 1 then
+            for j = 1, i-1 do
+                local n = term.expressions[j].expressions[1]
+                local d = term.expressions[j].expressions[2].expressions[1]
+                local p = term.expressions[j].expressions[2].expressions[2]
+                local _, s, t = PolynomialRing.extendedgcd(d, d:derivative())
+                s = s * n
+                t = t * n
+                V = V - t / ((p-Integer.one()) * BinaryOperation.POWEXP({d, p-Integer.one()}))
+                term.expressions[j+1].expressions[1] = term.expressions[j+1].expressions[1] + s + t:derivative() / (p-Integer.one())
+            end
+        end
+    end
+}
+\[ \text{V} = \print{V} \] 
+\luaexec{
+    local W = Integer.zero()
+    for _, term in ipairs(pfrac.expressions) do
+        a = term.expressions[\#term.expressions].expressions[1]
+        tex.print('\\[', a:tolatex(),'\\]')
+        b = term.expressions[1].expressions[2].expressions[1]
+        tex.print('\\[', b:tolatex(),'\\]')
+        y = a - b:derivative() * PolynomialRing({Integer.zero(), Integer.one()}, "z")
+        tex.print('\\[',y:tolatex(),'\\]')
+        if b.ring == PolynomialRing.getring() or y.ring == PolynomialRing.getring() then 
+            tex.print('poly')
+        end
+    end
+}
+\[ \text{b} = \print{b} \qquad \text{y} =\print{y} \] 
+\luaexec{
+   if b:getring() == y:getring() then 
+    tex.print('success')
+   else 
+    tex.print('fail') 
+   end 
+   tex.print('\\[',b.degree:tolatex(),'\\]')
+   tex.print('\\[',y.degree:tolatex(),'\\]')
+}
+b pseudodivide y is causing trouble
+\luaexec{
+    p = b:zero()
+    s = b
+    m = s.degree
+    n = y.degree
+    delta = Integer.max(m-n+Integer.one(), Integer.zero())
+    lcb = y:lc()
+    sigma = Integer.zero()
+}
+\[ \print{m} > \print{n} \] 
+\luaexec{
+    while m >= n and s~= Integer.zero() do 
+    local lcs = s:lc()
+        p = p * lcb + b:one():multiplyDegree((m-n):asnumber()) * lcs
+        s = s * lcb - y * b:one():multiplyDegree((m-n):asnumber()) * lcs
+        sigma = sigma + Integer.one()
+        m = s.degree
+    end
+    --qq = lcb^(delta - sigma)*p 
+    --rr = lcb^(delta - sigma)*s
+    qq = lcb^(delta - sigma)
+    rr = lcb^(delta - sigma)
+}
+\[ \text{lcb} = \print{lcb} \qquad \print{p} \qquad \print{s} \qquad \print{delta -sigma} \]
+\[ \text{qq} = \print{qq} \qquad \text{rr} = \print{rr} \] 
+\luaexec{
+    qq = lcb ^ Integer(2)
+}
+\[ \print{qq} \] 
+%\luaexec{
+%    c = b:pseudodivide(y)
+%}
+\[ \print{c} \] 
+\begin{CAS}
+    den = (x+1)^2*(x^2+2*x+5)
+    num = x^3+2*x^2+x/2+1
+    den = den:expand():autosimplify():topolynomial()
+    num = num:autosimplify():topolynomial()
+    f = PolynomialRing.partialfractions(num,den):autosimplify()
+    g = int(f,x)
+\end{CAS}
+\[ \print{g} = \print*{g} \] 
+
+\begin{CAS}
+    vars('x')
+    f = 1/(x^2+x+1)
+    g = int(f,x):autosimplify()
+\end{CAS}
+\[ \print{g} \] 
+
+
+\end{document}
+
+\begin{CAS}
+    vars('x')
+    f = x*(1+2*x^2)^(1/3)
+    l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+\[ \lprint{l} \] 
+\[ \print{int(f,x)} = \print*{int(f,x)}.\] 
+
+\hrulefill
+
+\begin{CAS}
+    vars('x')
+    num = Poly({1})
+    den = Poly({1,0,0,1})
+    g = PolynomialRing.partialfractions(num,den)
+    g = g:autosimplify()
+    num = Poly({-2,3},x)
+    den = Poly({-1,0,0,0,1},x)
+    h = PolynomialRing.partialfractions(num,den)
+    h = h:autosimplify()
+\end{CAS}
+%\[ \print{int(h,x)} = \print*{int(h,x)} \] 
+
+
+
+\end{document}
 
 \begin{CAS}
     vars('x')
@@ -41,4 +202,5 @@ Hi
 \[ \print{int(f,x)} = \print*{int(f,x)}\]
 \[ \{ \lprint{l} \} \] 
 \[ \print{g} \] 
-\end{document}
+
+\hrulefill
