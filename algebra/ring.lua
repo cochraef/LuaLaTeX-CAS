@@ -63,8 +63,8 @@ function Ring.resultantring(ring1, ring2)
         end
 
         if ring2 == Rational.getring() then
-            if ring1.child then
-                return ring1
+            if ring1.child and ring2.child and ring1.symbol == ring2.symbol then
+                return Rational.makering(ring1.symbol, Ring.resultantring(ring1.child, ring2.child))
             end
             return ring2
         end

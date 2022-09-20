@@ -89,6 +89,12 @@ function testeq(actual, expected, initial, sort)
     tests = tests + 1
 end
 
+-- Tests whether converting an expression to a ring produces the expected object in the expected ring
+function testringconvert(expression, toring, expected, expectedring)
+    testeq(expression:inring(toring), expected, expression)
+    testeq(expression:inring(toring):getring(), expectedring)
+end
+
 function endtest()
     print()
     print("Finished test without errors.")
@@ -118,23 +124,24 @@ end
 -- profiler = newProfiler()
 -- profiler:start()
 
-require("test.calculus.derivatives")
-require("test.calculus.integrals")
+-- require("test.calculus.derivatives")
+-- require("test.calculus.integrals")
 
-require("test.expressions.autosimplify")
-require("test.expressions.simplify")
-require("test.expressions.functions")
-require("test.expressions.logarithms")
--- require("test.expressions.rationalexponent")
-require("test.expressions.substitute")
+-- require("test.expressions.autosimplify")
+-- require("test.expressions.simplify")
+-- require("test.expressions.functions")
+-- require("test.expressions.logarithms")
+-- -- require("test.expressions.rationalexponent")
+-- require("test.expressions.substitute")
 
-require("test.polynomials.polynomial")
-require("test.polynomials.partialfractions")
-require("test.polynomials.polynomialmod")
-require("test.polynomials.roots")
+-- require("test.polynomials.polynomial")
+-- require("test.polynomials.partialfractions")
+-- require("test.polynomials.polynomialmod")
+-- require("test.polynomials.roots")
 
-require("test.rings.modulararithmetic")
-require("test.rings.number")
+require("test.rings.conversion")
+-- require("test.rings.modulararithmetic")
+-- require("test.rings.number")
 
 endall()
 
