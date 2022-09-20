@@ -17,10 +17,13 @@ local __obj = {__index = Rational, __eq = function(a, b)
             (a["child"] == b["child"] or a["child"] == nil or b["child"] == nil) and
             (a["symbol"] == b["symbol"] or a["child"] == nil or b["child"] == nil)
 end, __tostring = function(a)
-        if a.child and a.symbol then
+        if a.symbol then
             return tostring(a.child.child) .. "(" .. a.symbol .. ")"
         end
-        return "QQ"
+        if a.child then
+            return "QQ"
+        end
+        return "(Generic Fraction Field)"
     end}
 
 --- @param symbol SymbolExpression
@@ -71,6 +74,7 @@ function Rational:new(n, d, keep)
     o.denominator = d
     if not o.ring then
         o:reduce()
+        o.ring = Integer.getring()
     end
 
     if (not keep) and o.denominator == Integer.one() or (not keep) and o.numerator == Integer.zero() then
@@ -110,6 +114,10 @@ function Rational:inring(ring)
         return self
     end
 
+    if ring == Rational:getring() and ring.symbol then
+        return Rational(self:inring(ring.child), self:inring(ring.child):one(), true)
+    end
+
     if ring == PolynomialRing:getring() then
         return PolynomialRing({self:inring(ring.child)}, ring.symbol)
     end
@@ -119,7 +127,7 @@ end
 
 --- @return boolean
 function Rational:isconstant()
-    if self.ring then
+    if self.symbol then
         return false
     end
     return true
