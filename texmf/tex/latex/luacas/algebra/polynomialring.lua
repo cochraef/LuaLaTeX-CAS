@@ -564,7 +564,7 @@ end
 -- In the case where both coefficients are fields, this is equivalent to division with remainder.
 function PolynomialRing:pseudodivide(b)
 
-    local p =  self:zero()
+    local p = self:zero()
     local s = self
     local m = s.degree
     local n = b.degree
@@ -581,7 +581,11 @@ function PolynomialRing:pseudodivide(b)
         m = s.degree
     end
 
-    return lcb^(delta - sigma) * p, lcb^(delta - sigma) * s
+    if delta - sigma == Integer.zero() then 
+        return p,s
+    else 
+        return lcb^(delta - sigma) * p, lcb^(delta - sigma) * s
+    end
 end
 
 -- Polynomial rings are never fields, but when dividing by a polynomial by a constant we may want to use / instead of //

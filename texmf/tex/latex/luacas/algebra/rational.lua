@@ -27,7 +27,7 @@ end, __tostring = function(a)
 --- @param child RingIdentifier
 --- @return RingIdentifier
 function Rational.makering(symbol, child)
-    local t = {ring = PolynomialRing}
+    local t = {ring = Rational}
     t.symbol = symbol
     t.child = child
     t = setmetatable(t, __obj)

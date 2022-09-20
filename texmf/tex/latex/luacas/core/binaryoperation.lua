@@ -55,7 +55,7 @@ function BinaryOperation:new(operation, expressions)
             if index > 1 then
                 expressionnames = expressionnames .. ' '
             end
-            if expression:isatomic() then
+            if expression:isatomic() and not (a.operation == BinaryOperation.POW and expression:type() == Rational) then
                 expressionnames = expressionnames .. tostring(expression)
             else
                 expressionnames = expressionnames .. '(' .. tostring(expression) .. ')'
@@ -168,6 +168,9 @@ function BinaryOperation:expand()
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
             exp = exp:expand2(expanded.expressions[1])
+            if _ > 1 then 
+                exp = exp:autosimplify()
+            end
         end
         if pow < 0 then
             exp = exp^Integer(-1)

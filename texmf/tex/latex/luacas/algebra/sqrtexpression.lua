@@ -51,33 +51,7 @@ end
 --- @param other Expression
 --- @return boolean
 function SqrtExpression:order(other)
-    if other:isconstant() then
-        return false
-    end
-
-    if other:type() == SymbolExpression then
-        return self.expression:order(other)
-    end
-
-    if other:type() == BinaryOperation then
-        if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then
-            return BinaryOperation(other.operation,{self}):order(other)
-        end
-
-        if other.operation == BinaryOperation.POW then
-            return (self ^ Integer.one()):order(other)
-        end
-    end
-
-    if other:type() ~= SqrtExpression then
-        return true
-    end
-
-
-    if self.expression == other.expression then
-        return self.root:order(other.root)
-    end
-    return self.expression:order(other.expression)
+    return self:topower():order(other)
 end
 
 function SqrtExpression:topower()

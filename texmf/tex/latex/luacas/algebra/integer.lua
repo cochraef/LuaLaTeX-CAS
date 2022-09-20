@@ -263,6 +263,9 @@ function Integer:inring(ring)
     end
 
     if ring == Rational:getring() then
+        if ring.child then
+            return Rational(self:inring(ring.child), self:inring(ring.child):one(), true)
+        end
         return Rational(self, Integer.one(), true):inring(ring)
     end
 
