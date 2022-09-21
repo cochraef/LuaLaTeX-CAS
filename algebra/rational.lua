@@ -46,6 +46,9 @@ end
 local __o = Copy(__FieldOperations)
 __o.__index = Rational
 __o.__tostring = function(a)
+    if a.ring.symbol then
+        return "(" .. tostring(a.numerator)..")/("..tostring(a.denominator) .. ")"
+    end
     return tostring(a.numerator).."/"..tostring(a.denominator)
 end
 
@@ -115,7 +118,10 @@ function Rational:inring(ring)
     end
 
     if ring == Rational:getring() and ring.symbol then
-        return Rational(self:inring(ring.child), self:inring(ring.child):one(), true)
+        if not self:getring().symbol then
+            return Rational(self:inring(ring.child), self:inring(ring.child):one(), true)
+        end
+        return Rational(self.numerator:inring(ring.child), self.denominator:inring(ring.child), true)
     end
 
     if ring == PolynomialRing:getring() then
