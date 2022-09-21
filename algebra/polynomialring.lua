@@ -310,7 +310,7 @@ function PolynomialRing:tolatex()
     return out
 end
 
-function PolynomialRing:isatomic() 
+function PolynomialRing:isatomic()
     --if self.degree >= Integer.one() then 
     --    return false
     --else
@@ -406,8 +406,8 @@ function PolynomialRing:inring(ring)
         return self
     end
 
-    if ring == Rational:getring() and ring.child == self:getring() then
-        return Rational(self, Integer(1), true)
+    if ring == Rational:getring() and ring.symbol then
+        return Rational(self:inring(ring.child), self:inring(ring.child):one(), true)
     end
 
     if ring.symbol == self.symbol then
@@ -418,6 +418,7 @@ function PolynomialRing:inring(ring)
         return PolynomialRing(out, self.symbol)
     end
 
+    -- TODO: Allow re-ordering of polynomial rings, so from R[x][y] -> R[y][x] for instance
     if ring == PolynomialRing:getring() then
         return PolynomialRing({self:inring(ring.child)}, ring.symbol)
     end

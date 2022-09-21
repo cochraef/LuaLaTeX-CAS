@@ -92,6 +92,10 @@ function IntegerModN:inring(ring)
         return PolynomialRing({self:inring(ring.child)}, ring.symbol)
     end
 
+    if ring == Rational:getring() and ring.symbol then
+        return Rational(self:inring(ring.child), self:inring(ring.child):one(), true)
+    end
+
     if ring == Integer:getring() then
         return self.element:inring(ring)
     end
