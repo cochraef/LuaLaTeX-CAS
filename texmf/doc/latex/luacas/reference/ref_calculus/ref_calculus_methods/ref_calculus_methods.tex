@@ -244,6 +244,27 @@ Generates a list of possible $u$-substitutions to attempt in \mintinline{lua}{In
 
 Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo, Rothstein, and Trager's method in the case when \texttt{expression} is a rational function in the variable \texttt{symbol}. If \texttt{integrand} is not a rational function, then nil is returned. 
 
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = (x^2+2*x+2)/(x^2+3*x+2)
+    f = f:autosimplify()
+    g = IntegralExpression.rationalfunction(f,x)
+\end{CAS}
+\[ \int \print{f}\ dx = \print*{g} \] 
+\end{minted}
+\tcblower\begin{CAS}
+    vars('x')
+    f = (x^2+2*x+2)/(x^2+3*x+2)
+    f = f:autosimplify()
+    g = IntegralExpression.rationalfunction(f,x)
+\end{CAS}
+\[ \int \print{f}\ dx = \print*{g} \] 
+\end{codebox}
+
+
+
 \newcoderef{function IntegralExpression.partsmethod(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression} 
 
 Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via \emph{integration by parts}; returns nil if no suitable application of IBP is found. 
