@@ -4,7 +4,67 @@
 \usepackage{forest}
 
 \begin{document}
-Hi
+Hi 
+\begin{CAS}
+    vars('x','y')
+    f = x^3
+\end{CAS}
+\[\print{f} \]
+
+\luaexec{
+    results = {}
+    for index, expression in ipairs(f:subexpressions()) do
+        results[index] = expression:expand()
+    end
+    expanded = BinaryOperation(f.operation, results)
+}
+\[ \print{expanded} \] 
+\parseforest{expanded}
+\bracketset{action character = @}
+\begin{forest}
+    @\forestresult
+\end{forest}
+
+\luaexec{
+    if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
+        exp = BinaryOperation.MULEXP({Integer.one()});
+        pow = expanded.expressions[2]:asnumber()
+        for _ = 1, math.abs(pow) do
+            exp = exp:expand2(expanded.expressions[1])
+            if _ > 1 then 
+                exp = exp:autosimplify()
+            end
+            tex.print('$',exp:tolatex(),'$')
+        end
+    end
+}
+
+\luaexec{
+    exp = x^Integer(2)
+    exp = exp:expand2(x)
+    tex.print('$',exp:tolatex(),'$')
+}
+
+\begin{CAS}
+    g = x^2*y^3
+    g = g^2
+    g = g:expand()
+    f = x^3
+    f = f:expand()
+\end{CAS}
+\[ \print*{g} \qquad \print{f}\] 
+
+\begin{CAS}
+    g = (x^2+1)*(x^2+2*x+2)
+    den = g:expand():topolynomial()
+    num = Poly({1})
+    pfrac = PolynomialRing.partialfractions(num,den)   
+\end{CAS}
+\[ \print{pfrac}\] 
+\[ \print*{int(pfrac,x)} \] 
+
+\end{document}
+
 \begin{CAS}
     vars('x')
     f = 1/(x^4+2*x^2+1)
@@ -114,10 +174,26 @@ b pseudodivide y is causing trouble
     qq = lcb ^ Integer(2)
 }
 \[ \print{qq} \] 
-%\luaexec{
-%    c = b:pseudodivide(y)
-%}
+\luaexec{
+    c = b:pseudodivide(y)
+}
 \[ \print{c} \] 
+
+
+\end{document}
+
+\newpage
+
+\begin{CAS}
+    vars('A','B','C','D')
+    g = A/(x+1) + B/(x+1)^2 + (C*x+D)/(x^2+2*x+2)
+    g = g:combine():autosimplify()
+\end{CAS}
+\[ \print{g}\] 
+\[ \print{g.expressions[3]:expand()} \] 
+
+\newpage
+
 \begin{CAS}
     den = (x+1)^2*(x^2+2*x+5)
     num = x^3+2*x^2+x/2+1
@@ -130,77 +206,29 @@ b pseudodivide y is causing trouble
 
 \begin{CAS}
     vars('x')
-    f = 1/(x^2+x+1)
+    f = (x^2+x+2)/(x^2+2*x+5)
     g = int(f,x):autosimplify()
 \end{CAS}
 \[ \print{g} \] 
-
-
-\end{document}
-
 \begin{CAS}
     vars('x')
-    f = x*(1+2*x^2)^(1/3)
-    l = IntegralExpression.trialsubstitutions(f)
+    num = Poly({2,1,1})
+    den = Poly({5,2,1})
+    q,r = num:divremainder(den)
+    f = q + PolynomialRing.partialfractions(r,den)
+    g = int(f:autosimplify(),x)
 \end{CAS}
-\[ \lprint{l} \] 
-\[ \print{int(f,x)} = \print*{int(f,x)}.\] 
-
-\hrulefill
-
-\begin{CAS}
-    vars('x')
-    num = Poly({1})
-    den = Poly({1,0,0,1})
-    g = PolynomialRing.partialfractions(num,den)
-    g = g:autosimplify()
-    num = Poly({-2,3},x)
-    den = Poly({-1,0,0,0,1},x)
-    h = PolynomialRing.partialfractions(num,den)
-    h = h:autosimplify()
-\end{CAS}
-%\[ \print{int(h,x)} = \print*{int(h,x)} \] 
-
-
-
-\end{document}
-
-\begin{CAS}
-    vars('x')
-    f = e^x/(e^x*e^x+1)
-    l = IntegralExpression.trialsubstitutions(f:autosimplify())
-    t = IntegralExpression.substitutionmethod(f,x)
-\end{CAS}
-
-\[ \{ \lprint{l} \} \] 
-\[ \print{t} \] 
+\[ \print{g} = \print*{g} \] 
 
 \begin{CAS}
     vars('a','b','c','d')
-    x = a^(b*c+b*d)
-    x = factor(x)
+    f = -(-a-b)/(c+d)
 \end{CAS}
-\[ \print{x} = \print*{x} \] 
+\[ \print{f} = \print*{f} \] 
+\parseforest{f}
+\bracketset{action character = @}
+\begin{forest}
+    @\forestresult
+\end{forest}
 
-\begin{CAS}
-    vars('x')
-    f = cos(x)/(1+sin(x))
-    f = f:autosimplify()
-    l = IntegralExpression.trialsubstitutions(f)
-\end{CAS}
-\[ \print{int(f,x)} = \print*{int(f,x)} \] 
-\[ \{ \lprint{l} \} \] 
-
-\begin{CAS}
-    vars('x')
-    f = 1/(1+e^x)
-    f = f:autosimplify()
-    l = IntegralExpression.trialsubstitutions(f)
-    g = f / e^x
-    g = g:autosimplify()
-\end{CAS}
-\[ \print{int(f,x)} = \print*{int(f,x)}\]
-\[ \{ \lprint{l} \} \] 
-\[ \print{g} \] 
-
-\hrulefill
+\end{document}
