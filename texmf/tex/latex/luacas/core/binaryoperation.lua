@@ -164,6 +164,9 @@ function BinaryOperation:expand()
         return allsums:autosimplify()
     end
     if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
+        if expanded.expressions[1]:type() ~= BinaryOperation then 
+            return expanded:autosimplify()
+        end
         local exp = BinaryOperation.MULEXP({Integer.one()});
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
