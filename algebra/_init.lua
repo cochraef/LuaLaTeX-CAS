@@ -13,6 +13,7 @@ require("algebra.integerquotientring")
 require("algebra.sqrtexpression")
 
 require("algebra.absexpression")
+require("algebra.equation")
 require("algebra.factorialexpression")
 require("algebra.logarithm")
 require("algebra.rootexpression")

@@ -164,6 +164,9 @@ function BinaryOperation:expand()
         return allsums:autosimplify()
     end
     if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
+        if expanded.expressions[1]:type() ~= BinaryOperation then 
+            return expanded:autosimplify()
+        end
         local exp = BinaryOperation.MULEXP({Integer.one()});
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
@@ -538,6 +541,10 @@ function BinaryOperation:tolatex()
             end
             return out
         end
+        if #self.expressions == 2 and self.expressions[2]:type() == BinaryOperation and self.expressions[2].operation == BinaryOperation.POW and self.expressions[2].expressions[2] == -Integer.one() then 
+            out = '\\frac{' .. self.expressions[1]:tolatex() .. '}{' .. self.expressions[2].expressions[1]:tolatex() .. '}' 
+            return out 
+        end
         for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
                 if expression.operation == BinaryOperation.POW and expression.expressions[2]:isconstant() and expression.expressions[2] < Integer.zero() then
@@ -596,7 +603,11 @@ function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.SUB then
         local out = ''
         if not self.expressions[2] then
-            out = '-' .. self.expressions[1]:tolatex()
+            if not self.expressions[1]:isatomic() then 
+                out = '-\\left(' .. self.expressions[1]:tolatex() .. '\\right)'
+            else 
+                out = '-' .. self.expressions[1]:tolatex()
+            end
         else
             for index, expression in ipairs(self.expressions) do
                 if expression.operation and (expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB) and index >1 then 
