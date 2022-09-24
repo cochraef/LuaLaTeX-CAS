@@ -126,6 +126,10 @@ function Logarithm:autosimplify()
         return BinaryOperation.MULEXP({expression.expressions[2], Logarithm(base, expression.expressions[1])}):autosimplify()
     end
 
+    if expression:type() == Rational and expression.numerator == Integer.one() then
+        return (-Logarithm(base, expression.denominator)):autosimplify()
+    end
+
     -- Our expression cannot be simplified
     return Logarithm(base, expression)
 end
