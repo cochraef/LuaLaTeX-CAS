@@ -76,7 +76,7 @@ function SymbolExpression:order(other)
     end
 
     -- CASC Autosimplfication has some symbols appearing before functions, but that looks bad to me, so all symbols appear before products now.
-    if other:type() == FunctionExpression or other:type() == TrigExpression then
+    if other:type() == FunctionExpression or other:type() == TrigExpression or other:type() == Logarithm then
         return true
     end
 

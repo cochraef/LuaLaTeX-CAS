@@ -63,9 +63,25 @@ function BinaryOperation:simplifypower()
         return base
     end
 
-    -- Uses the property that b^(log(b, x)) == x
+    -- Uses the property that b ^ (log(b, x)) == x
     if exponent:type() == Logarithm and exponent.base == base then
         return exponent.expression
+    end
+
+    -- Uses the property that b ^ (a * log(b, x)) == x ^ a
+    if exponent.operation == BinaryOperation.MUL then
+        local x
+        local rest = Integer.one()
+        for _, expression in ipairs(exponent.expressions) do
+            if expression:type() == Logarithm and expression.base == base and not log then
+                x = expression.expression
+            else
+                rest = rest * expression
+            end
+        end
+        if x then
+            return (x ^ rest):autosimplify()
+        end
     end
 
     -- Uses the property that (x^a)^b = x^(a*b)
