@@ -144,32 +144,7 @@ end
 --- @param other Expression
 --- @return boolean
 function Logarithm:order(other)
-    if other:isatomic() then
-        return false
-    end
-
-    if other:type() == Logarithm then
-        if self.base ~= other.base then
-            return self.base:order(other.base)
-        end
-        return self.expression:order(other.expression)
-    end
-
-    if other:type() == BinaryOperation then
-        if other.operation == BinaryOperation.ADD or other.operation == BinaryOperation.MUL then
-            return BinaryOperation(other.operation,{self}):order(other)
-        end
-
-        if other.operation == BinaryOperation.POW then
-            return (self ^ Integer.one()):order(other)
-        end
-    end
-
-    if other:type() == TrigExpression then
-        return self.expression:order(other.expression)
-    end
-
-    return true
+    return FunctionExpression("log", {self.base, self.expression}):order(other)
 end
 
 --- @return string

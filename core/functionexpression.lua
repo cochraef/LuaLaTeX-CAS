@@ -190,6 +190,11 @@ function FunctionExpression:order(other)
         return self:order(other:topower())
     end
 
+    -- TODO: Make Logarithm and AbsExpression inherit from function expression to reduce code duplication
+    if other:type() == Logarithm then
+        return self:order(FunctionExpression("log", {other.base, other.expression}))
+    end
+
     if other:type() ~= FunctionExpression and other:type() ~= TrigExpression then
         return true
     end

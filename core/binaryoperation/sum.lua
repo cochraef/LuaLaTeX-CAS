@@ -207,7 +207,9 @@ function BinaryOperation:mergesums(other)
         if not first.expressions[1] then
             return result
         end
-        table.insert(result.expressions, 1, first.expressions[1])
+        if first.expressions[1] ~= Integer.zero(0) then
+            table.insert(result.expressions, 1, first.expressions[1])
+        end
         return result
     end
 
