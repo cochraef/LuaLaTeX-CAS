@@ -2,75 +2,170 @@
 --- An expression for the integral of an expression.
 --- @field symbol SymbolExpression
 --- @field expression Expression
+--- @field attemptedintegrands table<number, Expression>
+--- @field integrandresults table<number, Expression>
 --- @field upper Expression
 --- @field lower Expression
 
 IntegralExpression = {}
 __IntegralExpression = {}
 
+----------------------------
+-- Instance functionality --
+----------------------------
 
---------------------------
--- Static functionality --
---------------------------
-
-local attemptedIntegrands = {}
-
---- Recursive part of the indefinite integral operator. Returns nil if the expression could not be integrated.
---- We switch to prodcedural programming here because it is more natural.
+--- Creates a new integral operation with the given symbol and expression.
 --- @param expression Expression
 --- @param symbol SymbolExpression
---- @return Expression|nil
-function IntegralExpression.integrate(expression, symbol, enhancedsubs)
-    local simplified = expression:autosimplify()
+--- @param lower Expression
+--- @param upper Expression
+function IntegralExpression:new(expression, symbol, lower, upper)
+    local o = {}
+    local __o = Copy(__ExpressionOperations)
 
+    if not symbol or not expression then
+        error("Send wrong number of parameters: integrals must have a variable to integrate with respect to and an expression to integrate.")
+    end
+
+    if lower and not upper then
+        error("Send wrong number of parameters: definite integrals must have an upper and a lower bound.")
+    end
+
+    o.symbol = symbol
+    o.expression = Copy(expression)
+    o.attemptedintegrands = {}
+    o.integrandresults = {}
+    o.upper = Copy(upper)
+    o.lower = Copy(lower)
+
+    __o.__index = IntegralExpression
+    __o.__tostring = function(a)
+        if a:isdefinite() then
+            return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ", ".. tostring(a.lower) .. ', ' .. tostring(a.upper) .. ')'
+        end
+        return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ')'
+    end
+    __o.__eq = function(a, b)
+        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
+        if not b:type() == IntegralExpression then
+            return false
+        end
+        return a.symbol == b.symbol and a.expression == b.expression and a.upper == b.upper and a.lower == b.lower
+    end
+    o = setmetatable(o, __o)
+
+    return o
+end
+
+--- Returns true if the integral is definite, i.e., has an upper and lower bound.
+--- @return boolean
+function IntegralExpression:isdefinite()
+    return self.upper ~= nil
+end
+
+--- @return Expression
+function IntegralExpression:autosimplify()
+    self.current = self.expression
+    self.currentsymbol = self.symbol
+    local integrated = self:integrate()
+
+    -- Our expression could not be integrated.
+    if not integrated then
+        self.current = nil
+        self.currentsymbol = nil
+        return self
+    end
+
+    if self:isdefinite() then
+        return (integrated:substitute({[self.symbol]=self.upper}) - integrated:substitute({[self.symbol]=self.lower})):autosimplify()
+    end
+
+    return integrated:autosimplify()
+end
+
+--- Recursive part of the indefinite integral operator. Returns nil if the expression could not be integrated.
+--- @param enhancedsubs boolean
+--- @return Expression|nil
+function IntegralExpression:integrate(enhancedsubs)
+    self.current = self.current:autosimplify()
     -- print(simplified)
 
-    local F = IntegralExpression.table(simplified, symbol)
+    local F = self:table()
     if F then return F end
 
-    -- If we see the same integrand again, and it isn't in the table, we know it can't be solved
-    if Contains(attemptedIntegrands, expression) then
-        return nil
+    -- If we see the same integrand again, check for if it has been evaluated already, otherwise, it can't be solved
+    local lookuploc = Contains(self.attemptedintegrands, self.current)
+    if lookuploc then
+        return self.integrandresults[lookuploc]
     end
-    attemptedIntegrands[#attemptedIntegrands+1] = expression
+    local resultloc = #self.attemptedintegrands + 1
+    self.attemptedintegrands[resultloc] = self.current
 
-    F = IntegralExpression.linearproperties(simplified, symbol, enhancedsubs)
-    if F then return F end
-
-    F = IntegralExpression.substitutionmethod(simplified, symbol, true)
-    if F then return F end
-
-    F = IntegralExpression.rationalfunction(simplified, symbol, enhancedsubs)
-    if F then return F end
-
-    F = IntegralExpression.partsmethod(simplified, symbol, enhancedsubs)
-    if F then return F end
-
-    F = IntegralExpression.eulersformula(simplified, symbol, enhancedsubs)
-    if F then return F end
-
-    F = IntegralExpression.substitutionmethod(simplified, symbol, enhancedsubs)
-    if F then return F end
-
-    local expanded = simplified:expand()
-    if expression ~= expanded then
-        F = IntegralExpression.integrate(expanded, symbol, enhancedsubs)
-        if F then return F end
+    F = self:linearproperties(enhancedsubs)
+    if F then
+        self.integrandresults[resultloc] = F
+        return F
     end
-    expanded = (Integer.one()/((Integer.one()/simplified):autosimplify():expand())):autosimplify()
-    if expression ~= expanded then
-        F = IntegralExpression.integrate(expanded, symbol, enhancedsubs)
-        if F then return F end
+
+    F = self:substitutionmethod(true)
+    if F then
+        self.integrandresults[resultloc] = F
+        return F
+    end
+
+    F = self:rationalfunction(enhancedsubs)
+    if F then
+        self.integrandresults[resultloc] = F
+        return F
+    end
+
+    F = self:partsmethod(enhancedsubs)
+    if F then
+        self.integrandresults[resultloc] = F
+        return F
+    end
+
+    F = self:eulersformula(enhancedsubs)
+    if F then
+        self.integrandresults[resultloc] = F
+        return F
+    end
+
+    F = self:substitutionmethod(enhancedsubs)
+    if F then
+        self.integrandresults[resultloc] = F
+        return F
+    end
+
+    local old = self.current
+    local expanded = self.current:expand()
+    if self.current ~= expanded then
+        self.current = expanded
+        F = self:integrate(enhancedsubs)
+        if F then
+            self.integrandresults[resultloc] = F
+            return F
+        end
+    end
+    expanded = (Integer.one()/((Integer.one()/old):autosimplify():expand())):autosimplify()
+    if self.current ~= expanded then
+        self.current = expanded
+        F = self:integrate(enhancedsubs)
+        if F then
+            self.integrandresults[resultloc] = F
+            return F
+        end
     end
 
     return nil
 end
 
 --- A table of basic integrals, returns nil if the integrand isn't in the table.
---- @param integrand Expression
---- @param symbol SymbolExpression
 --- @return Expression|nil
-function IntegralExpression.table(integrand, symbol)
+function IntegralExpression:table()
+
+    local integrand = self.current
+    local symbol = self.currentsymbol
 
     -- Constant integrand rule - int(c, x) = c*x
     if integrand:freeof(symbol) then
@@ -195,10 +290,11 @@ function IntegralExpression.table(integrand, symbol)
 end
 
 --- Uses linearity to break up the integral and integrate each piece.
---- @param expression Expression
---- @param symbol SymbolExpression
 --- @return Expression|nil
-function IntegralExpression.linearproperties(expression, symbol, enhancedsubs)
+function IntegralExpression:linearproperties(enhancedsubs)
+    local expression = self.current
+    local symbol = self.currentsymbol
+
     if expression:type() == BinaryOperation then
         if expression.operation == BinaryOperation.MUL then
             local freepart = Integer.one()
@@ -213,7 +309,9 @@ function IntegralExpression.linearproperties(expression, symbol, enhancedsubs)
             if freepart == Integer.one() then
                 return nil
             end
-            local F = IntegralExpression.integrate(variablepart, symbol, enhancedsubs)
+            self.current = variablepart
+            self.currentsymbol = symbol
+            local F = self:integrate(enhancedsubs)
             if F then
                 return freepart*F
             end
@@ -223,7 +321,9 @@ function IntegralExpression.linearproperties(expression, symbol, enhancedsubs)
         if expression.operation == BinaryOperation.ADD then
             local sum = Integer.zero()
             for _, term in ipairs(expression.expressions) do
-                local F = IntegralExpression.integrate(term, symbol, enhancedsubs)
+                self.current = term
+                self.currentsymbol = symbol
+                local F = self:integrate(enhancedsubs)
                 if F then
                     sum = sum + F
                 else
@@ -239,11 +339,12 @@ function IntegralExpression.linearproperties(expression, symbol, enhancedsubs)
 end
 
 --- Attempts u-substitutions to evaluate the integral.
---- @param expression Expression
---- @param symbol SymbolExpression
+--- @param enhancedsubs boolean
 --- @return Expression|nil
-function IntegralExpression.substitutionmethod(expression, symbol, enhancedsubs)
-    local P = IntegralExpression.trialsubstitutions(expression)
+function IntegralExpression:substitutionmethod(enhancedsubs)
+    local expression = self.current
+    local symbol = self.currentsymbol
+    local P = self:trialsubstitutions(expression)
     local F = nil
     local i = 1
 
@@ -260,32 +361,10 @@ function IntegralExpression.substitutionmethod(expression, symbol, enhancedsubs)
             --factor u and cancel like non-constant terms
             u = u:factor():autosimplify()
 
-            -- now do the same for constants
-            -- local coeff = Integer.one()
-            -- for index, exp in ipairs(u:subexpressions()) do
-            --     if exp.operation ~= BinaryOperation.POW then
-            --         exp = BinaryOperation(BinaryOperation.POW,{exp,Integer.one()})
-            --     end
-            --     if exp.expressions[2]:type() == Integer and exp.expressions[1].operation == BinaryOperation.ADD then
-            --         local power = exp.expressions[2]
-            --         local sumpart = exp.expressions[1]
-            --         local coeffpart
-            --         if sumpart.expressions[1].operation == BinaryOperation.MUL and sumpart.expressions[1].expressions[1]:isconstant() then
-            --             coeffpart = sumpart.expressions[1].expressions[1] ^ power
-            --         end
-            --         if sumpart.expressions[1]:isconstant() then
-            --             coeffpart = sumpart.expressions[1]
-            --         end
-            --         if coeffpart then
-            --             u.expressions[index].expressions[1] = u.expressions[index].expressions[1] / coeffpart
-            --             coeff = coeff / (coeffpart ^ power)
-            --         end
-            --     end
-            -- end
-            -- u = u:autosimplify()
-
             if u:freeof(symbol) then
-                local FF = IntegralExpression.integrate(u, subsymbol, enhancedsubs)
+                self.current = u
+                self.currentsymbol = subsymbol
+                local FF = self:integrate(enhancedsubs)
                 if FF then
                     F = FF:substitute({[subsymbol]=g})
                 end
@@ -295,7 +374,9 @@ function IntegralExpression.substitutionmethod(expression, symbol, enhancedsubs)
                 local f = Equation(subsymbol, g):solvefor(symbol)
                 if f.lhs == symbol then
                     u = u:substitute({[symbol]=f.rhs}):autosimplify()
-                    local FF = IntegralExpression.integrate(u, subsymbol, true)
+                    self.current = u
+                    self.currentsymbol = subsymbol
+                    local FF = self:integrate(true)
                     if FF then
                         F = FF:substitute({[subsymbol]=g})
                     end
@@ -309,16 +390,15 @@ function IntegralExpression.substitutionmethod(expression, symbol, enhancedsubs)
 end
 
 --- Generates a list of possible u-substitutions to attempt
---- @param expression Expression
 --- @return table<number, Expression>
-function IntegralExpression.trialsubstitutions(expression)
+function IntegralExpression:trialsubstitutions(expression)
     local substitutions = {}
 
     -- Recursive part - evaluates each term in a product.
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.MUL then
         substitutions[#substitutions+1] = expression
         for _, term in ipairs(expression.expressions) do
-            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
+            substitutions = JoinArrays(substitutions, self:trialsubstitutions(term))
         end
     end
 
@@ -326,7 +406,7 @@ function IntegralExpression.trialsubstitutions(expression)
     if expression:type() == BinaryOperation and expression.operation == BinaryOperation.ADD then 
         substitutions[#substitutions+1] = expression
         for _,term in ipairs(expression.expressions) do 
-            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
+            substitutions = JoinArrays(substitutions, self:trialsubstitutions(term))
         end
     end
 
@@ -336,7 +416,7 @@ function IntegralExpression.trialsubstitutions(expression)
         if not expression.expression:isatomic() then 
             substitutions[#substitutions+1] = expression.expression
         end
-        substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expression))
+        substitutions = JoinArrays(substitutions, self:trialsubstitutions(expression.expression))
     end
 
     -- Bases and exponents of powers
@@ -345,11 +425,11 @@ function IntegralExpression.trialsubstitutions(expression)
         -- Atomic expressions are technically valid substitutions, but they won't be useful
         if not expression.expressions[1]:isatomic() then
             --substitutions[#substitutions+1] = expression.expressions[1]
-            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expressions[1]))
+            substitutions = JoinArrays(substitutions, self:trialsubstitutions(expression.expressions[1]))
         end
         if not expression.expressions[2]:isatomic() then
             --substitutions[#substitutions+1] = expression.expressions[2]
-            substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expressions[2]))
+            substitutions = JoinArrays(substitutions, self:trialsubstitutions(expression.expressions[2]))
         end
     end
 
@@ -359,10 +439,11 @@ end
 
 --- Uses Lazard, Rioboo, Rothstein, and Trager's method to integrate rational functions.
 --- This is mostly to try to avoid factoring and finding the roots of the full denominator whenever possible.
---- @param expression Expression
---- @param symbol SymbolExpression
+--- @param enhancedsubs boolean
 --- @return Expression|nil
-function IntegralExpression.rationalfunction(expression, symbol, enhancedsubs)
+function IntegralExpression:rationalfunction(enhancedsubs)
+    local expression = self.current
+    local symbol = self.currentsymbol
 
     -- Type checking and conversion to polynomial type.
     local f, g, fstat, gstat
@@ -411,7 +492,9 @@ function IntegralExpression.rationalfunction(expression, symbol, enhancedsubs)
 
     -- Seperates out the polynomial part and rational part and integrates the polynomial part.
     local q, h = f:divremainder(g)
-    U = IntegralExpression.integrate(q, symbol, enhancedsubs)
+    self.current = q
+    self.currentsymbol = symbol
+    U = self:integrate(enhancedsubs)
 
     if h == Integer.zero() then
         return U
@@ -475,10 +558,11 @@ end
 
 
 --- Attempts integration by parts for expressions with a polynomial factor in them. Other product expressions use Euler's formula.
---- @param expression Expression
---- @param symbol SymbolExpression
+--- @param enhancedsubs boolean
 --- @return Expression|nil
-function IntegralExpression.partsmethod(expression, symbol, enhancedsubs)
+function IntegralExpression:partsmethod(enhancedsubs)
+    local expression = self.current
+    local symbol = self.currentsymbol
     if expression:type() ~= BinaryOperation or expression.operation ~= BinaryOperation.MUL then
         return
     end
@@ -501,14 +585,18 @@ function IntegralExpression.partsmethod(expression, symbol, enhancedsubs)
     end
 
     --if vp:type() == Logarithm or vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
-    if select(2,vp:topolynomial()) then 
-        local v = IntegralExpression.integrate(vp, symbol, enhancedsubs)
+    if select(2,vp:topolynomial()) then
+        self.current = vp
+        self.currentsymbol = symbol
+        local v = self:integrate(enhancedsubs)
         if not v then
             goto skipI
         end
 
         local up = DerivativeExpression(u, symbol):autosimplify()
-        local vup = IntegralExpression.integrate(v*up,symbol, enhancedsubs)
+        self.current = v*up
+        self.currentsymbol = symbol
+        local vup = self:integrate(enhancedsubs)
         if not vup then
             goto skipI
         end
@@ -537,14 +625,18 @@ function IntegralExpression.partsmethod(expression, symbol, enhancedsubs)
     end
 
     --if vp.topolynomial or (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
-    if select(2,vp:topolynomial()) then 
-        local v = IntegralExpression.integrate(vp, symbol, enhancedsubs)
+    if select(2,vp:topolynomial()) then
+        self.current = vp
+        self.currentsymbol = symbol
+        local v = self:integrate(enhancedsubs)
         if not v then
             goto skipL
         end
 
         local up = DerivativeExpression(u, symbol):autosimplify()
-        local vup = IntegralExpression.integrate(v*up,symbol, enhancedsubs)
+        self.current = v*up
+        self.currentsymbol = symbol
+        local vup = self:integrate(enhancedsubs)
         if not vup then
             goto skipL
         end
@@ -576,7 +668,9 @@ function IntegralExpression.partsmethod(expression, symbol, enhancedsubs)
     if (vp:type() == TrigExpression and (vp.name == "cos" or vp.name == "sin")) or (vp.operation == BinaryOperation.POW and vp.expressions[1]:freeof(symbol)) then
         local results = {}
         while u ~= Integer.zero() do
-            local v = IntegralExpression.integrate(vp, symbol, enhancedsubs)
+            self.current = vp
+            self.currentsymbol = symbol
+            local v = self:integrate(enhancedsubs)
             if not v then
                 return
             end
@@ -596,10 +690,11 @@ function IntegralExpression.partsmethod(expression, symbol, enhancedsubs)
 end
 
 --- Attempts integration using Euler's formula and kind. Alternative for integration by parts for many expressions.
---- @param expression Expression
---- @param symbol SymbolExpression
+--- @param enhancedsubs boolean
 --- @return Expression|nil
-function IntegralExpression.eulersformula(expression, symbol, enhancedsubs)
+function IntegralExpression:eulersformula(enhancedsubs)
+    local expression = self.current
+    local symbol = self.currentsymbol
     local new = expression:substitute({[COS(symbol)] = (E^(I*symbol) + E^(-I*symbol))/Integer(2),
                                        [SIN(symbol)] = (E^(I*symbol) - E^(-I*symbol))/(Integer(2)*I)})
 
@@ -607,7 +702,8 @@ function IntegralExpression.eulersformula(expression, symbol, enhancedsubs)
         return
     end
 
-    local complexresult = IntegralExpression.integrate(new:autosimplify():expand(), symbol, enhancedsubs)
+    self.current = new:autosimplify():expand()
+    local complexresult = self:integrate(enhancedsubs)
 
     if not complexresult then
         return
@@ -642,75 +738,6 @@ function IntegralExpression.eulersformula(expression, symbol, enhancedsubs)
 
     return converttorectangular(complexresult:autosimplify()):expand():autosimplify()
 
-end
-
-----------------------------
--- Instance functionality --
-----------------------------
-
---- Creates a new integral operation with the given symbol and expression.
---- @param expression Expression
---- @param symbol SymbolExpression
---- @param lower Expression
---- @param upper Expression
-function IntegralExpression:new(expression, symbol, lower, upper)
-    local o = {}
-    local __o = Copy(__ExpressionOperations)
-
-    if not symbol or not expression then
-        error("Send wrong number of parameters: integrals must have a variable to integrate with respect to and an expression to integrate.")
-    end
-
-    if lower and not upper then
-        error("Send wrong number of parameters: definite integrals must have an upper and a lower bound.")
-    end
-
-    o.symbol = symbol
-    o.expression = Copy(expression)
-    o.upper = Copy(upper)
-    o.lower = Copy(lower)
-
-    __o.__index = IntegralExpression
-    __o.__tostring = function(a)
-        if a:isdefinite() then
-            return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ", ".. tostring(a.lower) .. ', ' .. tostring(a.upper) .. ')'
-        end
-        return 'int(' .. tostring(a.expression) .. ", " .. tostring(a.symbol) .. ')'
-    end
-    __o.__eq = function(a, b)
-        -- This shouldn't be needed, since __eq should only fire if both metamethods have the same function, but for some reason Lua always rungs this anyway
-        if not b:type() == IntegralExpression then
-            return false
-        end
-        return a.symbol == b.symbol and a.expression == b.expression and a.upper == b.upper and a.lower == b.lower
-    end
-    o = setmetatable(o, __o)
-
-    return o
-end
-
---- Returns true if the integral is definite, i.e., has an upper and lower bound.
---- @return boolean
-function IntegralExpression:isdefinite()
-    return self.upper ~= nil
-end
-
---- @return Expression
-function IntegralExpression:autosimplify()
-    local integrated = IntegralExpression.integrate(self.expression, self.symbol)
-
-    attemptedIntegrands = {}
-
-    -- Our expression could not be integrated.
-    if not integrated then
-        return self
-    end
-
-    if self:isdefinite() then
-        return (integrated:substitute({[self.symbol]=self.upper}) - integrated:substitute({[self.symbol]=self.lower})):autosimplify()
-    end
-
-    return integrated:autosimplify()
 end
 
 
