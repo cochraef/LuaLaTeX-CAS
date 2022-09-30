@@ -111,7 +111,7 @@ function PolynomialRing.resultantmulti(a, b)
         return b.coefficients[0]^m
     end
 
-    local delta = m - n + Integer.one()
+    local delta = m - n + Integer(1)
     local _ , r = PolynomialRing.pseudodivide(a, b)
     if r == Integer.zero() then
         return r.coefficients[0]
