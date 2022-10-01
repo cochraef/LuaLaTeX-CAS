@@ -47,7 +47,7 @@ function BinaryOperation:new(operation, expressions)
 
     __o.__index = BinaryOperation
     __o.__tostring = function(a)
-        local expressionnames = '';
+        local expressionnames = ''
         for index, expression in ipairs(a.expressions) do
             if index == 1 and not a.expressions[index + 1] then
                 expressionnames = expressionnames .. a.name .. ' '
@@ -157,7 +157,7 @@ function BinaryOperation:expand()
     end
     local expanded = BinaryOperation(self.operation, results)
     if expanded.operation == BinaryOperation.MUL then
-        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()});
+        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()})
         for _, expression in ipairs(expanded.expressions) do
             allsums = allsums:expand2(expression)
         end
@@ -167,7 +167,7 @@ function BinaryOperation:expand()
         if expanded.expressions[1]:type() ~= BinaryOperation then 
             return expanded:autosimplify()
         end
-        local exp = BinaryOperation.MULEXP({Integer.one()});
+        local exp = BinaryOperation.MULEXP({Integer.one()})
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
             exp = exp:expand2(expanded.expressions[1])

@@ -798,7 +798,7 @@ function Integer:primefactorization()
         mul[i] = BinaryOperation.POWEXP({factor, degree})
         i = i + 1
     end
-    return BinaryOperation.MULEXP(mul)
+    return BinaryOperation.MULEXP(mul):fix()
 end
 
 --- Recursive part of prime factorization using Pollard Rho.

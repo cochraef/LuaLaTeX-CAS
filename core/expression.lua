@@ -46,6 +46,25 @@ function Expression:simplify()
     return out
 end
 
+--- Prevents autosimplification of the expression until either a unfix() is called or a single autosimplify method is applied to it.
+--- THIS METHOD MUTATES THE OBJECT IT ACTS ON.
+--- @return Expression
+function Expression:fix()
+    function self:autosimplify()
+        self.autosimplify = self:type().autosimplify
+        return self
+    end
+    return self
+end
+
+--- Allows autosimplification of the expression.
+--- THIS METHOD MUTATES THE OBJECT IT ACTS ON.
+--- @return Expression
+function Expression:unfix()
+    self.autosimplify = self:type().autosimplify
+    return self
+end
+
 --- Returns a list of all subexpressions of an expression.
 --- @return table<number, Expression>
 function Expression:subexpressions()
