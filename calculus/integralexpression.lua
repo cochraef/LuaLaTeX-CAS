@@ -25,7 +25,7 @@ function IntegralExpression.integrate(integral)
     integral.expression = integral.expression:autosimplify()
 
     if not integral.recursive and #integral.attempts > 0 then
-        return Copy(integral:fix())
+        return Copy(integral:lock(Expression.NIL, true))
     end
 
     -- print(integral.expression)
@@ -290,7 +290,7 @@ function IntegralExpression.substitutionmethod(integral)
     local es = integral.enhancedsubstitution
 
     local P = IntegralExpression.trialsubstitutions(expression)
-    local F = nil
+    local F  = nil
     local i = 1
 
     while not F and i <= #P do
@@ -310,9 +310,11 @@ function IntegralExpression.substitutionmethod(integral)
                 integral.expression = u
                 integral.symbol = subsymbol
                 integral.enhancedsubstitution = es
-                local FF = IntegralExpression.integrate(integral)
-                if FF then
-                    F = FF:substitute({[subsymbol]=g})
+                F = IntegralExpression.integrate(integral)
+                if F then
+                    if integral.recursive then
+                        F = F:substitute({[subsymbol]=g})
+                    end
                     return F
                 end
             end
@@ -324,9 +326,11 @@ function IntegralExpression.substitutionmethod(integral)
                     integral.expression = u
                     integral.symbol = subsymbol
                     integral.enhancedsubstitution = integral.enhancedsubstitution - Integer.one()
-                    local FF = IntegralExpression.integrate(integral)
-                    if FF then
-                        F = FF:substitute({[subsymbol]=g})
+                    F = IntegralExpression.integrate(integral)
+                    if F then
+                        if integral.recursive then
+                            F = F:substitute({[subsymbol]=g})
+                        end
                         return F
                     end
                     integral.enhancedsubstitution = integral.enhancedsubstitution + Integer.one()
@@ -632,11 +636,15 @@ function IntegralExpression.partsmethod(integral)
             integral.expression = vp
             integral.symbol = symbol
             integral.enhancedsubstitution = es
-            local v = IntegralExpression.integrate(integral)
+            local v = IntegralExpression.integrate(integral):unlock():autosimplify()
             if not v then
                 return
             end
             local up = DerivativeExpression(u, symbol):autosimplify()
+
+            if not integral.recursive then
+                return (u*v - IntegralExpression(v*up, symbol):nonrecursive():lock(Expression.NIL, true)):autosimplify()
+            end
 
             results[#results+1] = u*v
             u = up
@@ -779,6 +787,10 @@ function IntegralExpression:autosimplify()
         return self
     end
 
+    if not self.recursive then
+        return integrated:autosimplify():unlock(true)
+    end
+
     if self:isdefinite() then
         return (integrated:substitute({[self.symbol]=self.upper}) - integrated:substitute({[self.symbol]=self.lower})):autosimplify()
     end
@@ -799,7 +811,9 @@ end
 --- @param subexpressions table<number, Expression>
 --- @return IntegralExpression
 function IntegralExpression:setsubexpressions(subexpressions)
-    return IntegralExpression(subexpressions[1], self.symbol, subexpressions[2], subexpressions[3])
+    local out = IntegralExpression(subexpressions[1], subexpressions[2], subexpressions[3], subexpressions[4])
+
+    return out;
 end
 
 -- function IntegralExpression:freeof(symbol)
