@@ -18,7 +18,6 @@ function Ring.resultantring(ring1, ring2)
     end
 
     if ring1 == PolynomialRing.getring() or ring2 == PolynomialRing.getring() then
-        -- TODO: Fix this so it works with arbitrarily-nested rings
         if ring1 == ring2.child then
             return ring2
         end

@@ -1,6 +1,6 @@
 --- @class TrigExpression
 --- Represents a trigonometric function from one expression to another.
---- @field name SymbolExpression
+--- @field name string
 --- @field expression Expression
 TrigExpression = {}
 __TrigExpression = {}
@@ -263,6 +263,9 @@ TrigExpression = setmetatable(TrigExpression, __TrigExpression)
 ----------------------
 TrigExpression.NAMES = {sin=1, cos=2, tan=3, csc=4, sec=5, cot=6,
                          arcsin=7, arccos=8, arctan=9, arccsc=10, arcsec=11, arccot=12}
+
+TrigExpression.INVERSES = {sin="arcsin", cos="arccos", tan="arctan", csc="arccsc", sec="arcsec", cot="arccot",
+                            arcsin="sin", arccos="cos", arctan="tan", arccsc="csc", arcsec="sec", arccot="cot"}
 
 TrigExpression.COSVALUES = {
     ["0"] = Integer.one(),

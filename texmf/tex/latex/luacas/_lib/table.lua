@@ -145,11 +145,11 @@ function ToStringTable(t)
     return tostring(t)
 end
 
--- Check if a table contains an element
+-- Check if a table contains an element, and returns the index of that element if it does
 function Contains(t, e)
-    for _, value in pairs(t) do
+    for index, value in pairs(t) do
         if value == e then
-            return true
+            return index
         end
     end
     return false
