@@ -263,6 +263,23 @@ Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo
 \[ \int \print{f}\ dx = \print*{g} \] 
 \end{codebox}
 
+In some cases, better results are returned via {\ttfamily partialfractions}. For example:
+\begin{CAS}
+    vars('x')
+    num = 2*x^2+1
+    den = ((x+1)*(x^2+2*x+2)):expand()
+    f = (num/den):autosimplify()
+    g = IntegralExpression.rationalfunction(f,x)
+\end{CAS}
+%\[ \print{g:simplify()} \] 
+
+On the other hand,
+\begin{CAS}
+    num = topoly(num)
+    den = topoly(den)
+    pfrac = PolynomialRing.partialfractions(num,den)
+\end{CAS}
+\[ \print*{int(pfrac,x)} \] 
 
 
 \newcoderef{function IntegralExpression.partsmethod(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression} 
