@@ -180,7 +180,13 @@ function parfrac(f,g,ffactor)
     local f,check1 = topoly(f) 
     local g,check2 = topoly(g)
     if check1 and check2 then 
-        return PolynomialRing.partialfractions(f,g,ffactor)
+        if f.degree >= g.degree then 
+            local q,r
+            q,r = f:divremainder(g) 
+            return q + PolynomialRing.partialfractions(r,g,ffactor)
+        else
+            return PolynomialRing.partialfractions(f,g,ffactor)
+        end
     else 
         return f/g 
     end
