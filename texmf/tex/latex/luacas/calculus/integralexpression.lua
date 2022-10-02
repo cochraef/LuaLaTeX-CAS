@@ -699,7 +699,7 @@ end
 function IntegralExpression:autosimplify()
     local integrated = IntegralExpression.integrate(self.expression, self.symbol)
 
-    attemptedIntegrands = {}
+    local attemptedIntegrands = {}
 
     -- Our expression could not be integrated.
     if not integrated then
