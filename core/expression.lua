@@ -147,6 +147,13 @@ function Expression:combine()
     return self
 end
 
+--- Attempts to collect all occurances of an expression in this expression.
+--- @param collect Expression
+--- @return Expression
+function Expression:collect(collect)
+    return self
+end
+
 --- Returns all non-constant subexpressions of this expression - helper method for factor.
 --- @return table<number, Expression>
 function Expression:getsubexpressionsrec()
