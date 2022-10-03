@@ -37,6 +37,17 @@ function Rational.makering(symbol, child)
     return t
 end
 
+--- Converts a string of the form -?[0-9]+ or -?[0-9]+\/[0-9]+ to a rational number.
+--- @param str string
+--- @return Rational|Integer
+function Rational.fromstring(str)
+    local divloc = string.find(str, "/");
+    if not divloc then
+        return Integer(str)
+    end
+    return Rational(Integer(string.sub(str, 1, divloc - 1)), Integer(string.sub(str, divloc + 1, #str)))
+end
+
 
 ----------------------------
 -- Instance functionality --

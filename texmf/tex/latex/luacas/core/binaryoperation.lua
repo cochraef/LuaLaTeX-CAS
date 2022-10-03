@@ -47,7 +47,7 @@ function BinaryOperation:new(operation, expressions)
 
     __o.__index = BinaryOperation
     __o.__tostring = function(a)
-        local expressionnames = '';
+        local expressionnames = ''
         for index, expression in ipairs(a.expressions) do
             if index == 1 and not a.expressions[index + 1] then
                 expressionnames = expressionnames .. a.name .. ' '
@@ -157,7 +157,7 @@ function BinaryOperation:expand()
     end
     local expanded = BinaryOperation(self.operation, results)
     if expanded.operation == BinaryOperation.MUL then
-        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()});
+        local allsums = BinaryOperation(BinaryOperation.ADD, {Integer.one()})
         for _, expression in ipairs(expanded.expressions) do
             allsums = allsums:expand2(expression)
         end
@@ -167,7 +167,7 @@ function BinaryOperation:expand()
         if expanded.expressions[1]:type() ~= BinaryOperation then 
             return expanded:autosimplify()
         end
-        local exp = BinaryOperation.MULEXP({Integer.one()});
+        local exp = BinaryOperation.MULEXP({Integer.one()})
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
             exp = exp:expand2(expanded.expressions[1])
@@ -342,6 +342,92 @@ function BinaryOperation:combine()
     else 
         return numerator/denominator
     end
+end
+
+--- @param collect Expression
+--- @return Expression
+function BinaryOperation:collect(collect)
+    -- Constant expressions cannot be collected
+    if collect:isconstant() then
+        return self
+    end
+
+    -- Recusively collect subexpressions
+    local results = {}
+    for index, expression in ipairs(self:subexpressions()) do
+        results[index] = expression:collect(collect)
+    end
+    local collected = BinaryOperation(self.operation, results)
+
+    if not (collected.operation == BinaryOperation.ADD) then
+        return collected:autosimplify()
+    end
+
+    local coefficients = {}
+
+    -- TODO: Add an expression map class
+    setmetatable(coefficients, {__index =
+                                        function(table, key)
+                                            local out = rawget(table, tostring(key))
+                                            return out or Integer.zero()
+                                        end,
+                                __newindex =
+                                        function (table, key, value)
+                                            rawset(table, tostring(key), value)
+                                        end
+    })
+
+    -- Finds all instances of a constant power of the expression to be collected, and maps each power to all terms it is multiplied by 
+    for _, expression in ipairs(collected:subexpressions()) do
+        if expression == collect then
+            coefficients[Integer.one()] = coefficients[Integer.one()] + Integer.one()
+        elseif expression.operation == BinaryOperation.POW and expression:subexpressions()[1] == collect and expression:subexpressions()[2]:isconstant() then
+            coefficients[expression:subexpressions()[2]] = coefficients[expression:subexpressions()[2]] + Integer.one()
+        elseif collect:type() == BinaryOperation and collect.operation == BinaryOperation.POW and
+                expression.operation == BinaryOperation.POW and expression:subexpressions()[1] == collect:subexpressions()[1] then
+            -- Handle the fact that autosimplify turns (a^x^n -> a^(xn)), this is needed if the term to collect is itself an exponential
+            local power = (expression:subexpressions()[2] / collect:subexpressions()[2]):autosimplify()
+            if power:isconstant() then
+                coefficients[power] = coefficients[power] + Integer.one()
+            else
+                coefficients[Integer.zero()] = coefficients[Integer.zero()] + expression
+            end
+        elseif expression.operation == BinaryOperation.MUL then
+            local varpart
+            local coeffpart = Integer.one()
+            for _, term in ipairs(expression:subexpressions()) do
+                if term == collect then
+                    varpart = Integer.one()
+                elseif (term.operation == BinaryOperation.POW and term:subexpressions()[1] == collect and term:subexpressions()[2]:isconstant()) then
+                    varpart = term:subexpressions()[2]
+                elseif collect:type() == BinaryOperation and collect.operation == BinaryOperation.POW and
+                        term.operation == BinaryOperation.POW and term:subexpressions()[1] == collect:subexpressions()[1] then
+                    local power = (term:subexpressions()[2] / collect:subexpressions()[2]):autosimplify()
+                    if power:isconstant() then
+                        varpart = power
+                    end
+                else
+                    coeffpart = coeffpart * term
+                end
+            end
+            if varpart then
+                coefficients[varpart] = coefficients[varpart] + coeffpart
+            else
+                coefficients[Integer.zero()] = coefficients[Integer.zero()] + expression
+            end
+        else
+            coefficients[Integer.zero()] = coefficients[Integer.zero()] + expression
+        end
+
+
+    end
+
+    local out = Integer.zero()
+    for index, value in pairs(coefficients) do
+        out = out + collect ^ Rational.fromstring(index) * value
+    end
+
+    return out:autosimplify()
 end
 
 --- @param other Expression

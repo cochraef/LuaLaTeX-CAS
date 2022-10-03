@@ -21,7 +21,7 @@ end
 --- Performs more rigorous simplification of an expression. Checks different equivalent forms and determines the 'smallest' expresion.
 --- @return Expression
 function Expression:simplify()
-    local me = self:autosimplify()
+    local me = self:unlock():autosimplify()
     local results = {}
     for index, expression in ipairs(me:subexpressions()) do
         results[index] = expression:simplify()
@@ -46,6 +46,51 @@ function Expression:simplify()
     return out
 end
 
+--- Changes the autosimplify behavior of an expression depending on its parameters.
+--- THIS METHOD MUTATES THE OBJECT IT ACTS ON.
+--- @param mode number
+--- @param permanent boolean
+--- @param recursive boolean
+--- @return Expression
+function Expression:lock(mode, permanent, recursive)
+    function self:autosimplify()
+        if not permanent then
+            self.autosimplify = nil
+        end
+
+        if mode == Expression.NIL then
+            return self
+        elseif mode == Expression.SUBS then
+            local results = {}
+            for index, expression in ipairs(self:subexpressions()) do
+                results[index] = expression:autosimplify()
+            end
+            self = self:setsubexpressions(results, true) -- TODO: Add mutate setsubexpressions
+            return self
+        end
+    end
+    if recursive then
+        for _, expression in ipairs(self:subexpressions()) do
+            expression:lock(mode, permanent, recursive)
+        end
+    end
+    return self
+end
+
+--- Frees any locks on expressions.
+--- THIS METHOD MUTATES THE OBJECT IT ACTS ON.
+--- @param recursive boolean
+--- @return Expression
+function Expression:unlock(recursive)
+    self.autosimplify = nil
+    if recursive then
+        for _, expression in ipairs(self:subexpressions()) do
+            expression:unlock(recursive)
+        end
+    end
+    return self
+end
+
 --- Returns a list of all subexpressions of an expression.
 --- @return table<number, Expression>
 function Expression:subexpressions()
@@ -62,10 +107,11 @@ function Expression:size()
     return out
 end
 
---- Returns a copy of the original expression with each subexpression substituted with a new one.
+--- Returns a copy of the original expression with each subexpression substituted with a new one, or a mutated version if mutate is true.
 --- @param subexpressions table<number, Expression>
+--- @param mutate boolean
 --- @return Expression
-function Expression:setsubexpressions(subexpressions)
+function Expression:setsubexpressions(subexpressions, mutate)
     error("Called unimplemented method : setsubexpressions()")
 end
 
@@ -98,6 +144,13 @@ end
 --- Attempts to combine an expression by collapsing sums of expressions together into a single factor, e.g. common denominator
 --- @return Expression
 function Expression:combine()
+    return self
+end
+
+--- Attempts to collect all occurances of an expression in this expression.
+--- @param collect Expression
+--- @return Expression
+function Expression:collect(collect)
     return self
 end
 
@@ -218,3 +271,10 @@ __ExpressionOperations.__call = function(a, ...)
     end
     return BinaryOperation.MULEXP({a, table.pack(...)[1]})
 end
+
+----------------------
+-- Static constants --
+----------------------
+
+Expression.NIL = 0
+Expression.SUBS = 1
