@@ -128,6 +128,7 @@ require("test.calculus.derivatives")
 require("test.calculus.integrals")
 
 require("test.expressions.autosimplify")
+require("test.expressions.collect")
 require("test.expressions.equations")
 require("test.expressions.simplify")
 require("test.expressions.functions")

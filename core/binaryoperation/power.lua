@@ -85,7 +85,7 @@ function BinaryOperation:simplifypower()
     end
 
     -- Uses the property that (x^a)^b = x^(a*b)
-    if not base:isatomic() and base.operation == BinaryOperation.POW and exponent:type() == Integer then
+    if not base:isatomic() and base.operation == BinaryOperation.POW and exponent:isconstant() then
         base, exponent = base.expressions[1], BinaryOperation(BinaryOperation.MUL, {exponent, base.expressions[2]}):autosimplify()
         return BinaryOperation(BinaryOperation.POW, {base, exponent}):autosimplify()
     end
