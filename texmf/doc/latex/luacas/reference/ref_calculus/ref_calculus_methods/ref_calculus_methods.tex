@@ -152,7 +152,7 @@ style=numeric,
 
 \subsection{Calculus Methods}
 
-\newcoderef{function IntegralExpression.table(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
+\newcoderef{function IntegralExpression.table(IntegralExpression)}{return Expression|nil}{}
 
 Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
 
@@ -160,75 +160,92 @@ Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by 
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
   vars('x')
-  f = IntegralExpression.table(cos(x),x)
-  g = IntegralExpression.table(x*cos(x),x)
+  f = int(cos(x),x)
+  f = IntegralExpression.table(f)
+  g = int(x*cos(x),x)
+  g = IntegralExpression.table(g)
 \end{CAS}
 \[ f = \print{f} \qquad g = \print{g} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('x')
-    f = IntegralExpression.table(cos(x),x)
-    g = IntegralExpression.table(x*cos(x),x)
+    f = int(cos(x),x)
+    f = IntegralExpression.table(f)
+    g = int(x*cos(x),x)
+    g = IntegralExpression.table(g)
   \end{CAS}
 \[ f = \print{f} \qquad g = \print{g} \] 
 \end{codebox}
+The table of integrals consists of power functions, exponentials, logarithms, trigonometric, and inverse trigonometric functions. 
 
-\newcoderef{function IntegralExpression.linearproperties(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
+\newcoderef{function IntegralExpression.linearproperties(IntegralExpression)}{return Expression|nil}{}
 
 Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression.integrate()}. For example:
 
-\begin{codebox}[]
+\begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    vars('x')
-    f = IntegralExpression.linearproperties(sin(x) + e^x,x)
-    g = IntegralExpression.table(sin(x)+e^x,x)
+  vars('x')
+  f = int(sin(x) + e^x,x)
+  g = IntegralExpression.table(f)
+  f = IntegralExpression.linearproperties(f)
 \end{CAS}
 \[ f = \print*{f} \qquad g = \print*{g} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('x')
-    f = IntegralExpression.linearproperties(sin(x) + e^x,x)
-    g = IntegralExpression.table(sin(x)+e^x,x)
+    f = int(sin(x) + e^x,x)
+    g = IntegralExpression.table(f)
+    f = IntegralExpression.linearproperties(f)
 \end{CAS}
-\[ f = \print*{f} \qquad g = \print*{g} \] 
+\[ f = \print*{f} \qquad g = \print*{g} \]
 \end{codebox} 
 
-\newcoderef{function IntegralExpression.substitutionmethod(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression} 
+\newcoderef{function IntegralExpression.substitutionmethod(IntegralExpression)}{return Expression|nil}{} 
 
 Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via $u$-substitution; returns nil if no suitable substitution is found to be successful. 
 
-\begin{codebox}[]
+\begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    f = IntegralExpression.substitutionmethod(x*sin(x^2),x)
-    g = IntegralExpression.substitutionmethod(x*sin(x),x)
+  vars('x')
+  f = int(x*e^(x^2),x)
+  g = int(x*e^x,x)
+  f = IntegralExpression.substitutionmethod(f)
+  g = IntegralExpression.substitutionmethod(g)
 \end{CAS}
 \[ f = \print*{f} \qquad g = \print*{g}.\] 
 \end{minted}
 \tcblower
 \begin{CAS}
-    f = IntegralExpression.substitutionmethod(x*sin(x^2),x)
-    g = IntegralExpression.substitutionmethod(x*sin(x),x)
+    vars('x')
+    f = int(x*e^(x^2),x)
+    f.enhancedsubstitution = 0
+    g = int(x*e^x,x)
+    g.enhancedsubstitution = 0
+    f = IntegralExpression.substitutionmethod(f)
+    g = IntegralExpression.substitutionmethod(g)
 \end{CAS}
 \[ f = \print*{f} \qquad g = \print*{g}.\] 
 \end{codebox}
 
-\newcoderef{function IntegralExpression.trialsubstitutions(integrand)}{return table<number, Expression}{integrand Expression}
+
+
+\newcoderef{function IntegralExpression.trialsubstitutions(Expression)}{return table<number, Expression}{}
 
 Generates a list of possible $u$-substitutions to attempt in \mintinline{lua}{IntegralExpression.substitutionmethod()}. 
 
-\begin{codebox}[]
+\begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    vars('x')
-    f = cos(x)/(1+sin(x))
-    f = f:autosimplify()
-    l = IntegralExpression.trialsubstitutions(f)
+  vars('x')
+  f = cos(x)/(1+sin(x))
+  f = f:autosimplify()
+  l = IntegralExpression.trialsubstitutions(f)
 \end{CAS}
-\[ \left\{ \lprint{l} \right\}.\] 
+$\left\{ \lprint{l} \right\}$.
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -237,10 +254,11 @@ Generates a list of possible $u$-substitutions to attempt in \mintinline{lua}{In
     f = f:autosimplify()
     l = IntegralExpression.trialsubstitutions(f)
 \end{CAS}
-\[ \left\{ \lprint{l} \right\}.\] 
+$ \left\{ \lprint{l} \right\}$.
 \end{codebox}
 
-\newcoderef{function IntegralExpression.rationalfunction(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
+
+\newcoderef{function IntegralExpression.rationalfunction(IntegralExpression)}{return Expression|nil}{}
 
 Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo, Rothstein, and Trager's method in the case when \texttt{expression} is a rational function in the variable \texttt{symbol}. If \texttt{integrand} is not a rational function, then nil is returned. 
 
@@ -250,20 +268,21 @@ Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo
     vars('x')
     f = (x^2+2*x+2)/(x^2+3*x+2)
     f = f:autosimplify()
-    g = IntegralExpression.rationalfunction(f,x)
+    g = IntegralExpression.rationalfunction(int(f,x))
 \end{CAS}
 \[ \int \print{f}\ dx = \print*{g} \] 
 \end{minted}
-\tcblower\begin{CAS}
+\tcblower
+\begin{CAS}
     vars('x')
     f = (x^2+2*x+2)/(x^2+3*x+2)
     f = f:autosimplify()
-    g = IntegralExpression.rationalfunction(f,x)
+    g = IntegralExpression.rationalfunction(int(f,x))
 \end{CAS}
 \[ \int \print{f}\ dx = \print*{g} \] 
 \end{codebox}
 
-In some cases, better results are returned via {\ttfamily partialfractions}. For example:
+In some cases, the \mintinline{lua}{.rationalfunction} method returns non-standard results. For example:
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
@@ -271,9 +290,10 @@ In some cases, better results are returned via {\ttfamily partialfractions}. For
   num = x^2
   den = ((x+1)*(x^2+2*x+2)):expand()
   f = (num/den):autosimplify()
-  g = IntegralExpression.rationalfunction(f,x)
+  f = int(f,x)
+  f = IntegralExpression.rationalfunction(f)
 \end{CAS}
-\[ \print{g:simplify()} \] 
+\[ \print{simplify(g)} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -281,9 +301,10 @@ In some cases, better results are returned via {\ttfamily partialfractions}. For
   num = x^2
   den = ((x+1)*(x^2+2*x+2)):expand()
   f = (num/den):autosimplify()
-  g = IntegralExpression.rationalfunction(f,x)
+  f = int(f,x)
+  f = IntegralExpression.rationalfunction(f)
 \end{CAS}
-\[ \print{g:simplify()} \] 
+\[ \print{simplify(f)} \] 
 \end{codebox}
 On the other hand:
 \begin{codebox}
@@ -300,8 +321,7 @@ On the other hand:
 \[ \print*{int(pfrac,x)} \] 
 \end{codebox}
 
-
-\newcoderef{function IntegralExpression.partsmethod(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression} 
+\newcoderef{function IntegralExpression.partsmethod(IntegralExpression)}{return Expression|nil}{} 
 
 Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via \emph{integration by parts}; returns nil if no suitable application of IBP is found. For example:
 
@@ -309,25 +329,27 @@ Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via \em
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x')
-    f = x*sin(x)
-    g = IntegralExpression.partsmethod(f,x)
-    ff = sin(x^2)
-    gg = IntegralExpression.partsmethod(ff,x)
+    f = int(x*e^x,x)
+    g = IntegralExpression.partsmethod(f)
+    ff = int(e^(x^2),x)
+    gg = IntegralExpression.partsmethod(ff)
 \end{CAS}
-\[ \int \print{f}\ dx = \print*{g} \] 
-\[ \int \print{ff}\ dx = \print*{gg} \] 
+\[ \print{f}= \print*{g} \] 
+\[ \print{ff} = \print*{gg} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('x')
-    f = x*sin(x)
-    g = IntegralExpression.partsmethod(f,x)
-    ff = sin(x^2)
-    gg = IntegralExpression.partsmethod(ff,x)
+    f = int(x*e^x,x)
+    g = IntegralExpression.partsmethod(f)
+    ff = int(e^(x^2),x)
+    gg = IntegralExpression.partsmethod(ff)
 \end{CAS}
-\[ \int \print{f}\ dx = \print*{g} \] 
-\[ \int \print{ff}\ dx = \print*{gg} \] 
+\[ \print{f}= \print*{g} \] 
+\[ \print{ff} = \print*{gg} \] 
 \end{codebox}
+
+\end{document}
 
 \newcoderef{function IntegralExpression.eulersformula(integrand, symbol)}{return Expression|nil}{integrand Expression, symbol SymbolExpression}
 

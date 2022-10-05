@@ -7,22 +7,11 @@
 Hi 
 \begin{CAS}
     vars('x')
-    f = cos(x)*e^(sin(x))
+    f = x^2/((x+1)*(x^2+2*x+2))
 \end{CAS}
-
-\begin{CAS}
-    g = IntegralExpression.table(f,x)
-\end{CAS}
-\[ \print{g} \] 
+\[ \print{int(f,x)} = \print*{int(f,x)}\] 
 
 \end{document}
 
-\begin{CAS}
-    vars('x')
-    num = 2*x^2+1
-    den = ((x+1)*(x^2+2*x+2)):expand()
-    f = (num/den):autosimplify()
-    g = IntegralExpression.rationalfunction(f,x)
-\end{CAS}
-\[ \print{g:simplify()} \] 
+
 
