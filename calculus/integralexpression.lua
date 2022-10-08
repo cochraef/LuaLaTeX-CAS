@@ -50,19 +50,19 @@ function IntegralExpression.integrate(integral)
         return F
     end
 
-    local exp = integral.expression
-    local sym = integral.symbol
-    local es = integral.enhancedsubstitution
-    integral.enhancedsubstitution = Integer.zero()
+    -- local exp = integral.expression
+    -- local sym = integral.symbol
+    -- local es = integral.enhancedsubstitution
+    -- integral.enhancedsubstitution = Integer.zero()
     F = IntegralExpression.substitutionmethod(integral)
     if F then
         -- print("u-Substitution")
         integral.results[newindex] = F
         return F
     end
-    integral.expression = exp
-    integral.symbol = sym
-    integral.enhancedsubstitution = es
+    -- integral.expression = exp
+    -- integral.symbol = sym
+    -- integral.enhancedsubstitution = es
 
 
     F = IntegralExpression.rationalfunction(integral)
@@ -108,7 +108,7 @@ function IntegralExpression.integrate(integral)
         end
     end
 
-    F = IntegralExpression.substitutionmethod(integral)
+    F = IntegralExpression.enhancedsubstitutionmethod(integral)
     if F then
         -- print("Enhanced u-Substitution")
         integral.results[newindex] = F
@@ -337,6 +337,37 @@ function IntegralExpression.substitutionmethod(integral)
                     return F
                 end
             end
+        end
+        i = i + 1
+    end
+
+    return F
+end
+
+--- Attempts u-substitutions to evaluate the integral, including solving for the original variable and substituting the result into the expression.
+--- @param integral IntegralExpression
+--- @return Expression|nil
+function IntegralExpression.enhancedsubstitutionmethod(integral)
+    local expression = integral.expression
+    local symbol = integral.symbol
+    local es = integral.enhancedsubstitution
+
+    local P = IntegralExpression.trialsubstitutions(expression)
+    local F  = nil
+    local i = 1
+
+    while not F and i <= #P do
+        local g = P[i]
+        if g ~= symbol and not g:freeof(symbol) then
+            local subsymbol = SymbolExpression("u")
+            if symbol == SymbolExpression("u") then
+                subsymbol = SymbolExpression("v")
+            end
+            local u = (expression / (DerivativeExpression(g, symbol))):autosimplify()
+            u = u:substitute({[g]=subsymbol}):autosimplify()
+
+            --factor u and cancel like non-constant terms
+            u = u:factor():autosimplify()
 
             if integral.enhancedsubstitution > Integer.zero() then
                 local f = Equation(subsymbol, g):solvefor(symbol)
@@ -760,6 +791,10 @@ function IntegralExpression:new(expression, symbol, lower, upper)
     o.lower = Copy(lower)
     o.recursive = true
 
+    o.attempts = {}
+    o.results = {}
+    o.enhancedsubstitution = IntegralExpression.ENHANCEDSUBSTITUTIONRECURSIONLIMIT
+
     __o.__index = IntegralExpression
     __o.__tostring = function(a)
         if a:isdefinite() then
@@ -795,10 +830,6 @@ end
 --- @return Expression
 function IntegralExpression:autosimplify()
     local arg = IntegralExpression(self.expression, self.symbol)
-    arg.attempts = {}
-    arg.results = {}
-    arg.enhancedsubstitution = IntegralExpression.ENHANCEDSUBSTITUTIONRECURSIONLIMIT
-    arg.recursive = self.recursive
     local integrated = IntegralExpression.integrate(arg)
 
     -- Our expression could not be integrated.
