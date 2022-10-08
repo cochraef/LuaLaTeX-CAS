@@ -45,39 +45,43 @@ function IntegralExpression.integrate(integral)
 
     F = IntegralExpression.linearproperties(integral)
     if F then
+        -- print("Linear Properties")
         integral.results[newindex] = F
         return F
     end
 
+    local exp = integral.expression
+    local sym = integral.symbol
     local es = integral.enhancedsubstitution
     integral.enhancedsubstitution = Integer.zero()
     F = IntegralExpression.substitutionmethod(integral)
     if F then
+        -- print("u-Substitution")
         integral.results[newindex] = F
         return F
     end
-
+    integral.expression = exp
+    integral.symbol = sym
     integral.enhancedsubstitution = es
+
+
     F = IntegralExpression.rationalfunction(integral)
     if F then
+        -- print("Rational Function")
         integral.results[newindex] = F
         return F
     end
 
     F = IntegralExpression.partsmethod(integral)
     if F then
+        -- print("Parts")
         integral.results[newindex] = F
         return F
     end
 
     F = IntegralExpression.eulersformula(integral)
     if F then
-        integral.results[newindex] = F
-        return F
-    end
-
-    F = IntegralExpression.substitutionmethod(integral)
-    if F then
+        -- print("Euler's formula")
         integral.results[newindex] = F
         return F
     end
@@ -86,14 +90,29 @@ function IntegralExpression.integrate(integral)
     if integral.expression ~= expanded then
         integral.expression = expanded
         F = IntegralExpression.integrate(integral)
-        if F then return F end
+        if F then
+            -- print("Expanded")
+            integral.results[newindex] = F
+            return F
+        end
     end
 
     expanded = (Integer.one()/((Integer.one()/integral.expression):autosimplify():expand())):autosimplify()
     if integral.expression ~= expanded then
         integral.expression = expanded
         F = IntegralExpression.integrate(integral)
-        if F then return F end
+        if F then
+            -- print("Inverse Expanded")
+            integral.results[newindex] = F
+            return F
+        end
+    end
+
+    F = IntegralExpression.substitutionmethod(integral)
+    if F then
+        -- print("Enhanced u-Substitution")
+        integral.results[newindex] = F
+        return F
     end
 
     return nil

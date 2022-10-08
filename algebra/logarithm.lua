@@ -39,12 +39,14 @@ end
 
 --- @return Expression
 function Logarithm:evaluate()
-    if not self.base:isconstant() or not self.expression:isconstant() or self.base < Integer.zero() or self.expression < Integer.zero() then
-        return self
+
+    if (self.base:isconstant() and (self.base <= Integer.zero() or self.base == Integer.one())) or 
+        (self.expression:isconstant() and self.expression <= Integer.zero()) then
+        error("Arithmetic error: division by zero")
     end
 
-    if self.base == Integer.zero() or self.expression == Integer.zero() or self.base == Integer.one() then
-        error("Arithmetic error: division by zero")
+    if not self.base:isconstant() or not self.expression:isconstant() then
+        return self
     end
 
     local power = Integer.one()
