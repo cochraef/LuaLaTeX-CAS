@@ -432,7 +432,7 @@ function IntegralExpression.rationalfunction(integral)
         end
     end
 
-    -- Explicit handling of degree 1 over a binomial.
+    -- Explicit handling of degree 1 or less over a binomial.
     do
         local disc =  g.coefficients[1]*g.coefficients[1]-Integer(4)*g.coefficients[2]*g.coefficients[0]
         if f.degree <= Integer.one() and g.degree == Integer(2) and disc < Integer.zero() then
