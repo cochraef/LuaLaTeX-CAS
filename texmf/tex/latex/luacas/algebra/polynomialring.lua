@@ -230,14 +230,22 @@ __o.__tostring = function(a)
     return string.sub(out, 1, string.len(out) - 1)
 end
 __o.__div = function(a, b)
-    if b.getring and Ring.resultantring(a.ring, b:getring()) ~= Ring.resultantring(a:getring(), b:getring()) then
+    if not b.getring then
+        return BinaryOperation.DIVEXP({a, b})
+    end
+    if Ring.resultantring(a.ring, b:getring()) ~= Ring.resultantring(a:getring(), b:getring()) then
         return a:div(b:inring(a:getring()))
     end
-    if b.getring and a:getring() == b:getring() then
+    if b.ring and b:getring() == Rational:getring() and a.symbol == b.ring.symbol then
+        return a:inring(b:getring()):div(b)
+    end
+    if a:getring() == b:getring() then
         return Rational(a, b, true)
     end
-    if b.getring and b.ring and b:getring() == Rational:getring() and a.symbol == b.ring.symbol then
-        return a:inring(b:getring()):div(b)
+    -- TODO: Fix this for arbitrary depth
+    if a:getring() == PolynomialRing:getring() and b:getring() == PolynomialRing:getring() and a.symbol == b.symbol then
+        local oring = Ring.resultantring(a:getring(), b:getring())
+        return Rational(a:inring(oring), b:inring(oring), true)
     end
     return BinaryOperation.DIVEXP({a, b})
 end
@@ -582,9 +590,9 @@ function PolynomialRing:pseudodivide(b)
         m = s.degree
     end
 
-    if delta - sigma == Integer.zero() then 
+    if delta - sigma == Integer.zero() then
         return p,s
-    else 
+    else
         return lcb^(delta - sigma) * p, lcb^(delta - sigma) * s
     end
 end

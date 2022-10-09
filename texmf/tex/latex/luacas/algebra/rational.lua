@@ -82,6 +82,10 @@ function Rational:new(n, d, keep)
         o.ring = d:getring()
     end
 
+    if d == Integer(0) then
+        error("Arithmetic error: division by zero")
+    end
+
     n = n or Integer.zero()
     d = d or Integer.one()
     o.numerator = n

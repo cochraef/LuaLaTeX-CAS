@@ -17,6 +17,15 @@ function Ring.resultantring(ring1, ring2)
         return ring1
     end
 
+    local orgring1 = ring1
+    local orgring2 = ring2
+
+    if ((ring1 == PolynomialRing.getring() and ring2 == Rational.getring()) or
+       (ring2 == PolynomialRing.getring() and ring1 == Rational.getring()))
+       and ring1.symbol == ring2.symbol then
+        return Rational.makering(ring1.symbol, Ring.resultantring(ring1.child, ring2.child))
+    end
+
     if ring1 == PolynomialRing.getring() or ring2 == PolynomialRing.getring() then
         if ring1 == ring2.child then
             return ring2
@@ -36,8 +45,15 @@ function Ring.resultantring(ring1, ring2)
             ring2 = ring2.child
         end
         local ring = Ring.resultantring(ring1, ring2)
-        for i = #symbols, 1, -1 do
-            ring = PolynomialRing.makering(symbols[i], ring)
+        -- TODO: Generalize this fix
+        if #symbols == 2 and orgring2.child == PolynomialRing.getring() and orgring2.symbol == symbols[2] then
+            for i = 1, #symbols do
+                ring = PolynomialRing.makering(symbols[i], ring)
+            end
+        else
+            for i = #symbols, 1, -1 do
+                ring = PolynomialRing.makering(symbols[i], ring)
+            end
         end
         return ring
     end
@@ -62,7 +78,13 @@ function Ring.resultantring(ring1, ring2)
         end
 
         if ring2 == Rational.getring() then
-            if ring1.child and ring2.child and ring1.symbol == ring2.symbol then
+            if not ring1.symbol then
+                return Rational.makering(ring2.symbol, Ring.resultantring(ring1, ring2.child))
+            end
+            if not ring2.symbol then
+                return Rational.makering(ring1.symbol, Ring.resultantring(ring1.child, ring2))
+            end
+            if ring1.symbol and ring2.symbol and ring1.symbol == ring2.symbol then
                 return Rational.makering(ring1.symbol, Ring.resultantring(ring1.child, ring2.child))
             end
             return ring2
