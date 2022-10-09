@@ -152,7 +152,7 @@ style=numeric,
 
 \subsection{Calculus Methods}
 
-\newcoderef{function IntegralExpression.table(IntegralExpression)}{return Expression|nil}{}
+\newcoderef{function IntegralExpression.table(integral)}{return Expression|nil}{integral IntegralExpression}
 
 Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
 
@@ -179,7 +179,7 @@ Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by 
 \end{codebox}
 The table of integrals consists of power functions, exponentials, logarithms, trigonometric, and inverse trigonometric functions. 
 
-\newcoderef{function IntegralExpression.linearproperties(IntegralExpression)}{return Expression|nil}{}
+\newcoderef{function IntegralExpression.linearproperties(integral)}{return Expression|nil}{integral IntegralExpression}
 
 Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression.integrate()}. For example:
 
@@ -203,7 +203,7 @@ Attempts to integrate the \texttt{integrand} with respect to \texttt{symbol} by 
 \[ f = \print*{f} \qquad g = \print*{g} \]
 \end{codebox} 
 
-\newcoderef{function IntegralExpression.substitutionmethod(IntegralExpression)}{return Expression|nil}{} 
+\newcoderef{function IntegralExpression.substitutionmethod(integral)}{return Expression|nil}{integral IntegralExpression} 
 
 Attempts to integrate \texttt{integrand} with respect to \texttt{symbol} via $u$-substitution; returns nil if no suitable substitution is found to be successful. 
 
