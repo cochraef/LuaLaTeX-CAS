@@ -7,9 +7,10 @@
 Hi 
 \begin{CAS}
     vars('x')
-    f = x^2/((x+1)*(x^2+2*x+2))
+    f = (1-x^2)^2
+    f = int(f,x,-1,1)
 \end{CAS}
-\[ \print{int(f,x)} = \print*{int(f,x)}\] 
+\[ \print{f} = \print*{f} \] 
 
 \end{document}
 
