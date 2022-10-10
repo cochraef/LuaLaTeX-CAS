@@ -232,7 +232,7 @@ The function \mintinline{lua}{diff()} shortcuts \mintinline{lua}{DiffExpression(
 \[ \print{f} = \print*{f} \qquad \print{g} = \print*{g} \]
 \end{codebox}
 
-\newcoderef{function IntegralExpression:new(expression, symbol, lower, upper)}{return IntegralExpression}{expression Expression, symbol SymbolExpression, lower Expression, upper Expression} 
+\newcoderef{function IntegralExpression:new(expression,symbol,lower,upper)}{return IntegralExpression}{expression Expression, symbol SymbolExpression, lower Expression, upper Expression} 
 
 Creates a new integral operation of the given \texttt{expression} with respect to the given \texttt{symbol} over the given \texttt{lower} and \texttt{upper} bounds. If \texttt{lower} and \texttt{upper} are omitted, then an \emph{indefinite} \texttt{IntegralExpression} is constructed. For example:
 
