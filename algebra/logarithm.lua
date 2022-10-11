@@ -136,6 +136,11 @@ function Logarithm:autosimplify()
     return Logarithm(base, expression)
 end
 
+--- @return Expression
+function Logarithm:expand()
+    return Logarithm(self.base:expand(), self.expression:expand()):autosimplify()
+end
+
 --- @return table<number, Expression>
 function Logarithm:subexpressions()
     return {self.base, self.expression}
