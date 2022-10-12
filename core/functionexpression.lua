@@ -37,26 +37,26 @@ function FunctionExpression:new(name, expressions, derivatives)
     o.name = name
     o.expressions = Copy(expressions)
     o.variables = Copy(expressions)
-    for _,expression in ipairs(o.variables) do 
+    for _,expression in ipairs(o.variables) do
         if not expression:isatomic() then
             o.variables = {}
-            if #o.expressions < 4 then 
+            if #o.expressions < 4 then
                 local defaultvars = {SymbolExpression('x'),SymbolExpression('y'),SymbolExpression('z')}
-                for i=1,#o.expressions do 
+                for i=1,#o.expressions do
                     o.variables[i] = defaultvars[i]
                 end
             else
-                for i=1,#o.expressions do 
+                for i=1,#o.expressions do
                     o.variables[i] = SymbolExpression('x_'..tostring(i))
                 end
             end
         end
     end
-    if derivatives then 
+    if derivatives then
         o.derivatives = Copy(derivatives)
     else
         o.derivatives = {}
-        for i=1,#o.variables do 
+        for i=1,#o.variables do
             o.derivatives[i] = Integer.zero()
         end
     end
@@ -78,14 +78,14 @@ function FunctionExpression:new(name, expressions, derivatives)
             return out .. ')'
         else
             local out = 'd'
-            if total > Integer.one() then 
+            if total > Integer.one() then
                 out = out ..'^' .. tostring(total)
             end
             out = out .. a.name .. '/'
-            for index,integer in ipairs(a.derivatives) do 
-                if integer > Integer.zero() then 
+            for index,integer in ipairs(a.derivatives) do
+                if integer > Integer.zero() then
                     out = out .. 'd' .. tostring(a.variables[index])
-                    if integer > Integer.one() then 
+                    if integer > Integer.one() then
                         out = out .. '^' .. tostring(integer)
                     end
                 end
@@ -115,8 +115,8 @@ function FunctionExpression:new(name, expressions, derivatives)
                 return false
             end
         end
-        for index,_ in ipairs(a.derivatives) do 
-            if a.derivatives[index] ~= b.derivatives[index] then 
+        for index,_ in ipairs(a.derivatives) do
+            if a.derivatives[index] ~= b.derivatives[index] then
                 return false
             end
         end
@@ -230,14 +230,14 @@ function FunctionExpression:tolatex()
         --end
     end
     local total = Integer.zero()
-    for _,integer in ipairs(self.derivatives) do 
+    for _,integer in ipairs(self.derivatives) do
         total = total + integer
     end
-    if #self.expressions == 1 then 
+    if #self.expressions == 1 then
         if total == Integer.zero() then
             goto continue
         else
-            if total < Integer(5) then 
+            if total < Integer(5) then
                 while total > Integer.zero() do
                     out = out .. "'"
                     total = total - Integer.one()
@@ -247,26 +247,26 @@ function FunctionExpression:tolatex()
             end
         end
     end
-    if #self.expressions > 1 then 
-        if total == Integer.zero() then 
+    if #self.expressions > 1 then
+        if total == Integer.zero() then
             goto continue
         else
-            if total < Integer(4) then 
+            if total < Integer(4) then
                 out = out .. '_{'
-                for index,integer in ipairs(self.derivatives) do 
+                for index,integer in ipairs(self.derivatives) do
                     local i = integer:asnumber()
-                    while i > 0 do 
+                    while i > 0 do
                         out = out .. self.variables[index]:tolatex()
                         i = i - 1
                     end
-                end 
+                end
                 out = out .. '}'
             else
                 out = '\\frac{\\partial^{' .. total:tolatex() .. '}' .. out .. '}{'
-                for index, integer in ipairs(self.derivatives) do 
-                    if integer > Integer.zero() then 
+                for index, integer in ipairs(self.derivatives) do
+                    if integer > Integer.zero() then
                         out = out .. '\\partial ' .. self.variables[index]:tolatex()
-                        if integer ~= Integer.one() then 
+                        if integer ~= Integer.one() then
                             out = out .. '^{' .. integer:tolatex() .. '}'
                         end
                     end

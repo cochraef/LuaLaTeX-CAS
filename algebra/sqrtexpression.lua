@@ -128,7 +128,7 @@ function SqrtExpression:autosimplify()
         for index, term in ipairs(primes.expressions) do
             local prime      = term.expressions[1]
             local primepower = term.expressions[2] / reduction
-            local coeffpower = primepower // newroot  
+            local coeffpower = primepower // newroot
             coeffresult[index] = prime ^ coeffpower
             local exprpower  = primepower - coeffpower*newroot
             exprresult[index]  = prime ^ exprpower

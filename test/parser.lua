@@ -91,10 +91,10 @@ function factor(exp,squarefrei)
     if exp:type() == PolynomialRing then
         if not squarefrei then
             return exp:factor()
-        else 
+        else
             if exp.ring == Integer.getring() or Rational.getring() then
                 return exp:squarefreefactorization()
-            end 
+            end
             if exp.ring == IntegerModN.getring() then
                 return exp:modularsquarefreefactorization()
             end
@@ -122,7 +122,7 @@ end
 
 function roots(expression)
     poly,ispoly = topoly(expression)
-    if ispoly then  
+    if ispoly then
         return poly:roots()
     end
     return RootExpression(expression)
@@ -133,20 +133,20 @@ function combine(expr)
 end
 
 function Mod(f,n)
-    if f:type() == Integer then 
+    if f:type() == Integer then
         return IntegerModN(f,n)
     end
-    if f:type() == PolynomialRing and f.ring == Integer.getring() then 
+    if f:type() == PolynomialRing and f.ring == Integer.getring() then
         local coeffs = {}
-        for i=0,f.degree:asnumber() do 
-            coeffs[i] = IntegerModN(f.coefficients[i],n) 
+        for i=0,f.degree:asnumber() do
+            coeffs[i] = IntegerModN(f.coefficients[i],n)
         end
         return PolynomialRing(coeffs,f.symbol,f.degree)
     end
 end
 
 function Poly(coefficients,symbol,degree)
-    local variable = symbol or 'x' 
+    local variable = symbol or 'x'
     return PolynomialRing:new(coefficients,variable,degree)
 end
 
@@ -156,38 +156,38 @@ function topoly(a)
 end
 
 function gcd(a,b)
-    if a:type() == Integer and b:type() == Integer then 
-        return Integer.gcd(a,b) 
+    if a:type() == Integer and b:type() == Integer then
+        return Integer.gcd(a,b)
     end
-    if a:type() == PolynomialRing and b:type() == PolynomialRing then 
-        return PolynomialRing.gcd(a,b) 
+    if a:type() == PolynomialRing and b:type() == PolynomialRing then
+        return PolynomialRing.gcd(a,b)
     end
 end
 
 function gcdext(a,b)
-    if a:type() == Integer and b:type() == Integer then 
-        return Integer.extendedgcd(a,b) 
+    if a:type() == Integer and b:type() == Integer then
+        return Integer.extendedgcd(a,b)
     end
-    A, ATF = topoly(a) 
-    B, BTF = topoly(b) 
-    if ATF and BTF then 
+    A, ATF = topoly(a)
+    B, BTF = topoly(b)
+    if ATF and BTF then
         return PolynomialRing.extendedgcd(A,B)
     end
     return nil,nil,nil
 end
 
 function parfrac(f,g,ffactor)
-    local f,check1 = topoly(f) 
+    local f,check1 = topoly(f)
     local g,check2 = topoly(g)
-    if check1 and check2 then 
+    if check1 and check2 then
         return PolynomialRing.partialfractions(f,g,ffactor)
-    else 
-        return f/g 
+    else
+        return f/g
     end
 end
 
 function factorial(a)
-    return FactorialExpression(a) 
+    return FactorialExpression(a)
 end
 
 -- Constants for the CAS. We may not want these in Lua itself, but in the latex end the user probably expects them.

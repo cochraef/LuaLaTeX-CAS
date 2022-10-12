@@ -24,7 +24,7 @@ function TrigExpression:new(name, expression)
     o.name = name
     o.expression = expression
     o.expressions = {expression}
-    if expression:isatomic() then 
+    if expression:isatomic() then
         o.variables = {expression}
     else
         o.variables = {SymbolExpression('x')}
@@ -68,7 +68,7 @@ function TrigExpression:evaluate()
             return PI / Integer(2)
          end
      end
- 
+
      if expression == PI then
         if self.name == "cos" or self.name == "sec" then
             return Integer(-1)
@@ -77,7 +77,7 @@ function TrigExpression:evaluate()
             return Integer.zero()
          end
      end
- 
+
      if expression:ismulratlPI() then
         local coeff = expression.expressions[1]
          if TrigExpression.COSVALUES[tostring(coeff)] ~= nil then
@@ -105,7 +105,7 @@ function TrigExpression:evaluate()
              end
          end
      end
- 
+
      if TrigExpression.ACOSVALUES[tostring(expression)] ~= nil then
         if self.name == "arccos" then
             return TrigExpression.ACOSVALUES[tostring(expression)]:autosimplify()
@@ -122,7 +122,7 @@ function TrigExpression:evaluate()
              end
          end
      end
- 
+
      if self.name == "arctan" and TrigExpression.ATANVALUES[tostring(expression)] ~= nil then
         return TrigExpression.ATANVALUES[tostring(expression)]:autosimplify()
     end

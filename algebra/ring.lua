@@ -36,6 +36,7 @@ function Ring.resultantring(ring1, ring2)
         end
 
         -- If none of the above conditions are satisfied, recusion is a pain, so we just strip all of the variables off of both rings.
+        -- TODO: Make this properly recursive, or just use a multivariable polynomial ring class
         local symbols = {}
         while ring1 == PolynomialRing.getring() do
             symbols[#symbols+1] = ring1.symbol
