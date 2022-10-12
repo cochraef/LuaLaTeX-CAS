@@ -234,10 +234,10 @@ __o.__div = function(a, b)
         return BinaryOperation.DIVEXP({a, b})
     end
     if Ring.resultantring(a.ring, b:getring()) ~= Ring.resultantring(a:getring(), b:getring()) then
-        return a:div(b:inring(a:getring()))
+        return a:div(b:inring(Ring.resultantring(a:getring(), b:getring())))
     end
     if b.ring and b:getring() == Rational:getring() and a.symbol == b.ring.symbol then
-        return a:inring(b:getring()):div(b)
+        return a:inring(Ring.resultantring(a:getring(), b:getring())):div(b)
     end
     if a:getring() == b:getring() then
         return Rational(a, b, true)

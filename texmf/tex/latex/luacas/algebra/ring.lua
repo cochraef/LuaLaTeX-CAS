@@ -17,9 +17,6 @@ function Ring.resultantring(ring1, ring2)
         return ring1
     end
 
-    local orgring1 = ring1
-    local orgring2 = ring2
-
     if ((ring1 == PolynomialRing.getring() and ring2 == Rational.getring()) or
        (ring2 == PolynomialRing.getring() and ring1 == Rational.getring()))
        and ring1.symbol == ring2.symbol then
@@ -33,6 +30,12 @@ function Ring.resultantring(ring1, ring2)
         if ring2 == ring1.child then
             return ring1
         end
+
+        if ring1 == PolynomialRing.getring() and ring2 == PolynomialRing.getring() and ring1.symbol == ring2.symbol then
+            return PolynomialRing.makering(ring1.symbol, Ring.resultantring(ring1.child, ring2.child))
+        end
+
+        -- If none of the above conditions are satisfied, recusion is a pain, so we just strip all of the variables off of both rings.
         local symbols = {}
         while ring1 == PolynomialRing.getring() do
             symbols[#symbols+1] = ring1.symbol
@@ -45,15 +48,12 @@ function Ring.resultantring(ring1, ring2)
             ring2 = ring2.child
         end
         local ring = Ring.resultantring(ring1, ring2)
-        -- TODO: Generalize this fix
-        if #symbols == 2 and orgring2.child == PolynomialRing.getring() and orgring2.symbol == symbols[2] then
-            for i = 1, #symbols do
-                ring = PolynomialRing.makering(symbols[i], ring)
-            end
-        else
-            for i = #symbols, 1, -1 do
-                ring = PolynomialRing.makering(symbols[i], ring)
-            end
+
+        if ring == Rational.getring() and Contains(symbols, ring.symbol) then
+            symbols = Remove(symbols, ring.symbol)
+        end
+        for i = #symbols, 1, -1 do
+            ring = PolynomialRing.makering(symbols[i], ring)
         end
         return ring
     end
