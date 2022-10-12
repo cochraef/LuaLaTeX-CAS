@@ -63,7 +63,7 @@ __o.__tostring = function(a)
     return tostring(a.numerator).."/"..tostring(a.denominator)
 end
 
---- Creates a new rational given an integer numerator and denominator.
+--- Creates a new rational given a numerator and denominator that are part of the same ring.
 --- Rational numbers are represented uniquely.
 --- @param n Ring
 --- @param d Ring
@@ -74,12 +74,10 @@ function Rational:new(n, d, keep)
 
     if n:getring() == PolynomialRing.getring() then
         o.symbol = n.symbol
-        o.ring = n:getring()
     end
 
     if d:getring() == PolynomialRing.getring() then
         o.symbol = d.symbol
-        o.ring = d:getring()
     end
 
     if d == Integer(0) then
@@ -90,10 +88,7 @@ function Rational:new(n, d, keep)
     d = d or Integer.one()
     o.numerator = n
     o.denominator = d
-    if not o.ring then
-        o:reduce()
-        o.ring = Integer.getring()
-    end
+    o:reduce()
 
     if (not keep) and o.denominator == Integer.one() or (not keep) and o.numerator == Integer.zero() then
         return o.numerator
@@ -102,15 +97,26 @@ function Rational:new(n, d, keep)
     return o
 end
 
---- Reduces a rational expression to standard form.
+--- Reduces a rational expression to standard form. This method mutates its object.
 function Rational:reduce()
-    if self.denominator < Integer.zero() then
-        self.denominator = -self.denominator
-        self.numerator = -self.numerator
+    if self.numerator:getring() == Integer.getring() then
+        if self.denominator < Integer.zero() then
+            self.denominator = -self.denominator
+            self.numerator = -self.numerator
+        end
+        local gcd = Integer.gcd(self.numerator, self.denominator)
+        self.numerator = self.numerator//gcd
+        self.denominator = self.denominator//gcd
+        self.ring = Integer.getring()
+    elseif self.numerator:getring() == PolynomialRing.getring() then
+        local lc = self.denominator:lc()
+        self.denominator = self.denominator/lc
+        self.numerator = self.numerator/lc
+        local gcd = PolynomialRing.gcd(self.numerator, self.denominator)
+        self.numerator = self.numerator//gcd
+        self.denominator = self.denominator//gcd
+        self.ring = Ring.resultantring(self.numerator:getring(), self.denominator:getring())
     end
-    local gcd = Integer.gcd(self.numerator, self.denominator)
-    self.numerator = self.numerator//gcd
-    self.denominator = self.denominator//gcd
 end
 
 
