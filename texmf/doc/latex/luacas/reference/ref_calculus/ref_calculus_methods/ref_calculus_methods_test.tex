@@ -1,0 +1,308 @@
+\subsection{Calculus Methods}
+
+\newcoderef{function IntegralExpression.table(integral)}{return Expression|nil}{integral IntegralExpression}
+
+Attempts to integrate the \texttt{integral.expression} with respect to \texttt{integral.symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = int(cos(x),x)
+  f = f:table()
+  g = int(x*cos(x),x)
+  g = g:table()
+\end{CAS}
+\[ f = \print{f} \qquad g = \print{g} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+  vars('x')
+  f = int(cos(x),x)
+  f = f:table()
+  g = int(x*cos(x),x)
+  g = g:table()
+  \end{CAS}
+\[ f = \print{f} \qquad g = \print{g} \] 
+\end{codebox}
+The table of integrals consists of power functions, exponentials, logarithms, trigonometric, and inverse trigonometric functions. 
+
+\newcoderef{function IntegralExpression.linearproperties(integral)}{return Expression|nil}{integral IntegralExpression}
+
+Attempts to integrate the \texttt{integral.expression} with respect to \texttt{integral.symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression:integrate()}. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = int(sin(x) + e^x,x)
+  g = f:table()
+  f = f:linearproperties()
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+  f = int(sin(x) + e^x,x)
+  g = f:table()
+  f = f:linearproperties()
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g} \]
+\end{codebox} 
+
+\newcoderef{function IntegralExpression.substitutionmethod(integral)}{return Expression|nil}{integral IntegralExpression} 
+
+Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} via $u$-substitution; returns nil if no suitable substitution is found to be successful. 
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = int(x*e^(x^2),x)
+  g = int(x*e^x,x)
+  f = f:substitutionmethod()
+  g = g:substitutionmethod()
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g}.\] 
+\end{minted}
+\tcblower
+\begin{CAS}
+  vars('x')
+  f = int(x*e^(x^2),x)
+  g = int(x*e^x,x)
+  f = f:substitutionmethod()
+  g = g:substitutionmethod()
+\end{CAS}
+\[ f = \print*{f} \qquad g = \print*{g}.\] 
+\end{codebox}
+
+\newcoderef{function IntegralExpression.enhancedsubstitutionmethod(integral)}{return Expression|nil}{integral IntegralExpression} 
+
+Attempts integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} via $u$-substitutions. This method distinguishes itself from the \mintinline{lua}{.substitutionmethod} by attempted to solve $u= g(x)$ for the original variable and then substituting the result into the expression. This behavior is not included in \mintinline{lua}{.substitutionmethod} due to speed concerns. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = int(x^5*sqrt(x^3+1),x)
+  g = f:substitutionmethod()
+  h = f:enhancedsubstitutionmethod()
+\end{CAS}
+\[ \print*{g} \] 
+\[ \print*{h} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = int(x^5*sqrt(x^3+1),x)
+    g = f:substitutionmethod()
+    h = f:enhancedsubstitutionmethod()
+\end{CAS}
+\[ \print*{g} \] 
+\[ \print*{h} \] 
+\end{codebox}
+
+
+\newcoderef{function IntegralExpression.trialsubstitutions(Expression)}{return table<number, Expression}{}
+
+Generates a list of possible $u$-substitutions to attempt in \mintinline{lua}{IntegralExpression.substitutionmethod()}. 
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = cos(x)/(1+sin(x))
+  f = f:autosimplify()
+  l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+$\left\{ \lprint{l} \right\}$.
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = cos(x)/(1+sin(x))
+    f = f:autosimplify()
+    l = IntegralExpression.trialsubstitutions(f)
+\end{CAS}
+$ \left\{ \lprint{l} \right\}$.
+\end{codebox}
+
+
+\newcoderef{function IntegralExpression.rationalfunction(IntegralExpression)}{return Expression|nil}{}
+
+Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo, Rothstein, and Trager's method in the case when \texttt{expression} is a rational function in the variable \texttt{symbol}. If \texttt{integrand} is not a rational function, then nil is returned. 
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = (x^2+2*x+2)/(x^2+3*x+2)
+    f = f:autosimplify()
+    g = int(f,x):rationalfunction()
+\end{CAS}
+\[ \int \print{f}\ dx = \print*{g} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = (x^2+2*x+2)/(x^2+3*x+2)
+    f = f:autosimplify()
+    g = int(f,x):rationalfunction()
+\end{CAS}
+\[ \int \print{f}\ dx = \print*{g} \] 
+\end{codebox}
+
+In some cases, the \mintinline{lua}{.rationalfunction} method returns non-standard results. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  num = x^2
+  den = ((x+1)*(x^2+2*x+2)):expand()
+  f = (num/den):autosimplify()
+  f = int(f,x):rationalfunction()
+\end{CAS}
+\[ \print{simplify(f)} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+  vars('x')
+  num = x^2
+  den = ((x+1)*(x^2+2*x+2)):expand()
+  f = (num/den):autosimplify()
+  f = int(f,x):rationalfunction()
+\end{CAS}
+\[ \print{simplify(f)} \] 
+\end{codebox}
+On the other hand:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  pfrac = parfrac(num,den)
+\end{CAS}
+\[ \print*{int(pfrac,x)} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    pfrac = parfrac(num,den)
+  \end{CAS}
+\[ \print*{int(pfrac,x)} \] 
+\end{codebox}
+
+\newcoderef{function IntegralExpression.partsmethod(IntegralExpression)}{return Expression|nil}{} 
+
+Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} via \emph{integration by parts}; returns nil if no suitable application of IBP is found. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = int(x*e^x,x)
+    g = f:partsmethod()
+    ff = int(e^(x^2),x)
+    gg = ff:partsmethod()
+\end{CAS}
+\[ \print{f}= \print*{g} \] 
+\[ \print{ff} = \print*{gg} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = int(x*e^x,x)
+    g = f:partsmethod()
+    ff = int(e^(x^2),x)
+    gg = ff:partsmethod()
+\end{CAS}
+\[ \print{f}= \print*{g} \] 
+\[ \print{ff} = \print*{gg} \] 
+\end{codebox}
+
+
+\newcoderef{function IntegralExpression.eulersformula(integral)}{return Expression|nil}{integral IntegralExpression}
+
+Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} by using the Euler formulas: 
+\[ \cos x = \frac{e^{ix} + e^{-ix}}{2} \qquad \sin x = \frac{e^{ix} - e^{-ix}}{2i}.\]  
+Per usual, this method returns nil if such a method is unsuccessful (or if the integrand is unchanged after applying the above substitutions). This can often be used as an alternative for integration by parts. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+  vars('x')
+  f = int(e^x*sin(x),x)
+  ff = int(x^2,x)
+  g = f:eulersformula()
+  gg = ff:eulersformula()
+\end{CAS}
+\[ \print*{g} \] 
+\[ \print*{gg}\]
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = int(e^x*sin(x),x)
+    ff = int(x^2,x)
+    g = f:eulersformula()
+    gg = ff:eulersformula()
+\end{CAS}
+\[ \print*{g} \] 
+\[ \print*{gg}\]
+\end{codebox}
+
+\newcoderef{function IntegralExpression.integrate(integral)}{return Expression|nil}{integral IntegralExpression}
+
+Recursive part of the indefinite integral operator; returns nil if the expression could not be integrated. The methods above get called (roughly) in the following order:
+\begin{enumerate}[(i)]
+    \item \mintinline{lua}{.table}
+    \item \mintinline{lua}{.linearproperties}
+    \item \mintinline{lua}{.substitutionmethod}
+    \item \mintinline{lua}{.rationalfunction}
+    \item \mintinline{lua}{.partsmethod} 
+    \item \mintinline{lua}{.eulersformula} 
+    \item \mintinline{lua}{.enhancedsubstitutionmethod}
+\end{enumerate}
+Between (vi) and (vii), the \mintinline{lua}{.integrate} method will attempt to expand the integrand and retry. The method is recursive in the sense that (most) of the methods listed above will call \mintinline{lua}{.integrate} at some point. For example, after a list of trial substitutions is created, the method \mintinline{lua}{.substitutionmethod} will call \mintinline{lua}{.integrate} to determine whether the new integrand can be integrated via any of the other methods in the list. 
+
+\subsubsection*{Parsing}
+
+Recall the function \mintinline{lua}{int()} which acts as a shortcut for \mintinline{lua}{IntegralExpression:new()}. When \mintinline{lua}{:autosimplify()} is called upon an \texttt{IntegralExpression}, then \mintinline{lua}{IntegralExpression.integrate} is applied. If \mintinline{lua}{nil} is returned, then \mintinline{lua}{:autosimplify()} returns \mintinline{lua}{self}; otherwise the result of \mintinline{lua}{.integrate} is returned and evaluated over the bounds, if any are given. For example:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = cos(x)*e^(sin(x))
+    f = int(f,x,0,pi/2)
+\end{CAS}
+\[ \print{f} = \print*{f}\] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = cos(x)*e^(sin(x))
+    f = int(f,x,0,pi/2)
+\end{CAS}
+\[ \print{f} = \print*{f}\] 
+\end{codebox}
+
+On the other hand:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = e^(e^x)
+    f = int(f,x,0,1)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = e^(e^x)
+    f = int(f,x,0,1)
+\end{CAS}
+\[ \print{f} = \print*{f} \] 
+\end{codebox}
+
+\coderef{function IntegralExpression:isdefinite()}{return bool}
+
+Returns \mintinline{lua}{true} of \texttt{IntegralExpression} is definite (i.e. if \texttt{.upper} and \texttt{.lower} are defined fields), otherwise returns \mintinline{lua}{false}. 

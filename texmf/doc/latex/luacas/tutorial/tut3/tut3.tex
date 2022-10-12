@@ -412,10 +412,9 @@ Of course, the schlubs that manage this package feel for Charlie, and recognize 
     a = y/z
     b = z/x
     c = x/y
-    d = a+b+c
-    e = combine(d)
+    d = combine(a+b+c)
 \end{CAS}
-\[ \print{d} = \print{e} \] 
+\[ \print{a+b+c} = \print{d} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -423,10 +422,9 @@ Of course, the schlubs that manage this package feel for Charlie, and recognize 
     a = y/z
     b = z/x
     c = x/y
-    d = a+b+c
-    e = combine(d)
+    d = combine(a+b+c)
 \end{CAS}
-\[ \print{d} = \print{e} \] 
+\[ \print{a+b+c} = \print{d} \] 
 \end{codebox}
 
 Here's Charlie's complete code (but using \mintinline{latex}{\directlua}) instead:
