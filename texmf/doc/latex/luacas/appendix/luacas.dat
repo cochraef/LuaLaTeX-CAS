@@ -65,16 +65,6 @@
         }%
     }%
 }%
-    
-\NewDocumentCommand{\yoink}{m O{#1}}{%
-\expandafter\def\csname #2\endcsname{%
-    \directlua{
-        tex.print(tostring(#1))
-        }%
-    }%
-}
-
-%\newcommand{\eval}[1]{\luaexec{tex.print(parse('#1'):tolatex())}}
 
 %%%%%%%%%%
 %% Core %%
@@ -86,17 +76,23 @@
     \IfBooleanTF{#1}{%
         \directlua{
             local sym = #2
-            tex.print(sym:autosimplify():tolatex())
+            if sym then 
+                tex.print(sym:autosimplify():tolatex())
+            else
+                tex.print('nil')
+            end
         }%
     }{%
         \directlua{
             local sym = #2
-            tex.print(sym:tolatex())
+            if sym then 
+                tex.print(sym:tolatex())
+            else
+                tex.print('nil')
+            end
         }%
     }%
 }
-
-%verbatim print
 
 \NewDocumentCommand{\vprint}{s m}{%
     \IfBooleanTF{#1}{%
@@ -110,6 +106,25 @@
             tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym:autosimplify())..[[\end{verbatim}}]])
         }%
     }%
+}
+
+\NewDocumentCommand{\lprint}{m O{nil,nil}}{%
+    \luaexec{
+        local tbl = #1
+        local low,upp = #2
+        local tmp =0
+        if tbl[0] == nil then 
+            tmp = 1
+        end
+        upp = upp or \#tbl 
+        low = low or tmp
+        for i=low,upp do 
+            tex.print(tbl[i]:tolatex())
+            if tbl[i+1] then 
+                tex.print(",")
+            end 
+        end
+    }
 }
 
 %prints the first level of an expression tree; for use within a tikzpicture environment
@@ -211,77 +226,5 @@
 \NewDocumentCommand{\whatis}{m}{%
     \luaexec{
         tex.sprint("{\\ttfamily",longwhatis(#1),"}")
-    }%
-}
-
-\NewDocumentCommand{\freeof}{s m m}{%
-    \IfBooleanTF{#1}{%
-        \luaexec{
-            local sym1 = #2
-            local sym2 = #3
-            if sym1:freeof(sym2) then 
-                tex.print(1)
-            else
-                tex.print(0)
-            end
-        }
-    }{%
-        \luaexec{
-            local sym1 = #2
-            local sym2 = #3
-            sym1 = sym1:autosimplify()
-            sym2 = sym2:autosimplify()
-            if sym1:freeof(sym2) then
-                tex.print(1)
-            else
-                tex.print(0)
-            end
-        }%
-    }%
-}
-
-\NewDocumentCommand{\isatomic}{s m}{%
-    \IfBooleanTF{#1}{
-        \luaexec{
-            local sym = #2
-            if sym:isatomic() then 
-                tex.print(1)
-            else
-                tex.print(0)
-            end
-        }
-    }{%
-        \luaexec{
-            local sym = #2
-            sym = sym:autosimplify()
-            if sym:isatomic() then 
-                tex.print(1)
-            else
-                tex.print(0)
-            end
-        }%
-    }%   
-}
-
-\NewDocumentCommand{\isconstant}{s m}{%
-    \IfBooleanTF{#1}{%
-        \luaexec{
-            local sym = #2
-            if sym:isconstant() then 
-                tex.print(1)
-            else 
-                tex.print(0)
-            end
-        }%
-    }{%
-        \luaexec{%
-            local sym = #2
-            sym = sym:autosimplify()
-            if sym:isconstant() then 
-                tex.print(1)
-            else 
-                tex.print(0)
-            end
-        }%
     }%
 }

@@ -173,7 +173,7 @@ It seems that \texttt{autosimplify()} did nothing; but there are significant str
 \end{center}
 \end{multicols}
 
-Ironically, the \emph{autosimplified} expression tree on the right looks more complicated than the one on the left! But on of the primary functions of \texttt{autosimplify()} is to take an expression (that truly could be input in a myriad of ways) and convert that expression into something \emph{anticipatable}. 
+Ironically, the \emph{autosimplified} expression tree on the right looks more complicated than the one on the left! But one of the primary functions of \texttt{autosimplify()} is to take an expression (that truly could be input in a myriad of ways) and convert that expression into something \emph{anticipatable}. 
 
 For example, suppose the user inputs:
 \begin{minted}{latex}
@@ -302,7 +302,7 @@ Otherwise, the \texttt{evaluate()} method will attempt to evaluate all subexpres
 \end{CAS}
 \[ \print{y} \] 
 \end{codebox}
-Whereas \texttt{autosimplify()} will return $3+2x$; indeed, the \texttt{autosimplify()} (usually) begins by evaluating first. 
+Whereas \texttt{autosimplify()} will return $3+2x$; indeed, the \texttt{autosimplify()} method (usually) begins by applying \texttt{evaluate()} first. 
 
 \coderef{function Expression:expand()}{return Expression}
 \index{Core!Methods!\texttt{expand}}
@@ -375,7 +375,7 @@ On the other hand:
 
 \subsubsection*{Parsing}
 
-There is a \texttt{factor()} function in the parser that is more type-aware than the basic \texttt{:factor()} method mentioned here. For example:
+There is a \texttt{factor()} function in the parser that is more class-aware than the basic \texttt{:factor()} method mentioned here. For example:
 \begin{codebox}
     \begin{minted}[fontsize = \small]{latex}
 \begin{CAS}
@@ -394,7 +394,7 @@ There is a \texttt{factor()} function in the parser that is more type-aware than
 \index{Core!Methods!\texttt{freeof}}
 \addcontentsline{toc}{subsubsection}{\ttfamily freeof}
 
-Determines whether or not an expression contains a particular {\ttfamily SymbolExpression} somewhere in the tree.
+Determines whether or not {\ttfamily Expression} contains a particular {\ttfamily symbol} somewhere in its expression tree.
 
 The method \texttt{freeof()} is quite literal. For example:
 \begin{codebox}
@@ -422,7 +422,7 @@ else
 end
 }
 \end{codebox}
-On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("foo")} contains a single node with no edges. With nary a \mintinline{lua}{SymbolExpression("fo")} to find in such a tree, we have:
+On the other hand, the expression tree for \mintinline{lua}{SymbolExpression("foo")} contains a single node with no edges. With nary a \mintinline{lua}{SymbolExpression("fo")} to find in such an expression tree, we have:
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
 vars('foo','fo')
@@ -605,7 +605,7 @@ end
 For the goals of autosimplification, \texttt{Expression}s must be ordered. \texttt{Expression:order(other)} method returns \mintinline{lua}{true} if \texttt{Expression} is ``less than'' \texttt{other} according to this ordering. 
 
 \begin{multicols}{2}
-On certain classes, the ordering intuitive:
+On certain classes, the ordering is intuitive:
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
@@ -1076,6 +1076,28 @@ Polynomial computations tend to be significantly faster when those polynomials a
 \end{CAS}
 \end{codebox}
 \end{multicols}
+
+\subsubsection*{Parsing}
+
+There is a \mintinline{lua}{topoly()} function that applies \mintinline{lua}{:autosimplify()} automatically to the input. For example:
+\begin{codebox}[]
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = 3+2*x+x^2
+    f = topoly(f)
+\end{CAS}
+The Lua variable \texttt{f} is the \whatis{f}: $\print{f}$.
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = 3+2*x+x^2
+    f = topoly(f)
+\end{CAS}
+The Lua variable \texttt{f} is the \whatis{f}: $\print{f}$.
+\end{codebox}
+
 
 \coderef{function Expression:type()}{return Expression | bool}
 \index{Core!Methods!\texttt{type}}

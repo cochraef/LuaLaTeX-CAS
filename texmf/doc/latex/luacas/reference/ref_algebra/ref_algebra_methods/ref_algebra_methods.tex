@@ -455,7 +455,7 @@ The function \texttt{gcdext()} is a shortcut to \texttt{Polynomial.extendedgcd()
 \[ \print{h} = (\print{f}) \left( \print{a} \right) + (\print{g})\left( \print{b} \right). \] 
 \end{codebox}
 
-\coderef{function PolynomialRing:evaluateAt(Expression)}{return Expression}
+\coderef{function PolynomialRing:evaluateat(Expression)}{return Expression}
 
 Uses Horner's rule to evaluate a polynomial at \texttt{Expression}. Typically, the input \texttt{Expression} is an \texttt{Integer} or \texttt{Rational}. For example:
 
@@ -605,6 +605,29 @@ Returns the greatest common divisor of two polynomials in a ring (assuming \text
 \[ \gcd(\print{f},\print{g}) = \print{h} \] 
 \end{codebox}
 
+\subsubsection*{Parsing}
+
+The function \mintinline{lua}{gcd()} shortcuts \mintinline{lua}{PolynomialRing.gcd()}. For example:
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x')
+    f = topoly(x^3 - x^2 + x - 1)
+    g = topoly(x^3 + 2*x^2 + x + 2)
+    h = gcd(f,g)
+\end{CAS}
+\[ \gcd(\print{f},\print{g}) = \print{h}.\] 
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x')
+    f = topoly(x^3 - x^2 + x - 1)
+    g = topoly(x^3 + 2*x^2 + x + 2)
+    h = gcd(f,g)
+\end{CAS}
+\[ \gcd(\print{f},\print{g}) = \print{h}.\] 
+\end{codebox}
+
 \coderef{function PolynomialRing.isatomic()}{return false}
 \coderef{function PolynomialRing.isconstant()}{return false}
 
@@ -646,7 +669,7 @@ Given two polynomials \texttt{poly1} and \texttt{poly2}, returns a list of the r
 Performs Karatsuba multiplication without constructing new polynomials recursively. But grade-school multiplication of polynomials is actually faster here up to a very large polynomial size due to Lua's overhead.
 
 \newcoderef{function PolynomialRing.partialfractions(g,f,ffactors)}{return BinaryOperation}{g PolynomialRing, f PolynomialRing, ffactors BinaryOperation}
-Returns the partial fraction decomposition of the rational function \texttt{g/f} given \texttt{PolynomialRing}s \texttt{g, f}, and some (not necessarily irreducible) factorization of \texttt{f}. If the factorization is omitted, the irreducible factorization is used. The degree of \texttt{g} must be less than the degree of \texttt{f}.
+Returns the partial fraction decomposition of the rational function \texttt{g/f} given \texttt{PolynomialRing}s \texttt{g, f}, and some (not necessarily irreducible) factorization \texttt{ffactors} of \texttt{f}. If the factorization is omitted, the irreducible factorization is used. The degree of \texttt{g} must be less than the degree of \texttt{f}.
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
@@ -762,20 +785,20 @@ If the decomposition of \texttt{PolynomialRing} (or a factor thereof) is not a c
 
 The function \mintinline{lua}{roots()} shortcuts \mintinline{lua}{PolynomialRing:roots()}. Also, the function \texttt{roots} attempts to cast the argument as a polynomial automatically using \mintinline{lua}{topoly()}. For example:
 
-\begin{codebox}[]
+\begin{codebox}
     \begin{minted}[breaklines,fontsize=\small]{latex}
 \begin{CAS}
-    f = x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2
-    r = roots(f)
+  f = x^6+x^5-x^4+2*x^3+4*x^2-2
+  r = roots(f)
 \end{CAS}
-\[ \left\{ \lprint{r} \right\} \] 
+$ \left\{ \lprint{r} \right\}$ 
 \end{minted}
 \tcblower        
     \begin{CAS}
         f = x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2
         r = roots(f)
     \end{CAS}
-    \[ \left\{ \lprint{r} \right\} \] 
+    $ \left\{ \lprint{r} \right\}$ 
 \end{codebox}
 
 \newcoderef{function PolynomialRing.resultant(a,b)}{return Field}{a PolynomialRing, b PolynomialRing} 
@@ -822,7 +845,7 @@ Returns the square-free factorization of a polynomial defined over the rationals
 \[ \print{s} \]
 \end{codebox}
 
-If the polynomial is defined over $\mathbf{Z}_p$ (where $p$ is prime), then the method \texttt{modularsquarefreefactorization()} should be used. 
+If the polynomial is defined over $\mathbf{Z}/p\mathbf{Z}$ (where $p$ is prime), then the method \texttt{modularsquarefreefactorization()} should be used. 
 
 \subsubsection*{Parsing}
 
@@ -1120,7 +1143,7 @@ Uses Miller-Rabin to determine whether a number is prime up to a very large numb
 \begin{CAS}
     p = 7038304939
     if p:isprime() then 
-        tex.print("p is prime!")
+        tex.print(p:tolatex(), "is prime!")
     end
 \end{CAS}
 \end{minted}
@@ -1128,7 +1151,7 @@ Uses Miller-Rabin to determine whether a number is prime up to a very large numb
 \begin{CAS}
     p = 7038304939
     if p:isprime() then 
-        tex.print("p is prime!")
+        tex.print(p:tolatex(), "is prime!")
     end
 \end{CAS}
 \end{codebox}

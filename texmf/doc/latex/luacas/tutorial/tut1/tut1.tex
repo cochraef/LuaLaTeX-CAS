@@ -54,25 +54,25 @@ Alice is teaching calculus, and she wants to give her students many examples of 
 
 Alice can access the \texttt{luacas} program using a custom environment: \mintinline{latex}{\begin{CAS}..\end{CAS}}. The first thing Alice must do is declare variables that will be used going forward:
 \begin{minted}{latex}
-    \begin{CAS}
-        vars('x','h')
-    \end{CAS}
+\begin{CAS}
+    vars('x','h')
+\end{CAS}
 \end{minted}
 Alice decides that $f$, the function to be differentiated, should be $x^2$. So Alice makes this assignment with:
 \begin{minted}{latex}
-    \begin{CAS}
-        vars('x','h')
-        f = x^2
-    \end{CAS}
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+\end{CAS}
 \end{minted}
 Now, Alice wants to use the variable $q$ to store the appropriate \emph{difference quotient} of $f$. Alice could hardcode this into $q$, but that seems to defeat the oft sought after goal of reusable code. So Alice decides to use the \texttt{substitute} command of \texttt{luacas}:
 \begin{minted}{latex}
-    \begin{CAS}
-        vars('x','h')
-        f = x^2
-        subs = {[x]=x+h}
-        q = (substitute(subs,f) - f)/h
-    \end{CAS}
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+\end{CAS}
 \end{minted}
 Alice is curious to know if $q$ is what she thinks it is. So Alice decides to have \LaTeX{} print out the contents of $q$ within her document. For this, she uses the \mintinline{latex}{\print} command. 
 \begin{CAS}
@@ -161,39 +161,39 @@ Alice is pretty happy with how everything is working, but she wants to be able t
 Here's Alice's completed code:
 \begin{codebox}[frame hidden,breakable]
 \begin{minted}[breaklines,fontsize=\small]{latex}
-    \begin{CAS}
-        vars('x','h')
-        f = x^2
+\begin{CAS}
+    vars('x','h')
+    f = x^2
+\end{CAS}
+Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using thelimit definition of the derivative. Toward that end, we start with the appopriatedifference quotient:
+\begin{CAS}
+    subs = {[x]=x+h}
+    q = (substitute(subs,f) - f)/h
+\end{CAS}
+\[ \begin{aligned}
+    \print{q} &= 
+    \begin{CAS} 
+        q = expand(q) 
     \end{CAS}
-    Let $f(x) = \print{f}$. We wish to compute the derivative of $f(x)$ at $x$ using the limit definition of the derivative. Toward that end, we start with the appopriate difference quotient:
+    \print{q}& &\text{expand/simplify} \\
     \begin{CAS}
-        subs = {[x]=x+h}
-        q = (substitute(subs,f) - f)/h
+        subs = {[h]=0}
+        q = substitute(subs,q)
     \end{CAS}
-    \[ \begin{aligned}
-        \print{q} &= 
-        \begin{CAS} 
-            q = expand(q) 
-        \end{CAS}
-        \print{q}& &\text{expand/simplify} \\
-        \begin{CAS}
-            subs = {[h]=0}
-            q = substitute(subs,q)
-        \end{CAS}
-        &\xrightarrow{h\to 0} \print{q}& &\text{take limit}\\ 
-        &= 
-        \begin{CAS}
-            q = simplify(q)
-        \end{CAS}
-        \print{q} & &\text{simplify.}
-    \end{aligned} \] 
-    So $\print{diff(f,x)} = \print*{diff(f,x)}$. 
+    &\xrightarrow{h\to 0} \print{q}& &\text{take limit}\\ 
+    &= 
+    \begin{CAS}
+        q = simplify(q)
+    \end{CAS}
+    \print{q} & &\text{simplify.}
+\end{aligned} \] 
+So $\print{diff(f,x)} = \print*{diff(f,x)}$. 
 \end{minted}
 \end{codebox}
     
 Alice can produce another example merely by changing the definition of $f$ on the third line to another polynomial:
 
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
 \begin{CAS}
     vars('x','h')
     f = 2*x^3-x

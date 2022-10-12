@@ -51,7 +51,7 @@ style=numeric,
 
 \section{The \LaTeX{} code}
 
-As noted above, this package is really a Lua program; the package {\ttfamily luacas.dat} is merely a shell to make accessing that Lua program easy and manageable from within \LaTeX{}. 
+As noted above, this package is really a Lua program; the package {\ttfamily luacas.sty} is merely a shell to make accessing that Lua program easy and manageable from within \LaTeX{}. 
 \inputminted[
     firstline=12,
     lastline=14,
@@ -72,7 +72,7 @@ We check to make sure the user is compiling with Lua\LaTeX{}; if not, an error m
     {latex}
     {luacas.dat}
 
-The following pacakages are required for various macros:
+The following packages are required for various macros:
 
 \inputminted[
     firstline=27,
@@ -88,6 +88,28 @@ The files \verb|helper.lua| and \verb|parser.lua| help bridge the gap between th
 \inputminted[
     firstline=35,
     lastline=37,
+    breaklines,
+    linenos,
+    numbersep=5pt]
+    {latex}
+    {luacas.dat}
+
+We now define the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment:
+
+\inputminted[
+    firstline=39,
+    lastline=42,
+    breaklines,
+    linenos,
+    numbersep=5pt]
+    {latex}
+    {luacas.dat}
+
+{\bf Note:} The contents are wrapped in the function \mintinline{lua}{CASparse()}. 
+
+\inputminted[
+    firstline=44,
+    lastline=230,
     breaklines,
     linenos,
     numbersep=5pt]

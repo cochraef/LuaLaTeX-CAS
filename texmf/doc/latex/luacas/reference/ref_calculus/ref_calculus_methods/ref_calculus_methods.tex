@@ -154,7 +154,7 @@ style=numeric,
 
 \newcoderef{function IntegralExpression.table(integral)}{return Expression|nil}{integral IntegralExpression}
 
-Attempts to integrate the \texttt{integral.expression} with respect to \texttt{integral.symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
+Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -181,7 +181,7 @@ The table of integrals consists of power functions, exponentials, logarithms, tr
 
 \newcoderef{function IntegralExpression.linearproperties(integral)}{return Expression|nil}{integral IntegralExpression}
 
-Attempts to integrate the \texttt{integral.expression} with respect to \texttt{integral.symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression:integrate()}. For example:
+Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression:integrate()}. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -240,8 +240,8 @@ Attempts integrate \texttt{integral.expression} with respect to \texttt{integral
   g = f:substitutionmethod()
   h = f:enhancedsubstitutionmethod()
 \end{CAS}
-\[ \print*{g} \] 
-\[ \print*{h} \] 
+\[ g= \print*{g} \] 
+\[ h= \print*{h} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -250,14 +250,14 @@ Attempts integrate \texttt{integral.expression} with respect to \texttt{integral
     g = f:substitutionmethod()
     h = f:enhancedsubstitutionmethod()
 \end{CAS}
-\[ \print*{g} \] 
-\[ \print*{h} \] 
+\[ g= \print*{g} \] 
+\[ h= \print*{h} \] 
 \end{codebox}
 
 
 \newcoderef{function IntegralExpression.trialsubstitutions(Expression)}{return table<number, Expression}{}
 
-Generates a list of possible $u$-substitutions to attempt in \mintinline{lua}{IntegralExpression.substitutionmethod()}. 
+Generates a list of possible $u$-substitutions to attempt in \texttt{substitutionmethod()} and \texttt{enhancedsubstitutionmethod()}. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -349,24 +349,24 @@ Attempts to integrate \texttt{integral.expression} with respect to \texttt{integ
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     vars('x')
-    f = int(x*e^x,x)
-    g = f:partsmethod()
-    ff = int(e^(x^2),x)
-    gg = ff:partsmethod()
+    a = int(x*e^x,x)
+    b = a:partsmethod()
+    c = int(e^(x^2),x)
+    d = c:partsmethod()
 \end{CAS}
-\[ \print{f}= \print*{g} \] 
-\[ \print{ff} = \print*{gg} \]
+\[ b=\print*{b} \] 
+\[ d=\print*{d} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('x')
-    f = int(x*e^x,x)
-    g = f:partsmethod()
-    ff = int(e^(x^2),x)
-    gg = ff:partsmethod()
+    a = int(x*e^x,x)
+    b = a:partsmethod()
+    c = int(e^(x^2),x)
+    d = c:partsmethod()
 \end{CAS}
-\[ \print{f}= \print*{g} \] 
-\[ \print{ff} = \print*{gg} \] 
+\[ b= \print*{b} \] 
+\[ d= \print*{d} \] 
 \end{codebox}
 
 
@@ -380,24 +380,24 @@ Per usual, this method returns nil if such a method is unsuccessful (or if the i
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
   vars('x')
-  f = int(e^x*sin(x),x)
-  ff = int(x^2,x)
-  g = f:eulersformula()
-  gg = ff:eulersformula()
+  a = int(e^x*sin(x),x)
+  b = int(x^2,x)
+  c = a:eulersformula()
+  d = b:eulersformula()
 \end{CAS}
-\[ \print*{g} \] 
-\[ \print*{gg}\]
+\[ c= \print*{c} \] 
+\[ d= \print*{d} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('x')
-    f = int(e^x*sin(x),x)
-    ff = int(x^2,x)
-    g = f:eulersformula()
-    gg = ff:eulersformula()
+    a = int(e^x*sin(x),x)
+    b = int(x^2,x)
+    c = a:eulersformula()
+    d = b:eulersformula()
 \end{CAS}
-\[ \print*{g} \] 
-\[ \print*{gg}\]
+\[ c= \print*{c} \] 
+\[ d= \print*{d} \]
 \end{codebox}
 
 \newcoderef{function IntegralExpression.integrate(integral)}{return Expression|nil}{integral IntegralExpression}
@@ -412,7 +412,7 @@ Recursive part of the indefinite integral operator; returns nil if the expressio
     \item \mintinline{lua}{.eulersformula} 
     \item \mintinline{lua}{.enhancedsubstitutionmethod}
 \end{enumerate}
-Between (vi) and (vii), the \mintinline{lua}{.integrate} method will attempt to expand the integrand and retry. The method is recursive in the sense that (most) of the methods listed above will call \mintinline{lua}{.integrate} at some point. For example, after a list of trial substitutions is created, the method \mintinline{lua}{.substitutionmethod} will call \mintinline{lua}{.integrate} to determine whether the new integrand can be integrated via any of the other methods in the list. 
+Between (vi) and (vii), the \mintinline{lua}{.integrate} method will attempt to expand the integrand and retry. The method is recursive in the sense that (most) of the methods listed above will call \mintinline{lua}{.integrate} at some point. For example, after a list of trial substitutions is created, the method \mintinline{lua}{.substitutionmethod} will call \mintinline{lua}{.integrate} to determine whether the new integrand can be integrated via the methods in the above list. 
 
 \subsubsection*{Parsing}
 

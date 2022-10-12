@@ -190,7 +190,7 @@ y = SymbolExpression("y")
 \index{Core!Classes!\texttt{BinaryOperation}}
 \addcontentsline{toc}{subsubsection}{\ttfamily BinaryOperation}
 
-Creates a new \texttt{BinaryOperation}. For example:
+Creates a new \texttt{BinaryOperation} expression. For example:
 
 \begin{codebox}
 \begin{minted}[fontsize=\small]{lua}
@@ -296,7 +296,7 @@ tex.print("\\[w=", w:tolatex(), "\\]")
 }
 \end{codebox}
 \reversemarginpar
-{\bf Warning:}\marginnote{\color{rose}\faExclamationTriangle} there are escape issues to be aware of with the operator \mintinline{latex}{%}. If you're writing custom \texttt{luacas} functions in a separate \texttt{.lua} file, then there are no issues; use \mintinline{latex}{%} with reckless abandon. But when using the operator \mintinline{latex}{%} within, say \mintinline{latex}{\begin{CAS}..\end{CAS}}, then one should write \mintinline{latex}{\%} in place of \mintinline{latex}{%}:
+{\bf Warning:}\marginnote{\color{rose}\faExclamationTriangle} There are escape issues to be aware of with the operator \mintinline{latex}{%}. If you're writing custom \texttt{luacas} functions in a separate \texttt{.lua} file, then there are no issues; use \mintinline{latex}{%} with reckless abandon. But when using the operator \mintinline{latex}{%} within, say \mintinline{latex}{\begin{CAS}..\end{CAS}}, then one should write \mintinline{latex}{\%} in place of \mintinline{latex}{%}:
 
 \begin{codebox}
 \begin{minted}[breaklines,fontsize=\small]{latex}
@@ -362,7 +362,7 @@ The variable \texttt{name} can be a string (like above), or another \texttt{Symb
     \item the variable \texttt{expressions}, i.e. the table \mintinline{lua}{{x,y}} is stored in \mintinline{lua}{f.expressions}.
 \end{itemize}
 
-Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The field \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$ or $x_1,x_2,\ldots$. For example:
+Wait a minute, what about \texttt{variables} and \texttt{derivatives}!? The field \texttt{variables} essentially stores a copy of the variable \texttt{expressions} \textit{as long as} the entries in that table are atomic. If they aren't, then \texttt{variables} will default to $x,y,z$, or $x_1,x_2,\ldots$ if the number of variables exceeds $3$. For example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}

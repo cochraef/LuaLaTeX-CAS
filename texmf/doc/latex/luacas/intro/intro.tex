@@ -47,11 +47,11 @@ The package {\ttfamily luacas} allows for symbolic computation within \LaTeX{}. 
     fxy = diff(f,x,y)
 \end{CAS}
 \begin{minted}[fontsize=\small]{latex}
-    \begin{CAS}
-        vars('x','y')
-        f = 3*x*y - x^2*y 
-        fxy = diff(f,x,y)
-    \end{CAS}
+\begin{CAS}
+    vars('x','y')
+    f = 3*x*y - x^2*y 
+    fxy = diff(f,x,y)
+\end{CAS}
 \end{minted}
 The above code will compute the mixed partial derivative $f_{xy}$ of the function $f$ defined by 
 \[ f(x,y)=3xy-x^2y.\]
@@ -124,7 +124,7 @@ The packages {\ttfamily tikz}, {\ttfamily forest}, and {\ttfamily xcolor} aren't
 \subsection{Installing {\ttfamily luacas}}
 The package manager for your local TeX distribution ought to install the package fine on its own. But for those who like to take matters into their own hands: unpack \texttt{luacas.zip} in the current working directory (or in a directory visible to TeX, like your local texmf directory), and in the preamble of your document, put:
 \begin{minted}{latex}
-    \usepackage{luacas}
+\usepackage{luacas}
 \end{minted}
 That's it, you're ready to go.
 

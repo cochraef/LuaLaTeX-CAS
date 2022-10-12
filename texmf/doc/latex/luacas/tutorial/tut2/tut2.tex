@@ -110,7 +110,7 @@ This isn't exactly what Bob had in mind. It occurs to Bob that he may need to si
 
 That's more like it! Now, Bob wants to find the roots to $dh$. Bob uses the \texttt{roots} command to do this:
 
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
 \begin{CAS}
     r = roots(dh)
 \end{CAS}
@@ -310,12 +310,12 @@ For Bob's purposes, \mintinline{latex}{\fetch{h}} is exactly what he needs:
 \end{tikzpicture}
 \end{codebox}
 Alternatively, Bob could use \mintinline{latex}{\store}. The \mintinline{latex}{\store} command will \emph{fetch} the contents of its mandatory argument and store it in a macro of the same name. 
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
 \store{h}
 \store{dh}
 \end{minted}
 Now the macros \mintinline{latex}{\h} and \mintinline{latex}{\dh} can be used in place of \mintinline{latex}{\fetch{h}} and \mintinline{latex}{\fetch{dh}}, respectively. An optional argument can be used to store contents in a macro under a different name. This is useful for situations like the following:
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
 \store{r[1]}[rootone]
 \end{minted}
 Now \mintinline{latex}{\rootone} can be used in place of \mintinline{latex}{\fetch{r[1]}}. But Bob wants to fetch all the values stored in \texttt{r} (and \texttt{v}, for that matter). In this case, Bob can use:
@@ -324,7 +324,7 @@ Now \mintinline{latex}{\rootone} can be used in place of \mintinline{latex}{\fet
 \store{v}
 \end{minted}
 The command \mintinline{latex}{\store{r}} is equivalent to:
-\begin{minted}[fontsize=\small]{latex}
+\begin{minted}{latex}
 \def\r{{ \fetch{r[1]}, \fetch{r[2]}, \fetch{r[3]}, \fetch{r[4]} }}
 \end{minted}
 The contents of the \LaTeX{} macro \mintinline{latex}{\r} can be accessed with \mintinline{latex}{\pgfmathsetmacro}. For example:

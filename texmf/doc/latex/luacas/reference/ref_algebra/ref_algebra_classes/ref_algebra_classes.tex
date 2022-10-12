@@ -255,7 +255,7 @@ The contents of the environment \mintinline{latex}{\begin{CAS}..\end{CAS}} are w
 \index{Algebra!Classes!\texttt{IntegerModN}}
 \addcontentsline{toc}{subsubsection}{\ttfamily IntegerModN}
 
-Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an element in the ring $\mathbb{Z}_n$, the integers modulo $n$. 
+Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an element in the ring $\mathbf{Z}/n\mathbf{Z}$, the integers modulo $n$. 
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
@@ -314,7 +314,7 @@ The function \texttt{Mod(,)} is a shortcut for \texttt{IntegerModN(,)}:
 \index{Algebra!Classes!\texttt{PolynomialRing}}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing}
 
-Takes a table of {\ttfamily coefficients} not all necessarily in the same ring and a {\ttfamily symbol} to create a polynomial with the given {\ttfamily symbol} and coefficients in the smallest possible ring that contains all of the coefficients. If {\ttfamily degree} is omitted, it will calculate the degree of the polynomial automatically. The list can either be one-indexed or zero-indexed, but if it is one-indexed, the internal list of coefficients will still be zero-indexed.
+Takes a table of {\ttfamily coefficients}, not all necessarily in the same ring, and a {\ttfamily symbol} to create a polynomial in $\mathtt{R[x]}$ where $\mathtt{x}$ is {\ttfamily symbol} and $\mathtt{R}$ is the smallest {\ttfamily Ring} possible given the coefficients. If {\ttfamily degree} is omitted, it will calculate the degree of the polynomial automatically. The list can either be one-indexed or zero-indexed, but if it is one-indexed, the internal list of coefficients will still be zero-indexed.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}

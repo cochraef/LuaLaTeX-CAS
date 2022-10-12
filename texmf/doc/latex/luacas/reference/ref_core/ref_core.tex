@@ -127,7 +127,7 @@ style=numeric,
 
 \def\error{\color{red}}
 \def\self{\color{gray}}
-\def\call{$\star$ }
+\def\call{}
 
 \begin{document}
 \thispagestyle{empty}
@@ -163,75 +163,75 @@ rect/.style = {rectangle split,
                     },
                     forked edges
         [Expression\nodepart{two}\begin{minipage}{0.5\textwidth}\vskip-0.2cm\begin{multicols}{2}
-            {\error evaluate()} \\
-            {\error autosimplify()} \\  
-            simplify() \\ 
-            size() \\ 
-            {\error subexpressions()} \\ 
-            {\error setsubexpressions()} \\
-            {\error freeof()} \\ 
-            {\error substitute(map)} \\
-            {\self expand()} \\
-            {\self factor()} \\
-            {\self combine()} \\
-            getsubexpressionsrec() \\ 
-            {\error isatomic()} \\ 
-            {\error isconstant()} \\
-            isrealconstant() \\ 
-            iscomplexconstant() \\ 
-            {\error order(other)} \\ 
-            {\self topolynomial()} \\
-            {\error tolatex()} \\
-            type()\end{multicols}\end{minipage}
+            {\error :evaluate()} \\
+            {\error :autosimplify()} \\  
+            :simplify() \\ 
+            :size() \\ 
+            {\error :subexpressions()} \\ 
+            {\error :setsubexpressions()} \\
+            {\error :freeof(symbol)} \\ 
+            {\error :substitute(map)} \\
+            {\self :expand()} \\
+            {\self :factor()} \\
+            {\self :combine()} \\
+            :getsubexpressionsrec() \\ 
+            {\error :isatomic()} \\ 
+            {\error :isconstant()} \\
+            :isrealconstant() \\ 
+            :iscomplexconstant() \\ 
+            {\error :order(other)} \\ 
+            {\self :topolynomial()} \\
+            {\error :tolatex()} \\
+            :type()\end{multicols}\end{minipage}
             [AtomicExpression\nodepart{two}
-                {\self tocompoundexpression()} \\
-                {\self evaluate()} \\ 
-                {\self autosimplify()} \\ 
-                subexpressions() \\ 
-                {\self setsubexpressions()} \\ 
-                substitute(map) \\ 
-                isatomic() \\ 
-                tolatex()
+                {\self :tocompoundexpression()} \\
+                {\self :evaluate()} \\ 
+                {\self :autosimplify()} \\ 
+                :subexpressions() \\ 
+                {\self :setsubexpressions()} \\ 
+                :substitute(map) \\ 
+                :isatomic() \\ 
+                :tolatex()
                 [SymbolExpression\nodepart{two}
-                    {\call new(symbol)} \\
-                    freeof() \\
-                    isconstant() \\
-                    order(other) \\
-                    topolynomial()
+                    {\call :new(symbol)} \\
+                    :freeof(symbol) \\
+                    :isconstant() \\
+                    :order(other) \\
+                    :topolynomial()
                 ,fill = roseblue!50]
                 [ConstantExpression\nodepart{two}
-                    freeof()\\
-                    isconstant() \\
-                    order(other)
+                    :freeof(symbol)\\
+                    :isconstant() \\
+                    :order(other)
                 ]
             ]
             [CompoundExpression\nodepart{two}
-                freeof() \\
-                substitute(map) \\
-                isatomic() \\ 
-                isconstant()
+                :freeof(symbol) \\
+                :substitute(map) \\
+                :isatomic() \\ 
+                :isconstant()
                 [BinaryOperation\nodepart{two}
-                    {\call new(operation,expressions)} \\
-                    evaluate() \\
-                    autosimplify() (!)\\
-                    subexpressions() \\
-                    setsubexpressions() \\ 
-                    expand() \\
-                    factor() \\
-                    combine() \\
-                    order(other) \\
-                    {iscommutatitve()}\\
-                    topolynomial() \\
-                    tolatex()
+                    {\call :new(operation,expressions)} \\
+                    :evaluate() \\
+                    :autosimplify() (!)\\
+                    :subexpressions() \\
+                    :setsubexpressions() \\ 
+                    :expand() \\
+                    :factor() \\
+                    :combine() \\
+                    :order(other) \\
+                    {:iscommutatitve()}\\
+                    :topolynomial() \\
+                    :tolatex()
                 , fill=roseblue!50]
                 [FunctionExpression\nodepart{two}
-                    {\call new(name,expressions)}\\
-                    evaluate()\\
-                    autosimplify()\\
-                    subexpressions()\\
-                    setsubexpressions()\\
-                    order(other)\\
-                    tolatex()                
+                    {\call :new(name,expressions)}\\
+                    :evaluate()\\
+                    :autosimplify()\\
+                    :subexpressions()\\
+                    :setsubexpressions()\\
+                    :order(other)\\
+                    :tolatex()                
                 , fill=roseblue!50]
             ]
         ]
@@ -242,7 +242,7 @@ The number of core methods should generally be kept small, since every new type 
 All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. As mentioned previously, metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
 
 \begin{itemize}
-    \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua (and elsewhere...). 
+    \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua and exporting to external programs. 
     
     \item {\ttfamily \_\_eq} determines whether an expression is structurally identical to another expression.
 \end{itemize}
