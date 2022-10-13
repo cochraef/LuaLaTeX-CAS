@@ -511,6 +511,7 @@ If the \texttt{.ring} field is nil, then the \texttt{Rational} represents a rati
 \end{codebox}
 
 \coderef{function AbsExpression:new(expression)}{return AbsExpression}
+\addcontentsline{toc}{subsubsection}{\ttfamily AbsExpression}
 
 Creates a new absolute value expression with the given expression.
 
@@ -584,6 +585,7 @@ The function \mintinline{lua}{abs()} is a shortcut to \mintinline{lua}{AbsExpres
 \end{codebox}
 
 \newcoderef{function Logarithm:new(base,arg)}{return Logarithm}{base Expression, arg Expression}
+\addcontentsline{toc}{subsubsection}{\ttfamily Logarithm}
 
 Creates a new \texttt{Logarithm} expression with the given \texttt{base} and \texttt{arg}ument. Some basic simplification rules are known to \texttt{autosimplify()}:
 
@@ -659,6 +661,7 @@ There is also a \mintinline{lua}{ln()} function to shortcut \texttt{Logarithm} w
 \end{codebox}
 
 \newcoderef{function FactorialExpression:new(expression)}{return FactorialExpression}{expression Expression}
+\addcontentsline{toc}{subsubsection}{\ttfamily FactorialExpression}
 
 Creates a new \texttt{FactorialExpression} with the given \texttt{expression}. For example:
 
@@ -714,6 +717,7 @@ The function \mintinline{lua}{factorial()} is a shortcut to \texttt{FactorialExp
 \end{codebox}
 
 \newcoderef{function SqrtExpression:new(expression, root)}{return SqrtExpression}{expression Expression, root Integer}
+\addcontentsline{toc}{subsubsection}{\ttfamily SqrtExpression}
 
 Creates a new \texttt{SqrtExpression} with the given \texttt{expression} and \texttt{root}. Typically, \texttt{expression} is an \texttt{Integer} or \texttt{Rational}, and \texttt{SqrtExpression} is intended to represent a positive real number. If \texttt{root} is omitted, then \texttt{root} defaults to \mintinline{lua}{Integer(2)}. For example:
 
@@ -802,6 +806,7 @@ The function \mintinline{lua}{sqrt()} shortcuts \texttt{SqrtExpression()}:
 \end{codebox}
 
 \newcoderef{function TrigExpression:new(name,expression)}{return TrigExpression}{name string|SymbolExpression, expression Expression}
+\addcontentsline{toc}{subsubsection}{\ttfamily TrigExpression}
 
 Creates a new trig expression with the given \texttt{name} and \texttt{expression}. For example:
 
@@ -865,6 +870,7 @@ The usual trigonometric functions have the anticipated shortcut names. For examp
 \end{codebox}
 
 \newcoderef{function RootExpression:new(expression)}{return RootExpression}{expression Expression} 
+\addcontentsline{toc}{subsubsection}{\ttfamily RootExpression}
 
 Creates a new \texttt{RootExpression} with the given \texttt{expression}. The method \mintinline{lua}{RootExpression:autosimplify()} attempts to return a list of zeros of \texttt{expression}. If no such set can be found, then 
 

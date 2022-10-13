@@ -15,12 +15,12 @@
 
 \RequirePackage{iftex}
 \ifluatex
-    \RequirePackage{luacode}
+  \RequirePackage{luacode}
 \else
-    {\PackageError{luacas}
-    {Not running under LuaLaTeX}
-    {This package requires LuaLaTeX. Try compiling this document with\MessageBreak 'lualatex' instead of 'latex'. This is a fatal error; I'm aborting now.}%
-    }\stop
+  {\PackageError{luacas}
+  {Not running under LuaLaTeX}
+  {This package requires LuaLaTeX. Try compiling this document with\MessageBreak 'lualatex' instead of 'latex'. This is a fatal error; I'm aborting now.}%
+  }\stop
 \fi
 
 %Required Packages
@@ -37,33 +37,33 @@
 } 
 
 \NewDocumentEnvironment{CAS}%
-    {+b}%
-    {\luaexec{CASparse([[#1]])}}%
-    {}
+  {+b}%
+  {\luaexec{CASparse([[#1]])}}%
+  {}
 
 \newcommand{\get}%
-    [2][true]%
-    {\directlua{disp(#2, #1)}}  
+  [2][true]%
+  {\directlua{disp(#2, #1)}}  
     
 \newcommand{\fetch}[1]{
-    \directlua{tex.print(tostring(#1))}
+  \directlua{tex.print(tostring(#1))}
 }
 
 \NewDocumentCommand{\store}{m O{#1}}{
-    \expandafter\def\csname #2\endcsname{%
-        \directlua{
-            input = #1
-            if not input[1] then
-                tex.sprint{tostring(input)}
-            else
-                tex.sprint("{")
-                for _,entry in ipairs(input) do 
-                    tex.sprint(tostring(entry),",")
-                end
-                tex.sprint("}")
-            end
-        }%
+  \expandafter\def\csname #2\endcsname{%
+    \directlua{
+      input = #1
+      if not input[1] then
+        tex.sprint{tostring(input)}
+      else
+        tex.sprint("{")
+        for _,entry in ipairs(input) do 
+            tex.sprint(tostring(entry),",")
+        end
+        tex.sprint("}")
+      end
     }%
+  }%
 }%
 
 %%%%%%%%%%
@@ -73,158 +73,158 @@
 %pretty print
 
 \NewDocumentCommand{\print}{s m}{%
-    \IfBooleanTF{#1}{%
-        \directlua{
-            local sym = #2
-            if sym then 
-                tex.print(sym:autosimplify():tolatex())
-            else
-                tex.print('nil')
-            end
-        }%
-    }{%
-        \directlua{
-            local sym = #2
-            if sym then 
-                tex.print(sym:tolatex())
-            else
-                tex.print('nil')
-            end
-        }%
+  \IfBooleanTF{#1}{%
+    \directlua{
+      local sym = #2
+      if sym then 
+        tex.print(sym:autosimplify():tolatex())
+      else
+        tex.print('nil')
+      end
     }%
+  }{%
+    \directlua{
+      local sym = #2
+      if sym then 
+        tex.print(sym:tolatex())
+      else
+        tex.print('nil')
+      end
+    }%
+  }%
 }
 
 \NewDocumentCommand{\vprint}{s m}{%
-    \IfBooleanTF{#1}{%
-        \directlua{
-            local sym = #2
-            tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym)..[[\end{verbatim}}]])
-        }%
-    }{%
-        \directlua{
-            local sym = #2
-            tex.sprint([[\unexpanded{\begin{verbatim}]]..tostring(sym:autosimplify())..[[\end{verbatim}}]])
-        }%
+  \IfBooleanTF{#1}{%
+    \directlua{
+      local sym = #2
+      tex.sprint([[\unexpanded{\begin{verbatim}]] .. tostring(sym) .. [[\end{verbatim}}]])
     }%
+  }{%
+    \directlua{
+      local sym = #2
+      tex.sprint([[\unexpanded{\begin{verbatim}]] .. tostring(sym:autosimplify()) .. [[\end{verbatim}}]])
+    }%
+  }%
 }
 
 \NewDocumentCommand{\lprint}{m O{nil,nil}}{%
-    \luaexec{
-        local tbl = #1
-        local low,upp = #2
-        local tmp =0
-        if tbl[0] == nil then 
-            tmp = 1
-        end
-        upp = upp or \#tbl 
-        low = low or tmp
-        for i=low,upp do 
-            tex.print(tbl[i]:tolatex())
-            if tbl[i+1] then 
-                tex.print(",")
-            end 
-        end
-    }
+  \luaexec{
+    local tbl = #1
+    local low,upp = #2
+    local tmp =0
+    if tbl[0] == nil then 
+      tmp = 1
+    end
+    upp = upp or \#tbl 
+    low = low or tmp
+    for i=low,upp do 
+      tex.print(tbl[i]:tolatex())
+      if tbl[i+1] then 
+          tex.print(",")
+      end 
+    end
+  }
 }
 
 %prints the first level of an expression tree; for use within a tikzpicture environment
 
 \NewDocumentCommand{\printshrub}{s m}{%
-    \IfBooleanTF{#1}{%
-        \directlua{
-            local sym = #2
-            sym = sym:autosimplify()
-            tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
-            tex.print(sym:gettheshrub())
-            tex.print(";")
-        }%
-    }{%
-        \directlua{
-            local sym = #2
-            tex.print("\\node [label=90:",whatis(sym),"] {",nameof(sym),"}")
-            tex.print(sym:gettheshrub())
-            tex.print(";")
-        }%
+  \IfBooleanTF{#1}{%
+    \directlua{
+      local sym = #2
+      sym = sym:autosimplify()
+      tex.print("\\node [label=90:", whatis(sym), "] {", nameof(sym), "}")
+      tex.print(sym:gettheshrub())
+      tex.print(";")
+    }%
+  }{%
+    \directlua{
+      local sym = #2
+      tex.print("\\node [label=90:", whatis(sym), "] {", nameof(sym), "}")
+      tex.print(sym:gettheshrub())
+      tex.print(";")
+    }%
     }
 }
 
 %prints the full expression tree; for use within a tikzpicture environment
     
 \NewDocumentCommand{\printtree}{s m}{%
-    \IfBooleanTF{#1}{%
-        \luaexec{
-            local sym = #2
-            sym = sym:autosimplify()
-            tex.print("\\node {",nameof(sym),"}")
-            tex.print(sym:getthetree())
-            tex.print(";")
-        }%
-    }{%
-        \luaexec{
-            local sym = #2
-            tex.print("\\node {",nameof(sym),"}")
-            tex.print(sym:getthetree())
-            tex.print(";")
-        }%
-    }
+  \IfBooleanTF{#1}{%
+    \luaexec{
+      local sym = #2
+      sym = sym:autosimplify()
+      tex.print("\\node {",nameof(sym),"}")
+      tex.print(sym:getthetree())
+      tex.print(";")
+    }%
+  }{%
+    \luaexec{
+      local sym = #2
+      tex.print("\\node {",nameof(sym),"}")
+      tex.print(sym:getthetree())
+      tex.print(";")
+    }%
+  }
 }
 
 %parses an expression tree for use within the forest environment; result is stored in \forestresult
 
 \NewDocumentCommand{\parseforest}{s m}{%
-    \IfBooleanTF{#1}{%
-        \luaexec{
-            local sym = #2
-            sym = sym:autosimplify()
-            tex.print("\\def\\forestresult{")
-            tex.print("[")
-            tex.print(nameof(sym))
-            tex.print(sym:gettheforest())
-            tex.print("]")
-            tex.print("}")
-        }%
-    }{%
-        \luaexec  {
-            local sym = #2
-            tex.print("\\def\\forestresult{")
-            tex.print("[")
-            tex.print(nameof(sym))
-            tex.print(sym:gettheforest())
-            tex.print("]")
-            tex.print("}")
-        }%
-    }
+  \IfBooleanTF{#1}{%
+    \luaexec{
+      local sym = #2
+      sym = sym:autosimplify()
+      tex.print("\\def\\forestresult{")
+      tex.print("[")
+      tex.print(nameof(sym))
+      tex.print(sym:gettheforest())
+      tex.print("]")
+      tex.print("}")
+    }%
+  }{%
+    \luaexec  {
+      local sym = #2
+      tex.print("\\def\\forestresult{")
+      tex.print("[")
+      tex.print(nameof(sym))
+      tex.print(sym:gettheforest())
+      tex.print("]")
+      tex.print("}")
+    }%
+  }
 }
 
 \NewDocumentCommand{\parseshrub}{s m}{%
-    \IfBooleanTF{#1}{%
-        \luaexec{
-            local sym = #2
-            sym = sym:autosimplify()
-            tex.print("\\def\\shrubresult{")
-            tex.print("[")
-            tex.print(nameof(sym))
-            tex.print(", tikz+={\\node[anchor=south] at (.north) {test};}")
-            tex.print(sym:getthefancyshrub())
-            tex.print("]")
-            tex.print("}")
-        }%
-    }{%
-        \luaexec{
-            local sym = #2
-            tex.print("\\def\\shrubresult{")
-            tex.print("[")
-            tex.print(nameof(sym))
-            tex.print(", tikz+={\\node[anchor=south,font=\\ttfamily\\footnotesize,gray] at (.north) {",longwhatis(sym),"};}")
-            tex.print(sym:getthefancyshrub())
-            tex.print("]")
-            tex.print("}")
-        }%
-    }
+  \IfBooleanTF{#1}{%
+    \luaexec{
+      local sym = #2
+      sym = sym:autosimplify()
+      tex.print("\\def\\shrubresult{")
+      tex.print("[")
+      tex.print(nameof(sym))
+      tex.print(", tikz+={\\node[anchor=south] at (.north) {test};}")
+      tex.print(sym:getthefancyshrub())
+      tex.print("]")
+      tex.print("}")
+    }%
+  }{%
+    \luaexec{
+      local sym = #2
+      tex.print("\\def\\shrubresult{")
+      tex.print("[")
+      tex.print(nameof(sym))
+      tex.print(", tikz+={\\node[anchor=south  font=\\ttfamily\\footnotesize,gray] at (.north) {",longwhati  (sym),"};}")
+      tex.print(sym:getthefancyshrub())
+      tex.print("]")
+      tex.print("}")
+    }%
+  }
 }
 
 \NewDocumentCommand{\whatis}{m}{%
-    \luaexec{
-        tex.sprint("{\\ttfamily",longwhatis(#1),"}")
-    }%
+  \luaexec{
+    tex.sprint("{\\ttfamily",longwhatis(#1),"}")
+  }%
 }

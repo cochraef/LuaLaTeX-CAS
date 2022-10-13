@@ -105,10 +105,31 @@ We now define the \mintinline{latex}{\begin{CAS}..\end{CAS}} environment:
     {latex}
     {luacas.dat}
 
-{\bf Note:} The contents are wrapped in the function \mintinline{lua}{CASparse()}. 
+{\bf Note:} The contents are wrapped in the function \mintinline{lua}{CASparse()}. We now define the retrieving macros \mintinline{latex}{\get}, \mintinline{latex}{\fetch}, and \mintinline{latex}{\store}:
 
 \inputminted[
     firstline=44,
+    lastline=67,
+    breaklines,
+    linenos,
+    numbersep=5pt]
+    {latex}
+    {luacas.dat}
+And now we define the printing macros \mintinline{latex}{\print}, \mintinline{latex}{\vprint}, and \mintinline{latex}{\lprint}:
+
+\inputminted[
+    firstline=75,
+    lastline=128,
+    breaklines,
+    linenos,
+    numbersep=5pt]
+    {latex}
+    {luacas.dat}
+
+And finally, we define the macros useful for printing expression trees:
+
+\inputminted[
+    firstline=130,
     lastline=230,
     breaklines,
     linenos,

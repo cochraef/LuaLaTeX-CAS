@@ -7,10 +7,12 @@
 Hi 
 \begin{CAS}
     vars('x')
-    f = (1-x^2)^2
-    f = int(f,x,-1,1)
+    a = 2*cos(x)+3*sin(x)
+    b = x*cos(x)+x^2*sin(x)
+    c = a+b
+    d = c:collect(sin(x))
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{d} \] 
 
 \end{document}
 
