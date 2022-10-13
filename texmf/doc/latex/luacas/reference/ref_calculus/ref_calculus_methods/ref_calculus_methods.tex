@@ -153,6 +153,7 @@ style=numeric,
 \subsection{Calculus Methods}
 
 \newcoderef{function IntegralExpression.table(integral)}{return Expression|nil}{integral IntegralExpression}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.table}
 
 Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} by checking a table of basic integrals; returns nil if the integrand isn't in the table. For example:
 
@@ -180,6 +181,7 @@ Attempts to integrate \texttt{integral.expression} with respect to \texttt{integ
 The table of integrals consists of power functions, exponentials, logarithms, trigonometric, and inverse trigonometric functions. 
 
 \newcoderef{function IntegralExpression.linearproperties(integral)}{return Expression|nil}{integral IntegralExpression}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.linearproperties}
 
 Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} by using linearity properties (e.g. the integral of a sum/difference is the sum/difference of integrals); returns nil if any individual component cannot be integrated using \mintinline{lua}{IntegralExpression:integrate()}. For example:
 
@@ -203,6 +205,7 @@ Attempts to integrate \texttt{integral.expression} with respect to \texttt{integ
 \end{codebox} 
 
 \newcoderef{function IntegralExpression.substitutionmethod(integral)}{return Expression|nil}{integral IntegralExpression} 
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.substitutionmethod}
 
 Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} via $u$-substitution; returns nil if no suitable substitution is found to be successful. 
 
@@ -229,6 +232,7 @@ Attempts to integrate \texttt{integral.expression} with respect to \texttt{integ
 \end{codebox}
 
 \newcoderef{function IntegralExpression.enhancedsubstitutionmethod(integral)}{return Expression|nil}{integral IntegralExpression} 
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.enhancedsubstitutionmethod}
 
 Attempts integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} via $u$-substitutions. This method distinguishes itself from the \mintinline{lua}{.substitutionmethod} by attempted to solve $u= g(x)$ for the original variable and then substituting the result into the expression. This behavior is not included in \mintinline{lua}{.substitutionmethod} due to speed concerns. For example:
 
@@ -256,6 +260,7 @@ Attempts integrate \texttt{integral.expression} with respect to \texttt{integral
 
 
 \newcoderef{function IntegralExpression.trialsubstitutions(Expression)}{return table<number, Expression}{}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.trialsubstitutions}
 
 Generates a list of possible $u$-substitutions to attempt in \texttt{substitutionmethod()} and \texttt{enhancedsubstitutionmethod()}. For example:
 
@@ -281,6 +286,7 @@ $ \left\{ \lprint{l} \right\}$.
 
 
 \newcoderef{function IntegralExpression.rationalfunction(IntegralExpression)}{return Expression|nil}{}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.rationalfunction}
 
 Integrates \texttt{integrand} with respect to \texttt{symbol} via Lazard, Rioboo, Rothstein, and Trager's method in the case when \texttt{expression} is a rational function in the variable \texttt{symbol}. If \texttt{integrand} is not a rational function, then nil is returned. 
 
@@ -342,6 +348,7 @@ On the other hand:
 \end{codebox}
 
 \newcoderef{function IntegralExpression.partsmethod(IntegralExpression)}{return Expression|nil}{} 
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.partsmethod}
 
 Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} via \emph{integration by parts}; returns nil if no suitable application of IBP is found. For example:
 
@@ -371,6 +378,7 @@ Attempts to integrate \texttt{integral.expression} with respect to \texttt{integ
 
 
 \newcoderef{function IntegralExpression.eulersformula(integral)}{return Expression|nil}{integral IntegralExpression}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.eulersformula}
 
 Attempts to integrate \texttt{integral.expression} with respect to \texttt{integral.symbol} by using the Euler formulas: 
 \[ \cos x = \frac{e^{ix} + e^{-ix}}{2} \qquad \sin x = \frac{e^{ix} - e^{-ix}}{2i}.\]  
@@ -401,6 +409,7 @@ Per usual, this method returns nil if such a method is unsuccessful (or if the i
 \end{codebox}
 
 \newcoderef{function IntegralExpression.integrate(integral)}{return Expression|nil}{integral IntegralExpression}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.integrate}
 
 Recursive part of the indefinite integral operator; returns nil if the expression could not be integrated. The methods above get called (roughly) in the following order:
 \begin{enumerate}[(i)]
@@ -456,6 +465,7 @@ On the other hand:
 \end{codebox}
 
 \coderef{function IntegralExpression:isdefinite()}{return bool}
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression.isdefinite}
 
 Returns \mintinline{lua}{true} of \texttt{IntegralExpression} is definite (i.e. if \texttt{.upper} and \texttt{.lower} are defined fields), otherwise returns \mintinline{lua}{false}. 
 

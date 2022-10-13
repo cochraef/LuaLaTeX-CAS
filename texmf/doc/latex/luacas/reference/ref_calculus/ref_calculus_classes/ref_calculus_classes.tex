@@ -138,6 +138,7 @@ There are only a few classes (currently) in the calculus module all of which are
 \end{itemize}
 
 \newcoderef{function DerivativeExpression:new(expression, symbol)}{return DerivativeExpression}{expression Expression, symbol SymbolExpression} 
+\addcontentsline{toc}{subsubsection}{\ttfamily DerivativeExpression}
 
 Creates a new single-variable derivative operation of the given \texttt{expression} with respect to the given \texttt{symbol}. If \texttt{symbol} is omitted, then \texttt{symbol} takes the default value of \mintinline{lua}{SymbolExpression("x")}. For example:
 
@@ -178,6 +179,7 @@ The function \mintinline{lua}{DD()} shortcuts \mintinline{lua}{DerivativeExpress
 Alternatively, one could also use \mintinline{lua}{diff()} (see below). 
 
 \newcoderef{function DiffExpression:new(expression, symbols)}{return DiffExpression}{expression Expression, symbols table<number, Symbol>}
+\addcontentsline{toc}{subsubsection}{\ttfamily DiffExpression}
 
 Creates a new multi-variable higher-order derivative operation of the given \texttt{expression} with respect to the given \texttt{symbols}. As opposed to \texttt{DerivativeExpression}, the argument \texttt{symbols} cannot be omitted. For example:
 
@@ -233,6 +235,7 @@ The function \mintinline{lua}{diff()} shortcuts \mintinline{lua}{DiffExpression(
 \end{codebox}
 
 \newcoderef{function IntegralExpression:new(expression,symbol,lower,upper)}{return IntegralExpression}{expression Expression, symbol SymbolExpression, lower Expression, upper Expression} 
+\addcontentsline{toc}{subsubsection}{\ttfamily IntegralExpression}
 
 Creates a new integral operation of the given \texttt{expression} with respect to the given \texttt{symbol} over the given \texttt{lower} and \texttt{upper} bounds. If \texttt{lower} and \texttt{upper} are omitted, then an \emph{indefinite} \texttt{IntegralExpression} is constructed. For example:
 

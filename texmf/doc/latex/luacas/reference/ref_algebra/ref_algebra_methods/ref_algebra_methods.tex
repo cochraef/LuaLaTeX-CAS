@@ -1142,19 +1142,19 @@ Returns the prime factorization of this integer as a \texttt{BinaryOperation}.
 \coderef{function Integer:findafactor()}{return Integer}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer:findafactor}
 
-Return a non-trivial factor of n via Pollard Rho, or returns n if n is prime.
+Return a non-trivial factor of {\ttfamily Integer} via Pollard Rho, or returns {\ttfamily Integer} if {\ttfamily Integer} is prime.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    a = 408
+    a = 4199
     f = a:findafactor()
 \end{CAS}
 \[ \print{f} \mid \print{a} \] 
 \end{minted}
 \tcblower
 \begin{CAS}
-    a = 408
+    a = 4199
     f = a:findafactor()
 \end{CAS}
 \[ \print{f} \mid \print{a} \] 
@@ -1164,7 +1164,7 @@ Return a non-trivial factor of n via Pollard Rho, or returns n if n is prime.
 \coderef{function Integer:isprime()}{return bool}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer:isprime}
 
-Uses Miller-Rabin to determine whether a number is prime up to a very large number.
+Uses Miller-Rabin to determine whether {\ttfamily Integer} is prime up to a very large number.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
