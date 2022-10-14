@@ -133,9 +133,9 @@ style=numeric,
 \thispagestyle{empty}
 
 \section{Core}
-    This section contains reference materials for the core functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them. 
+    This section contains reference materials for the core functionality of \texttt{luacas}. The classes in this module are diagramed below according to inheritance along with the methods/functions one can call upon them.
     \begin{itemize}
-        \item {\error\ttfamily\itshape method}: an abstract method (a method that must be implemented by a subclass to be called); 
+        \item {\error\ttfamily\itshape method}: an abstract method (a method that must be implemented by a subclass to be called);
         \item {\self\ttfamily\itshape method}: a method that returns the expression unchanged;
         \item {\ttfamily\itshape method}: a method that is either unique, implements an abstract method, or overrides an abstract method;
         \item {\tikz[baseline=-0.5ex]\node[fill=roseblue!50] {\ttfamily\bfseries Class};}: a concrete class.
@@ -164,33 +164,33 @@ rect/.style = {rectangle split,
                     forked edges
         [Expression\nodepart{two}\begin{minipage}{0.5\textwidth}\vskip-0.2cm\begin{multicols}{2}
             {\error :evaluate()} \\
-            {\error :autosimplify()} \\  
-            :simplify() \\ 
-            :size() \\ 
-            {\error :subexpressions()} \\ 
+            {\error :autosimplify()} \\
+            :simplify() \\
+            :size() \\
+            {\error :subexpressions()} \\
             {\error :setsubexpressions()} \\
-            {\error :freeof(symbol)} \\ 
+            {\error :freeof(symbol)} \\
             {\error :substitute(map)} \\
             {\self :expand()} \\
             {\self :factor()} \\
             {\self :combine()} \\
-            :getsubexpressionsrec() \\ 
-            {\error :isatomic()} \\ 
+            :getsubexpressionsrec() \\
+            {\error :isatomic()} \\
             {\error :isconstant()} \\
-            :isrealconstant() \\ 
-            :iscomplexconstant() \\ 
-            {\error :order(other)} \\ 
+            :isrealconstant() \\
+            :iscomplexconstant() \\
+            {\error :order(other)} \\
             {\self :topolynomial()} \\
             {\error :tolatex()} \\
             :type()\end{multicols}\end{minipage}
             [AtomicExpression\nodepart{two}
                 {\self :tocompoundexpression()} \\
-                {\self :evaluate()} \\ 
-                {\self :autosimplify()} \\ 
-                :subexpressions() \\ 
-                {\self :setsubexpressions()} \\ 
-                :substitute(map) \\ 
-                :isatomic() \\ 
+                {\self :evaluate()} \\
+                {\self :autosimplify()} \\
+                :subexpressions() \\
+                {\self :setsubexpressions()} \\
+                :substitute(map) \\
+                :isatomic() \\
                 :tolatex()
                 [SymbolExpression\nodepart{two}
                     {\call :new(symbol)} \\
@@ -208,14 +208,14 @@ rect/.style = {rectangle split,
             [CompoundExpression\nodepart{two}
                 :freeof(symbol) \\
                 :substitute(map) \\
-                :isatomic() \\ 
+                :isatomic() \\
                 :isconstant()
                 [BinaryOperation\nodepart{two}
                     {\call :new(operation,expressions)} \\
                     :evaluate() \\
                     :autosimplify() (!)\\
                     :subexpressions() \\
-                    :setsubexpressions() \\ 
+                    :setsubexpressions() \\
                     :expand() \\
                     :factor() \\
                     :combine() \\
@@ -231,7 +231,7 @@ rect/.style = {rectangle split,
                     :subexpressions()\\
                     :setsubexpressions()\\
                     :order(other)\\
-                    :tolatex()                
+                    :tolatex()
                 , fill=roseblue!50]
             ]
         ]
@@ -239,11 +239,11 @@ rect/.style = {rectangle split,
 \end{center}
 The number of core methods should generally be kept small, since every new type of expression must implement all of these methods. The exception to this, of course, is core methods that call other core methods that provide a unified interface to expressions. For instance, {\ttfamily size()} calls {\ttfamily subexpressions()}, so it only needs to be implemented in the expression interface.
 
-All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. As mentioned previously, metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
+All expressions should also implement the {\ttfamily \_\_tostring} and {\ttfamily \_\_eq} metamethods. Metamethods cannot be inherited using Lua, thus every expression object created by a constructor must assign a metatable to that object.
 
 \begin{itemize}
-    \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua and exporting to external programs. 
-    
+    \item {\ttfamily \_\_tostring} provides a human-readable version of an expression for printing within Lua and exporting to external programs.
+
     \item {\ttfamily \_\_eq} determines whether an expression is structurally identical to another expression.
 \end{itemize}
 \end{document}

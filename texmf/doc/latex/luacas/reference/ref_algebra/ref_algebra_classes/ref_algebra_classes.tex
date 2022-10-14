@@ -138,14 +138,14 @@ The abstract classes in the algebra module all inherit from the \texttt{Constant
     \item \texttt{Ring}
     \item \texttt{EuclideanDomain}
     \item \texttt{Field}
-\end{itemize}    
+\end{itemize}
 
 The {\ttfamily EuclideanDomain} class is a sub-class to the {\ttfamily Ring} class, and the {\ttfamily Field} class is a sub-class to the {\ttfamily EuclideanDomain} class.
 
 The following concrete classes inherit from the {\ttfamily Ring} class (or one of the sub-classes mentioned above). However, not all of them are proper {\ttfamily ConstantExpression}s, so some of them override the {\ttfamily isconstant()} method.
 
 \begin{itemize}
-    \item {\ttfamily Integer} 
+    \item {\ttfamily Integer}
     \item {\ttfamily IntegerModN}
     \item {\ttfamily Rational}
     \item {\ttfamily PolynomialRing}
@@ -215,7 +215,7 @@ tex.print('The last 14 digits of c:', tostring([2]),'.')
 The global field {\ttfamily DIGITSIZE} is set to \texttt{14} so that exact arithmetic on {\ttfamily Integer}s can be done as efficiently as possible while respecting Lua's limitations.
 
 \subsubsection*{Fields}
-{\ttfamily Integer}s have a {\ttfamily .sign} field which contains the Lua number {\ttfamily 1} or {\ttfamily -1} depending on whether \texttt{Integer} is positive or negative. 
+{\ttfamily Integer}s have a {\ttfamily .sign} field which contains the Lua number {\ttfamily 1} or {\ttfamily -1} depending on whether \texttt{Integer} is positive or negative.
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
 tex.print('The sign of',tostring(b),'is:',tostring(b.sign))
@@ -231,7 +231,7 @@ tex.print('The sign of',tostring(b),'is:',tostring(b.sign))
 
 \subsubsection*{Parsing}
 
-The contents of the environment \mintinline{latex}{\begin{CAS}..\end{CAS}} are wrapped in the argument of a function \mintinline{lua}{CASparse()} which, among other things, seeks out digit strings intended to represent integers, and wraps those in \texttt{Integer('...')}. 
+The contents of the environment \mintinline{latex}{\begin{CAS}..\end{CAS}} are wrapped in the argument of a function \mintinline{lua}{CASparse()} which, among other things, seeks out digit strings intended to represent integers, and wraps those in \texttt{Integer('...')}.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -240,7 +240,7 @@ The contents of the environment \mintinline{latex}{\begin{CAS}..\end{CAS}} are w
 \end{CAS}
 \directlua{
     tex.print(tostring(c[1]))
-} 
+}
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -248,14 +248,14 @@ The contents of the environment \mintinline{latex}{\begin{CAS}..\end{CAS}} are w
 \end{CAS}
 \directlua{
     tex.print(tostring(c[1]))
-} 
+}
 \end{codebox}
 
 \newcoderef{function IntegerModN:new(i,n)}{return IntegerModN}{i Integer, n Integer}
 \index{Algebra!Classes!\texttt{IntegerModN}}
 \addcontentsline{toc}{subsubsection}{\ttfamily IntegerModN}
 
-Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an element in the ring $\mathbf{Z}/n\mathbf{Z}$, the integers modulo $n$. 
+Takes an {\ttfamily Integer i} and {\ttfamily Integer n} and constructs an element in the ring $\mathbf{Z}/n\mathbf{Z}$, the integers modulo $n$.
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{lua}
@@ -299,7 +299,7 @@ The function \texttt{Mod(,)} is a shortcut for \texttt{IntegerModN(,)}:
     n = 57
     a = Mod(i,n)
 \end{CAS}
-\[\print{i}\equiv\print{a}\bmod{\print{n}}\] 
+\[\print{i}\equiv\print{a}\bmod{\print{n}}\]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -307,7 +307,7 @@ The function \texttt{Mod(,)} is a shortcut for \texttt{IntegerModN(,)}:
     n = 57
     a = Mod(i,n)
 \end{CAS}
-\[ \print{i} \equiv \print{a} \bmod{\print{n}}\] 
+\[ \print{i} \equiv \print{a} \bmod{\print{n}}\]
 \end{codebox}
 
 \newcoderef{function PolynomialRing:new(coefficients, symbol, degree)}{return PolynomialRing}{coefficients table<number,Ring>, symbol string|SymbolExpression, degree Integer}
@@ -321,15 +321,15 @@ Takes a table of {\ttfamily coefficients}, not all necessarily in the same ring,
 \begin{CAS}
   f = PolynomialRing({0,1/3,-1/2,1/6},'t')
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = PolynomialRing({0,1/3,-1/2,1/6},'t')
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{codebox}
-The \texttt{PolynomialRing} class overwrites the \mintinline{lua}{isatomic()} and \mintinline{lua}{isconstant()} inheritances from the abstract class \texttt{ConstantExpression}. 
+The \texttt{PolynomialRing} class overwrites the \mintinline{lua}{isatomic()} and \mintinline{lua}{isconstant()} inheritances from the abstract class \texttt{ConstantExpression}.
 \subsubsection*{Fields}
 
 \begin{multicols}{2}
@@ -368,7 +368,7 @@ for i=0,f.degree:asnumber() do
     tostring(i),
     '}\\]')
 end
-if f.ring == Rational.getring() then 
+if f.ring == Rational.getring() then
   tex.print('Rational coefficients')
 end
 \end{minted}
@@ -384,7 +384,7 @@ for i=0,f.degree:asnumber() do
     '}\\]'
   )
   end
-  if f.ring == Rational.getring() then 
+  if f.ring == Rational.getring() then
     tex.print('Rational coefficients')
   end
 }
@@ -399,13 +399,13 @@ The function \mintinline{lua}{Poly()} is a shortcut for \mintinline{lua}{Polynom
 \begin{CAS}
     f = Poly({0,1/3,-1/2,1/6})
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = Poly({0,1/3,-1/2,1/6})
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{codebox}
 
 Alternatively, one could typeset the polynomial naturally and use the \texttt{topoly()} function. This is the same as the \texttt{topolynomial()} method except that the \texttt{autosimplify()} method is automatically called first:
@@ -417,7 +417,7 @@ Alternatively, one could typeset the polynomial naturally and use the \texttt{to
     f = 1/3*x - 1/2*x^2 + 1/6*x^3
     f = topoly(f)
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -425,14 +425,14 @@ Alternatively, one could typeset the polynomial naturally and use the \texttt{to
     f = 1/3*x - 1/2*x^2 + 1/6*x^3
     f = topoly(f)
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{codebox}
 
 \newcoderef{function Rational:new(n,d,keep)}{return Rational}{n Ring, d Ring, keep bool}
 \index{Algebra!Classes!\texttt{Rational}}
 \addcontentsline{toc}{subsubsection}{\ttfamily Rational}
 
-Takes a numerator {\ttfamily n} and denominator {\ttfamily d} in the same {\ttfamily Ring} and constructs a rational expression in the field of fractions over that ring. For the integers, this is the ring of rational numbers. If the {\ttfamily keep} flag is omitted, the constructed object will be simplified to have smallest possible denominator, possibly returning an object in the original {\ttfamily Ring}. Typically, the {\ttfamily Ring} will be either {\ttfamily Integer} or {\ttfamily PolynomialRing}, so {\ttfamily Rational} can be viewed as a constructor for either a rational number or a rational function. 
+Takes a numerator {\ttfamily n} and denominator {\ttfamily d} in the same {\ttfamily Ring} and constructs a rational expression in the field of fractions over that ring. For the integers, this is the ring of rational numbers. If the {\ttfamily keep} flag is omitted, the constructed object will be simplified to have smallest possible denominator, possibly returning an object in the original {\ttfamily Ring}. Typically, the {\ttfamily Ring} will be either {\ttfamily Integer} or {\ttfamily PolynomialRing}, so {\ttfamily Rational} can be viewed as a constructor for either a rational number or a rational function.
 
 For example:
 \begin{codebox}
@@ -469,24 +469,23 @@ tex.print('\\[',c:tolatex(),'\\]')
 
 \subsubsection*{Fields}
 
-\texttt{Rational}s naturally have the two fields: \texttt{numerator}, \texttt{denominator}. These fields store precisely what you think.
+\texttt{Rational}s naturally have the two fields: \texttt{numerator}, \texttt{denominator}. These fields store precisely what you think. \texttt{Rational}s also have a \texttt{ring} field which stores the \texttt{RingIdentifier} to which the numerator and denominator belong. (This is $\mathbb{Z}$ for the rational numbers.)
 
-If \texttt{numerator} or \texttt{denominator} are \texttt{PolynomialRing}s, then the constructed \texttt{Rational} will have two additional fields: \texttt{symbol} and \texttt{ring}. The field \texttt{ring} stores the \texttt{RingIdentifier} for the \texttt{PolynomialRing} to which either the numerator or denominator belong.
+If \texttt{numerator} or \texttt{denominator} are \texttt{PolynomialRing}s, then the constructed \texttt{Rational} will have an additional field: \texttt{symbol}. This stores the symbol the polynomial rings are constructed over.
 
 \begin{codebox}[]
     \begin{minted}{lua}
-if c.ring == PolynomialRing.getring() then 
+if c.ring == PolynomialRing.getring() then
   tex.print('$',c:tolatex(),'$ is a Rational Function in the variable',c.symbol)
 end
 \end{minted}
 \tcblower
 \luaexec{
-if c.ring == PolynomialRing.getring() then 
+if c.ring == PolynomialRing.getring() then
   tex.print('$',c:tolatex(),'$ is a Rational Function in the variable',c.symbol)
 end
 }
 \end{codebox}
-If the \texttt{.ring} field is nil, then the \texttt{Rational} represents a rational number (i.e., a ratio of \texttt{Integer}s). 
 
 \subsubsection*{Parsing}
 
@@ -499,7 +498,7 @@ If the \texttt{.ring} field is nil, then the \texttt{Rational} represents a rati
     b = Poly({4,1})
     c = a/b
 \end{CAS}
-\[ \print{c} \] 
+\[ \print{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -507,7 +506,7 @@ If the \texttt{.ring} field is nil, then the \texttt{Rational} represents a rati
     b = Poly({4,1})
     c = a/b
 \end{CAS}
-\[ \print{c} \] 
+\[ \print{c} \]
 \end{codebox}
 
 \coderef{function AbsExpression:new(expression)}{return AbsExpression}
@@ -522,7 +521,7 @@ Creates a new absolute value expression with the given expression.
     g = Poly({-1,1})
     h = AbsExpression(f/g)
 \end{CAS}
-\[ h = \print{h} \] 
+\[ h = \print{h} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -530,7 +529,7 @@ Creates a new absolute value expression with the given expression.
     g = Poly({-1,1})
     h = AbsExpression(f/g)
 \end{CAS}
-\[ h = \print{h} \] 
+\[ h = \print{h} \]
 \end{codebox}
 
 \subsubsection*{Fields}
@@ -573,7 +572,7 @@ The function \mintinline{lua}{abs()} is a shortcut to \mintinline{lua}{AbsExpres
     g = Poly({-1,1})
     h = abs(f/g)
 \end{CAS}
-\[ h = \print{h} \] 
+\[ h = \print{h} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -581,7 +580,7 @@ The function \mintinline{lua}{abs()} is a shortcut to \mintinline{lua}{AbsExpres
     g = Poly({-1,1})
     h = abs(f/g)
 \end{CAS}
-\[ h = \print{h} \] 
+\[ h = \print{h} \]
 \end{codebox}
 
 \newcoderef{function Logarithm:new(base,arg)}{return Logarithm}{base Expression, arg Expression}
@@ -595,20 +594,20 @@ Creates a new \texttt{Logarithm} expression with the given \texttt{base} and \te
     vars('b','x','y')
     f = Logarithm(b,x^y)
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{f} = \print*{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('b','x','y')
     f = Logarithm(b,x^y)
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{f} = \print*{f} \]
 \end{codebox}
 
 \subsubsection*{Fields}
 
 \begin{multicols}{2}
-\texttt{Logarithm}s have two fields: \texttt{base} and \texttt{expression}; \texttt{base} naturally stores the base of the logarithm (i.e., the first argument of \texttt{Logarithm}) while \texttt{expression} stores the argument of the logarithm (i.e., the second argument of \texttt{Logarithm}). 
+\texttt{Logarithm}s have two fields: \texttt{base} and \texttt{expression}; \texttt{base} naturally stores the base of the logarithm (i.e., the first argument of \texttt{Logarithm}) while \texttt{expression} stores the argument of the logarithm (i.e., the second argument of \texttt{Logarithm}).
 
 \begin{center}
     \parseshrub{f}
@@ -619,7 +618,7 @@ Creates a new \texttt{Logarithm} expression with the given \texttt{base} and \te
             rounded corners=1pt,
             fill = gray!20,
             s sep = 1.5cm}
-        @\shrubresult 
+        @\shrubresult
     \end{forest}
 \end{center}
 \end{multicols}
@@ -634,14 +633,14 @@ The function \mintinline{lua}{log()} is a shortcut to \texttt{Logarithm}:
     vars('b')
     f = log(b,b)
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{f} = \print*{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     vars('b')
     f = log(b,b)
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{f} = \print*{f} \]
 \end{codebox}
 
 There is also a \mintinline{lua}{ln()} function to shortcut \texttt{Logarithm} where the base is \texttt{e}, the natural exponent.
@@ -651,13 +650,13 @@ There is also a \mintinline{lua}{ln()} function to shortcut \texttt{Logarithm} w
 \begin{CAS}
     f = ln(e)
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{f} = \print*{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = ln(e)
 \end{CAS}
-\[ \print{f} = \print*{f} \] 
+\[ \print{f} = \print*{f} \]
 \end{codebox}
 
 \newcoderef{function FactorialExpression:new(expression)}{return FactorialExpression}{expression Expression}
@@ -670,33 +669,33 @@ Creates a new \texttt{FactorialExpression} with the given \texttt{expression}. F
 \begin{CAS}
     a = FactorialExpression(5)
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = FactorialExpression(5)
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{codebox}
-The \texttt{evaluate()} method will compute factorials of positive \texttt{Integer}s:
+The \texttt{evaluate()} method will compute factorials of nonnegative \texttt{Integer}s:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     a = FactorialExpression(5)
 \end{CAS}
-\[ \print{a} = \print{a:evaluate()} \] 
+\[ \print{a} = \print{a:evaluate()} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = FactorialExpression(5)
 \end{CAS}
-\[ \print{a} = \print{a:evaluate()} \] 
+\[ \print{a} = \print{a:evaluate()} \]
 \end{codebox}
 
 \subsubsection*{Fields}
 
-\texttt{FactorialExpression}s have only one field: \texttt{expression}. This field stores the argument of \texttt{FactorialExpression()}. 
+\texttt{FactorialExpression}s have only one field: \texttt{expression}. This field stores the argument of \texttt{FactorialExpression()}.
 
 \subsubsection*{Parsing}
 
@@ -707,13 +706,13 @@ The function \mintinline{lua}{factorial()} is a shortcut to \texttt{FactorialExp
 \begin{CAS}
     a = factorial(5)
 \end{CAS}
-\[ \print{a} = \print{a:evaluate()} \] 
+\[ \print{a} = \print{a:evaluate()} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = factorial(5)
 \end{CAS}
-\[ \print{a} = \print{a:evaluate()} \] 
+\[ \print{a} = \print{a:evaluate()} \]
 \end{codebox}
 
 \newcoderef{function SqrtExpression:new(expression, root)}{return SqrtExpression}{expression Expression, root Integer}
@@ -725,14 +724,14 @@ Creates a new \texttt{SqrtExpression} with the given \texttt{expression} and \te
     \begin{minted}[fontsize=\small]{lua}
 a = SqrtExpression(Integer(8))
 b = SqrtExpression(Integer(8),Integer(3))
-c = a+b 
+c = a+b
 tex.print('\\[',c:tolatex(),'\\]')
 \end{minted}
 \tcblower
 \directlua{
     a = SqrtExpression(Integer(8))
 b = SqrtExpression(Integer(8),Integer(3))
-c = a+b 
+c = a+b
 tex.print('\\[',c:tolatex(),'\\]')
 }
 \end{codebox}
@@ -794,7 +793,7 @@ The function \mintinline{lua}{sqrt()} shortcuts \texttt{SqrtExpression()}:
     b = sqrt(27/16,3)
     c = a+b
 \end{CAS}
-\[ \print{c} = \print*{c} \] 
+\[ \print{c} = \print*{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -802,7 +801,7 @@ The function \mintinline{lua}{sqrt()} shortcuts \texttt{SqrtExpression()}:
     b = sqrt(27/16,3)
     c = a+b
 \end{CAS}
-\[ \print{c} = \print*{c} \] 
+\[ \print{c} = \print*{c} \]
 \end{codebox}
 
 \newcoderef{function TrigExpression:new(name,expression)}{return TrigExpression}{name string|SymbolExpression, expression Expression}
@@ -832,7 +831,7 @@ tex.print('\\[',f:tolatex(),'\\]')
 \begin{itemize}
     \item \mintinline{lua}{TrigExpression.name} stores the string \texttt{name}, i.e. the first argument of \mintinline{lua}{TrigExpression()};
     \item \mintinline{lua}{TrigExpression.expression} stores the \texttt{Expression} \texttt{expression}, i.e. the second argument of \mintinline{lua}{TrigExpression()};
-    \item and all fields inherited from \texttt{FunctionExpression} (e.g. \mintinline{lua}{TrigExpression.derivatives} which defaults to \mintinline{lua}{Integer.zero()}). 
+    \item and all fields inherited from \texttt{FunctionExpression} (e.g. \mintinline{lua}{TrigExpression.derivatives} which defaults to \mintinline{lua}{Integer.zero()}).
 \end{itemize}
 
 \columnbreak
@@ -860,23 +859,23 @@ The usual trigonometric functions have the anticipated shortcut names. For examp
 \begin{CAS}
     f = arctan(x^2)
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = arctan(x^2)
 \end{CAS}
-\[ \print{f} \] 
+\[ \print{f} \]
 \end{codebox}
 
-\newcoderef{function RootExpression:new(expression)}{return RootExpression}{expression Expression} 
+\newcoderef{function RootExpression:new(expression)}{return RootExpression}{expression Expression}
 \addcontentsline{toc}{subsubsection}{\ttfamily RootExpression}
 
-Creates a new \texttt{RootExpression} with the given \texttt{expression}. The method \mintinline{lua}{RootExpression:autosimplify()} attempts to return a list of zeros of \texttt{expression}. If no such set can be found, then 
+Creates a new \texttt{RootExpression} with the given \texttt{expression}. The method \mintinline{lua}{RootExpression:autosimplify()} attempts to return a list of zeros of \texttt{expression}. If no such set can be found, then
 
-\mintinline{lua}{RootExpression(expression:autosimplify())} 
+\mintinline{lua}{RootExpression(expression:autosimplify())}
 
-is returned instead. At the moment, \texttt{expression} must be a univariate polynomial of degree $0,1,2$ or $3$ in order for the \texttt{autosimplify()} method to return anything interesting. Of course, \texttt{luacas} can find roots of higher degree polynomials, but this involves more machinery/methods within the \texttt{PolynomialRing} class. 
+is returned instead. At the moment, \texttt{expression} must be a univariate polynomial of degree $0,1,2$ or $3$ in order for the \texttt{autosimplify()} method to return anything interesting. Of course, \texttt{luacas} can find roots of higher degree polynomials, but this involves more machinery/methods within the \texttt{PolynomialRing} class.
 
 \subsubsection*{Fields}
 \texttt{RootExpression}s have only one field: \texttt{.expression}. For example:
@@ -887,14 +886,14 @@ is returned instead. At the moment, \texttt{expression} must be a univariate pol
     f = Poly({3,2,1})
     r = RootExpression(f)
 \end{CAS}
-\[ \print{r} \] 
+\[ \print{r} \]
 \end{minted}
-\tcblower 
+\tcblower
 \begin{CAS}
     f = Poly({3,2,1})
     r = RootExpression(f)
 \end{CAS}
-\[ \print{r} \] 
+\[ \print{r} \]
 \end{codebox}
 
 \begin{center}
@@ -906,26 +905,26 @@ is returned instead. At the moment, \texttt{expression} must be a univariate pol
         rounded corners=1pt,
         fill=gray!20,
         l sep = 2cm}
-    @\shrubresult 
+    @\shrubresult
 \end{forest}
 \end{center}
 \end{multicols}
 
 \subsubsection*{Parsing}
 
-The function \mintinline{lua}{roots()} essentially shortcuts \texttt{RootExpression()}, but when \texttt{expression} is of the \texttt{PolynomialRing}-type, then \texttt{PolynomialRing:roots()} is returned. 
+The function \mintinline{lua}{roots()} essentially shortcuts \texttt{RootExpression()}, but when \texttt{expression} is of the \texttt{PolynomialRing}-type, then \texttt{PolynomialRing:roots()} is returned.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     r = roots(f)
 \end{CAS}
-\[ \print{r[1]} \qquad \print{r[2]} \] 
+\[ \print{r[1]} \qquad \print{r[2]} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     r = roots(f)
 \end{CAS}
-\[ \print{r[1]} \qquad \print{r[2]} \] 
+\[ \print{r[1]} \qquad \print{r[2]} \]
 \end{codebox}
 \end{document}

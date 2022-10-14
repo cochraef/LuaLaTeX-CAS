@@ -179,7 +179,7 @@ Arithmetic\marginnote{\color{rose}\large\faHandPointRight} of {\ttfamily Ring} e
     g = Poly({2,5})
     h = f+g
 \end{CAS}
-\[ (\print{f}) + (\print{g}) = \print{h} \] 
+\[ (\print{f}) + (\print{g}) = \print{h} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -187,11 +187,11 @@ Arithmetic\marginnote{\color{rose}\large\faHandPointRight} of {\ttfamily Ring} e
     g = Poly({2,5})
     h = f+g
 \end{CAS}
-\[ (\print{f}) + (\print{g}) = \print{h} \] 
+\[ (\print{f}) + (\print{g}) = \print{h} \]
 \end{codebox}
-So why have the {\ttfamily Ring} class to begin with? Many of the rings in the algebra package are subsets of one another. For instance, integers are subsets of rationals, which are subsets of polynomial rings over the rationals, etc. To smoothly convert objects from one ring to another, it's good to have a class like {\ttfamily Ring} to handle all the ``traffic.'' 
+So why have the {\ttfamily Ring} class to begin with? Many of the rings in the algebra package are subsets of one another. For instance, integers are subsets of rationals, which are subsets of polynomial rings over the rationals, etc. To smoothly convert objects from one ring to another, it's good to have a class like {\ttfamily Ring} to handle all the ``traffic.''
 
-For example, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information about the exact ring of an object, including the symbol the ring has if it's a polynomial ring. To perform operations on two elements of different rings, the CAS does the following: 
+For example, the {\ttfamily RingIdentifier} object acts as a pseudo-class that stores information about the exact ring of an object, including the symbol the ring has if it's a polynomial ring. To perform operations on two elements of different rings, the CAS does the following:
 
 To get the generic {\ttfamily RingIdentifier} from a class, it uses the static method:
 \coderef{function Ring.makering()}{return RingIdentifier}
@@ -237,7 +237,7 @@ b = Integer(3)
 ring1 = a:getring()
 ring2 = b:getring()
 ring = Ring.resultantring(ring1,ring2)
-if ring == a:getring() then 
+if ring == a:getring() then
     tex.print('polynomial ring')
 end
 \end{minted}
@@ -248,7 +248,7 @@ end
     ring1 = a:getring()
     ring2 = b:getring()
     ring = Ring.resultantring(ring1,ring2)
-    if ring == a:getring() then 
+    if ring == a:getring() then
         tex.print('polynomial ring')
     end
 }
@@ -258,19 +258,19 @@ Finally, the CAS converts both objects into the resultant {\ttfamily RingIdentif
 
 \coderef{function Ring:inring(ring)}{return Ring}
 
-So, for example: 
+So, for example:
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{lua}
 b = b:inring(ring)
-if b:type() == PolynomialRing then 
+if b:type() == PolynomialRing then
     tex.print('b is a polynomial now')
 end
 \end{minted}
 \tcblower
 \luaexec{
     b = b:inring(ring)
-    if b:type() == PolynomialRing then 
+    if b:type() == PolynomialRing then
         tex.print('b is a polynomial now')
     end
 }
@@ -284,7 +284,7 @@ Finally, the CAS is able to perform the operation with the correct \mintinline{l
     b = 1/2
     c = a+b
 \end{CAS}
-\[ \print{a} + \print{b} = \print{c} \] 
+\[ \print{a} + \print{b} = \print{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -292,7 +292,7 @@ Finally, the CAS is able to perform the operation with the correct \mintinline{l
     b = 2/3
     c = a+b
 \end{CAS}
-\[ \print{a} + \print{b} = \print{c} \] 
+\[ \print{a} + \print{b} = \print{c} \]
 \end{codebox}
 
 
@@ -302,7 +302,7 @@ To add another class that implements {\ttfamily Ring} and has proper conversion 
 
 We now discuss the more arithmetic methods included in the algebra package beginning with the \texttt{PolynomialRing} class.
 
-\coderef{function PolynomialRing:decompose()}{return table<number, PolynomialRing} 
+\coderef{function PolynomialRing:decompose()}{return table<number, PolynomialRing}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing:decompose}
 
 Returns a list of polynomials that form a complete decomposition of the given polynomial. For example:
@@ -313,14 +313,14 @@ Returns a list of polynomials that form a complete decomposition of the given po
     f = Poly({5,-4,5,-2,1})
     d = f:decompose()
 \end{CAS}
-\[ \left\{ \lprint{d} \right\} \] 
+\[ \left\{ \lprint{d} \right\} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = Poly({5,-4,5,-2,1})
     d = f:decompose()
 \end{CAS}
-\[ \left\{ \lprint{d} \right\} \] 
+\[ \left\{ \lprint{d} \right\} \]
 \end{codebox}
 In particular, the code:
 \begin{minted}{lua}
@@ -335,7 +335,7 @@ recovers $f$:
 
 
 
-\coderef{function PolynomialRing.derivative()}{return PolynomialRing}
+\coderef{function PolynomialRing:derivative()}{return PolynomialRing}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing:derivative}
 
 Returns the formal derivative of the given polynomial. For example:
@@ -346,7 +346,7 @@ Returns the formal derivative of the given polynomial. For example:
     g = f:derivative()
 \end{CAS}
 \[ \print{f} \xrightarrow{d/dx}
-    \print{g} \] 
+    \print{g} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -354,10 +354,10 @@ Returns the formal derivative of the given polynomial. For example:
     g = f:derivative()
 \end{CAS}
 \[ \print{f} \xrightarrow{d/dx}
-    \print{g} \] 
+    \print{g} \]
 \end{codebox}
 
-\coderef{function PolynomialRing:divisors()}{return table<number, PolynomialRing>} 
+\coderef{function PolynomialRing:divisors()}{return table<number, PolynomialRing>}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing:divisors}
 
 Returns a list of all monic divisors of positive degree of the polynomial, assuming the polynomial ring is a Euclidean Domain. For example:
@@ -369,7 +369,7 @@ Returns a list of all monic divisors of positive degree of the polynomial, assum
     f = topoly(x^4 - 2*x^3 - x + 2)
     d = f:divisors()
 \end{CAS}
-\[ \left\{ \lprint{d} \right\} \] 
+\[ \left\{ \lprint{d} \right\} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -377,7 +377,7 @@ Returns a list of all monic divisors of positive degree of the polynomial, assum
     f = topoly(x^4 - 2*x^3 - x + 2)
     d = f:divisors()
 \end{CAS}
-\[ \left\{ \lprint{d} \right\} \] 
+\[ \left\{ \lprint{d} \right\} \]
 \end{codebox}
 
 \newcoderef{function PolynomialRing:divremainder(poly1)}{return poly2,poly3}{poly1 PolynomialRing,..., poly3 PolynomialRing}
@@ -392,8 +392,8 @@ Uses synthetic division to return the quotient (\texttt{poly2}) and remainder (\
     g = Poly({1,1})
     q,r = f:divremainder(g)
 \end{CAS}
-\[ \print{f} = (\print{g})(\print{q}) 
-    + \print{r} \] 
+\[ \print{f} = (\print{g})(\print{q})
+    + \print{r} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -401,7 +401,7 @@ Uses synthetic division to return the quotient (\texttt{poly2}) and remainder (\
     g = Poly({1,1})
     q,r = f:divremainder(g)
 \end{CAS}
-\[ \print{f} = (\print{g})(\print{q}) 
+\[ \print{f} = (\print{g})(\print{q})
     + \print{r} \]
 \end{codebox}
 
@@ -411,7 +411,7 @@ Uses synthetic division to return the quotient (\texttt{poly2}) and remainder (\
 Given two \texttt{PolynomialRing} elements \texttt{poly1,poly2} returns:
 \begin{itemize}
     \item \texttt{poly3}: the gcd of \texttt{poly1,poly2};
-    \item \texttt{poly4,poly5}: the coefficients from Bezout's lemma via the extended gcd. 
+    \item \texttt{poly4,poly5}: the coefficients from Bezout's lemma via the extended gcd.
 \end{itemize}
 For example:
 
@@ -423,8 +423,8 @@ For example:
     g = topoly((x-1)*(x+2)*(x+3))
     h,a,b = PolynomialRing.extendedgcd(f,g)
 \end{CAS}
-\[ \print{f*a+g*b} = (\print{f})\left( \print{a} \right) + 
-    (\print{g})\left(\print{b} \right)\] 
+\[ \print{f*a+g*b} = (\print{f})\left( \print{a} \right) +
+    (\print{g})\left(\print{b} \right)\]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -433,8 +433,8 @@ For example:
     g = topoly((x-1)*(x+2)*(x+3))
     h,a,b = PolynomialRing.extendedgcd(f,g)
 \end{CAS}
-\[ \print{f*a+g*b} = (\print{f})\left( \print{a} \right) + 
-    (\print{g})\left(\print{b} \right)\] 
+\[ \print{f*a+g*b} = (\print{f})\left( \print{a} \right) +
+    (\print{g})\left(\print{b} \right)\]
 \end{codebox}
 
 \subsubsection*{Parsing}
@@ -448,8 +448,8 @@ The function \texttt{gcdext()} is a shortcut to \texttt{Polynomial.extendedgcd()
     g = topoly((x+4)*(x-3))
     h,a,b = gcdext(f,g)
 \end{CAS}
-\[ \print{h} = (\print{f}) \left( \print{a} \right) + 
-    (\print{g})\left( \print{b} \right). \] 
+\[ \print{h} = (\print{f}) \left( \print{a} \right) +
+    (\print{g})\left( \print{b} \right). \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -457,7 +457,7 @@ The function \texttt{gcdext()} is a shortcut to \texttt{Polynomial.extendedgcd()
     g = topoly((x+4)*(x-3))
     h,a,b = gcdext(f,g)
 \end{CAS}
-\[ \print{h} = (\print{f}) \left( \print{a} \right) + (\print{g})\left( \print{b} \right). \] 
+\[ \print{h} = (\print{f}) \left( \print{a} \right) + (\print{g})\left( \print{b} \right). \]
 \end{codebox}
 
 \coderef{function PolynomialRing:evaluateat(Expression)}{return Expression}
@@ -494,14 +494,14 @@ Factors the given polynomial into irreducible terms over the polynomial ring to 
     f = Poly({8,24,32,24,10,2})
     a = f:factor()
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = Poly({8,24,32,24,10,2})
     a = f:factor()
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{codebox}
 
 On the other hand:
@@ -512,14 +512,14 @@ On the other hand:
     f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})
     a = f:factor()
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})
     a = f:factor()
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{codebox}
 
 The syntax \mintinline{lua}{f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})} is awkward. Alternatively, one can use the following instead:
@@ -529,14 +529,14 @@ The syntax \mintinline{lua}{f = Poly({Mod(1,5),Mod(0,5),Mod(1,5)})} is awkward. 
     f = Mod(Poly({1,0,1}),5)
     a = f:factor()
 \end{CAS}
-\[ \print{f} = \print{a} \] 
+\[ \print{f} = \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = Mod(Poly({1,0,1}),5)
     a = f:factor()
 \end{CAS}
-\[ \print{f} = \print{a} \] 
+\[ \print{f} = \print{a} \]
 \end{codebox}
 
 \subsubsection*{Parsing}
@@ -549,20 +549,20 @@ The function \mintinline{lua}{factor()} shortcuts \mintinline{lua}{PolynomialRin
     f = Poly({8,24,32,24,10,2})
     a = factor(f)
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = Poly({8,24,32,24,10,2})
     a = factor(f)
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{codebox}
 
 \newcoderef{function PolynomialRing:freeof(symbol)}{return bool}{symbol SymbolExpression}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing:freeof}
 
-Checks the value of the field \mintinline{lua}{PolynomialRing.symbol} against \texttt{symbol}; returns \mintinline{lua}{true} if these symbols are not equal, and returns \mintinline{lua}{false} otherwise. 
+Checks the value of the field \mintinline{lua}{PolynomialRing.symbol} against \texttt{symbol}; returns \mintinline{lua}{true} if these symbols are not equal, and returns \mintinline{lua}{false} otherwise.
 
 Recall: the default symbol for \texttt{Poly} is \texttt{'x'}. So, for example:
 \begin{codebox}[]
@@ -570,9 +570,9 @@ Recall: the default symbol for \texttt{Poly} is \texttt{'x'}. So, for example:
 \begin{CAS}
     f = Poly({2,2,1})
     vars('t')
-    if f:freeof(t) then 
+    if f:freeof(t) then
         tex.print('$',f:tolatex(),'$ is free of $',t:tolatex(),'$')
-    else 
+    else
         tex.print('$',f:tolatex(),'$ is bound by $',t:tolatex(),'$')
     end
 \end{CAS}
@@ -581,9 +581,9 @@ Recall: the default symbol for \texttt{Poly} is \texttt{'x'}. So, for example:
 \begin{CAS}
     f = Poly({2,2,1})
     vars('t')
-    if f:freeof(t) then 
+    if f:freeof(t) then
         tex.print('$',f:tolatex(),'$ is free of $',t:tolatex(),'$')
-    else 
+    else
         tex.print('$',f:tolatex(),'$ is bound by $',t:tolatex(),'$')
     end
 \end{CAS}
@@ -602,7 +602,7 @@ Returns the greatest common divisor of two polynomials in a ring (assuming \text
     g = topoly((x^2+1)*(x+2))
     h = PolynomialRing.gcd(f,g)
 \end{CAS}
-\[ \gcd(\print{f},\print{g}) = \print{h} \] 
+\[ \gcd(\print{f},\print{g}) = \print{h} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -611,7 +611,7 @@ Returns the greatest common divisor of two polynomials in a ring (assuming \text
     g = topoly((x^2+1)*(x+2))
     h = PolynomialRing.gcd(f,g)
 \end{CAS}
-\[ \gcd(\print{f},\print{g}) = \print{h} \] 
+\[ \gcd(\print{f},\print{g}) = \print{h} \]
 \end{codebox}
 
 \subsubsection*{Parsing}
@@ -625,7 +625,7 @@ The function \mintinline{lua}{gcd()} shortcuts \mintinline{lua}{PolynomialRing.g
     g = topoly(x^3 + 2*x^2 + x + 2)
     h = gcd(f,g)
 \end{CAS}
-\[ \gcd(\print{f},\print{g}) = \print{h}.\] 
+\[ \gcd(\print{f},\print{g}) = \print{h}.\]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -634,11 +634,11 @@ The function \mintinline{lua}{gcd()} shortcuts \mintinline{lua}{PolynomialRing.g
     g = topoly(x^3 + 2*x^2 + x + 2)
     h = gcd(f,g)
 \end{CAS}
-\[ \gcd(\print{f},\print{g}) = \print{h}.\] 
+\[ \gcd(\print{f},\print{g}) = \print{h}.\]
 \end{codebox}
 
-\coderef{function PolynomialRing.isatomic()}{return false}
-\coderef{function PolynomialRing.isconstant()}{return false}
+\coderef{function PolynomialRing:isatomic()}{return false}
+\coderef{function PolynomialRing:isconstant()}{return false}
 
 The inheritances from \texttt{ConstantExpression} are overridden for the \texttt{PolynomialRing} class.
 
@@ -655,7 +655,7 @@ Given two polynomials \texttt{poly1} and \texttt{poly2}, returns a list of the r
   r = PolynomialRing.monicgcdremainders(f,g)
 \end{CAS}
 \luaexec{
-  for i=1,\#r do 
+  for i=1,\#r do
     tex.print('\\[', r[i]:tolatex(), '\\]')
   end
 }
@@ -668,7 +668,7 @@ Given two polynomials \texttt{poly1} and \texttt{poly2}, returns a list of the r
     r = PolynomialRing.monicgcdremainders(f,g)
 \end{CAS}
 \luaexec{
-    for i=1,\#r do 
+    for i=1,\#r do
         tex.print('\\[', r[i]:tolatex(), '\\]')
     end
 }
@@ -691,7 +691,7 @@ Returns the partial fraction decomposition of the rational function \texttt{g/f}
     f = topoly((x^2+1)^2*(x+1))
     a = PolynomialRing.partialfractions(g,f)
 \end{CAS}
-\[ \print{g/f} = \print*{a} \] 
+\[ \print{g/f} = \print*{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -699,12 +699,12 @@ Returns the partial fraction decomposition of the rational function \texttt{g/f}
     f = topoly((x^2+1)^2*(x+1))
     a = PolynomialRing.partialfractions(g,f)
 \end{CAS}
-\[ \print{g/f} = \print*{a} \] 
+\[ \print{g/f} = \print*{a} \]
 \end{codebox}
 
 \subsubsection*{Parsing}
 
-The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinline{lua}{PolynomialRing.partialfractions()}. Additionally, the \texttt{parfrac} function will automatically try to convert the first two arguments to the \texttt{PolynomialRing} type via \mintinline{lua}{topoly()}. 
+The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinline{lua}{PolynomialRing.partialfractions()}. Additionally, the \texttt{parfrac} function will automatically try to convert the first two arguments to the \texttt{PolynomialRing} type via \mintinline{lua}{topoly()}.
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
@@ -712,7 +712,7 @@ The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinl
     f = (x^2+1)^2*(x+1)
     a = parfrac(g,f)
 \end{CAS}
-\[ \print{g/f} = \print*{a} \] 
+\[ \print{g/f} = \print*{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -720,13 +720,13 @@ The function \mintinline{lua}{parfrac()} shortcuts the more long winded \mintinl
     f = (x^2+1)^2*(x+1)
     a = parfrac(g,f)
 \end{CAS}
-\[ \print{g/f} = \print*{a} \] 
+\[ \print{g/f} = \print*{a} \]
 \end{codebox}
 
 \newcoderef{function PolynomialRing:rationalroots()}{return remaining, roots}{remaining PolynomialRing, roots table<number,PolynomialRing>}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing:rationalroots}
 
-This method finds the factors of \texttt{PolynomialRing} (up to multiplicity) that correspond to rational roots; these factors are stored in a table \texttt{roots} and returned in the second output of the method. Those factors are then divided out of \texttt{Polynomialring}; the \texttt{PolynomialRing} that remains is returned in the first output of the method. For example: 
+This method finds the factors of \texttt{PolynomialRing} (up to multiplicity) that correspond to rational roots; these factors are stored in a table \texttt{roots} and returned in the second output of the method. Those factors are then divided out of \texttt{Polynomialring}; the \texttt{PolynomialRing} that remains is returned in the first output of the method. For example:
 
 \begin{codebox}
     \begin{minted}[breaklines,fontsize=\small]{latex}
@@ -736,7 +736,7 @@ This method finds the factors of \texttt{PolynomialRing} (up to multiplicity) th
 \end{CAS}
 The factors of $f$ corresponding to rational roots are:
 \luaexec{
-  for i =1, \#r do 
+  for i =1, \#r do
     tex.print('\\[', r[i]:tolatex(), '\\]')
   end
 }
@@ -750,7 +750,7 @@ The part of $f$ that remains after dividing out these linear terms is:
   \end{CAS}
   The factors of $f$ corresponding to rational roots are:
   \luaexec{
-    for i =1, \#r do 
+    for i =1, \#r do
       tex.print('\\[', r[i]:tolatex(), '\\]')
     end
   }
@@ -769,14 +769,14 @@ Returns a list of roots of \texttt{PolynomialRing}, simplified up to cubics. For
     f = topoly(x^6 + 3*x^5 + 6*x^4 + 7*x^3 + 6*x^2 + 3*x + 2)
     r = f:roots()
 \end{CAS}
-$ \left\{ \lprint{r} \right\}$ 
+$ \left\{ \lprint{r} \right\}$
 \end{minted}
 \tcblower
 \begin{CAS}
     f = topoly(x^6 + 3*x^5 + 6*x^4 + 7*x^3 + 6*x^2 + 3*x + 2)
     r = f:roots()
 \end{CAS}
-$ \left\{ \lprint{r} \right\}$ 
+$ \left\{ \lprint{r} \right\}$
 \end{codebox}
 If the decomposition of \texttt{PolynomialRing} (or a factor thereof) is not a chain of cubics or lesser degree polynomials, then \texttt{RootExpression} is returned instead. For example:
 
@@ -786,14 +786,14 @@ If the decomposition of \texttt{PolynomialRing} (or a factor thereof) is not a c
     f = topoly(x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2)
     r = f:roots()
 \end{CAS}
-\[ \left\{ \lprint{r} \right\} \] 
+\[ \left\{ \lprint{r} \right\} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = topoly(x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2)
     r = f:roots()
 \end{CAS}
-\[ \left\{ \lprint{r} \right\} \] 
+\[ \left\{ \lprint{r} \right\} \]
 \end{codebox}
 
 \subsubsection*{Parsing}
@@ -806,17 +806,17 @@ The function \mintinline{lua}{roots()} shortcuts \mintinline{lua}{PolynomialRing
   f = x^6+x^5-x^4+2*x^3+4*x^2-2
   r = roots(f)
 \end{CAS}
-$ \left\{ \lprint{r} \right\}$ 
+$ \left\{ \lprint{r} \right\}$
 \end{minted}
-\tcblower        
+\tcblower
     \begin{CAS}
         f = x^6 + x^5 - x^4 + 2*x^3 + 4*x^2 - 2
         r = roots(f)
     \end{CAS}
-    $ \left\{ \lprint{r} \right\}$ 
+    $ \left\{ \lprint{r} \right\}$
 \end{codebox}
 
-\newcoderef{function PolynomialRing.resultant(a,b)}{return Field}{a PolynomialRing, b PolynomialRing} 
+\newcoderef{function PolynomialRing.resultant(a,b)}{return Field}{a PolynomialRing, b PolynomialRing}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing.resultant}
 
 Returns the resultant of two polynomials \texttt{a,b} in the same ring, whose coefficients are all part of a field. For example:
@@ -828,7 +828,7 @@ Returns the resultant of two polynomials \texttt{a,b} in the same ring, whose co
     g = topoly(x^2+2*x-3)
     r = PolynomialRing.resultant(f,g)
 \end{CAS}
-\[ \operatorname{res}(f,g) = \print{r} \] 
+\[ \operatorname{res}(f,g) = \print{r} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -836,13 +836,13 @@ Returns the resultant of two polynomials \texttt{a,b} in the same ring, whose co
     g = topoly(x^2+2*x-3)
     r = PolynomialRing.resultant(f,g)
 \end{CAS}
-\[ \operatorname{res}(f,g) = \print{r} \] 
+\[ \operatorname{res}(f,g) = \print{r} \]
 \end{codebox}
 
-\coderef{function PolynomialRing:squarefreefactorization()}{return BinaryOperation} 
+\coderef{function PolynomialRing:squarefreefactorization()}{return BinaryOperation}
 \addcontentsline{toc}{subsubsection}{\ttfamily PolynomialRing:squarefreefactorization}
 
-Returns the square-free factorization of a polynomial defined over the rationals. 
+Returns the square-free factorization of a polynomial defined over the rationals.
 
 \begin{codebox}[]
     \begin{minted}[fontsize=\small]{latex}
@@ -851,7 +851,7 @@ Returns the square-free factorization of a polynomial defined over the rationals
     f = topoly(x^7 - 13*x^6 + 66*x^5 - 158*x^4 + 149*x^3 + 63*x^2 - 216*x + 108)
     s = f:squarefreefactorization()
 \end{CAS}
-\[ \print{s} \] 
+\[ \print{s} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -862,7 +862,7 @@ Returns the square-free factorization of a polynomial defined over the rationals
 \[ \print{s} \]
 \end{codebox}
 
-If the polynomial is defined over $\mathbf{Z}/p\mathbf{Z}$ (where $p$ is prime), then the method \texttt{modularsquarefreefactorization()} should be used. 
+If the polynomial is defined over $\mathbf{Z}/p\mathbf{Z}$ (where $p$ is prime), then the method \texttt{modularsquarefreefactorization()} should be used.
 
 \subsubsection*{Parsing}
 
@@ -874,14 +874,14 @@ The function \mintinline{lua}{factor()} has an optional boolean argument that if
     f = topoly(x^6 + 2*x^5 + 4*x^4 + 4*x^3 + 5*x^2 + 2*x + 2)
     s = factor(f,true)
 \end{CAS}
-\[ \print{s} \] 
+\[ \print{s} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     f = topoly(x^6 + 2*x^5 + 4*x^4 + 4*x^3 + 5*x^2 + 2*x + 2)
     s = factor(f,true)
 \end{CAS}
-\[ \print{s} \] 
+\[ \print{s} \]
 \end{codebox}
 And also:
 \begin{codebox}[]
@@ -891,7 +891,7 @@ And also:
     f = Mod(f,5)
     s = factor(f,true)
 \end{CAS}
-\[ \print{s} \] 
+\[ \print{s} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -914,7 +914,7 @@ Returns the greatest common divisor of \texttt{a,b}. For example:
     b = 252
     c = Integer.gcd(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} \] 
+\[ \gcd(a,b) = \print{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -922,7 +922,7 @@ Returns the greatest common divisor of \texttt{a,b}. For example:
     b = 252
     c = Integer.gcd(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} \] 
+\[ \gcd(a,b) = \print{c} \]
 \end{codebox}
 
 \subsubsection*{Parsing}
@@ -934,7 +934,7 @@ The function \mintinline{lua}{gcd()} shortcuts \texttt{Integer.gcd()}. For examp
     a = 408
     b = 252
     c = gcd(a,b)
-\[ \gcd(a,b) = \print{c} \] 
+\[ \gcd(a,b) = \print{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -942,7 +942,7 @@ The function \mintinline{lua}{gcd()} shortcuts \texttt{Integer.gcd()}. For examp
     b = 252
     c = gcd(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} \] 
+\[ \gcd(a,b) = \print{c} \]
 \end{codebox}
 
 
@@ -958,7 +958,7 @@ Returns the greatest common divisor of \texttt{a,b} as well as Bezout's coeffici
     b = 252
     c,x,y = Integer.extendedgcd(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -966,7 +966,7 @@ Returns the greatest common divisor of \texttt{a,b} as well as Bezout's coeffici
     b = 252
     c,x,y = Integer.extendedgcd(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \]
 \end{codebox}
 
 \subsubsection*{Parsing}
@@ -980,7 +980,7 @@ The function \mintinline{lua}{gcdext()} shortcuts \mintinline{lua}{Integer.exten
     b = 252
     c,x,y = gcdext(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -988,14 +988,14 @@ The function \mintinline{lua}{gcdext()} shortcuts \mintinline{lua}{Integer.exten
     b = 252
     c,x,y = gcdext(a,b)
 \end{CAS}
-\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \] 
+\[ \gcd(a,b) = \print{c} = \print{a}(\print{x}) + \print{b}(\print{y}) \]
 \end{codebox}
 
 \newcoderef{function Integer.max(a,b)}{return Integer, Integer}{a Integer, b Integer}
 \newcoderef{function Integer.min(a,b)}{return Integer, Integer}{a Integer, b Integer}
 \addcontentsline{toc}{subsubsection}{{\ttfamily Integer.max} and {\ttfamily Integer.min}}
 
-Returns the max/min of \texttt{a,b}; the second output is the min/max (respectively). 
+Returns the max/min of \texttt{a,b}; the second output is the min/max (respectively).
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -1004,7 +1004,7 @@ Returns the max/min of \texttt{a,b}; the second output is the min/max (respectiv
     b = 7
     c = Integer.max(a,b)
 \end{CAS}
-\[ \max(\print{a},\print{b}) = \print{c} \] 
+\[ \max(\print{a},\print{b}) = \print{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -1012,7 +1012,7 @@ Returns the max/min of \texttt{a,b}; the second output is the min/max (respectiv
     b = 7
     c = Integer.max(a,b)
 \end{CAS}
-\[ \max(\print{a},\print{b}) = \print{c} \] 
+\[ \max(\print{a},\print{b}) = \print{c} \]
 \end{codebox}
 
 
@@ -1034,7 +1034,7 @@ Returns the ceiling of the log base (defaults to 10) of a. In other words, retur
     b = 10
     c = Integer.ceillog(a,b)
 \end{CAS}
-\[ \print{c} \] 
+\[ \print{c} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -1042,10 +1042,10 @@ Returns the ceiling of the log base (defaults to 10) of a. In other words, retur
     b = 10
     c = Integer.ceillog(a,b)
 \end{CAS}
-\[ \print{c} \] 
+\[ \print{c} \]
 \end{codebox}
 
-\newcoderef{function Integer.powmod(a,b,n)}{return Integer}{a Integer,..., n Integer} 
+\newcoderef{function Integer.powmod(a,b,n)}{return Integer}{a Integer,..., n Integer}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer.powmod}
 
 Returns the \texttt{Integer} $c$ such that $c \equiv a^b \bmod{n}$. This should be used when $a^b$ is potentially large.
@@ -1058,7 +1058,7 @@ Returns the \texttt{Integer} $c$ such that $c \equiv a^b \bmod{n}$. This should 
     p = 62501
     c = Integer.powmod(a,b,p)
 \end{CAS}
-\[ \print{c} \equiv \print{a}^{\print{b}} \bmod{\print{p}} \] 
+\[ \print{c} \equiv \print{a}^{\print{b}} \bmod{\print{p}} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -1067,10 +1067,10 @@ Returns the \texttt{Integer} $c$ such that $c \equiv a^b \bmod{n}$. This should 
     p = 62501
     c = Integer.powmod(a,b,p)
 \end{CAS}
-\[ \print{c} \equiv \print{a}^{\print{b}} \bmod{\print{p}} \] 
+\[ \print{c} \equiv \print{a}^{\print{b}} \bmod{\print{p}} \]
 \end{codebox}
 
-\newcoderef{function Integer:divremainder(b)}{return Integer, Integer}{b Integer} 
+\newcoderef{function Integer:divremainder(b)}{return Integer, Integer}{b Integer}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer:divremainder}
 
 Returns the quotient and remainder over the integers. Uses the standard base 10 long division algorithm.
@@ -1082,7 +1082,7 @@ Returns the quotient and remainder over the integers. Uses the standard base 10 
     b = 252
     q,r = Integer.divremainder(a,b)
 \end{CAS}
-\[ \print{a} = \print{b} \cdot \print{q} + \print{r} \] 
+\[ \print{a} = \print{b} \cdot \print{q} + \print{r} \]
 \end{minted}
 \tcblower
 \begin{CAS}
@@ -1090,13 +1090,13 @@ Returns the quotient and remainder over the integers. Uses the standard base 10 
     b = 252
     q,r = Integer.divremainder(a,b)
 \end{CAS}
-\[ \print{a} = \print{b} \cdot \print{q} + \print{r} \] 
+\[ \print{a} = \print{b} \cdot \print{q} + \print{r} \]
 \end{codebox}
 
 \coderef{function Integer:asnumber()}{return number}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer:asnumber}
 
-Returns this integer as a floating point number. Can only approximate the value of large integers.
+Returns the integer as a floating point number. Can only approximate the value of large integers.
 
 \coderef{function Integer:divisors()}{return table<number, Integer>}
 
@@ -1108,20 +1108,20 @@ Returns all positive divisors of the integer. Not guaranteed to be in any order.
     a = 408
     d = a:divisors()
 \end{CAS}
-\[ \left\{ \lprint{d} \right\} \] 
+\[ \left\{ \lprint{d} \right\} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = 408
     d = a:divisors()
 \end{CAS}
-\[ \left\{ \lprint{d} \right\} \] 
+\[ \left\{ \lprint{d} \right\} \]
 \end{codebox}
 
 \coderef{function Integer:primefactorization()}{return BinaryOperation}
 \addcontentsline{toc}{subsubsection}{\ttfamily Integer:primefactorization}
 
-Returns the prime factorization of this integer as a \texttt{BinaryOperation}.
+Returns the prime factorization of the integer as a \texttt{BinaryOperation}.
 
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
@@ -1129,14 +1129,14 @@ Returns the prime factorization of this integer as a \texttt{BinaryOperation}.
     a = 408
     pf = a:primefactorization()
 \end{CAS}
-\[ \print{pf} \] 
+\[ \print{pf} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = 408
     pf = a:primefactorization()
 \end{CAS}
-\[ \print{pf} \] 
+\[ \print{pf} \]
 \end{codebox}
 
 \coderef{function Integer:findafactor()}{return Integer}
@@ -1150,14 +1150,14 @@ Return a non-trivial factor of {\ttfamily Integer} via Pollard Rho, or returns {
     a = 4199
     f = a:findafactor()
 \end{CAS}
-\[ \print{f} \mid \print{a} \] 
+\[ \print{f} \mid \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = 4199
     f = a:findafactor()
 \end{CAS}
-\[ \print{f} \mid \print{a} \] 
+\[ \print{f} \mid \print{a} \]
 \end{codebox}
 
 
@@ -1170,7 +1170,7 @@ Uses Miller-Rabin to determine whether {\ttfamily Integer} is prime up to a very
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
     p = 7038304939
-    if p:isprime() then 
+    if p:isprime() then
         tex.print(p:tolatex(), "is prime!")
     end
 \end{CAS}
@@ -1178,7 +1178,7 @@ Uses Miller-Rabin to determine whether {\ttfamily Integer} is prime up to a very
 \tcblower
 \begin{CAS}
     p = 7038304939
-    if p:isprime() then 
+    if p:isprime() then
         tex.print(p:tolatex(), "is prime!")
     end
 \end{CAS}
@@ -1192,13 +1192,13 @@ Reduces a rational expression of integers to standard form. This method is calle
 \begin{codebox}
     \begin{minted}[fontsize=\small]{latex}
 \begin{CAS}
-    a = Rational(8,6)   
+    a = Rational(8,6)
 \end{CAS}
 \[ \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
-    a = Rational(8,6)  
+    a = Rational(8,6)
 \end{CAS}
 \[ \print{a} \]
 \end{codebox}
@@ -1209,7 +1209,7 @@ Reduces a rational expression of integers to standard form. This method is calle
 
 Converts a \texttt{Rational} expression into the corresponding \texttt{BinaryOperation} expression.
 
-\coderef{function Rational:asnumber()}{return number} 
+\coderef{function Rational:asnumber()}{return number}
 \addcontentsline{toc}{subsubsection}{\ttfamily Rational:asnumber}
 
 Returns the given rational as an approximate floating point number. Going the other way, the parser in \mintinline{latex}{\begin{CAS}..\end{CAS}} will convert decimals (as written) to fractions. For example:
@@ -1219,13 +1219,13 @@ Returns the given rational as an approximate floating point number. Going the ot
 \begin{CAS}
     a = 0.375
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{minted}
 \tcblower
 \begin{CAS}
     a = 0.375
 \end{CAS}
-\[ \print{a} \] 
+\[ \print{a} \]
 \end{codebox}
 
 \coderef{function SqrtExpression:topower()}{return BinaryOperation}
@@ -1245,7 +1245,7 @@ Converts a \texttt{SqrtExpression} to the appropriate \texttt{BinaryOperation}. 
 Then:
 \begin{multicols}{2}
     \begin{center}
-        \underline{Expression shrub for \texttt{a}:} 
+        \underline{Expression shrub for \texttt{a}:}
 
         \parseshrub{a}
         \bracketset{action character = @}
