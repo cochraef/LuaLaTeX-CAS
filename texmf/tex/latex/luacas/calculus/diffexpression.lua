@@ -130,7 +130,7 @@ function DiffExpression:tolatex()
     if self.degree == 1 then
         varlist = varlist .. 'd}{d' .. self.symbols[1]:tolatex() .. '}\\left(' .. self.expression:tolatex() .. '\\right)'
     end
-    if self.degree > 1 then      
+    if self.degree > 1 then
         local cvarlist = {}
         local count = 1
         for index, var in ipairs(self.symbols) do
@@ -140,7 +140,7 @@ function DiffExpression:tolatex()
                 table.insert(cvarlist,{var,count})
                 count = 1
             end
-        end  
+        end
         if #cvarlist == 1 then
             varlist = varlist .. 'd^{' .. self.degree .. '}}{' .. 'd' .. cvarlist[1][1]:tolatex() .. '^{' .. self.degree .. '}'
         end

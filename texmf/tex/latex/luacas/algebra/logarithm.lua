@@ -40,7 +40,7 @@ end
 --- @return Expression
 function Logarithm:evaluate()
 
-    if (self.base:isconstant() and (self.base <= Integer.zero() or self.base == Integer.one())) or 
+    if (self.base:isconstant() and (self.base <= Integer.zero() or self.base == Integer.one())) or
         (self.expression:isconstant() and self.expression <= Integer.zero()) then
         error("Arithmetic error: division by zero")
     end
