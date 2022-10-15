@@ -55,9 +55,9 @@ function DerivativeExpression:evaluate()
 
     -- Chain rule for arbitrary functions
 
-    if exp:type() == FunctionExpression then 
+    if exp:type() == FunctionExpression then
         local results = {}
-        for index,expression in ipairs(exp.expressions) do 
+        for index,expression in ipairs(exp.expressions) do
             local dout = FunctionExpression(exp.name,exp.expressions,exp.derivatives)
             dout.variables = exp.variables
             dout.derivatives[index] = dout.derivatives[index]+Integer.one()

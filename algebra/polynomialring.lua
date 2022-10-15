@@ -256,20 +256,20 @@ function PolynomialRing:tolatex()
     if loc == 0 then
         return self.coefficients[loc]:tolatex()
     end
-    if self.ring == Rational.getring() or self.ring == Integer.getring() or self.ring == IntegerModN.getring() then 
-        if self.coefficients[loc] ~= Integer.one() then 
+    if self.ring == Rational.getring() or self.ring == Integer.getring() or self.ring == IntegerModN.getring() then
+        if self.coefficients[loc] ~= Integer.one() then
             out = out .. self.coefficients[loc]:tolatex() .. self.symbol
         else
             out = out .. self.symbol
         end
-        if loc ~=1 then 
+        if loc ~=1 then
             out = out .. "^{" .. loc .. "}"
-        end 
+        end
         loc = loc -1
-        while loc >=0 do 
+        while loc >=0 do
             local coeff = self.coefficients[loc]
-            if coeff == Integer.one() then 
-                if loc == 0 then 
+            if coeff == Integer.one() then
+                if loc == 0 then
                     out = out .. "+" .. coeff:tolatex()
                     goto skip
                 else
@@ -277,8 +277,8 @@ function PolynomialRing:tolatex()
                     goto continue
                 end
             end
-            if coeff == Integer(-1) then 
-                if loc == 0 then 
+            if coeff == Integer(-1) then
+                if loc == 0 then
                     out = out .. "-" .. coeff:neg():tolatex()
                     goto skip
                 else
@@ -286,30 +286,30 @@ function PolynomialRing:tolatex()
                     goto continue
                 end
             end
-            if coeff < Integer.zero() then 
+            if coeff < Integer.zero() then
                 out = out .. "-" .. coeff:neg():tolatex()
-            end 
-            if coeff == Integer.zero() then 
+            end
+            if coeff == Integer.zero() then
                 goto skip
             end
-            if coeff > Integer.zero() then 
+            if coeff > Integer.zero() then
                 out = out .. "+" .. coeff:tolatex()
             end
             ::continue::
-            if loc > 1 then 
+            if loc > 1 then
                 out = out .. self.symbol .. "^{" .. loc .. "}"
-            end 
-            if loc == 1 then 
+            end
+            if loc == 1 then
                 out = out .. self.symbol
-            end 
+            end
             ::skip::
             loc = loc-1
         end
     else
-        while loc >=0 do 
+        while loc >=0 do
             if loc >=1 then
                 out = out .. self.coefficients[loc]:tolatex() .. self.symbol .. "^{" .. loc .. "} + "
-            else 
+            else
                 out = out .. self.coefficients[loc]:tolatex() .. self.symbol .. "^{" .. loc .. "}"
             end
         loc = loc-1
@@ -319,7 +319,7 @@ function PolynomialRing:tolatex()
 end
 
 function PolynomialRing:isatomic()
-    --if self.degree >= Integer.one() then 
+    --if self.degree >= Integer.one() then
     --    return false
     --else
         return false
@@ -817,10 +817,10 @@ function PolynomialRing:roots()
     for i, factor in ipairs(factorization.expressions) do
         if i > 1 then
             local decomp = factor.expressions[1]:decompose()
-            for _, poly in ipairs(decomp) do 
-                if poly.degree > Integer(3) then 
+            for _, poly in ipairs(decomp) do
+                if poly.degree > Integer(3) then
                     table.insert(roots,RootExpression(factor.expressions[1]))
-                    goto nextfactor 
+                    goto nextfactor
                 end
             end
             local factorroots = RootExpression(decomp[#decomp]):autosimplify()

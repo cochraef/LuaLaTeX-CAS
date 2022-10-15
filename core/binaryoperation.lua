@@ -164,14 +164,14 @@ function BinaryOperation:expand()
         return allsums:autosimplify()
     end
     if expanded.operation == BinaryOperation.POW and expanded.expressions[2]:type() == Integer then
-        if expanded.expressions[1]:type() ~= BinaryOperation then 
+        if expanded.expressions[1]:type() ~= BinaryOperation then
             return expanded:autosimplify()
         end
         local exp = BinaryOperation.MULEXP({Integer.one()})
         local pow = expanded.expressions[2]:asnumber()
         for _ = 1, math.abs(pow) do
             exp = exp:expand2(expanded.expressions[1])
-            if _ > 1 then 
+            if _ > 1 then
                 exp = exp:autosimplify()
             end
         end
@@ -276,19 +276,19 @@ end
 --- @return Expression
 function BinaryOperation:combine()
     local den, num, aux, mul, input = {}, {}, {}, {}, self:autosimplify():expand()
-    if input.operation ~= BinaryOperation.ADD then 
+    if input.operation ~= BinaryOperation.ADD then
         return input
     end
     for _, expr in ipairs(input.expressions) do
         local numpart, denpart = Integer.one(), Integer.one()
-        if expr.operation == BinaryOperation.POW and expr.expressions[2]:type() == Integer and expr.expressions[2] < Integer.zero() then 
+        if expr.operation == BinaryOperation.POW and expr.expressions[2]:type() == Integer and expr.expressions[2] < Integer.zero() then
             denpart = denpart*expr.expressions[1] ^ expr.expressions[2]:neg()
-            for index,term in ipairs(den) do 
+            for index,term in ipairs(den) do
                 if expr.expressions[1] == den[index] then
                     if expr.expressions[2]:neg() > mul[index] then
                         mul[index] = expr.expressions[2]:neg()
                         goto continue
-                    else 
+                    else
                         goto continue
                     end
                 end
@@ -297,13 +297,13 @@ function BinaryOperation:combine()
             table.insert(mul,expr.expressions[2]:neg())
             ::continue::
         end
-        if expr.operation == BinaryOperation.MUL then 
-            for _,subexpr in ipairs(expr.expressions) do 
+        if expr.operation == BinaryOperation.MUL then
+            for _,subexpr in ipairs(expr.expressions) do
                 if subexpr.operation == BinaryOperation.POW and subexpr.expressions[2]:type() == Integer and subexpr.expressions[2] < Integer.zero() then
-                    denpart = denpart*subexpr.expressions[1] ^ subexpr.expressions[2]:neg()   
-                    for index,term in ipairs(den) do 
+                    denpart = denpart*subexpr.expressions[1] ^ subexpr.expressions[2]:neg()
+                    for index,term in ipairs(den) do
                         if subexpr.expressions[1] == den[index] then
-                            if subexpr.expressions[2]:neg() > mul[index] then 
+                            if subexpr.expressions[2]:neg() > mul[index] then
                                 mul[index] = subexpr.expressions[2]:neg()
                                 goto continue
                             else
@@ -314,20 +314,20 @@ function BinaryOperation:combine()
                     table.insert(den,subexpr.expressions[1])
                     table.insert(mul,subexpr.expressions[2]:neg())
                     ::continue::
-                else 
-                    numpart = numpart*subexpr 
+                else
+                    numpart = numpart*subexpr
                 end
             end
         end
-        if expr.operation ~= BinaryOperation.POW and expr.operation ~= BinaryOperation.MUL then 
-            numpart = expr 
+        if expr.operation ~= BinaryOperation.POW and expr.operation ~= BinaryOperation.MUL then
+            numpart = expr
         end
         table.insert(num,numpart)
         table.insert(aux,denpart)
     end
     local denominator = Integer.one()
     local numerator   = Integer.zero()
-    for index,expr in ipairs(den) do 
+    for index,expr in ipairs(den) do
         denominator = denominator*den[index] ^ mul[index]
     end
     denominator = denominator:autosimplify()
@@ -337,9 +337,9 @@ function BinaryOperation:combine()
         numerator = numerator + expr*uncommon
     end
     numerator = numerator:simplify():factor()
-    if denominator == Integer.one() then 
-        return numerator 
-    else 
+    if denominator == Integer.one() then
+        return numerator
+    else
         return numerator/denominator
     end
 end
@@ -377,7 +377,7 @@ function BinaryOperation:collect(collect)
                                         end
     })
 
-    -- Finds all instances of a constant power of the expression to be collected, and maps each power to all terms it is multiplied by 
+    -- Finds all instances of a constant power of the expression to be collected, and maps each power to all terms it is multiplied by
     for _, expression in ipairs(collected:subexpressions()) do
         if expression == collect then
             coefficients[Integer.one()] = coefficients[Integer.one()] + Integer.one()
@@ -617,19 +617,19 @@ function BinaryOperation:tolatex()
         local sign = ''
         local out = ''
         local denom = ''
-        if self:autosimplify():isconstant() then 
-            for index, expression in ipairs(self.expressions) do 
-                if index == 1 then 
+        if self:autosimplify():isconstant() then
+            for index, expression in ipairs(self.expressions) do
+                if index == 1 then
                     out = out .. expression:tolatex()
                 else
-                    out = out .. "\\cdot " .. expression:tolatex() 
+                    out = out .. "\\cdot " .. expression:tolatex()
                 end
             end
             return out
         end
-        if #self.expressions == 2 and self.expressions[2]:type() == BinaryOperation and self.expressions[2].operation == BinaryOperation.POW and self.expressions[2].expressions[2] == -Integer.one() then 
-            out = '\\frac{' .. self.expressions[1]:tolatex() .. '}{' .. self.expressions[2].expressions[1]:tolatex() .. '}' 
-            return out 
+        if #self.expressions == 2 and self.expressions[2]:type() == BinaryOperation and self.expressions[2].operation == BinaryOperation.POW and self.expressions[2].expressions[2] == -Integer.one() then
+            out = '\\frac{' .. self.expressions[1]:tolatex() .. '}{' .. self.expressions[2].expressions[1]:tolatex() .. '}'
+            return out
         end
         for _, expression in ipairs(self.expressions) do
             if expression:type() == BinaryOperation then
@@ -689,14 +689,14 @@ function BinaryOperation:tolatex()
     if self.operation == BinaryOperation.SUB then
         local out = ''
         if not self.expressions[2] then
-            if not self.expressions[1]:isatomic() then 
+            if not self.expressions[1]:isatomic() then
                 out = '-\\left(' .. self.expressions[1]:tolatex() .. '\\right)'
-            else 
+            else
                 out = '-' .. self.expressions[1]:tolatex()
             end
         else
             for index, expression in ipairs(self.expressions) do
-                if expression.operation and (expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB) and index >1 then 
+                if expression.operation and (expression.operation == BinaryOperation.ADD or expression.operation == BinaryOperation.SUB) and index >1 then
                     out = out .. "\\left(" .. expression:tolatex() .. "\\right)"
                 else
                     out = out .. expression:tolatex()

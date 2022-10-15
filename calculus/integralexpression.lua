@@ -408,9 +408,9 @@ function IntegralExpression.trialsubstitutions(expression)
     end
 
     --Recursive part - evaluates each term in a sum.
-    if expression:type() == BinaryOperation and expression.operation == BinaryOperation.ADD then 
+    if expression:type() == BinaryOperation and expression.operation == BinaryOperation.ADD then
         substitutions[#substitutions+1] = expression
-        for _,term in ipairs(expression.expressions) do 
+        for _,term in ipairs(expression.expressions) do
             substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(term))
         end
     end
@@ -418,7 +418,7 @@ function IntegralExpression.trialsubstitutions(expression)
     -- Function forms and arguments of function forms (includes a recursive part)
     if expression:type() == TrigExpression or expression:type() == Logarithm then
         substitutions[#substitutions+1] = expression
-        if not expression.expression:isatomic() then 
+        if not expression.expression:isatomic() then
             substitutions[#substitutions+1] = expression.expression
         end
         substitutions = JoinArrays(substitutions, IntegralExpression.trialsubstitutions(expression.expression))

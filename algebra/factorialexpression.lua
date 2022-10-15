@@ -36,7 +36,7 @@ function FactorialExpression:evaluate()
         if not FactorialExpression.LIMIT then
             FactorialExpression.LIMIT = Integer(5000)
         end
-    
+
         if self.expression > FactorialExpression.LIMIT then
             return self
         end
