@@ -1275,4 +1275,31 @@ Then:
     \end{center}
 \end{multicols}
 
+\newcoderef{function Equation:solvefor(var)}{return Equation}{var SymbolExpression}
+\addcontentsline{toc}{subsubsection}{\ttfamily Equation:solvefor}
+
+Attempts to solve the equation for a particular variable.
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars("x", "y", "z")
+    lhs = e ^ (x^2 * y)
+    rhs = z + 1
+    eq = Equation(lhs, rhs):autosimplify()
+    eqx = eq:solvefor(x)
+\end{CAS}
+\[ \print{eq} \to \print{eqx} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars("x", "y", "z")
+    lhs = e ^ (x^2 * y)
+    rhs = z + 1
+    eq = Equation(lhs, rhs):autosimplify()
+    eqx = eq:solvefor(x)
+\end{CAS}
+\[ \print{eq} \to \print{eqx} \]
+\end{codebox}
+
 \end{document}

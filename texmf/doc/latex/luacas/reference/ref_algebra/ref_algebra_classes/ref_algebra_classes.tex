@@ -160,6 +160,7 @@ The other concrete classes in the Algebra package do not inherit from the {\ttfa
     \item {\ttfamily SqrtExpression}
     \item {\ttfamily TrigExpression}
     \item {\ttfamily RootExpression}
+    \item {\ttfamily Equation}
 \end{itemize}
 
 \newcoderef{function Integer:new(n)}{return Integer}{n number|string|Integer}
@@ -927,4 +928,48 @@ The function \mintinline{lua}{roots()} essentially shortcuts \texttt{RootExpress
 \end{CAS}
 \[ \print{r[1]} \qquad \print{r[2]} \]
 \end{codebox}
+
+
+\newcoderef{function Equation:new(lhs, rhs)}{return Equation}{lhs Expression, rhs Expression}
+\addcontentsline{toc}{subsubsection}{\ttfamily Equation}
+
+Creates a new \texttt{Equation} expression with the given \texttt{lhs} (left hand side) and \texttt{rhs} (right hand side). If both sides of the equation are constants, or structurally identical, \texttt{autosimplify()} will return a boolean:
+
+\begin{codebox}
+    \begin{minted}[fontsize=\small]{latex}
+\begin{CAS}
+    vars('x','y')
+    f = Equation(sin(x-y),sin(x-y))
+    g = f:autosimplify()
+\end{CAS}
+\[ \print{f} = \print{g} \]
+\end{minted}
+\tcblower
+\begin{CAS}
+    vars('x','y')
+    f = Equation(sin(x-y),sin(x-y))
+    g = f:autosimplify()
+\end{CAS}
+\[ \print{f} = true \]
+\end{codebox}
+
+\subsubsection*{Fields}
+
+\begin{multicols}{2}
+\texttt{Equation}s have two fields: \texttt{lhs} and \texttt{rhs}; which store the expressions on the left and right sides of the equation.
+
+\begin{center}
+    \parseshrub{f}
+    \bracketset{action character = @}
+    \begin{forest}
+        for tree = {font = \ttfamily,
+            draw,
+            rounded corners=1pt,
+            fill = gray!20,
+            s sep = 1.5cm}
+        @\shrubresult
+    \end{forest}
+\end{center}
+\end{multicols}
+
 \end{document}
