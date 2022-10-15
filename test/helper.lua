@@ -29,23 +29,26 @@
     if a:type() == DiffExpression then
         return "DiffExp"
     end
-    if a:type() == IntegralExpression then 
+    if a:type() == IntegralExpression then
         return "Intgrl"
     end
-    if a:type() == SqrtExpression then 
+    if a:type() == SqrtExpression then
         return "Sqrt"
     end
-    if a:type() == PolynomialRing then 
-        return "Poly" 
+    if a:type() == PolynomialRing then
+        return "Poly"
     end
-    if a:type() == AbsExpression then 
-        return "ABS" 
+    if a:type() == AbsExpression then
+        return "ABS"
     end
-    if a:type() == Logarithm then 
-        return "LOG" 
+    if a:type() == Logarithm then
+        return "LOG"
     end
-    if a:type() == RootExpression then 
-        return "RootOf" 
+    if a:type() == RootExpression then
+        return "RootOf"
+    end
+    if a:type() == Equation then
+        return "="
     end
     return "No Clue"
 end
@@ -78,39 +81,42 @@ function longwhatis(a)
     if a:type() == DiffExpression then
         return "DiffExpression"
     end
-    if a:type() == IntegralExpression then 
-        return "IntegralExpression" 
+    if a:type() == IntegralExpression then
+        return "IntegralExpression"
     end
-    if a:type() == SqrtExpression then 
-        return "SqrtExpression" 
+    if a:type() == SqrtExpression then
+        return "SqrtExpression"
     end
-    if a:type() == PolynomialRing then 
-        return "PolynomialRing" 
+    if a:type() == PolynomialRing then
+        return "PolynomialRing"
     end
-    if a:type() == AbsExpression then 
-        return "AbsExpression" 
+    if a:type() == AbsExpression then
+        return "AbsExpression"
     end
-    if a:type() == Logarithm then 
-        return "Logarithm" 
+    if a:type() == Logarithm then
+        return "Logarithm"
     end
-    if a:type() == RootExpression then 
-        return "RootExpression" 
+    if a:type() == RootExpression then
+        return "RootExpression"
+    end
+    if a:type() == Equation then
+        return "Equation"
     end
     return "No Clue"
 end
 
 function whatring(a)
-    if a:getring() == Rational.makering() then 
-        return "Rational" 
+    if a:getring() == Rational.makering() then
+        return "Rational"
     end
-    if a:getring() == PolynomialRing.makering() then 
-        return "PolynomialRing" 
+    if a:getring() == PolynomialRing.makering() then
+        return "PolynomialRing"
     end
-    if a:getring() == Integer.makering() then 
+    if a:getring() == Integer.makering() then
         return "Integer"
     end
-    if a:getring() == IntegerModN.makering() then 
-        return "IntegerModN" 
+    if a:getring() == IntegerModN.makering() then
+        return "IntegerModN"
     end
     return "No Clue"
 end
@@ -155,23 +161,23 @@ function nameof(sym)
     if sym:type() == DiffExpression then
         return "diff"
     end
-    if sym:type() == IntegralExpression then 
-        return "$\\mathtt{\\int}$" 
+    if sym:type() == IntegralExpression then
+        return "$\\mathtt{\\int}$"
     end
-    if sym:type() == SqrtExpression then 
+    if sym:type() == SqrtExpression then
         return "$\\mathtt{\\sqrt{\\phantom{x}}}$"
     end
-    if sym:type() == PolynomialRing then 
-        return "Poly" 
+    if sym:type() == PolynomialRing then
+        return "Poly"
     end
-    if sym:type() == AbsExpression then 
-        return "abs" 
+    if sym:type() == AbsExpression then
+        return "abs"
     end
-    if sym:type() == Logarithm then 
-        return "log" 
+    if sym:type() == Logarithm then
+        return "log"
     end
-    if sym:type() == RootExpression then 
-        return "RootOf" 
+    if sym:type() == RootExpression then
+        return "RootOf"
     end
     return "No Clue"
 end
@@ -219,35 +225,35 @@ end
 
 function Expression:getthefancyshrub()
     local string = ""
-    if self:type() == DiffExpression then 
+    if self:type() == DiffExpression then
         for _, expression in ipairs(self:subexpressions()) do
             string = string.." [ $\\mathtt{"..expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
         end
         string = string.." [ $\\mathtt{\\{"
-        for _,symbol in ipairs(self.symbols) do 
-            if next(self.symbols,_) == nil then 
+        for _,symbol in ipairs(self.symbols) do
+            if next(self.symbols,_) == nil then
                 string = string .. symbol:tolatex().."\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.symbols};} ] "
             else
-                string = string .. symbol:tolatex() .. "," 
+                string = string .. symbol:tolatex() .. ","
             end
         end
         return string
     end
-    if self:type() == IntegralExpression then 
+    if self:type() == IntegralExpression then
         string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
         string = string .. "[ $\\mathtt{"..self.symbol:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.symbol};} ]"
-        if self:isdefinite() then 
+        if self:isdefinite() then
             string = string .. "[ $\\mathtt{"..self.lower:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.lower};} ] "
             string = string .. "[ $\\mathtt{"..self.upper:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.upper};} ] "
-            return string 
-        end 
+            return string
+        end
         return string
     end
-    if self:type() == PolynomialRing then 
+    if self:type() == PolynomialRing then
         string = string .. " [ $\\mathtt{\\{"
-        for index=0, self.degree:asnumber() do 
+        for index=0, self.degree:asnumber() do
             string = string .. tostring(self.coefficients[index])
-            if index < self.degree:asnumber() then 
+            if index < self.degree:asnumber() then
                 string = string .. ","
             end
         end
@@ -255,43 +261,43 @@ function Expression:getthefancyshrub()
         string = string .. " [ $\\mathtt{"..self.symbol.. "}$, tikz+={\\node[anchor=north, font=\\ttfamily\\footnotesize,gray] at (.south) {.symbol};} ]"
         return string
     end
-    if self:type() == SqrtExpression then 
+    if self:type() == SqrtExpression then
         string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]"
         string = string .. "[ $\\mathtt{"..self.root:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.root};} ]"
         return string
     end
-    if self:type() == TrigExpression then 
+    if self:type() == TrigExpression then
         string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]"
         return string
     end
-    if self:type() == AbsExpression then 
-        string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] " 
-        return string 
+    if self:type() == AbsExpression then
+        string = string .. " [ $\\mathtt{"..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ] "
+        return string
     end
-    if self:type() == Logarithm then 
-        string = string .. " [$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]" 
+    if self:type() == Logarithm then
+        string = string .. " [$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]"
         string = string .. " [$\\mathtt{" ..self.base:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray]  at (.south) {.base};} ]"
-        return string 
+        return string
     end
-    if self:type() == RootExpression then 
-        string = string .. "[$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]" 
-        return string 
+    if self:type() == RootExpression then
+        string = string .. "[$\\mathtt{" ..self.expression:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expression};} ]"
+        return string
     end
-    if self:type() == FunctionExpression then 
+    if self:type() == FunctionExpression then
         local string1 = ''
         local string2 = ''
         local string3 = ''
-        for index=1, #self.variables do 
+        for index=1, #self.variables do
             string1 = string1 .. tostring(self.expressions[index])
-            if index < #self.variables then 
+            if index < #self.variables then
                 string1 = string1 .. ","
             end
             string2 = string2 .. tostring(self.variables[index])
-            if index < #self.variables then 
+            if index < #self.variables then
                 string2 = string2 .. ","
             end
             string3 = string3 .. tostring(self.derivatives[index])
-            if index < #self.variables then 
+            if index < #self.variables then
                 string3 = string3 .. ","
             end
         end
