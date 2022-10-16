@@ -71,13 +71,13 @@ The core CAS program is written purely in Lua and integrated into \LaTeX{} via L
 
 The target audience for this package are mathematics students, instructors, and professionals who would like some ability to perform basic symbolic computations within \LaTeX{} without the need for laborious and technical setup. But truly, this package was born out of a desire from the authors to learn more about symbolic computation. What you're looking at here is the proverbial ``carrot at the end of the stick'' to keep our learning moving forward.
 
-Using a scripting language (like Lua) for the core CAS reduces performance dramatically, but the following considerations make it a good option for our intentions:
+Using a scripting language (like Lua) as opposed to a compiled language for the core CAS reduces performance dramatically, but the following considerations make it a good option for our intentions:
 
 \begin{itemize}
     \item Compiled languages that can communicate with \LaTeX{} in some way (such as C through Lua) require compiling the code on each machine before running, reducing portability.
     \item Our target usage would generally not involve computations that take longer than a second, such as factoring large primes or polynomials.
     \item Lua is a fast scripting language, especially when compared to Python, and is designed to be compact and portable.
-    \item If C code could be used, we could tie into one of many open-source C symbolic calculators, but the point of this project is to learn the mathematics of symbolic computation. The barebones but friendly nature of Lua makes it an ideal language from a pedagogical point of view.
+    \item If C code could be used, we could tie into one of many open-source C symbolic calculators, but the point of this project is to learn the mathematics of symbolic computation. The barebones but friendly nature of Lua makes it an ideal language for these intents from a pedagogical point of view.
 \end{itemize}
 
 \subsection{Features}
