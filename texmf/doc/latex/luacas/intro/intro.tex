@@ -67,7 +67,7 @@ There are various methods for fetching and/or printing results from the CAS with
 
 \subsection{About}
 
-The core CAS program is written purely in Lua and integrated into \LaTeX{} via Lua\LaTeX{}. Currently, most existing computer algebra systems such as Maple and Mathematica allow converting their stored expressions to \LaTeX{} code, but this still requires exporting code from \LaTeX{} to another program and importing it back, which can be tedious.
+The core CAS program is written purely in Lua and integrated into \LaTeX{} via Lua\LaTeX{}. Currently, most existing computer algebra systems such as Maple and Mathematica allow for converting their stored expressions to \LaTeX{} code, but this still requires exporting code from \LaTeX{} to another program and importing it back, which can be tedious.
 
 The target audience for this package are mathematics students, instructors, and professionals who would like some ability to perform basic symbolic computations within \LaTeX{} without the need for laborious and technical setup. But truly, this package was born out of a desire from the authors to learn more about symbolic computation. What you're looking at here is the proverbial ``carrot at the end of the stick'' to keep our learning moving forward.
 
@@ -77,7 +77,7 @@ Using a scripting language (like Lua) as opposed to a compiled language for the 
     \item Compiled languages that can communicate with \LaTeX{} in some way (such as C through Lua) require compiling the code on each machine before running, reducing portability.
     \item Our target usage would generally not involve computations that take longer than a second, such as factoring large primes or polynomials.
     \item Lua is a fast scripting language, especially when compared to Python, and is designed to be compact and portable.
-    \item If C code could be used, we could tie into one of many open-source C symbolic calculators, but the point of this project is to learn the mathematics of symbolic computation. The barebones but friendly nature of Lua makes it an ideal language for these intents from a pedagogical point of view.
+    \item If C code could be used, we could tie into one of many open-source C symbolic calculators, but the point of this project was (and continues to be) to learn the mathematics of symbolic computation. The barebones but friendly nature of Lua made it an ideal language for those intents.
 \end{itemize}
 
 \subsection{Features}
@@ -105,7 +105,7 @@ We'd like to thank the faculty of the Department of Mathematics at Rose-Hulman I
 
 \subsection{Requirements}
 
-The \texttt{luacas} package (naturally) requires you to compile with Lua\LaTeX{}. Beyond that, the following packages are needed:
+The \texttt{luacas} package (naturally) requires you to compile with Lua\LaTeX{} (Lua 5.3 or higher is required in particular). Beyond that, the following packages are needed:
 \begin{multicols}{2}
 {\ttfamily
 \begin{itemize}
@@ -130,6 +130,14 @@ That's it, you're ready to go.
 
 \subsection{Todo}
 
-Put todo stuff here.
+Beyond squashing bugs that inevitably exist in any new piece of software, future enhancements to \texttt{luacas} may include:
+\begin{itemize}
+    \item Improvements to existing functionality, e.g., a more powerful \texttt{simplify()} command and more powerful expression manipulation tools in general, particularly in relation to complex numbers, a designated class for multivariable polynomial rings, irreducible factorization over multivariable polynomial rings, and performance improvements;
+    \item New features in the existing packages, such as sum and product expressions \& symbolic evaluation of both, and symbolic differential equation solving;
+    \item New packages, such as for logic (boolean expressions), set theory (sets), and linear algebra (vectors and matrices), and autosimplification rules and algorithms for all of them;
+    \item Numeric functionality, such as numeric root-finding, linear algebra, integration, and differentiation;
+    \item A parser capable of evaluating arbitrary LaTeX code and turning it into CAS expressions.
+\end{itemize}
+
 
 \end{document}
