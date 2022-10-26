@@ -6,14 +6,17 @@
 \begin{document}
 Hi 
 \begin{CAS}
-    vars('x')
-    a = 2*cos(x)+3*sin(x)
-    b = x*cos(x)+x^2*sin(x)
-    c = a+b
-    d = c:collect(sin(x))
+    vars('x','f')
+    f = f(x)
+    df = diff(f,x)
 \end{CAS}
-\[ \print{d} \] 
-
+\[ \print*{f} \qquad \print*{df} \] 
+\begin{CAS}
+    g = f + df 
+    g = g:autosimplify()
+    g = substitute({[x]=1},g)
+\end{CAS}
+\[ \print*{g} \] 
 \end{document}
 
 

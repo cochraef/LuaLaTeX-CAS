@@ -50,7 +50,7 @@ style=numeric,
 
 \subsection{Tutorial 2: Finding Maxima/Minima}
 
-Bob is teaching calculus too, and he wants to give his students many examples of \emph{finding the local max/min of a given function}. But, like Alice, Bob doesn't want to work out a bunch of examples by-hand. Bob decides to try his hand with \texttt{luacas} after having been taught the basics by Alice. 
+Bob is teaching calculus too, and he wants to give his students many examples of the process of \emph{finding the local max/min of a given function}. But, like Alice, Bob doesn't want to work out a bunch of examples by-hand. Bob decides to try his hand with \texttt{luacas} after having been taught the basics by Alice. 
 
 Bob decides to stick with polynomials for these examples; if anything because those functions are in the wheel-house of \texttt{luacas}. In particular, Bob decides that the \emph{derivative} of the function he wants to use should be a composition of quadratics. This ought to ensure that the roots of that derivative are expressible in a nice way. 
 
@@ -211,7 +211,7 @@ v = simplify(substitute({[x]=r[1]},h))
 \end{minted} 
 The parser sees \mintinline{lua}{r[1]} and interprets \texttt{1} as \texttt{Integer(1)} -- but \mintinline{lua}{r[Integer(1)]} is \texttt{nil}, so no substitution is performed. 
 
-The good news is that, excluding the annoyance between \texttt{Integer} and Lua number, interacting with the CAS via \mintinline{latex}{\directlua} is not much different than interacting with it via \mintinline{latex}{\begin{CAS}..\end{CAS}}
+The good news is that, excluding the annoyance between \texttt{Integer} and Lua number, interacting with the CAS via \mintinline{latex}{\directlua} is not much different than interacting with it via \mintinline{latex}{\begin{CAS}..\end{CAS}}.
 
 \subsubsection*{Back to the tutorial...}
 
@@ -259,7 +259,7 @@ The function \mintinline{lua}{ZTable()} sets indices appropriately for use withi
 }
 \[ \left\{ \lprint{v} \right\} \] 
 \end{codebox}
-Great! But still; Bob doesn't want to just pretty-print the roots of $dh$. Bob is determined to plot the results -- he wants to hammer home the point that the roots of $dh$ point to the local extrema of $h$. 
+Great! But still; Bob doesn't want to just pretty-print the roots of $dh$ (or the values that $h$ takes at those roots). Bob is determined to plot the results -- he wants to hammer home the point that the roots of $dh$ point to the local extrema of $h$. 
 
 Luckily, Bob is familiar with some of the fantastic graphics tools in the \LaTeX{} ecosystem, like \texttt{pgfplots} and \texttt{asymptote}. But then Bob begins to wonder, ``How can I yoink results out of \texttt{luacas} so that I may yeet them into something like \texttt{pgfplots}?''
 Bob is delighted to find the following commands: \mintinline{latex}{\fetch} and \mintinline{latex}{\store}.

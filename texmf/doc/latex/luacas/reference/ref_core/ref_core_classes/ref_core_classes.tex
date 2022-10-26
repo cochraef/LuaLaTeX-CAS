@@ -318,13 +318,11 @@ tex.print("\\[w=", w:tolatex(), "\\]")
 \end{codebox}
 The above escape will {\bf not} work with \mintinline{latex}{\directlua}, but it will work for \mintinline{latex}{\luaexec} from the \texttt{luacode} package. Indeed, the \texttt{luacode} package was designed (in part) to make escapes like this more manageable. Here is the equivalent code using \mintinline{latex}{\luaexec}:
 \begin{codebox}[]
-\begin{minted}[fontsize=\small]{latex}
-\luaexec{
+\begin{minted}[fontsize=\small]{lua}
 a = Integer(17)
 b = Integer(5)
 c = a \% b
 tex.print("\\[",c:tolatex(),"\\equiv",a:tolatex(), "\\bmod{",b:tolatex(),"} \\]")
-}
 \end{minted}
 \tcblower
 \luaexec{
