@@ -179,6 +179,9 @@ function nameof(sym)
     if sym:type() == RootExpression then
         return "RootOf"
     end
+    if sym:type() == Equation then 
+        return "$\\mathtt{=}$" 
+    end
     return "No Clue"
 end
 
@@ -304,6 +307,11 @@ function Expression:getthefancyshrub()
         string = string .. "[$\\mathtt{ \\{" .. string1 .. "\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.expressions};} ]"
         string = string .. "[$\\mathtt{ \\{" .. string2 .. "\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.variables};} ]"
         string = string .. "[$\\mathtt{ \\{" .. string3 .. "\\}}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.derivatives};} ]"
+        return string
+    end
+    if self:type() == Equation then 
+        string = string .. " [$\\mathtt{" ..self.lhs:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray] at (.south) {.lhs};} ]"
+        string = string .. " [$\\mathtt{" ..self.rhs:tolatex().."}$, tikz+={\\node[anchor=north,font=\\ttfamily\\footnotesize,gray]  at (.south) {.rhs};} ]"
         return string
     end
     for index, expression in ipairs(self:subexpressions()) do
