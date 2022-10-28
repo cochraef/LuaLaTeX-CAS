@@ -13,3 +13,10 @@
 *.ilg
 *.xml
 *.pyg
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.ind
+.vscode/
+
