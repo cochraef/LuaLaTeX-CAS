@@ -53,7 +53,7 @@ The package {\ttfamily luacas} allows for symbolic computation within \LaTeX{}. 
     fxy = diff(f,x,y)
 \end{CAS}
 \end{minted}
-The above code will compute the mixed partial derivative $f_{xy}$ of the function $f$ defined by
+The above code will compute the mixed partial derivative $f_{xy}$ of the function $f$ defined by 
 \[ f(x,y)=3xy-x^2y.\]
 There are various methods for fetching and/or printing results from the CAS within your \LaTeX{} document:
 
@@ -95,7 +95,7 @@ Currently, {\ttfamily luacas} includes the following functionality:
     \item Symbolic differentiation and integration
 \end{itemize}
 
-The CAS is written using object-oriented Lua, so it is modular and would be easy to extend its functionality (which we hope to do in the future).
+The CAS is written using object-oriented Lua, so it is modular and would be easy to extend its functionality.
 
 \subsection{Acknowledgements}
 
@@ -136,7 +136,7 @@ Beyond squashing bugs that inevitably exist in any new piece of software, future
     \item New features in the existing packages, such as sum and product expressions \& symbolic evaluation of both, and symbolic differential equation solving;
     \item New packages, such as for logic (boolean expressions), set theory (sets), and linear algebra (vectors and matrices), and autosimplification rules and algorithms for all of them;
     \item Numeric functionality, such as numeric root-finding, linear algebra, integration, and differentiation;
-    \item A parser capable of evaluating arbitrary LaTeX code and turning it into CAS expressions.
+    \item A parser capable of evaluating arbitrary \LaTeX{} code and turning it into CAS expressions.
 \end{itemize}
 
 
