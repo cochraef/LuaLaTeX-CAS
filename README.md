@@ -10,6 +10,10 @@ The Lua CAS itself can be downloaded or cloned from [https://github.com/cochraef
 
 The package manager for your local TeX distribution ought to work just fine. Alternatively, download luacas.tds.zip and unzip the file in the root of one of your TDS trees. You may need to update some filename database after this (this may vary depending on your TeX distribution).
 
+# Authors
+
+This package is authored and maintained by Evan Cochrane and Timothy All.
+
 # License
 
 Permission is granted to copy, distribute and/or modify this
