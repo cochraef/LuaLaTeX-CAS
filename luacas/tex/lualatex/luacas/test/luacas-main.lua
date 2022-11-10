@@ -1,8 +1,8 @@
 ---@diagnostic disable: lowercase-global
 -- Runs test code from test files.
 
-require("calculus._init")
-require("_lib.pepperfish")
+require("calculus.luacas-_init")
+require("_lib.luacas-pepperfish")
 
 -- Stuff required for the basic parser.
 local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT", abs = "ABS", fact="FACT"}
@@ -124,26 +124,26 @@ end
 -- profiler = newProfiler()
 -- profiler:start()
 
-require("test.calculus.derivatives")
-require("test.calculus.integrals")
+require("test.calculus.luacas-derivatives")
+require("test.calculus.luacas-integrals")
 
-require("test.expressions.autosimplify")
-require("test.expressions.collect")
-require("test.expressions.equations")
-require("test.expressions.simplify")
-require("test.expressions.functions")
-require("test.expressions.logarithms")
--- require("test.expressions.rationalexponent")
-require("test.expressions.substitute")
+require("test.expressions.luacas-autosimplify")
+require("test.expressions.luacas-collect")
+require("test.expressions.luacas-equations")
+require("test.expressions.luacas-simplify")
+require("test.expressions.luacas-functions")
+require("test.expressions.luacas-logarithms")
+-- require("test.expressions.luacas-rationalexponent")
+require("test.expressions.luacas-substitute")
 
-require("test.polynomials.polynomial")
-require("test.polynomials.partialfractions")
-require("test.polynomials.polynomialmod")
-require("test.polynomials.roots")
+require("test.polynomials.luacas-polynomial")
+require("test.polynomials.luacas-partialfractions")
+require("test.polynomials.luacas-polynomialmod")
+require("test.polynomials.luacas-roots")
 
-require("test.rings.conversion")
-require("test.rings.modulararithmetic")
-require("test.rings.number")
+require("test.rings.luacas-conversion")
+require("test.rings.luacas-modulararithmetic")
+require("test.rings.luacas-number")
 
 endall()
 

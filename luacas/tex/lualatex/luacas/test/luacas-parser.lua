@@ -2,7 +2,7 @@
 
 
 
-require("calculus._init")
+require("calculus.luacas-_init")
 
 -- Splits a string on a seperator.
 function split(str, sep)
