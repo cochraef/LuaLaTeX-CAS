@@ -1,7 +1,7 @@
 ---@diagnostic disable: lowercase-global
 -- Runs test code from test files.
 
-require("calculus.luacas-_init")
+require("calculus.luacas-calculus_init")
 require("_lib.luacas-pepperfish")
 
 -- Stuff required for the basic parser.

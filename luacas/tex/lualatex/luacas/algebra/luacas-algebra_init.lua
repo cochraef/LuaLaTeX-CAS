@@ -1,7 +1,7 @@
 -- Loads algebra files in the correct order.
 require("_lib.luacas-table")
 
-require("core.luacas-_init")
+require("core.luacas-core_init")
 
 require("algebra.luacas-ring")
 require("algebra.luacas-euclideandomain")
