@@ -258,13 +258,20 @@ function PolynomialRing:tolatex()
     end
     if self.ring == Rational.getring() or self.ring == Integer.getring() or self.ring == IntegerModN.getring() then
         if self.coefficients[loc] ~= Integer.one() then
-            out = out .. self.coefficients[loc]:tolatex() .. self.symbol
+            if self.coefficients[loc] == Integer(-1) then
+                out = out .. "-" .. self.symbol
+            elseif self.coefficients[loc] == Integer.zero() then
+                goto lead
+            else
+                out = out .. self.coefficients[loc]:tolatex() .. self.symbol
+            end
         else
             out = out .. self.symbol
         end
         if loc ~=1 then
             out = out .. "^{" .. loc .. "}"
         end
+        ::lead::
         loc = loc -1
         while loc >=0 do
             local coeff = self.coefficients[loc]
