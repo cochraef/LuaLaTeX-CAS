@@ -88,7 +88,15 @@ function Rational:new(n, d, keep)
     d = d or Integer.one()
     o.numerator = n
     o.denominator = d
-    o:reduce()
+    if not keep then
+        o:reduce()
+    end
+
+    if o.numerator:getring() == Integer.getring() then
+        o.ring = Integer.getring()
+    elseif o.numerator:getring() == PolynomialRing.getring() then
+        o.ring = Ring.resultantring(o.numerator:getring(), o.denominator:getring())
+    end
 
     if (not keep) and o.denominator == Integer.one() or (not keep) and o.numerator == Integer.zero() then
         return o.numerator
@@ -107,7 +115,6 @@ function Rational:reduce()
         local gcd = Integer.gcd(self.numerator, self.denominator)
         self.numerator = self.numerator//gcd
         self.denominator = self.denominator//gcd
-        self.ring = Integer.getring()
     elseif self.numerator:getring() == PolynomialRing.getring() then
         local lc = self.denominator:lc()
         self.denominator = self.denominator/lc
@@ -115,7 +122,6 @@ function Rational:reduce()
         local gcd = PolynomialRing.gcd(self.numerator, self.denominator)
         self.numerator = self.numerator//gcd
         self.denominator = self.denominator//gcd
-        self.ring = Ring.resultantring(self.numerator:getring(), self.denominator:getring())
     end
 end
 

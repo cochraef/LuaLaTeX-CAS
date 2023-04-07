@@ -321,3 +321,8 @@ function CASparse(input)
         print(err)
     end
 end
+
+a = Integer(6)
+b = Integer(10)
+d = Rational(a,b,true):autosimplify()
+print(d)
