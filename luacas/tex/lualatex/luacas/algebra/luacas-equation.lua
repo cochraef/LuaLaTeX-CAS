@@ -3,7 +3,7 @@
 --- @field lhs Expression
 --- @field rhs Expression
 Equation = {}
-__Equation = {}
+local __Equation = {}
 
 --------------------------
 -- Static functionality --

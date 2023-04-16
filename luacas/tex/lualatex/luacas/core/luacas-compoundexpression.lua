@@ -1,7 +1,7 @@
 --- @class CompoundExpression
 --- Interface for an expression consisting of one or more subexpressions.
 CompoundExpression = {}
-__CompoundExpression = {}
+local __CompoundExpression = {}
 
 ----------------------
 -- Instance methods --

@@ -10,7 +10,7 @@
 --- @field recursive boolean
 
 IntegralExpression = {}
-__IntegralExpression = {}
+local __IntegralExpression = {}
 
 
 --------------------------

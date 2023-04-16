@@ -3,7 +3,7 @@
 --- @field self table<number, number>
 --- @field sign number
 Integer = {}
-__Integer = {}
+local __Integer = {}
 
 --------------------------
 -- Static functionality --
@@ -138,9 +138,9 @@ end
 ----------------------------
 
 -- So we don't have to copy the Euclidean operations each time we create an integer.
-local __o = Copy(__EuclideanOperations)
-__o.__index = Integer
-__o.__tostring = function(a) -- Only works if the digit size is a power of 10
+__IntegerOperations = Copy(__EuclideanOperations)
+__IntegerOperations.__index = Integer
+__IntegerOperations.__tostring = function(a) -- Only works if the digit size is a power of 10
     local out = ""
     for i, digit in ipairs(a) do
         local pre = tostring(math.floor(digit))
@@ -156,7 +156,7 @@ __o.__tostring = function(a) -- Only works if the digit size is a power of 10
     end
     return out
 end
-__o.__div = function(a, b)   -- Constructor for a rational number disguised as division
+__IntegerOperations.__div = function(a, b)   -- Constructor for a rational number disguised as division
     if not b.getring then
         return BinaryOperation.DIVEXP({a, b})
     end
@@ -165,7 +165,7 @@ __o.__div = function(a, b)   -- Constructor for a rational number disguised as d
     end
     return __FieldOperations.__div(a, b)
 end
-__o.__concat = function(a, b) -- Like a decimal, but fancier. Used mainly for the parser with decimal numbers.
+__IntegerOperations.__concat = function(a, b) -- Like a decimal, but fancier. Used mainly for the parser with decimal numbers.
     return a + b / (Integer(10) ^ Integer.ceillog(b))
 end
 
@@ -174,7 +174,7 @@ end
 --- @return Integer
 function Integer:new(n)
     local o = {}
-    o = setmetatable(o, __o)
+    o = setmetatable(o, __IntegerOperations)
 
     if not n then
         o[1] = 0

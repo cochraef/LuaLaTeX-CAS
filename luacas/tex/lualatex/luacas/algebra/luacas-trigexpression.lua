@@ -3,7 +3,7 @@
 --- @field name string
 --- @field expression Expression
 TrigExpression = {}
-__TrigExpression = {}
+local __TrigExpression = {}
 
 ----------------------------
 -- Instance functionality --

@@ -4,7 +4,7 @@
 --- @field denominator Ring
 --- @field ring RingIdentifier
 Rational = {}
-__Rational = {}
+local __Rational = {}
 
 
 --------------------------
@@ -54,9 +54,9 @@ end
 ----------------------------
 
 -- So we don't have to copy the field operations each time.
-local __o = Copy(__FieldOperations)
-__o.__index = Rational
-__o.__tostring = function(a)
+__RationalOperations = Copy(__FieldOperations)
+__RationalOperations.__index = Rational
+__RationalOperations.__tostring = function(a)
     if a.ring.symbol then
         return "(" .. tostring(a.numerator)..")/("..tostring(a.denominator) .. ")"
     end
@@ -70,7 +70,7 @@ end
 --- @param keep boolean
 function Rational:new(n, d, keep)
     local o = {}
-    o = setmetatable(o, __o)
+    o = setmetatable(o, __RationalOperations)
 
     if n:getring() == PolynomialRing.getring() then
         o.symbol = n.symbol

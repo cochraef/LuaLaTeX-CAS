@@ -3,7 +3,7 @@
 --- Interface for a mathematical expression without any symbols.
 --- ConstantExpressions are AtomicExpressions by default, but individual classes may overwrite that inheritance.
 ConstantExpression = {}
-__ConstantExpression = {}
+local __ConstantExpression = {}
 
 ----------------------
 -- Instance methods --

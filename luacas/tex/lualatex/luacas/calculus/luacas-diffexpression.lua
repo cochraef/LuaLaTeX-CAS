@@ -4,7 +4,7 @@
 --- @field expression Expression
 
 DiffExpression = {}
-__DiffExpression = {}
+local __DiffExpression = {}
 
 ----------------------------
 -- Instance functionality --

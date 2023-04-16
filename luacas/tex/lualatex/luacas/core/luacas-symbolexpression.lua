@@ -3,7 +3,7 @@
 --- @field symbol string
 --- @alias Symbol SymbolExpression
 SymbolExpression = {}
-__SymbolExpression = {}
+local __SymbolExpression = {}
 
 ----------------------
 -- Instance methods --

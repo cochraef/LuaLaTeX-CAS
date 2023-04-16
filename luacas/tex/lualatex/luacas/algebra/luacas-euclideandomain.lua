@@ -1,7 +1,7 @@
 --- @class EuclideanDomain
 --- Interface for an element of a euclidean domain.
 EuclideanDomain = {}
-__EuclideanDomain = {}
+local __EuclideanDomain = {}
 
 ----------------------
 -- Required methods --

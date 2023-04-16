@@ -1,7 +1,7 @@
 --- @class AtomicExpression
 --- Interface for an atomic mathematical expression that has no sub-expressions.
 AtomicExpression = {}
-__AtomicExpression = {}
+local __AtomicExpression = {}
 
 
 ----------------------

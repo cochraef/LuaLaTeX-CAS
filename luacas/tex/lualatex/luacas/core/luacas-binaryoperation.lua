@@ -5,7 +5,7 @@
 --- @field operation function
 --- @field expressions table<number, Expression>
 BinaryOperation = {}
-__BinaryOperation = {}
+local __BinaryOperation = {}
 
 ----------------------------
 -- Instance functionality --

@@ -4,7 +4,7 @@
 --- @field base Expression
 --- @field expression Expression
 Logarithm = {}
-__Logarithm = {}
+local __Logarithm = {}
 
 ----------------------------
 -- Instance functionality --

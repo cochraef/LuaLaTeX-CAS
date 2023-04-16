@@ -1,7 +1,7 @@
 --- @class Field
 --- Interface for an element of a field.
 Field = {}
-__Field = {}
+local __Field = {}
 
 ----------------------
 -- Required methods --

@@ -1,8 +1,10 @@
 -- Rudimentary parser for making the CAS easier to use. Essentially just wraps SymbolExpression() around symbols and Integer() around integers.
 
 
-
-require("calculus.luacas-calculus_init")
+local luacas = require("luacas_init")
+luacas:initglobalmodule("core")
+luacas:initglobalmodule("algebra")
+luacas:initglobalmodule("calculus")
 
 -- Splits a string on a seperator.
 function split(str, sep)
@@ -321,8 +323,3 @@ function CASparse(input)
         print(err)
     end
 end
-
-a = Integer(6)
-b = Integer(10)
-d = Rational(a,b,true):autosimplify()
-print(d)

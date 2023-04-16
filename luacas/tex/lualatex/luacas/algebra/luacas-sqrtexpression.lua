@@ -2,7 +2,7 @@
 --- An expression that represents the positive real solution to x^n = a where n is a positive integer and a is constant.
 --- @field expression Expression
 SqrtExpression = {}
-__SqrtExpression = {}
+local __SqrtExpression = {}
 
 ----------------------------
 -- Instance functionality --

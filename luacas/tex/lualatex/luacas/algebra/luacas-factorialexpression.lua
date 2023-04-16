@@ -2,7 +2,7 @@
 --- The factorial of an expression.
 --- @field expression Expression
 FactorialExpression = {}
-__FactorialExpression = {}
+local __FactorialExpression = {}
 
 ----------------------------
 -- Instance functionality --

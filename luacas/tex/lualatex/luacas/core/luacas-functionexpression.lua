@@ -6,7 +6,7 @@
 --- @field variables table<number,SymbolExpression>
 --- @alias Function FunctionExpression
 FunctionExpression = {}
-__FunctionExpression = {}
+local __FunctionExpression = {}
 
 ----------------------------
 -- Instance functionality --

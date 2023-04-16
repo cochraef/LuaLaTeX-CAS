@@ -2,7 +2,7 @@
 --- The absolute value of an expression.
 --- @field expression Expression
 AbsExpression = {}
-__AbsExpression = {}
+local __AbsExpression = {}
 
 ----------------------------
 -- Instance functionality --

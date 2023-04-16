@@ -1,8 +1,12 @@
 ---@diagnostic disable: lowercase-global
 -- Runs test code from test files.
 
-require("calculus.luacas-calculus_init")
 require("_lib.luacas-pepperfish")
+
+local luacas = require("luacas_init")
+luacas:initglobalmodule("core")
+luacas:initglobalmodule("algebra")
+luacas:initglobalmodule("calculus")
 
 -- Stuff required for the basic parser.
 local constants = {e="E", pi = "PI", ln = "LN", log = "LOG", Integer = "Integer", DD = "DD", int = "INT", abs = "ABS", fact="FACT"}

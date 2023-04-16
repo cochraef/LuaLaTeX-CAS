@@ -4,7 +4,7 @@
 --- @field modulus Integer
 
 IntegerModN = {}
-__IntegerModN = {}
+local __IntegerModN = {}
 
 -- Metatable for ring objects.
 local __obj = {__index = IntegerModN, __eq = function(a, b)
@@ -37,11 +37,10 @@ end
 ----------------------------
 
 -- So we don't have to copy the field operations each time
-local __o
-__o = Copy(__FieldOperations)
+__IntegerModNOperations = Copy(__FieldOperations)
 
-__o.__index = IntegerModN
-__o.__tostring = function(a)
+__IntegerModNOperations.__index = IntegerModN
+__IntegerModNOperations.__tostring = function(a)
     return tostring(a.element)
 end
 
@@ -56,7 +55,7 @@ function IntegerModN:new(i, n)
         error("Argument error: modulus must be an integer greater than 0.")
     end
 
-    o = setmetatable(o, __o)
+    o = setmetatable(o, __IntegerModNOperations)
 
     if i < Integer.zero() or i >= n then
         i = i % n

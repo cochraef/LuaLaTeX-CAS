@@ -4,7 +4,7 @@
 --- @field symbol SymbolExpression
 --- @field ring RingIdentifier
 PolynomialRing = {}
-__PolynomialRing = {}
+local __PolynomialRing = {}
 
 -- Metatable for ring objects.
 local __obj = {__index = PolynomialRing, __eq = function(a, b)
@@ -214,9 +214,9 @@ end
 ----------------------------
 
 -- So we don't have to copy the Euclidean operations each time
-local __o = Copy(__EuclideanOperations)
-__o.__index = PolynomialRing
-__o.__tostring = function(a)
+__PolynomialOperations = Copy(__EuclideanOperations)
+__PolynomialOperations.__index = PolynomialRing
+__PolynomialOperations.__tostring = function(a)
     local out = ""
     local loc = a.degree:asnumber()
     while loc >= 0 do
@@ -229,7 +229,7 @@ __o.__tostring = function(a)
     end
     return string.sub(out, 1, string.len(out) - 1)
 end
-__o.__div = function(a, b)
+__PolynomialOperations.__div = function(a, b)
     if not b.getring then
         return BinaryOperation.DIVEXP({a, b})
     end
@@ -337,7 +337,7 @@ end
 -- Creates a new polynomial ring given an array of coefficients and a symbol
 function PolynomialRing:new(coefficients, symbol, degree)
     local o = {}
-    o = setmetatable(o, __o)
+    o = setmetatable(o, __PolynomialOperations)
 
     if type(coefficients) ~= "table" then
         error("Sent parameter of wrong type: Coefficients must be in an array")

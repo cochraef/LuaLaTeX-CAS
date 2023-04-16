@@ -2,7 +2,7 @@
 --- An expression that represents the solutions to expression = 0.
 --- @field expression Expression
 RootExpression = {}
-__RootExpression = {}
+local __RootExpression = {}
 
 ----------------------------
 -- Instance functionality --

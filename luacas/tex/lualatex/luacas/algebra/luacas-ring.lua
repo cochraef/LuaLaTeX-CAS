@@ -1,7 +1,7 @@
 --- @class Ring
 --- Interface for an element of a ring with unity.
 Ring = {}
-__Ring = {}
+local __Ring = {}
 
 --------------------------
 -- Static functionality --

@@ -3,7 +3,7 @@
 --- @field symbol SymbolExpression
 --- @field expression Expression
 DerivativeExpression = {}
-__DerivativeExpression = {}
+local __DerivativeExpression = {}
 
 ----------------------------
 -- Instance functionality --
