@@ -170,6 +170,12 @@ function luacas:initmodule(mod)
         return nil
     end
 
+    -- FIXME: This is a special case, since the algebra module is dependent on the core module and vice versa,
+    -- but our initialization scheme does not allow for circular dependencies.
+    if mod == "core" then
+        self:initmodule("algebra")
+    end
+
     -- Since other modules require globals from their dependencies, we only remove global variables after all modules have been initalized
     local G = self:saveglobalstate()
     self:_initmodulerec(mod)
@@ -202,39 +208,50 @@ function luacas:_initmodulerec(mod)
         end
 
         -- Sets the environment for each method of each class to include all dependent classes of this class.
-        local realenv = luacas:saveglobalstate()
-        for _, class in pairs(self[mod]) do
-            -- print(_)
-            for _, func in pairs(class) do
-                -- print("    ", _)
-                if type(func) == "function" then
-                    --- Functions only have an _ENV upvalue if they have a global variable, so this should work
-                    local _envloc = debug.findupvalue(func, "_ENV")
-                    if _envloc then
-                        debug.upvaluejoin(func, debug.findupvalue(func, "_ENV"), function () return realenv end, 1)
-                    end
-                end
-            end
-
-            -- local meta = getmetatable(class)
-            -- if meta then
-            --     for _, func in pairs(meta) do
-            --         print("    ", _)
-            --         if type(func) == "function" then
-            --             --- Functions only have an _ENV upvalue if they have a global variable, so this should work
-            --             local _envloc = debug.findupvalue(func, "_ENV")
-            --             if _envloc then
-            --                 debug.upvaluejoin(func, debug.findupvalue(func, "_ENV"), function () return realenv end, 1)
-            --             end
-            --         end
-            --     end
-            -- end
+        self:setmoduleenvironment(mod)
+        -- FIXME: This is a special case, since the algebra module is dependent on the core module and vice versa,
+        -- but our initialization scheme does not allow for circular dependencies.
+        if mod == "algebra" then
+            self:setmoduleenvironment("core")
         end
 
         -- Adds fields to module tables
         for _, class in ipairs(self:modulefields(mod)) do
             self[mod][class] = _G[class]
         end
+    end
+end
+
+--- Sets the environment for each method of each class in a module to the current global environment, so it can keep using global variables when reset.
+--- @param mod string
+function luacas:setmoduleenvironment(mod)
+    local realenv = self:saveglobalstate()
+    for _, class in pairs(self[mod]) do
+        -- print(_)
+        for _, func in pairs(class) do
+            -- print("    ", _)
+            if type(func) == "function" then
+                --- Functions only have an _ENV upvalue if they have a global variable, so this should work
+                local _envloc = debug.findupvalue(func, "_ENV")
+                if _envloc then
+                    debug.upvaluejoin(func, debug.findupvalue(func, "_ENV"), function () return realenv end, 1)
+                end
+            end
+        end
+
+        -- local meta = getmetatable(class)
+        -- if meta then
+        --     for _, func in pairs(meta) do
+        --         print("    ", _)
+        --         if type(func) == "function" then
+        --             --- Functions only have an _ENV upvalue if they have a global variable, so this should work
+        --             local _envloc = debug.findupvalue(func, "_ENV")
+        --             if _envloc then
+        --                 debug.upvaluejoin(func, debug.findupvalue(func, "_ENV"), function () return realenv end, 1)
+        --             end
+        --         end
+        --     end
+        -- end
     end
 end
 
