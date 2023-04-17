@@ -170,7 +170,7 @@ function luacas:initmodule(mod)
         return nil
     end
 
-    -- FIXME: This is a special case, since the algebra module is dependent on the core module and vice versa,
+    -- TODO: This is a special case, since the algebra module is dependent on the core module and vice versa,
     -- but our initialization scheme does not allow for circular dependencies.
     if mod == "core" then
         self:initmodule("algebra")
@@ -209,7 +209,7 @@ function luacas:_initmodulerec(mod)
 
         -- Sets the environment for each method of each class to include all dependent classes of this class.
         self:setmoduleenvironment(mod)
-        -- FIXME: This is a special case, since the algebra module is dependent on the core module and vice versa,
+        -- TODO: This is a special case, since the algebra module is dependent on the core module and vice versa,
         -- but our initialization scheme does not allow for circular dependencies.
         if mod == "algebra" then
             self:setmoduleenvironment("core")
