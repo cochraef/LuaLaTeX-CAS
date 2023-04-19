@@ -23,7 +23,7 @@ This package is authored and maintained by Evan Cochrane and Timothy All.
 
 # Bug Reporting
 
-Bug reports with the documentation or bugs related to the LaTeX end should go in this repository, while bug reports related to the CAS should go in [https://github.com/cochraef/LuaCAS](https://github.com/cochraef/LuaCAS). There is no required format for bugs, but it should be clear how to replicate the bug and what you think the intended functionality should be.
+Bugs can be reported in the issues tab in the Github repository for this repo. There is no required format for bugs, but it should be clear how to replicate the bug and what you think the intended functionality should be.
 
 # License
 
