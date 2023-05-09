@@ -90,6 +90,9 @@ end
 --- @return Integer
 function Integer.ceillog(a, base)
     base = base or Integer(10)
+    if a == Integer.one() then 
+        return Integer.one()
+    end
     local k = Integer.zero()
 
     while (base ^ k) < a do
