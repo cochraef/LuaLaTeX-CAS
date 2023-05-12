@@ -307,7 +307,7 @@ function CASparse(input)
     -- Replaces each instance of a decimal with .., so we can use integer metatables to convert it into a rational properly.
     str = string.gsub(str, "Integer%('[0-9]+'%)%.Integer%('[0-9]+'%)", function (s)
         local ints = split(s, "%.")
-        return ints[1] .. ".." .. ints[2]
+        return "("..ints[1] .. ".." .. ints[2] .. ")"
     end)
     str = string.gsub(str, ".?%.Integer%('[0-9]+'%)", function (s)
         if string.sub(s, 1, 2) == ".." then
