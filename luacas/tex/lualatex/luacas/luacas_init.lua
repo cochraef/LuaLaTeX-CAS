@@ -169,6 +169,11 @@ function luacas:initmodule(mod)
     if not self.moduleinfo[mod] then
         return nil
     end
+    
+    if (not debug) or (not debug.upvaluejoin) or (not debug.getupvalue) then
+        error("Lua debug library functions are not avaliable. Please use luacas:initglobalmodule(mod) instead.")
+        return nil
+    end
 
     -- TODO: This is a special case, since the algebra module is dependent on the core module and vice versa,
     -- but our initialization scheme does not allow for circular dependencies.
